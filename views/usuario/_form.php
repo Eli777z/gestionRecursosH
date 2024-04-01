@@ -16,7 +16,11 @@ use yii\bootstrap4\ActiveForm;
 
     <?= $form->field($model, 'password')->passwordInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'status')->textInput() ?>
+    <?= $form->field($model, 'status')->dropDownList([
+     10 => 'Activo',
+   0 => 'Inactivo',
+  
+]) ?>
 
     <?= $form->field($model, 'rol')->textInput() ?>
 

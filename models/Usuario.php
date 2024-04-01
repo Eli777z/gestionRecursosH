@@ -15,8 +15,7 @@ use Yii;
  */
 class Usuario extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 {
-
-    
+    const SCENARIO_CREATE = 'create';
     /**
      * {@inheritdoc}
      */
@@ -31,9 +30,11 @@ class Usuario extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public function rules()
     {
         return [
-            [['username', 'password', 'status', 'rol'], 'required'],
+            [['username','status', 'rol'], 'required'],
             [['status', 'rol'], 'integer'],
-            [['username', 'password'], 'string', 'max' => 255],
+            [['username'], 'string', 'max' => 30],
+            [['password'], 'string', 'max' => 64],
+            [['username', 'password', 'status'], 'required', 'on'=> self:: SCENARIO_CREATE],
         ];
     }
 

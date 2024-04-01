@@ -44,8 +44,6 @@ class UsuarioController extends Controller
         ]);
     }
 
-   
-
     /**
      * Displays a single Usuario model.
      * @param int $id ID
@@ -67,7 +65,7 @@ class UsuarioController extends Controller
     public function actionCreate()
     {
         $model = new Usuario();
-
+        $model->scenario = Usuario:: SCENARIO_CREATE;
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             
             $hash =  Yii::$app->security->generatePasswordHash($model->password);
@@ -99,35 +97,34 @@ class UsuarioController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-  
-    $previous_photo = $model->photo;   
-    if ($this->request->isPost && $model->load($this->request->post())) {
-      //  $upload = UploadedFile::getInstance($model, 'photo');   
-      //  if(is_object($upload)){
-        //    $upload_filename = 'uploads/user_profile/' . $upload->baseName . '.' . $upload->extension;
-          //  $upload->saveAs($upload_filename);
-           // $model->photo = $upload_filename;   
-       // }else{
-         //   $model->photo = $previous_photo;                    
-        //}
-        
-        if (!empty($model->password)) {
-            $hash = Yii::$app->security->generatePasswordHash($model->password);
-            $model->password = $hash;
-        } else {
-           
-            $model->password = $model->getOldAttribute('password');
-        }
 
-        if ($model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+       // $previous_photo = $model->photo;   
+        if ($this->request->isPost && $model->load($this->request->post())) {
+          //  $upload = UploadedFile::getInstance($model, 'photo');   
+          //  if(is_object($upload)){
+            //    $upload_filename = 'uploads/user_profile/' . $upload->baseName . '.' . $upload->extension;
+              //  $upload->saveAs($upload_filename);
+               // $model->photo = $upload_filename;   
+           // }else{
+             //   $model->photo = $previous_photo;                    
+            //}
+            
+            if (!empty($model->password)) {
+                $hash = Yii::$app->security->generatePasswordHash($model->password);
+                $model->password = $hash;
+            } else {
+               
+                $model->password = $model->getOldAttribute('password');
+            }
+    
+            if ($model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
-    }
- $model->password='';
-    return $this->render('update', [
-        'model' => $model,
-       
-    ]);
+     $model->password='';
+        return $this->render('update', [
+            'model' => $model,
+        ]);
     }
 
     /**

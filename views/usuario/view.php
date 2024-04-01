@@ -32,8 +32,13 @@ $this->params['breadcrumbs'][] = $this->title;
                         'attributes' => [
                             'id',
                             'username',
-                            'password',
-                            'status',
+                           // 'password',
+                           [
+                            'attribute' => 'status',
+                            'value' => function ($model) {
+                                return $model->status == 0 ? 'Inactivo' : 'Activo';
+                            },
+                        ],
                             'rol',
                         ],
                     ]) ?>
