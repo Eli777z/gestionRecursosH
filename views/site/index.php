@@ -1,5 +1,5 @@
 <?php
-$this->title = 'Starter Page';
+$this->title = 'PAGINA DE INICIO';
 $this->params['breadcrumbs'] = [['label' => $this->title]];
 ?>
 <div class="container-fluid">
