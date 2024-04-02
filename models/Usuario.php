@@ -15,6 +15,8 @@ use Yii;
  */
 class Usuario extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 {
+ 
+   
     const SCENARIO_CREATE = 'create';
     /**
      * {@inheritdoc}
@@ -37,7 +39,7 @@ class Usuario extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
             [['username', 'password', 'status'], 'required', 'on'=> self:: SCENARIO_CREATE],
         ];
     }
-
+ 
     /**
      * {@inheritdoc}
      */
@@ -51,6 +53,23 @@ class Usuario extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
             'rol' => 'Rol',
         ];
     }
+   // public $rol;
+
+   public static function isUserAdmin($id)
+   {
+       $user = self::findOne(['id' => $id, 'status' => '10']);
+       return $user !== null && $user->rol === 2;
+   }
+
+   public static function isUserSimple($id)
+   {
+       $user = self::findOne(['id' => $id, 'status' => '10']);
+       return $user !== null && $user->rol === 1;
+   }
+
+
+
+
       //Este lo pide pero lo dejamos como null por que no lo usamos por el momento
       public function getAuthKey() {
         return null;

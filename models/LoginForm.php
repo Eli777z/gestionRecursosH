@@ -51,7 +51,7 @@ class LoginForm extends Model
 
             if(!$user || $user->status === 0 ){
                
-               $this->addError($attribute, 'inactivo');
+               $this->addError($attribute, 'Usuario inactivo');
               
            }
            else

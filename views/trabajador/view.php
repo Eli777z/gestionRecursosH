@@ -4,10 +4,10 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\Usuario */
+/* @var $model app\models\Trabajador */
 
 $this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Usuarios', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Trabajadors', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
@@ -18,8 +18,8 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="row">
                 <div class="col-md-12">
                     <p>
-                        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-                        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
+                        <?= Html::a('Update', ['update', 'id' => $model->id, 'idusuario' => $model->idusuario], ['class' => 'btn btn-primary']) ?>
+                        <?= Html::a('Delete', ['delete', 'id' => $model->id, 'idusuario' => $model->idusuario], [
                             'class' => 'btn btn-danger',
                             'data' => [
                                 'confirm' => 'Are you sure you want to delete this item?',
@@ -31,21 +31,15 @@ $this->params['breadcrumbs'][] = $this->title;
                         'model' => $model,
                         'attributes' => [
                             'id',
-                            'username',
-                           // 'password',
-                           [
-                            'attribute' => 'status',
-                            'value' => function ($model) {
-                                return $model->status == 0 ? 'Inactivo' : 'Activo';
-                            },
-                        ],
-                            //'rol',
-                            [
-                                'attribute' => 'rol',
-                                'value' => function ($model) {
-                                    return $model->rol == 1 ? 'Trabajador' : 'Gestor de recursos humanos';
-                                },
-                            ],
+                            'nombre',
+                            'apellido',
+                            'fecha_nacimiento',
+                            'codigo_postal',
+                            'calle',
+                            'numero_casa',
+                            'colonia',
+                            'foto',
+                            'idusuario',
                         ],
                     ]) ?>
                 </div>

@@ -22,7 +22,13 @@ use yii\bootstrap4\ActiveForm;
   
 ]) ?>
 
-    <?= $form->field($model, 'rol')->textInput() ?>
+  
+    <?= $form->field($model, 'rol')->dropDownList([
+    1 => 'Trabajador',
+ 2 => 'Gestor de recursos humanos',
+   
+  
+]) ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

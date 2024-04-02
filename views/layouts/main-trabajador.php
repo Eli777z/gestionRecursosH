@@ -1,34 +1,13 @@
 <?php
-use app\models\Usuario;
+
 /* @var $this \yii\web\View */
 /* @var $content string */
 
 use yii\helpers\Html;
-if(Yii:: $app->controller->action->id === 'portaltrabajador'){
-    echo $this-> render(
-    'main-trabajador',
-    ['content' => $content]
-    );
-    
-    }
-
-   elseif(Yii:: $app->controller->action->id === 'login'){
-        echo $this-> render(
-        'main-login',
-        ['content' => $content]
-        );
-        
-        }
-        elseif(Yii:: $app->controller->action->id === 'error'){
-            echo $this-> render(
-            'main-error',
-            ['content' => $content]
-            );
-            
-            }
 
 
-    else{
+
+
 \hail812\adminlte3\assets\FontAwesomeAsset::register($this);
 \hail812\adminlte3\assets\AdminLteAsset::register($this);
 $this->registerCssFile('https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback');
@@ -52,15 +31,13 @@ $this->registerJsFile($publishedRes[1].'/control_sidebar.js', ['depends' => '\ha
 <body class="hold-transition sidebar-mini">
 <?php $this->beginBody() ?>
 
-
-
 <div class="wrapper">
     <!-- Navbar -->
     <?= $this->render('navbar', ['assetDir' => $assetDir]) ?>
     <!-- /.navbar -->
 
     <!-- Main Sidebar Container -->
-    <?= $this->render('sidebar', ['assetDir' => $assetDir]) ?>
+    <?= $this->render('sidebarTrabajador', ['assetDir' => $assetDir]) ?>
 
     <!-- Content Wrapper. Contains page content -->
     <?= $this->render('content', ['content' => $content, 'assetDir' => $assetDir]) ?>
@@ -78,4 +55,4 @@ $this->registerJsFile($publishedRes[1].'/control_sidebar.js', ['depends' => '\ha
 </body>
 </html>
 <?php $this->endPage() ?>
-<?php }?>
+<?php ?>

@@ -9,6 +9,8 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+//use app\models\User;
+use app\models\Usuario;
 
 class SiteController extends Controller
 {
@@ -20,15 +22,40 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::class,
-                'only' => ['logout'],
+                'only' => ['logout', 'user', 'admin'],
                 'rules' => [
                     [
-                        'actions' => ['logout'],
+                        //El administrador tiene permisos sobre las siguientes acciones
+                        'actions' => ['logout', 'admin'],
+                        //Esta propiedad establece que tiene permisos
                         'allow' => true,
+                        //Usuarios autenticados, el signo ? es para invitados
                         'roles' => ['@'],
+                        //Este método nos permite crear un filtro sobre la identidad del usuario
+                        //y así establecer si tiene permisos o no
+                        'matchCallback' => function ($rule, $action) {
+                            //Llamada al método que comprueba si es un administrador
+                            return Usuario::isUserAdmin(Yii::$app->user->identity->id);
+                        },
                     ],
+                    [
+                       //Los usuarios simples tienen permisos sobre las siguientes acciones
+                       'actions' => ['logout', 'user'],
+                       //Esta propiedad establece que tiene permisos
+                       'allow' => true,
+                       //Usuarios autenticados, el signo ? es para invitados
+                       'roles' => ['@'],
+                       //Este método nos permite crear un filtro sobre la identidad del usuario
+                       //y así establecer si tiene permisos o no
+                       'matchCallback' => function ($rule, $action) {
+                          //Llamada al método que comprueba si es un usuario simple
+                          return Usuario::isUserSimple(Yii::$app->user->identity->id);
+                      },
+                   ],
                 ],
             ],
+     //Controla el modo en que se accede a las acciones, en este ejemplo a la acción logout
+     //sólo se puede acceder a través del método post
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
@@ -72,22 +99,34 @@ class SiteController extends Controller
     public function actionLogin()
     {
         if (!Yii::$app->user->isGuest) {
-            return $this->goHome();
+            // Si el usuario ya está autenticado, redirige según su rol
+            $userId = Yii::$app->user->identity->id;
+            if (Usuario::isUserAdmin($userId)) {
+                return $this->redirect(["site/portalgestionrh"]);
+            } else {
+                return $this->redirect(["site/portaltrabajador"]);
+            }
         }
-
+    
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            if($model->login()){ // Si se logea con éxito                                 
-                return $this->redirect(['/site']);
-            }     
-            return $this->goBack();
+            // Si el inicio de sesión es exitoso, redirige según el rol
+            $userId = Yii::$app->user->identity->id;
+            if (Usuario::isUserAdmin($userId)) {
+                return $this->redirect(["site/portalgestionrh"]);
+            } else {
+                return $this->redirect(["site/portaltrabajador"]);
+            }
+        } else {
+            // Si hay errores en el inicio de sesión, muestra la vista de login
+            $model->password = '';
+            return $this->render('login', [
+                'model' => $model,
+            ]);
         }
-
-        $model->password = '';
-        return $this->render('login', [
-            'model' => $model,
-        ]);
     }
+    
+    
 
     /**
      * Logout action.
@@ -128,4 +167,15 @@ class SiteController extends Controller
     {
         return $this->render('about');
     }
+    public function actionPortalgestionrh()
+    {
+        return $this->render('portalgestionrh');
+    }
+    
+    public function actionPortaltrabajador()
+    {
+        return $this->render('portaltrabajador');
+    }
+    
+
 }

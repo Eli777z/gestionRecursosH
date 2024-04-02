@@ -8,10 +8,17 @@ use Yii;
  * This is the model class for table "trabajador".
  *
  * @property int $id
- * @property string $username
- * @property string $password
- * @property int $status
- * @property int $rol
+ * @property string $nombre
+ * @property string $apellido
+ * @property string $fecha_nacimiento
+ * @property int $codigo_postal
+ * @property string $calle
+ * @property int $numero_casa
+ * @property string $colonia
+ * @property string $foto
+ * @property int $idusuario
+ *
+ * @property Usuario $idusuario0
  */
 class Trabajador extends \yii\db\ActiveRecord
 {
@@ -29,9 +36,15 @@ class Trabajador extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['username', 'password', 'status', 'rol'], 'required'],
-            [['status', 'rol'], 'integer'],
-            [['username', 'password'], 'string', 'max' => 255],
+            [['nombre', 'apellido', 'fecha_nacimiento', 'codigo_postal', 'calle', 'numero_casa', 'colonia', 'foto', 'idusuario'], 'required'],
+            [['fecha_nacimiento'], 'safe'],
+            [['codigo_postal', 'numero_casa', 'idusuario'], 'integer'],
+            [['nombre'], 'string', 'max' => 30],
+            [['apellido'], 'string', 'max' => 60],
+            [['calle'], 'string', 'max' => 85],
+            [['colonia'], 'string', 'max' => 35],
+            [['foto'], 'string', 'max' => 100],
+            [['idusuario'], 'exist', 'skipOnError' => true, 'targetClass' => Usuario::class, 'targetAttribute' => ['idusuario' => 'id']],
         ];
     }
 
@@ -42,10 +55,25 @@ class Trabajador extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'username' => 'Username',
-            'password' => 'Password',
-            'status' => 'Status',
-            'rol' => 'Rol',
+            'nombre' => 'Nombre',
+            'apellido' => 'Apellido',
+            'fecha_nacimiento' => 'Fecha Nacimiento',
+            'codigo_postal' => 'Codigo Postal',
+            'calle' => 'Calle',
+            'numero_casa' => 'Numero Casa',
+            'colonia' => 'Colonia',
+            'foto' => 'Foto',
+            'idusuario' => 'Idusuario',
         ];
+    }
+
+    /**
+     * Gets query for [[Idusuario0]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getIdusuario0()
+    {
+        return $this->hasOne(Usuario::class, ['id' => 'idusuario']);
     }
 }

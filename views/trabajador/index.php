@@ -4,10 +4,10 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\UsuarioSearch */
+/* @var $searchModel app\models\TrabajadorSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Usuarios';
+$this->title = 'Trabajador';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="container-fluid">
@@ -17,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="card-body">
                     <div class="row mb-2">
                         <div class="col-md-12">
-                            <?= Html::a('Create Usuario', ['create'], ['class' => 'btn btn-success']) ?>
+                            <?= Html::a('Create Trabajador', ['create'], ['class' => 'btn btn-success']) ?>
                         </div>
                     </div>
 
@@ -32,21 +32,15 @@ $this->params['breadcrumbs'][] = $this->title;
                             ['class' => 'yii\grid\SerialColumn'],
 
                             'id',
-                            'username',
-                          //  'password',
-                          [
-                            'attribute' => 'status',
-                            'value' => function ($model) {
-                                return $model->status == 0 ? 'Inactivo' : 'Activo';
-                            },
-                        ],
-                           // 'rol',
-                            [
-                                'attribute' => 'rol',
-                                'value' => function ($model) {
-                                    return $model->rol == 2 ? 'Gestor de recursos humanos' : 'Trabajador';
-                                },
-                            ],
+                            'nombre',
+                            'apellido',
+                            'fecha_nacimiento',
+                            'codigo_postal',
+                            //'calle',
+                            //'numero_casa',
+                            //'colonia',
+                            //'foto',
+                            //'idusuario',
 
                             ['class' => 'hail812\adminlte3\yii\grid\ActionColumn'],
                         ],
