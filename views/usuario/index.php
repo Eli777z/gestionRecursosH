@@ -33,21 +33,21 @@ $this->params['breadcrumbs'][] = $this->title;
 
                             'id',
                             'username',
-                          //  'password',
-                          [
-                            'attribute' => 'status',
-                            'value' => function ($model) {
-                                return $model->status == 0 ? 'Inactivo' : 'Activo';
-                            },
-                        ],
-                           // 'rol',
-                            [
-                                'attribute' => 'rol',
+                               //  'password',
+                               [
+                                'attribute' => 'status',
                                 'value' => function ($model) {
-                                    return $model->rol == 2 ? 'Gestor de recursos humanos' : 'Trabajador';
+                                    return $model->status == 0 ? 'Inactivo' : 'Activo';
                                 },
                             ],
-
+                               // 'rol',
+                                [
+                                    'attribute' => 'rol',
+                                    'value' => function ($model) {
+                                        return $model->rol == 2 ? 'Gestor de recursos humanos' : 'Trabajador';
+                                    },
+                                ],
+    
                             ['class' => 'hail812\adminlte3\yii\grid\ActionColumn'],
                         ],
                         'summaryOptions' => ['class' => 'summary mb-2'],

@@ -4,10 +4,12 @@ namespace app\controllers;
 
 use Yii;
 use app\models\Trabajador;
+use app\models\Usuario;
 use app\models\TrabajadorSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\db\Exception;
 
 /**
  * TrabajadorController implements the CRUD actions for Trabajador model.
@@ -75,6 +77,7 @@ class TrabajadorController extends Controller
             'model' => $model,
         ]);
     }
+    
 
     /**
      * Updates an existing Trabajador model.
@@ -107,10 +110,33 @@ class TrabajadorController extends Controller
      */
     public function actionDelete($id, $idusuario)
     {
-        $this->findModel($id, $idusuario)->delete();
-
-        return $this->redirect(['index']);
+        $trabajador = $this->findModel($id, $idusuario);
+    
+    // Obtén el ID del usuario asociado al trabajador
+    $idUsuario = $trabajador->idusuario;
+    
+    // Elimina tanto el trabajador como su usuario asociado
+    $transaction = Yii::$app->db->beginTransaction();
+    
+    try {
+        // Primero elimina el trabajador
+        $trabajador->delete();
+        
+        // Luego elimina su usuario asociado
+        Usuario::findOne($idUsuario)->delete();
+        
+        $transaction->commit();
+        
+        Yii::$app->session->setFlash('success', 'Trabajador eliminado exitosamente.');
+    } catch (Exception $e) {
+        $transaction->rollBack();
+        
+        Yii::$app->session->setFlash('error', 'Error al eliminar el trabajadory su usuario.');
     }
+    
+    return $this->redirect(['index']);
+    }
+
 
     /**
      * Finds the Trabajador model based on its primary key value.

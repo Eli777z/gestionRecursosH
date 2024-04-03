@@ -16,7 +16,18 @@ use yii\bootstrap4\ActiveForm;
 
     <?= $form->field($model, 'apellido')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'fecha_nacimiento')->textInput() ?>
+    <?= $form->field($model, 'fecha_nacimiento')->widget(\yii\jui\DatePicker::className(), [
+    'language' => 'es', // Asegúrate de establecer el idioma adecuado
+    'dateFormat' => 'php:Y-m-d', // Formato de la fecha
+    'options' => ['class' => 'form-control'], // Clase CSS para el estilo
+    'clientOptions' => [
+        
+        'changeYear' => true, // Permite cambiar el año
+        'changeMonth' => true, // Permite cambiar el mes
+        'yearRange' => '-100:+0', // Rango de años disponibles
+    ],
+]) ?>
+    
 
     <?= $form->field($model, 'codigo_postal')->textInput() ?>
 
@@ -26,7 +37,7 @@ use yii\bootstrap4\ActiveForm;
 
     <?= $form->field($model, 'colonia')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'foto')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'foto')->fileInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'idusuario')->textInput() ?>
 

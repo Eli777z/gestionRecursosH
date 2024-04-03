@@ -71,6 +71,19 @@ $config = [
             'rules' => [
             ],
         ],
+        'assetManager' => [
+
+            'bundles' => [
+
+                'yii\jui\JuiAsset' => [
+
+                    'css' => ['themes/redmond/jquery-ui.css'],
+
+                ]
+
+            ]
+
+        ],
         
     ],
     'params' => $params,
@@ -81,8 +94,12 @@ $config = [
             'site/logout',
             'gii/*', 
             'admin/*',
-            'usuario',
+            'usuario/*',
             'trabajador/*',
+            'departamento/*',
+            'infolaboral/*',
+            //'infolaboral/*',
+
             'some-controller/some-action',
             // The actions listed here will be allowed to everyone including guests.
             // So, 'admin/*' should not appear here in the production, of course.

@@ -45,7 +45,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'value' => function ($model) {
                                     return $model->rol == 1 ? 'Trabajador' : 'Gestor de recursos humanos';
                                 },
-                            ],
+                            ],        
                         ],
                     ]) ?>
                 </div>

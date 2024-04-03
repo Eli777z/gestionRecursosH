@@ -39,7 +39,7 @@ use yii\helpers\Html;
                 'items' => [
                     ['label' => 'Inicio', 'icon' => 'home', 'url' => ['site/portalgestionrh']],
 
-                    ['label' => 'Trabajadores', 'icon' => 'user', 'url' => ['usuario/index']],
+                    ['label' => 'Trabajadores', 'icon' => 'user', 'url' => ['trabajador0/index']],
                     ['label' => 'Gii',  'icon' => 'file-code', 'url' => ['/gii'], 'target' => '_blank'],
 
                     ['label' => 'MULTI LEVEL EXAMPLE', 'header' => true],

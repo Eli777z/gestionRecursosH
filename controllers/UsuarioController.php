@@ -86,7 +86,6 @@ class UsuarioController extends Controller
             'model' => $model,
         ]);
     }
-
     /**
      * Updates an existing Usuario model.
      * If update is successful, the browser will be redirected to the 'view' page.

@@ -12,11 +12,11 @@ use Yii;
  * @property string $password
  * @property int $status
  * @property int $rol
+ *
+ * @property Trabajador[] $trabajadors
  */
-class Usuario extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
+class Usuario extends  \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 {
- 
-   
     const SCENARIO_CREATE = 'create';
     /**
      * {@inheritdoc}
@@ -39,7 +39,7 @@ class Usuario extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
             [['username', 'password', 'status'], 'required', 'on'=> self:: SCENARIO_CREATE],
         ];
     }
- 
+
     /**
      * {@inheritdoc}
      */
@@ -53,55 +53,63 @@ class Usuario extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
             'rol' => 'Rol',
         ];
     }
-   // public $rol;
-
-   public static function isUserAdmin($id)
-   {
-       $user = self::findOne(['id' => $id, 'status' => '10']);
-       return $user !== null && $user->rol === 2;
-   }
-
-   public static function isUserSimple($id)
-   {
-       $user = self::findOne(['id' => $id, 'status' => '10']);
-       return $user !== null && $user->rol === 1;
-   }
-
-
-
-
-      //Este lo pide pero lo dejamos como null por que no lo usamos por el momento
-      public function getAuthKey() {
-        return null;
-       //return $this->auth_key;
-    }    
-    
-    // interface
-    public function validateAuthKey($authKey) {
-        return $this->getAuthKey() == $authKey;
+    public static function isUserAdmin($id)
+    {
+        $user = self::findOne(['id' => $id, 'status' => '10']);
+        return $user !== null && $user->rol === 2;
     }
-    
-    // interface
-    public static function findIdentityByAccessToken($token, $type = null) {
-        throw new \yii\base\NotSupportedException("'findIdentityByAccessToken' is not implemented");
+ 
+    public static function isUserSimple($id)
+    {
+        $user = self::findOne(['id' => $id, 'status' => '10']);
+        return $user !== null && $user->rol === 1;
     }
-    
-    /* Identity Interface */
-    public function getId(){
-        return $this->id;
-    }
-        
-    public static function findIdentity($id) {
-        return static::findOne(['id' => $id]);
-    }
-    
-   // Utilizamos el mismo nombre de método que definimos como el nombre de usuario
-    public static function findByUserName($username) {
-        return static::findOne(['username' => $username]);
-    }
-    
-    
-    public function validatePassword($password) {
-        return Yii::$app->security->validatePassword($password, $this->password);
+ 
+ 
+ 
+ 
+       //Este lo pide pero lo dejamos como null por que no lo usamos por el momento
+       public function getAuthKey() {
+         return null;
+        //return $this->auth_key;
+     }    
+     
+     // interface
+     public function validateAuthKey($authKey) {
+         return $this->getAuthKey() == $authKey;
+     }
+     
+     // interface
+     public static function findIdentityByAccessToken($token, $type = null) {
+         throw new \yii\base\NotSupportedException("'findIdentityByAccessToken' is not implemented");
+     }
+     
+     /* Identity Interface */
+     public function getId(){
+         return $this->id;
+     }
+         
+     public static function findIdentity($id) {
+         return static::findOne(['id' => $id]);
+     }
+     
+    // Utilizamos el mismo nombre de método que definimos como el nombre de usuario
+     public static function findByUserName($username) {
+         return static::findOne(['username' => $username]);
+     }
+     
+     
+     public function validatePassword($password) {
+         return Yii::$app->security->validatePassword($password, $this->password);
+     }
+
+    /**
+     * Gets query for [[Trabajadors]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTrabajadors()
+    {
+        return $this->hasMany(Trabajador::class, ['idusuario' => 'id']);
     }
 }

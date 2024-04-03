@@ -7,7 +7,7 @@ use yii\widgets\Pjax;
 /* @var $searchModel app\models\TrabajadorSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Trabajador';
+$this->title = 'Trabajadors';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="container-fluid">
