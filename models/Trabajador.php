@@ -15,7 +15,7 @@ use Yii;
  * @property int $codigo_postal
  * @property string $calle
  * @property int $numero_casa
- * @property int $telefono
+ * @property string $telefono
  * @property string $colonia
  * @property string $foto
  * @property int $idusuario
@@ -40,16 +40,20 @@ class Trabajador extends \yii\db\ActiveRecord
         return [
             [['nombre', 'apellido', 'email', 'fecha_nacimiento', 'codigo_postal', 'calle', 'numero_casa', 'telefono', 'colonia', 'idusuario'], 'required'],
             [['fecha_nacimiento'], 'safe'],
-            [['codigo_postal', 'numero_casa', 'telefono', 'idusuario'], 'integer'],
+            [['codigo_postal', 'numero_casa', 'idusuario'], 'integer'],
             [['nombre'], 'string', 'max' => 30],
             [['apellido'], 'string', 'max' => 60],
             [['email', 'foto'], 'string', 'max' => 100],
+            [['email'], 'email'],
             [['calle'], 'string', 'max' => 85],
+            [['telefono'], 'string', 'max' => 10],
+            ['telefono', 'match', 'pattern' => '/^[0-9]{10}$/'], // Asegura que sean solo números
             [['colonia'], 'string', 'max' => 35],
             [['foto'], 'file', 'skipOnEmpty' => TRUE, 'extensions' => 'png, jpg'],
             [['idusuario'], 'exist', 'skipOnError' => true, 'targetClass' => Usuario::class, 'targetAttribute' => ['idusuario' => 'id']],
         ];
     }
+    
 
     /**
      * {@inheritdoc}

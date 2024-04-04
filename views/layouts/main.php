@@ -26,6 +26,7 @@ if(Yii:: $app->controller->action->id === 'portaltrabajador'){
             );
             
             }
+         
 
 
     else{

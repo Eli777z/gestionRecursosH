@@ -189,6 +189,7 @@ class TrabajadorController extends Controller
         ]);
     }
 
+
     /**
      * Deletes an existing Trabajador model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
@@ -225,7 +226,6 @@ class TrabajadorController extends Controller
     
     return $this->redirect(['index']);
     }
-
 
     /**
      * Finds the Trabajador model based on its primary key value.

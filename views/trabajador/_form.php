@@ -19,7 +19,7 @@ use yii\bootstrap4\ActiveForm;
 
     <?= $form->field($model, 'apellido')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'email')->textInput() ?>
 
     <?= $form->field($model, 'fecha_nacimiento')->widget(\yii\jui\DatePicker::className(), [
         'language' => 'es',
@@ -31,14 +31,19 @@ use yii\bootstrap4\ActiveForm;
             'yearRange' => '-100:+0',
         ],
     ]) ?>
-
     <?= $form->field($model, 'codigo_postal')->textInput() ?>
 
     <?= $form->field($model, 'calle')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'numero_casa')->textInput() ?>
 
-    <?= $form->field($model, 'telefono')->textInput() ?>
+    <?= $form->field($model, 'telefono')->textInput([
+    'maxlength' => true,
+    'pattern' => '\d*',
+    'inputmode' => 'numeric',
+   // 'placeholder' => 'Ingresa 10 dígitos'
+]) ?>
+
 
     <?= $form->field($model, 'colonia')->textInput(['maxlength' => true]) ?>
 

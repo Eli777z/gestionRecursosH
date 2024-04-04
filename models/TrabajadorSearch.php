@@ -17,8 +17,8 @@ class TrabajadorSearch extends Trabajador
     public function rules()
     {
         return [
-            [['id', 'codigo_postal', 'numero_casa', 'telefono', 'idusuario'], 'integer'],
-            [['nombre', 'apellido', 'email', 'fecha_nacimiento', 'calle', 'colonia', 'foto'], 'safe'],
+            [['id', 'codigo_postal', 'numero_casa', 'idusuario'], 'integer'],
+            [['nombre', 'apellido', 'email', 'fecha_nacimiento', 'calle', 'telefono', 'colonia', 'foto'], 'safe'],
         ];
     }
 
@@ -62,7 +62,6 @@ class TrabajadorSearch extends Trabajador
             'fecha_nacimiento' => $this->fecha_nacimiento,
             'codigo_postal' => $this->codigo_postal,
             'numero_casa' => $this->numero_casa,
-            'telefono' => $this->telefono,
             'idusuario' => $this->idusuario,
         ]);
 
@@ -70,6 +69,7 @@ class TrabajadorSearch extends Trabajador
             ->andFilterWhere(['like', 'apellido', $this->apellido])
             ->andFilterWhere(['like', 'email', $this->email])
             ->andFilterWhere(['like', 'calle', $this->calle])
+            ->andFilterWhere(['like', 'telefono', $this->telefono])
             ->andFilterWhere(['like', 'colonia', $this->colonia])
             ->andFilterWhere(['like', 'foto', $this->foto]);
 
