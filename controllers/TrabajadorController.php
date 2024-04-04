@@ -11,6 +11,7 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\db\Exception;
 use yii\web\UploadedFile;
+
 /**
  * TrabajadorController implements the CRUD actions for Trabajador model.
  */
@@ -65,66 +66,68 @@ class TrabajadorController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-   
-     public function actionCreate()
-     {
-         $model = new Trabajador();
-         $user = new Usuario(); // Asumiendo que tienes un modelo Usuario
-         $user->scenario = Usuario::SCENARIO_CREATE;
-         if ($model->load(Yii::$app->request->post()) && $user->load(Yii::$app->request->post())) {
-             $transaction = Yii::$app->db->beginTransaction(); // Iniciar transacción
-             // Generar username y password
-             $user->username = $model->nombre . $model->apellido;
-             $nombres = explode(" ", $model->nombre);
-        $apellidos = explode(" ", $model->apellido);
-        $usernameBase = strtolower($nombres[0][0] . $apellidos[0] . (isset($apellidos[1]) ? $apellidos[1][0] : ''));
-        $user->username = $usernameBase;
-        // Verificar si el username ya existe y añadir un número incremental
-        $counter = 1;
-        while (Usuario::find()->where(['username' => $user->username])->exists()) {
-            $user->username = $usernameBase . $counter;
-            $counter++;
+    public function actionCreate()
+    {
+        $model = new Trabajador();
+        $user = new Usuario(); // Asumiendo que tienes un modelo Usuario
+        $user->scenario = Usuario::SCENARIO_CREATE;
+        if ($model->load(Yii::$app->request->post()) && $user->load(Yii::$app->request->post())) {
+            $transaction = Yii::$app->db->beginTransaction(); // Iniciar transacción
+            // Generar username y password
+            $user->username = $model->nombre . $model->apellido;
+            $nombres = explode(" ", $model->nombre);
+       $apellidos = explode(" ", $model->apellido);
+       $usernameBase = strtolower($nombres[0][0] . $apellidos[0] . (isset($apellidos[1]) ? $apellidos[1][0] : ''));
+       $user->username = $usernameBase;
+       // Verificar si el username ya existe y añadir un número incremental
+       $counter = 1;
+       while (Usuario::find()->where(['username' => $user->username])->exists()) {
+           $user->username = $usernameBase . $counter;
+           $counter++;
+       }
+       // Generar password
+       $user->password = 'contrasena'; // 
+            $user->status= 10;
+            $hash = Yii::$app->security->generatePasswordHash($user->password);
+            $user->password = $hash;
+            try {
+                if ($user->save()) {
+                    $model->idusuario = $user->id; // Asignar ID de usuario al trabajador
+                    $auth = \Yii::$app->authManager;
+                    $authorRole = $auth->getRole('trabajador');
+                    $auth->assign($authorRole, $user->id);
+                    // Proceso para guardar la foto, si existe
+                    $upload = UploadedFile::getInstance($model, 'foto');                
+                    if (is_object($upload)) {
+                        $upload_filename = 'uploads/user_profile/' . $upload->baseName . '.' . $upload->extension;
+                        $upload->saveAs($upload_filename);
+                        $model->foto = $upload_filename;   
+                    }
+                    if ($model->save()) { // Enviar correo electrónico con los datos de acceso
+                        Yii::$app->mailer->compose()
+                            ->setFrom('elitaev7@gmail.com') // Reemplaza con tu dirección de correo de salida
+                            ->setTo($model->email) // El email del trabajador
+                            ->setSubject('Datos de acceso al sistema')
+                            ->setTextBody("Nos comunicamos con usted, {$model->nombre}.\nAquí están tus datos de acceso:\nNombre de Usuario: {$user->username}\nContraseña: contrasena") // Reemplaza 'contrasena' con la contraseña generada si es diferente
+                            ->send();
+                
+                        $transaction->commit(); // Si todo está bien, hacer commit
+                        Yii::$app->session->setFlash('success', "Trabajador y usuario creados con éxito.");
+                        return $this->redirect(['view', 'id' => $model->id]);
+                    } else {
+                        $transaction->rollBack(); // Si falla, hacer rollback
+                    }
+                }
+            } catch (\Exception $e) {
+                $transaction->rollBack(); // Si hay excepción, hacer rollback
+                throw $e;
+            }
         }
-        // Generar password
-        $user->password = 'contrasena'; // 
-             $user->status= 10;
-             $hash = Yii::$app->security->generatePasswordHash($user->password);
-             $user->password = $hash;
-             try {
-                 if ($user->save()) {
-                     $model->idusuario = $user->id; // Asignar ID de usuario al trabajador
-                     $auth = \Yii::$app->authManager;
-                     $authorRole = $auth->getRole('trabajador');
-                     $auth->assign($authorRole, $user->id);
-                     // Proceso para guardar la foto, si existe
-                     $upload = UploadedFile::getInstance($model, 'foto');                
-                     if (is_object($upload)) {
-                         $upload_filename = 'uploads/user_profile/' . $upload->baseName . '.' . $upload->extension;
-                         $upload->saveAs($upload_filename);
-                         $model->foto = $upload_filename;   
-                     }
-                     if ($model->save()) {
-                         $transaction->commit(); // Si todo está bien, hacer commit
-                         Yii::$app->session->setFlash('success', "Trabajador y usuario creados con éxito.");
-                         return $this->redirect(['view', 'id' => $model->id]);
-                     } else {
-                         $transaction->rollBack(); // Si falla, hacer rollback
-                     }
-                 }
-             } catch (\Exception $e) {
-                 $transaction->rollBack(); // Si hay excepción, hacer rollback
-                 throw $e;
-             }
-         }
-         return $this->render('create', [
-             'model' => $model,
-             'user' => $user,
-         ]);
-     }
-     
-    
-
-    
+        return $this->render('create', [
+            'model' => $model,
+            'user' => $user,
+        ]);
+    }
 
     /**
      * Updates an existing Trabajador model.
@@ -144,12 +147,15 @@ class TrabajadorController extends Controller
             $transaction = Yii::$app->db->beginTransaction(); // Iniciar transacción
            
             try {
+                $user->username = $user->getOldAttribute('username');
+                $user->status = $user->getOldAttribute('status');
                 if (!empty($user->password)) {
                     $hash = Yii::$app->security->generatePasswordHash($user->password);
                     $user->password = $hash;
                 } else {
                    
                     $user->password = $user->getOldAttribute('password');
+
                 }
 
                 if ($user->save()) {
@@ -182,7 +188,6 @@ class TrabajadorController extends Controller
             'user' => $user, // Pasar el modelo Usuario a la vista
         ]);
     }
-    
 
     /**
      * Deletes an existing Trabajador model.
@@ -238,10 +243,6 @@ class TrabajadorController extends Controller
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
-
-
-
-
     protected function findModel($id, $idusuario)
     {
         if (($model = Trabajador::findOne(['id' => $id, 'idusuario' => $idusuario])) !== null) {
@@ -250,7 +251,7 @@ class TrabajadorController extends Controller
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
-    //public function actionView($id, $idusuario)
+     //public function actionView($id, $idusuario)
     //{
       //  return $this->render('view', [
         //    'model' => $this->findModel($id, $idusuario),

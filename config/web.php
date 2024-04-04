@@ -45,11 +45,18 @@ $config = [
             
         ],
         'mailer' => [
-            'class' => \yii\symfonymailer\Mailer::class,
-            'viewPath' => '@app/mail',
-            // send all mails to a file by default.
-            'useFileTransport' => true,
+            'class' => 'yii\swiftmailer\Mailer',
+        'viewPath' => '@app/mail',
+        'useFileTransport' => false, // Cambiar a false para enviar correos reales
+        'transport' => [
+            'class' => 'Swift_SmtpTransport',
+            'host' => 'smtp.gmail.com',
+            'username' => 'elitaev7@gmail.com',
+            'password' => 'vdcj rfzv xpuh aluy',
+            'port' => '587',
+            'encryption' => 'tls',
         ],
+    ],
         'authManager' => [
             'class' => 'yii\rbac\DbManager',
         ],
@@ -132,5 +139,9 @@ if (YII_ENV_DEV) {
         ]
     ];
 }
+
+
+//private static final String EMAIL_USERNAME = "elitaev7@gmail.com"; 
+  //  private static final String EMAIL_PASSWORD = "vdcj rfzv xpuh aluy";
 
 return $config;

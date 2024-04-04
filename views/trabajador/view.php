@@ -33,10 +33,12 @@ $this->params['breadcrumbs'][] = $this->title;
                             'id',
                             'nombre',
                             'apellido',
+                            'email:email',
                             'fecha_nacimiento',
                             'codigo_postal',
                             'calle',
                             'numero_casa',
+                            'telefono',
                             'colonia',
                             [
                                 'attribute'=>'foto',

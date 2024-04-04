@@ -25,13 +25,17 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'apellido') ?>
 
+    <?= $form->field($model, 'email') ?>
+
     <?= $form->field($model, 'fecha_nacimiento') ?>
 
-    <?= $form->field($model, 'codigo_postal') ?>
+    <?php // echo $form->field($model, 'codigo_postal') ?>
 
     <?php // echo $form->field($model, 'calle') ?>
 
     <?php // echo $form->field($model, 'numero_casa') ?>
+
+    <?php // echo $form->field($model, 'telefono') ?>
 
     <?php // echo $form->field($model, 'colonia') ?>
 
