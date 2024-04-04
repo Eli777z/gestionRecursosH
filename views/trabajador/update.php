@@ -15,7 +15,8 @@ $this->params['breadcrumbs'][] = 'Update';
             <div class="row">
                 <div class="col-md-12">
                     <?=$this->render('_form', [
-                        'model' => $model
+                      'model' => $model,
+                      'user' => $user, // Pasar el modelo Usuario a la vista
                     ]) ?>
                 </div>
             </div>

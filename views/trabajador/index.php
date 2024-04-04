@@ -32,10 +32,20 @@ $this->params['breadcrumbs'][] = $this->title;
                             ['class' => 'yii\grid\SerialColumn'],
 
                             'id',
+                            [
+                                'attribute'=>'foto',
+                                'format' => ['html'],
+                                'value' => function ($data) {
+                                    return Html::img('/' . $data['foto'],
+                                    ['width' => '80px',
+                                     'height' => '80px']);
+                                   },
+                                
+                            ],
                             'nombre',
                             'apellido',
                             'fecha_nacimiento',
-                            'codigo_postal',
+                            //'codigo_postal',
                             //'calle',
                             //'numero_casa',
                             //'colonia',

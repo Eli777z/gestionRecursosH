@@ -38,7 +38,11 @@ $this->params['breadcrumbs'][] = $this->title;
                             'calle',
                             'numero_casa',
                             'colonia',
-                            'foto',
+                            [
+                                'attribute'=>'foto',
+                                'value'=>('/'.$model->foto),
+                                'format' => ['image',['width'=>'100','height'=>'100']],
+                            ],
                             'idusuario',
                         ],
                     ]) ?>

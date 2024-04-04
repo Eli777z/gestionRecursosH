@@ -10,41 +10,44 @@ use yii\bootstrap4\ActiveForm;
 
 <div class="trabajador-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
+
+    <!-- Eliminar los campos de username y password ya que se generarán automáticamente -->
+
+
+    
+
+    <?= $form->field($user, 'rol')->dropDownList([
+        1 => 'Trabajador',
+        2 => 'Gestor de recursos humanos',
+    ]) ?>
 
     <?= $form->field($model, 'nombre')->textInput(['maxlength' => true]) ?>
-
     <?= $form->field($model, 'apellido')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'fecha_nacimiento')->widget(\yii\jui\DatePicker::className(), [
-    'language' => 'es', // Asegúrate de establecer el idioma adecuado
-    'dateFormat' => 'php:Y-m-d', // Formato de la fecha
-    'options' => ['class' => 'form-control'], // Clase CSS para el estilo
-    'clientOptions' => [
-        
-        'changeYear' => true, // Permite cambiar el año
-        'changeMonth' => true, // Permite cambiar el mes
-        'yearRange' => '-100:+0', // Rango de años disponibles
-    ],
-]) ?>
-    
+        'language' => 'es',
+        'dateFormat' => 'php:Y-m-d',
+        'options' => ['class' => 'form-control'],
+        'clientOptions' => [
+            'changeYear' => true,
+            'changeMonth' => true,
+            'yearRange' => '-100:+0',
+        ],
+    ]) ?>
 
     <?= $form->field($model, 'codigo_postal')->textInput() ?>
-
     <?= $form->field($model, 'calle')->textInput(['maxlength' => true]) ?>
-
     <?= $form->field($model, 'numero_casa')->textInput() ?>
-
     <?= $form->field($model, 'colonia')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'foto')->fileInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'idusuario')->textInput() ?>
+    <?= $form->field($model, 'foto')->fileInput(['class'=>'form-control']) ?>
 
     <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton('Guardar', ['class' => 'btn btn-success']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>
 
 </div>
+
+

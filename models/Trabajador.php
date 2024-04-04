@@ -36,7 +36,7 @@ class Trabajador extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['nombre', 'apellido', 'fecha_nacimiento', 'codigo_postal', 'calle', 'numero_casa', 'colonia', 'foto', 'idusuario'], 'required'],
+            [['nombre', 'apellido', 'fecha_nacimiento', 'codigo_postal', 'calle', 'numero_casa', 'colonia', 'idusuario'], 'required'],
             [['fecha_nacimiento'], 'safe'],
             [['codigo_postal', 'numero_casa', 'idusuario'], 'integer'],
             [['nombre'], 'string', 'max' => 30],
@@ -44,7 +44,9 @@ class Trabajador extends \yii\db\ActiveRecord
             [['calle'], 'string', 'max' => 85],
             [['colonia'], 'string', 'max' => 35],
             [['foto'], 'string', 'max' => 100],
+            [['foto'], 'file', 'skipOnEmpty' => TRUE, 'extensions' => 'png, jpg'],
             [['idusuario'], 'exist', 'skipOnError' => true, 'targetClass' => Usuario::class, 'targetAttribute' => ['idusuario' => 'id']],
+           
         ];
     }
 
