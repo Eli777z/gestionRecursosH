@@ -75,7 +75,18 @@ class TrabajadorController extends Controller
              $transaction = Yii::$app->db->beginTransaction(); // Iniciar transacción
              // Generar username y password
              $user->username = $model->nombre . $model->apellido;
-             $user->password = 'contrasena'; // Establecer contraseña por defecto
+             $nombres = explode(" ", $model->nombre);
+        $apellidos = explode(" ", $model->apellido);
+        $usernameBase = strtolower($nombres[0][0] . $apellidos[0] . (isset($apellidos[1]) ? $apellidos[1][0] : ''));
+        $user->username = $usernameBase;
+        // Verificar si el username ya existe y añadir un número incremental
+        $counter = 1;
+        while (Usuario::find()->where(['username' => $user->username])->exists()) {
+            $user->username = $usernameBase . $counter;
+            $counter++;
+        }
+        // Generar password
+        $user->password = 'contrasena'; // 
              $user->status= 10;
              $hash = Yii::$app->security->generatePasswordHash($user->password);
              $user->password = $hash;
