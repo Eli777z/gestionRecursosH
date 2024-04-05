@@ -41,7 +41,7 @@ use yii\helpers\Html;
 
                     ['label' => 'Trabajadores', 'icon' => 'user', 'url' => ['trabajador/index']],
                     ['label' => 'Gii',  'icon' => 'file-code', 'url' => ['/gii'], 'target' => '_blank'],
-                    ['label' => 'Administrador', 'icon' => 'user', 'url' => ['/admin']],
+                    ['label' => 'Administrador', 'icon' => 'user-tie', 'url' => ['/admin']],
                     ['label' => 'MULTI LEVEL EXAMPLE', 'header' => true],
                     ['label' => 'Level1'],
                     [

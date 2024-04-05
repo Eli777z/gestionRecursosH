@@ -41,10 +41,15 @@ $this->params['breadcrumbs'][] = $this->title;
                             'telefono',
                             'colonia',
                             [
-                                'attribute'=>'foto',
-                                'value'=>('/'.$model->foto),
-                                'format' => ['image',['width'=>'100','height'=>'100']],
+                                'attribute' => 'foto',
+                                'value' => function ($model) {
+                                    // Asumiendo que 'web' es un alias que apunta a la carpeta pública
+                                    $rutaRelativa = str_replace(Yii::getAlias('@runtime'), Yii::getAlias('@web'), $model->foto);
+                                    return $rutaRelativa;
+                                },
+                                'format' => ['image', ['width' => '100', 'height' => '100']],
                             ],
+                            
                             'idusuario',
                         ],
                     ]) ?>

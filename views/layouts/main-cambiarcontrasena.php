@@ -44,7 +44,7 @@ $this->registerJsFile($publishedRes[1].'/control_sidebar.js', ['depends' => '\ha
     
     <!-- /.login-logo -->
 
-    <?= $this->render('contenterror', ['content' => $content, 'assetDir' => $assetDir]) ?>
+    <?= $this->render('contentcambiarc', ['content' => $content, 'assetDir' => $assetDir]) ?>
 
    
     <!-- /.content-wrapper -->

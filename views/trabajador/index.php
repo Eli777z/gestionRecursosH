@@ -7,7 +7,7 @@ use yii\widgets\Pjax;
 /* @var $searchModel app\models\TrabajadorSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Trabajadors';
+$this->title = 'Trabajadores';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="container-fluid">
@@ -17,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="card-body">
                     <div class="row mb-2">
                         <div class="col-md-12">
-                            <?= Html::a('Crear Trabajador', ['create'], ['class' => 'btn btn-primary']) ?>
+                            <?= Html::a('Agregar Trabajador', ['create'], ['class' => 'btn btn-primary']) ?>
                         </div>
                     </div>
 

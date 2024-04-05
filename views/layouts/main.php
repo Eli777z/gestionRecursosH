@@ -26,6 +26,13 @@ if(Yii:: $app->controller->action->id === 'portaltrabajador'){
             );
             
             }
+            elseif(Yii:: $app->controller->action->id === 'cambiarcontrasena'){
+                echo $this-> render(
+                'main-cambiarcontrasena',
+                ['content' => $content]
+                );
+                
+                }
          
 
 

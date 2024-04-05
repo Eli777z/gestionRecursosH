@@ -69,57 +69,80 @@ class TrabajadorController extends Controller
     public function actionCreate()
     {
         $model = new Trabajador();
-        $user = new Usuario(); // Asumiendo que tienes un modelo Usuario
+        $user = new Usuario();
         $user->scenario = Usuario::SCENARIO_CREATE;
         if ($model->load(Yii::$app->request->post()) && $user->load(Yii::$app->request->post())) {
-            $transaction = Yii::$app->db->beginTransaction(); // Iniciar transacción
-            // Generar username y password
+            $transaction = Yii::$app->db->beginTransaction();
             $user->username = $model->nombre . $model->apellido;
             $nombres = explode(" ", $model->nombre);
-       $apellidos = explode(" ", $model->apellido);
-       $usernameBase = strtolower($nombres[0][0] . $apellidos[0] . (isset($apellidos[1]) ? $apellidos[1][0] : ''));
-       $user->username = $usernameBase;
-       // Verificar si el username ya existe y añadir un número incremental
-       $counter = 1;
-       while (Usuario::find()->where(['username' => $user->username])->exists()) {
-           $user->username = $usernameBase . $counter;
-           $counter++;
-       }
-       // Generar password
-       $user->password = 'contrasena'; // 
-            $user->status= 10;
+            $apellidos = explode(" ", $model->apellido);
+            $usernameBase = strtolower($nombres[0][0] . $apellidos[0] . (isset($apellidos[1]) ? $apellidos[1][0] : ''));
+            $user->username = $usernameBase;
+            $counter = 1;
+            while (Usuario::find()->where(['username' => $user->username])->exists()) {
+                $user->username = $usernameBase . $counter;
+                $counter++;
+            }
+            $user->password = 'contrasena';
+            $user->status = 10;
+            $user->nuevo = 4;
             $hash = Yii::$app->security->generatePasswordHash($user->password);
             $user->password = $hash;
             try {
                 if ($user->save()) {
-                    $model->idusuario = $user->id; // Asignar ID de usuario al trabajador
+                    $model->idusuario = $user->id;
                     $auth = \Yii::$app->authManager;
                     $authorRole = $auth->getRole('trabajador');
                     $auth->assign($authorRole, $user->id);
-                    // Proceso para guardar la foto, si existe
-                    $upload = UploadedFile::getInstance($model, 'foto');                
-                    if (is_object($upload)) {
-                        $upload_filename = 'uploads/user_profile/' . $upload->baseName . '.' . $upload->extension;
-                        $upload->saveAs($upload_filename);
-                        $model->foto = $upload_filename;   
+                    $upload = UploadedFile::getInstance($model, 'foto');
+                  //  if (is_object($upload)) {
+                    //    $upload_filename = 'uploads/user_profile/' . $upload->baseName . '.' . $upload->extension;
+                      //  $upload->saveAs($upload_filename);
+                        //$model->foto = $upload_filename;
+                    //}
+                   // $nombreCarpeta = Yii::getAlias('@runtime') . '/trabajadores/' . $model->nombre . '_' . $model->apellido;
+                    //if (!is_dir($nombreCarpeta)) {
+                      //  mkdir($nombreCarpeta, 0775, true);
+                   // }
+
+                   if (is_object($upload)) {
+                    // Crea la carpeta del trabajador si no existe
+                    $nombreCarpetaTrabajador = Yii::getAlias('@runtime') . '/trabajadores/' . $model->nombre . '_' . $model->apellido;
+                    if (!is_dir($nombreCarpetaTrabajador)) {
+                        mkdir($nombreCarpetaTrabajador, 0775, true);
                     }
-                    if ($model->save()) { // Enviar correo electrónico con los datos de acceso
+                    
+                    // Crea la subcarpeta 'user_profile' dentro de la carpeta del trabajador si no existe
+                    $nombreCarpetaUserProfile = $nombreCarpetaTrabajador . '/foto_Trabajador';
+                    if (!is_dir($nombreCarpetaUserProfile)) {
+                        mkdir($nombreCarpetaUserProfile, 0775, true);
+                    }
+                
+                    // Guarda la foto del perfil en la subcarpeta 'user_profile' de la carpeta del trabajador
+                    $upload_filename = $nombreCarpetaUserProfile . '/' . $upload->baseName . '.' . $upload->extension;
+                    $upload->saveAs($upload_filename);
+                    $model->foto = $upload_filename;   
+                }
+                
+
+
+                    if ($model->save()) {
+
                         Yii::$app->mailer->compose()
-                            ->setFrom('elitaev7@gmail.com') // Reemplaza con tu dirección de correo de salida
-                            ->setTo($model->email) // El email del trabajador
+                            ->setFrom('elitaev7@gmail.com')
+                            ->setTo($model->email)
                             ->setSubject('Datos de acceso al sistema')
                             ->setTextBody("Nos comunicamos con usted, {$model->nombre}.\nAquí están tus datos de acceso:\nNombre de Usuario: {$user->username}\nContraseña: contrasena") // Reemplaza 'contrasena' con la contraseña generada si es diferente
                             ->send();
-                
-                        $transaction->commit(); // Si todo está bien, hacer commit
+                        $transaction->commit();
                         Yii::$app->session->setFlash('success', "Trabajador y usuario creados con éxito.");
                         return $this->redirect(['view', 'id' => $model->id]);
                     } else {
-                        $transaction->rollBack(); // Si falla, hacer rollback
+                        $transaction->rollBack();
                     }
                 }
             } catch (\Exception $e) {
-                $transaction->rollBack(); // Si hay excepción, hacer rollback
+                $transaction->rollBack();
                 throw $e;
             }
         }
@@ -141,11 +164,11 @@ class TrabajadorController extends Controller
     {
         $model = $this->findModel2($id);
         $user = Usuario::findOne($model->idusuario); // Encuentra el usuario asociado
-        $previous_photo = $model->foto; 
-    
+        $previous_photo = $model->foto;
+
         if ($model->load(Yii::$app->request->post()) && $user->load(Yii::$app->request->post())) {
             $transaction = Yii::$app->db->beginTransaction(); // Iniciar transacción
-           
+
             try {
                 $user->username = $user->getOldAttribute('username');
                 $user->status = $user->getOldAttribute('status');
@@ -153,21 +176,20 @@ class TrabajadorController extends Controller
                     $hash = Yii::$app->security->generatePasswordHash($user->password);
                     $user->password = $hash;
                 } else {
-                   
-                    $user->password = $user->getOldAttribute('password');
 
+                    $user->password = $user->getOldAttribute('password');
                 }
 
                 if ($user->save()) {
-                    $upload = UploadedFile::getInstance($model, 'foto');   
+                    $upload = UploadedFile::getInstance($model, 'foto');
                     if (is_object($upload)) {
                         $upload_filename = 'uploads/user_profile/' . $upload->baseName . '.' . $upload->extension;
                         $upload->saveAs($upload_filename);
-                        $model->foto = $upload_filename;   
+                        $model->foto = $upload_filename;
                     } else {
-                        $model->foto = $previous_photo;                    
+                        $model->foto = $previous_photo;
                     }
-    
+
                     if ($model->save()) {
                         $transaction->commit(); // Si todo está bien, hacer commit
                         return $this->redirect(['view', 'id' => $model->id]);
@@ -182,7 +204,7 @@ class TrabajadorController extends Controller
                 Yii::$app->session->setFlash('error', $e->getMessage());
             }
         }
-        $user->password='';
+        $user->password = '';
         return $this->render('update', [
             'model' => $model,
             'user' => $user, // Pasar el modelo Usuario a la vista
@@ -201,30 +223,30 @@ class TrabajadorController extends Controller
     public function actionDelete($id, $idusuario)
     {
         $trabajador = $this->findModel($id, $idusuario);
-    
-    // Obtén el ID del usuario asociado al trabajador
-    $idUsuario = $trabajador->idusuario;
-    
-    // Elimina tanto el trabajador como su usuario asociado
-    $transaction = Yii::$app->db->beginTransaction();
-    
-    try {
-        // Primero elimina el trabajador
-        $trabajador->delete();
-        
-        // Luego elimina su usuario asociado
-        Usuario::findOne($idUsuario)->delete();
-        
-        $transaction->commit();
-        
-        Yii::$app->session->setFlash('success', 'Trabajador eliminado exitosamente.');
-    } catch (Exception $e) {
-        $transaction->rollBack();
-        
-        Yii::$app->session->setFlash('error', 'Error al eliminar el trabajadory su usuario.');
-    }
-    
-    return $this->redirect(['index']);
+
+        // Obtén el ID del usuario asociado al trabajador
+        $idUsuario = $trabajador->idusuario;
+
+        // Elimina tanto el trabajador como su usuario asociado
+        $transaction = Yii::$app->db->beginTransaction();
+
+        try {
+            // Primero elimina el trabajador
+            $trabajador->delete();
+
+            // Luego elimina su usuario asociado
+            Usuario::findOne($idUsuario)->delete();
+
+            $transaction->commit();
+
+            Yii::$app->session->setFlash('success', 'Trabajador eliminado exitosamente.');
+        } catch (Exception $e) {
+            $transaction->rollBack();
+
+            Yii::$app->session->setFlash('error', 'Error al eliminar el trabajadory su usuario.');
+        }
+
+        return $this->redirect(['index']);
     }
 
     /**
@@ -251,10 +273,10 @@ class TrabajadorController extends Controller
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
-     //public function actionView($id, $idusuario)
+    //public function actionView($id, $idusuario)
     //{
-      //  return $this->render('view', [
-        //    'model' => $this->findModel($id, $idusuario),
-        //]);
+    //  return $this->render('view', [
+    //    'model' => $this->findModel($id, $idusuario),
+    //]);
     //}
 }

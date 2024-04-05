@@ -101,21 +101,36 @@ class SiteController extends Controller
         if (!Yii::$app->user->isGuest) {
             // Si el usuario ya está autenticado, redirige según su rol
             $userId = Yii::$app->user->identity->id;
+            $user = Usuario::findOne($userId);
+            // Verifica si es el primer inicio de sesión
+            if ($user->nuevo == 4) {
+                // Redirige al usuario a la acción de cambio de contraseña
+                return $this->redirect(['usuario/cambiarcontrasena']);
+            }
             if (Usuario::isUserAdmin($userId)) {
                 return $this->redirect(["site/portalgestionrh"]);
             } else {
                 return $this->redirect(["site/portaltrabajador"]);
             }
         }
-    
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
+            $userId = Yii::$app->user->identity->id;
+            $user = Usuario::findOne($userId);
             // Si el inicio de sesión es exitoso, redirige según el rol
             $userId = Yii::$app->user->identity->id;
             if (Usuario::isUserAdmin($userId)) {
                 return $this->redirect(["site/portalgestionrh"]);
             } else {
-                return $this->redirect(["site/portaltrabajador"]);
+                if ($user->nuevo == 4) {
+                    // Redirige al usuario a la acción de cambio de contraseña
+                    return $this->redirect(['usuario/cambiarcontrasena']);
+                }else{
+
+                    return $this->redirect(["site/portaltrabajador"]);
+                }
+
+               
             }
         } else {
             // Si hay errores en el inicio de sesión, muestra la vista de login
@@ -125,6 +140,8 @@ class SiteController extends Controller
             ]);
         }
     }
+
+   
     
     
 
@@ -177,5 +194,10 @@ class SiteController extends Controller
         return $this->render('portaltrabajador');
     }
     
+
+    public function actionCambiarcontrasena()
+    {
+        return $this->render('usuario/cambiarcontrasena');
+    }
 
 }

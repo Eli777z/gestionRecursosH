@@ -18,6 +18,7 @@ use Yii;
 class Usuario extends  \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 {
     const SCENARIO_CREATE = 'create';
+    //public $primer_login;
     /**
      * {@inheritdoc}
      */
@@ -33,9 +34,10 @@ class Usuario extends  \yii\db\ActiveRecord implements \yii\web\IdentityInterfac
     {
         return [
             [['username','status', 'rol'], 'required'],
-            [['status', 'rol'], 'integer'],
+            [['status', 'rol', 'nuevo'], 'integer'],
             [['username'], 'string', 'max' => 30],
             [['password'], 'string', 'max' => 64],
+            
             [['username', 'password', 'status'], 'required', 'on'=> self:: SCENARIO_CREATE],
         ];
     }
@@ -51,6 +53,7 @@ class Usuario extends  \yii\db\ActiveRecord implements \yii\web\IdentityInterfac
             'password' => 'Password',
             'status' => 'Status',
             'rol' => 'Rol',
+            'nuevo' => 'Nuevo',
         ];
     }
     public static function isUserAdmin($id)
@@ -63,6 +66,12 @@ class Usuario extends  \yii\db\ActiveRecord implements \yii\web\IdentityInterfac
     {
         $user = self::findOne(['id' => $id, 'status' => '10']);
         return $user !== null && $user->rol === 1;
+    }
+ 
+    public static function isUserNuevo($id)
+    {
+        $user = self::findOne(['id' => $id, 'status' => '10', 'nuevo' => '4']);
+        return $user !== null && $user->rol === 1 && $user->nuevo !=4;
     }
  
  

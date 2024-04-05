@@ -49,21 +49,29 @@ class LoginForm extends Model
 
           
 
-            if(!$user || $user->status === 0 ){
+          //  if(!$user || $user->status === 0 ){
                
-               $this->addError($attribute, 'Usuario inactivo');
+            //   $this->addError($attribute, 'Usuario inactivo');
               
+           //}
+           if(!$user){
+            $this->addError($attribute, 'Usuario no encontrado.');
            }
+           elseif( $user->status === 0){
+            $this->addError($attribute, 'Usuario inactivo.');
+
+        }
            else
            {
-            if (!$user || !$user->validatePassword($this->password) ) {
+            if(!$user->validatePassword($this->password))
                 $this->addError($attribute, 'Incorrect username or password.');
                 //echo "$user->status";
                  echo '<script>console.log("'.$user->status.'");</script>';
-           }
+           
             
                // $this->addError($attribute, 'usuario activo.');
             }
+          
 
            
 

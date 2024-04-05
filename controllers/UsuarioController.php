@@ -8,7 +8,7 @@ use app\models\UsuarioSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-
+use app\models\CambiarContrasenaForm;
 /**
  * UsuarioController implements the CRUD actions for Usuario model.
  */
@@ -139,6 +139,40 @@ class UsuarioController extends Controller
 
         return $this->redirect(['index']);
     }
+
+   // En tu TrabajadorController o SiteController
+
+
+
+public function actionCambiarcontrasena()
+{
+    // Verifica si el usuario tiene el atributo 'nuevo' igual a 4
+    $user = Usuario::findOne(Yii::$app->user->identity->id);
+    if ($user->nuevo != 4) {
+        // Si no es igual a 4, redirige al portal de trabajador
+        return $this->redirect(['site/portaltrabajador']);
+    }
+
+    $model = new CambiarContrasenaForm(); // Asume que tienes un modelo de formulario para el cambio de contraseña
+
+    if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+        $user->password = Yii::$app->security->generatePasswordHash($model->newPassword);
+        $user->nuevo = 0; // Actualiza el estado a no nuevo
+        if ($user->save()) {
+            Yii::$app->session->setFlash('success', 'Tu contraseña ha sido cambiada.');
+            return $this->redirect(['site/portaltrabajador']); // o redirige a donde prefieras
+        } else {
+            Yii::$app->session->setFlash('error', 'Hubo un error al cambiar tu contraseña.');
+        }
+    }
+
+    return $this->render('cambiarcontrasena', [
+        'model' => $model,
+    ]);
+}
+
+
+
 
     /**
      * Finds the Usuario model based on its primary key value.
