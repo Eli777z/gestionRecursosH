@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\helpers\Url;
+use yii\bootstrap5\Tabs;
 /* @var $this yii\web\View */
 /* @var $model app\models\Trabajador */
 
@@ -11,6 +12,9 @@ $this->params['breadcrumbs'][] = ['label' => 'Trabajadors', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
+
+
+<?php $this->beginBlock('expediente');?>
 
 <div class="container-fluid">
     <div class="card">
@@ -59,3 +63,23 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
     <!--.card-->
 </div>
+<?php $this->endBlock();?>
+
+
+<?= Tabs::widget([
+    'items' => [
+        [
+            'label' => 'Información',
+            'content' => $this->blocks['expediente'],
+            'active' => true,
+        ],
+        [
+            'label' => 'Agregar Expediente',
+            'content' => $this->blocks['expedienteForm'],
+            
+        ],
+        // ... otras pestañas si las necesitas
+    ],
+]);
+?>
+

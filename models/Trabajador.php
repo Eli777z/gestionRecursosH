@@ -20,6 +20,7 @@ use Yii;
  * @property string $foto
  * @property int $idusuario
  *
+ * @property Expediente[] $expedientes
  * @property Usuario $idusuario0
  */
 class Trabajador extends \yii\db\ActiveRecord
@@ -46,14 +47,14 @@ class Trabajador extends \yii\db\ActiveRecord
             [['email', 'foto'], 'string', 'max' => 100],
             [['email'], 'email'],
             [['calle'], 'string', 'max' => 85],
-            [['telefono'], 'string', 'max' => 10],
-            ['telefono', 'match', 'pattern' => '/^[0-9]{10}$/'], // Asegura que sean solo números
+            [['telefono'], 'string', 'max' => 15],
+            ['telefono', 'match', 'pattern' => '/^[0-9]{10}$/'], 
             [['colonia'], 'string', 'max' => 35],
             [['foto'], 'file', 'skipOnEmpty' => TRUE, 'extensions' => 'png, jpg'],
+            
             [['idusuario'], 'exist', 'skipOnError' => true, 'targetClass' => Usuario::class, 'targetAttribute' => ['idusuario' => 'id']],
         ];
     }
-    
 
     /**
      * {@inheritdoc}
@@ -74,6 +75,16 @@ class Trabajador extends \yii\db\ActiveRecord
             'foto' => 'Foto',
             'idusuario' => 'Idusuario',
         ];
+    }
+
+    /**
+     * Gets query for [[Expedientes]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getExpedientes()
+    {
+        return $this->hasMany(Expediente::class, ['idtrabajador' => 'id']);
     }
 
     /**

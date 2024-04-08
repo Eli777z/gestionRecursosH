@@ -11,6 +11,7 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\db\Exception;
 use yii\web\UploadedFile;
+use app\models\Expediente;
 
 /**
  * TrabajadorController implements the CRUD actions for Trabajador model.
@@ -56,11 +57,20 @@ class TrabajadorController extends Controller
      */
     public function actionView($id)
     {
+        $modelTrabajador = $this->findModel2($id); // Asegúrate de obtener el modelo de Trabajador correcto
+        $modelExpediente = new Expediente(); // Crea una instancia del modelo Expediente
+    
+        // Renderiza el formulario de Expediente desde su carpeta correspondiente
+        $this->view->blocks['expedienteForm'] = $this->renderPartial('/expediente/create', [
+            'model' => $modelExpediente,
+        ]);
+        
         return $this->render('view', [
-            'model' => $this->findModel2($id),
+            'model' => $modelTrabajador,
         ]);
     }
-
+    
+    
     /**
      * Creates a new Trabajador model.
      * If creation is successful, the browser will be redirected to the 'view' page.
