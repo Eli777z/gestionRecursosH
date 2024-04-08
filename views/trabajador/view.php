@@ -2,7 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
-
+use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $model app\models\Trabajador */
 
@@ -42,13 +42,10 @@ $this->params['breadcrumbs'][] = $this->title;
                             'colonia',
                             [
                                 'attribute' => 'foto',
-                                'value' => function ($model) {
-                                    // Asumiendo que 'web' es un alias que apunta a la carpeta pública
-                                    $rutaRelativa = str_replace(Yii::getAlias('@runtime'), Yii::getAlias('@web'), $model->foto);
-                                    return $rutaRelativa;
-                                },
-                                'format' => ['image', ['width' => '100', 'height' => '100']],
+                                'value' => Url::to(['trabajador/foto-trabajador', 'id' => $model->id]),
+                                'format' => ['image',['width'=>'100','height'=>'100']], // Ajusta el tamaño según necesites
                             ],
+                            
                             
                             'idusuario',
                         ],

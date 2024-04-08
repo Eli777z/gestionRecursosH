@@ -33,15 +33,20 @@ $this->params['breadcrumbs'][] = $this->title;
 
                             'id',
                             [
-                                'attribute'=>'foto',
-                                'format' => ['html'],
-                                'value' => function ($data) {
-                                    return Html::img('/' . $data['foto'],
-                                    ['width' => '80px',
-                                     'height' => '80px']);
-                                   },
-                                
+                                'attribute' => 'foto',
+                                'format' => 'html',
+                                'value' => function ($model) {
+                                    if ($model->foto) {
+                                        // Asegúrate de que la ruta de la acción del controlador sea correcta
+                                        $urlImagen = Yii::$app->urlManager->createUrl(['trabajador/foto-trabajador', 'id' => $model->id]);
+                                        return Html::img($urlImagen, ['width' => '80px', 'height' => '80px']);
+                                    }
+                                    return null; // O puedes retornar una imagen por defecto si no hay foto
+                                },
                             ],
+                            
+                            
+
                             'nombre',
                             'apellido',
                             'email:email',

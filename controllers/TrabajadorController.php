@@ -182,13 +182,34 @@ class TrabajadorController extends Controller
 
                 if ($user->save()) {
                     $upload = UploadedFile::getInstance($model, 'foto');
-                    if (is_object($upload)) {
-                        $upload_filename = 'uploads/user_profile/' . $upload->baseName . '.' . $upload->extension;
-                        $upload->saveAs($upload_filename);
-                        $model->foto = $upload_filename;
-                    } else {
-                        $model->foto = $previous_photo;
-                    }
+        if (is_object($upload)) {
+            // Define la ruta de la carpeta del trabajador
+            $nombreCarpetaTrabajador = Yii::getAlias('@runtime') . '/trabajadores/' . $model->nombre . '_' . $model->apellido;
+            if (!is_dir($nombreCarpetaTrabajador)) {
+                mkdir($nombreCarpetaTrabajador, 0775, true);
+            }
+
+            // Define la ruta de la subcarpeta 'foto_Trabajador'
+            $nombreCarpetaUserProfile = $nombreCarpetaTrabajador . '/foto_Trabajador';
+            if (!is_dir($nombreCarpetaUserProfile)) {
+                mkdir($nombreCarpetaUserProfile, 0775, true);
+            }
+
+            // Define la ruta del archivo de la foto
+            $upload_filename = $nombreCarpetaUserProfile . '/' . $upload->baseName . '.' . $upload->extension;
+
+            // Guarda la nueva foto y actualiza la ruta en el modelo
+            if ($upload->saveAs($upload_filename)) {
+                // Si hay una foto anterior y es diferente a la nueva, considera eliminar la anterior
+                if ($previous_photo && $previous_photo !== $upload_filename && file_exists($previous_photo)) {
+                    @unlink($previous_photo);
+                }
+                $model->foto = $upload_filename;
+            }
+        } else {
+            $model->foto = $previous_photo; // Si no se subió una nueva foto, mantiene la anterior
+        }
+
 
                     if ($model->save()) {
                         $transaction->commit(); // Si todo está bien, hacer commit
@@ -257,6 +278,20 @@ class TrabajadorController extends Controller
      * @return Trabajador the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
+
+
+     public function actionFotoTrabajador($id)
+{
+    $model = $this->findModel2($id); // Encuentra el modelo del trabajador basado en el ID
+
+    // Asegúrate de que el archivo exista y de que sea una imagen
+    if (file_exists($model->foto) && @getimagesize($model->foto)) {
+        return Yii::$app->response->sendFile($model->foto);
+    } else {
+        throw new \yii\web\NotFoundHttpException('La imagen no existe.');
+    }
+}
+
     protected function findModel2($id)
     {
         if (($model = Trabajador::findOne(['id' => $id])) !== null) {
