@@ -4,6 +4,9 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\helpers\Url;
 use yii\bootstrap5\Tabs;
+use yii\grid\GridView;
+use yii\bootstrap4\Modal;
+use yii\web\YiiAsset;
 /* @var $this yii\web\View */
 /* @var $model app\models\Trabajador */
 
@@ -11,10 +14,12 @@ $this->title = $model->id;
 $this->params['breadcrumbs'][] = ['label' => 'Trabajadors', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
+
 ?>
 
 
-<?php $this->beginBlock('expediente');?>
+
+
 
 <div class="container-fluid">
     <div class="card">
@@ -31,6 +36,8 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                         ]) ?>
                     </p>
+                    <?php $this->beginBlock('datos');?>
+                    
                     <?= DetailView::widget([
                         'model' => $model,
                         'attributes' => [
@@ -54,6 +61,72 @@ $this->params['breadcrumbs'][] = $this->title;
                             'idusuario',
                         ],
                     ]) ?>
+<?php $this->endBlock();?>
+<?php $this->beginBlock('expediente');?>
+<h2>Expedientes del Trabajador</h2>
+<?php
+
+// Registro de YiiAsset
+YiiAsset::register($this);
+
+// Botón para abrir el modal
+echo Html::button('Agregar Expediente', [
+    'class' => 'btn btn-success',
+    'id' => 'btn-agregar-expediente',
+    'value' => Url::to(['expediente/create', 'idtrabajador' => $model->id]),
+]);
+
+// Modal para cargar el formulario de creación de expediente
+Modal::begin([
+    'title' => '<h4>Agregar Expediente</h4>',
+    'id' => 'modal-agregar-expediente',
+]);
+echo '<div id="modalContent"></div>';
+Modal::end();
+
+
+?>
+
+<?= GridView::widget([
+    'dataProvider' => new \yii\data\ActiveDataProvider([
+        'query' => $model->getExpedientes(), // Obtener los expedientes del trabajador
+        'pagination' => [
+            'pageSize' => 50,
+        ],
+    ]),
+    'columns' => [
+        'id',
+        [
+            'attribute' => 'nombre',
+            'format' => 'raw',
+            'value' => function ($model) {
+                return Html::a($model->nombre, ['expediente/open', 'id' => $model->id], ['target' => '_blank']);
+            },
+        ],
+        'fechasubida',
+        // Otras columnas que desees mostrar...
+        [
+            'class' => 'yii\grid\ActionColumn',
+            'template' => '{view} {update} {delete}', // Puedes personalizar las acciones que deseas mostrar
+            'buttons' => [
+                'view' => function ($url, $model) {
+                    return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', ['expediente/view', 'id' => $model->id], ['title' => 'View']);
+                },
+                'update' => function ($url, $model) {
+                    return Html::a('<span class="glyphicon glyphicon-pencil"></span>', ['expediente/update', 'id' => $model->id], ['title' => 'Update']);
+                },
+                'delete' => function ($url, $model) {
+                    return Html::a('<span class="glyphicon glyphicon-trash"></span>', ['expediente/delete', 'id' => $model->id], [
+                        'title' => 'Delete',
+                        'data-confirm' => 'Are you sure you want to delete this item?',
+                        'data-method' => 'post',
+                    ]);
+                },
+            ],
+        ],
+    ],
+]) ?>
+<?php $this->endBlock();?>
                 </div>
                 <!--.col-md-12-->
             </div>
@@ -63,23 +136,70 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
     <!--.card-->
 </div>
-<?php $this->endBlock();?>
-
 
 <?= Tabs::widget([
-    'items' => [
-        [
-            'label' => 'Información',
-            'content' => $this->blocks['expediente'],
-            'active' => true,
+        'items' => [
+            [
+                'label' => 'Información',
+                'content' => $this->blocks['datos'],
+
+                'active' => true,
+               
+            ],
+            [
+                'label' => 'Archivos',
+                'content' => $this->blocks['expediente'],
+
+
+            ],
+           
+
         ],
-        [
-            'label' => 'Agregar Expediente',
-            'content' => $this->blocks['expedienteForm'],
-            
-        ],
-        // ... otras pestañas si las necesitas
-    ],
-]);
+    ]);
+
+    ?>
+
+
+
+<?php
+// JavaScript para manejar el modal y la carga del formulario
+$this->registerJs('
+$(document).ready(function() {
+    $("#btn-agregar-expediente").click(function() {
+        $("#modal-agregar-expediente").modal("show")
+            .find("#modalContent")
+            .load($(this).attr("value"));
+    });
+});
+
+// JavaScript para manejar el envío del formulario dentro del modal
+$(document).on("beforeSubmit", "form#expediente-form", function(event) {
+    event.preventDefault(); // Evitar envío de formulario por defecto
+    
+    var form = $(this);
+    
+    $.ajax({
+        url: form.attr("action"),
+        type: form.attr("method"),
+        data: form.serialize(),
+        dataType: "json",
+        success: function(response) {
+            if (response.success) {
+                // Mostrar mensaje de éxito
+                $("#modal-agregar-expediente").modal("hide"); // Opcional: cerrar modal
+                alert("El expediente se ha creado correctamente.");
+            } else {
+                // Mostrar mensaje de error si es necesario
+                alert("Hubo un error al crear el expediente.");
+            }
+        },
+        error: function() {
+            // Mostrar mensaje de error en caso de fallo en la solicitud AJAX
+            alert("Error al enviar el formulario.");
+        }
+    });
+});
+');
 ?>
+
 

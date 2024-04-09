@@ -64,10 +64,10 @@ class ExpedienteController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
+    public function actionCreate($idtrabajador)
     {
         $model = new Expediente();
-    
+        $model->idtrabajador = $idtrabajador;
         if (Yii::$app->request->isPost) {
             $model->load(Yii::$app->request->post());
             $file = UploadedFile::getInstance($model, 'ruta');
@@ -95,14 +95,14 @@ class ExpedienteController extends Controller
                 $model->ruta = $rutaArchivo;
                 $model->tipo = $file->extension;
                 $model->fechasubida = date('Y-m-d H:i:s'); // O la fecha que desees registrar
-                
+              //  $model->idusuario = idtrabajador;
                 if ($model->save()) {
-                    return $this->redirect(['view', 'id' => $model->id]);
+                    return $this->redirect(['trabajador/view','id' => $trabajador->id]);
                 }
             }
         }
     
-        return $this->render('create', [
+        return $this->renderAjax('_form', [
             'model' => $model,
         ]);
     }
@@ -144,6 +144,21 @@ class ExpedienteController extends Controller
 
         return $this->redirect(['index']);
     }
+
+
+public function actionOpen($id)
+{
+    $model = Expediente::findOne($id);
+    if ($model) {
+        $rutaArchivo = $model->ruta;
+        if (file_exists($rutaArchivo)) {
+            return Yii::$app->response->sendFile($rutaArchivo, $model->nombre, ['inline' => true]);
+        }
+    }
+    // Si el archivo no se encuentra, puedes redirigir o mostrar un mensaje de error
+    Yii::$app->session->setFlash('error', 'El archivo solicitado no se encuentra disponible.');
+    return $this->redirect(['trabajador/index']); // Cambia esto por la acción o la vista que desees
+}
 
     /**
      * Finds the Expediente model based on its primary key value.

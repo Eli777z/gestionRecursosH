@@ -55,20 +55,17 @@ class TrabajadorController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
+ 
+
     public function actionView($id)
-    {
-        $modelTrabajador = $this->findModel2($id); // Asegúrate de obtener el modelo de Trabajador correcto
-        $modelExpediente = new Expediente(); // Crea una instancia del modelo Expediente
+{
+    $modelTrabajador = $this->findModel2($id);
     
-        // Renderiza el formulario de Expediente desde su carpeta correspondiente
-        $this->view->blocks['expedienteForm'] = $this->renderPartial('/expediente/create', [
-            'model' => $modelExpediente,
-        ]);
-        
-        return $this->render('view', [
-            'model' => $modelTrabajador,
-        ]);
-    }
+    return $this->render('view', [
+        'model' => $modelTrabajador,
+    ]);
+}
+
     
     
     /**

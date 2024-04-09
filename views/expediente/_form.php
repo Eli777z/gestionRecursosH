@@ -1,5 +1,5 @@
 <?php
-
+use kartik\file\FileInput;
 use yii\helpers\Html;
 use yii\bootstrap4\ActiveForm;
 use yii\widgets\Pjax;;
@@ -20,13 +20,12 @@ use yii\widgets\Pjax;;
 
                         <?= $form->field($model, 'nombre')->textInput(['maxlength' => true]) ?>
 
-                        <?= $form->field($model, 'ruta')->fileInput() ?> <!-- Modificado para subir archivos -->
+                        <?= $form->field($model, 'ruta')->widget(FileInput::classname(), ['options' => ['accept' => 'file/*'],]) ?>
 
                         <?= $form->field($model, 'tipo')->textInput(['maxlength' => true]) ?>
 
-                       <?= $form->field($model, 'fechasubida')->textInput() ?>
-
-                        <?= $form->field($model, 'idtrabajador')->textInput() ?>
+                     
+                     
 
                         <div class="form-group">
                             <?= Html::submitButton('Guardar', ['class' => 'btn btn-success']) ?>
