@@ -1,5 +1,5 @@
 <?php
-
+use hail812\adminlte3\yii\grid\ActionColumn;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\helpers\Url;
@@ -16,11 +16,6 @@ $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 
 ?>
-
-
-
-
-
 <div class="container-fluid">
     <div class="card">
         <div class="card-body">
@@ -63,11 +58,12 @@ $this->params['breadcrumbs'][] = $this->title;
                     ]) ?>
 <?php $this->endBlock();?>
 <?php $this->beginBlock('expediente');?>
-<h2>Expedientes del Trabajador</h2>
+<br>
+<h2>Expediente de <?=$model->nombre?>
+</h2>
 <?php
 
-// Registro de YiiAsset
-YiiAsset::register($this);
+
 
 // Botón para abrir el modal
 echo Html::button('Agregar Expediente', [
@@ -75,6 +71,8 @@ echo Html::button('Agregar Expediente', [
     'id' => 'btn-agregar-expediente',
     'value' => Url::to(['expediente/create', 'idtrabajador' => $model->id]),
 ]);
+
+
 
 // Modal para cargar el formulario de creación de expediente
 Modal::begin([
@@ -86,81 +84,6 @@ Modal::end();
 
 
 ?>
-
-<?= GridView::widget([
-    'dataProvider' => new \yii\data\ActiveDataProvider([
-        'query' => $model->getExpedientes(), // Obtener los expedientes del trabajador
-        'pagination' => [
-            'pageSize' => 50,
-        ],
-    ]),
-    'columns' => [
-        'id',
-        [
-            'attribute' => 'nombre',
-            'format' => 'raw',
-            'value' => function ($model) {
-                return Html::a($model->nombre, ['expediente/open', 'id' => $model->id], ['target' => '_blank']);
-            },
-        ],
-        'fechasubida',
-        // Otras columnas que desees mostrar...
-        [
-            'class' => 'yii\grid\ActionColumn',
-            'template' => '{view} {update} {delete}', // Puedes personalizar las acciones que deseas mostrar
-            'buttons' => [
-                'view' => function ($url, $model) {
-                    return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', ['expediente/view', 'id' => $model->id], ['title' => 'View']);
-                },
-                'update' => function ($url, $model) {
-                    return Html::a('<span class="glyphicon glyphicon-pencil"></span>', ['expediente/update', 'id' => $model->id], ['title' => 'Update']);
-                },
-                'delete' => function ($url, $model) {
-                    return Html::a('<span class="glyphicon glyphicon-trash"></span>', ['expediente/delete', 'id' => $model->id], [
-                        'title' => 'Delete',
-                        'data-confirm' => 'Are you sure you want to delete this item?',
-                        'data-method' => 'post',
-                    ]);
-                },
-            ],
-        ],
-    ],
-]) ?>
-<?php $this->endBlock();?>
-                </div>
-                <!--.col-md-12-->
-            </div>
-            <!--.row-->
-        </div>
-        <!--.card-body-->
-    </div>
-    <!--.card-->
-</div>
-
-<?= Tabs::widget([
-        'items' => [
-            [
-                'label' => 'Información',
-                'content' => $this->blocks['datos'],
-
-                'active' => true,
-               
-            ],
-            [
-                'label' => 'Archivos',
-                'content' => $this->blocks['expediente'],
-
-
-            ],
-           
-
-        ],
-    ]);
-
-    ?>
-
-
-
 <?php
 // JavaScript para manejar el modal y la carga del formulario
 $this->registerJs('
@@ -173,7 +96,7 @@ $(document).ready(function() {
 });
 
 // JavaScript para manejar el envío del formulario dentro del modal
-$(document).on("beforeSubmit", "form#expediente-form", function(event) {
+$(document).on("beforeSubmit", "#expediente-form", function(event) {
     event.preventDefault(); // Evitar envío de formulario por defecto
     
     var form = $(this);
@@ -201,5 +124,89 @@ $(document).on("beforeSubmit", "form#expediente-form", function(event) {
 });
 ');
 ?>
+
+
+<?= GridView::widget([
+    'dataProvider' => new \yii\data\ActiveDataProvider([
+        'query' => $model->getExpedientes(), // Obtener los expedientes del trabajador
+        'pagination' => [
+            'pageSize' => 50,
+        ],
+    ]),
+    'columns' => [
+        'id',
+       'nombre',
+        'fechasubida',
+        [
+            'class' => ActionColumn::class,
+            'template' => '{view} {delete} {download}',
+            'buttons' => [
+                'view' => function ($url, $model) {
+                    return Html::a('<i class="far fa-eye"></i>', ['expediente/open', 'id' => $model->id], [
+                        'target' => '_blank',
+                        'title' => 'Ver archivo',
+                        'class' => 'btn btn-info btn-xs', // Clase de Bootstrap para un botón de información pequeño
+                    ]);
+                },
+                'delete' => function ($url, $model) {
+                    return Html::a('<i class="fas fa-trash"></i>', ['expediente/delete', 'id' => $model->id, 'idtrabajador' => $model->idtrabajador], [
+                        'title' => Yii::t('yii', 'Eliminar'),
+                        'data-confirm' => Yii::t('yii', '¿Estás seguro de que deseas eliminar este elemento?'),
+                        'data-method' => 'post',
+                        'data-pjax' => '0',
+                        'class' => 'btn btn-danger btn-xs', // Clase de Bootstrap para un botón de peligro pequeño
+                    ]);
+                },
+                'download' => function ($url, $model) {
+                    return Html::a('<i class="fas fa-download"></i>', ['expediente/download', 'id' => $model->id], [
+                        'title' => 'Descargar archivo',
+                        'class' => 'btn btn-success btn-xs', // Clase de Bootstrap para un botón de éxito pequeño
+                    ]);
+                },
+            ],
+        ],
+        
+        
+    ],
+    'summaryOptions' => ['class' => 'summary mb-2'],
+    'pager' => [
+        'class' => 'yii\bootstrap4\LinkPager',
+    ]
+]); ?>
+<?php $this->endBlock();?>
+                </div>
+                <!--.col-md-12-->
+            </div>
+            <!--.row-->
+        </div>
+        <!--.card-body-->
+    </div>
+    <!--.card-->
+</div>
+
+<?= Tabs::widget([
+        'items' => [
+            [
+                'label' => 'Información',
+                'content' => $this->blocks['datos'],
+
+                'active' => true,
+               
+            ],
+            [
+                'label' => 'Expediente',
+                'content' => $this->blocks['expediente'],
+
+
+            ],
+           
+
+        ],
+    ]);
+
+    ?>
+
+
+
 
 

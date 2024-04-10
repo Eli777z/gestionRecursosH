@@ -10,35 +10,34 @@ use yii\widgets\Pjax;;
 
 
 <div class="container-fluid">
-    <div class="card">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="expediente-form">
+   
+<div class="expediente-form">
 
-                        <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
+    <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
 
-                        <?= $form->field($model, 'nombre')->textInput(['maxlength' => true]) ?>
+    <!-- Campo oculto para el nombre del archivo -->
+    <?= $form->field($model, 'nombre')->hiddenInput(['maxlength' => true, 'id' => 'nombre-archivo'])->label(false) ?>
 
-                        <?= $form->field($model, 'ruta')->widget(FileInput::classname(), ['options' => ['accept' => 'file/*'],]) ?>
-
-                        <?= $form->field($model, 'tipo')->textInput(['maxlength' => true]) ?>
-
-                     
-                     
-
-                        <div class="form-group">
-                            <?= Html::submitButton('Guardar', ['class' => 'btn btn-success']) ?>
-                        </div>
-
-                        <?php ActiveForm::end(); ?>
-
-                    </div>
-                </div>
-                <!--.col-md-12-->
-            </div>
-            <!--.row-->
-        </div>
-        <!--.card-body-->
+    <?= $form->field($model, 'ruta')->widget(FileInput::classname(), ['options' => ['accept' => 'file/*'],]) ?>
+    <?= $form->field($model, 'tipo')->hiddenInput(['maxlength' => true, 'id' => 'tipo-archivo'])-> label(false) ?>
+    <div class="form-group">
+        <?= Html::submitButton('Guardar', ['class' => 'btn btn-success', 'id' => 'btn-agregar-expediente']) ?>
     </div>
-    <!--.card-->
+
+    <?php ActiveForm::end(); ?>
+
+</div>
+
+<script>
+$(document).ready(function() {
+    // Cuando se selecciona un archivo, establece el nombre del archivo y la extensión en los campos correspondientes
+    $('#expediente-ruta').on('change', function() {
+        var fileName = $(this).val().split('\\').pop();
+        $('#nombre-archivo').val(fileName);
+        // Obtener la extensión del archivo
+        var fileExt = fileName.split('.').pop();
+        $('#tipo-archivo').val(fileExt);
+    });
+});
+</script>
+</div>

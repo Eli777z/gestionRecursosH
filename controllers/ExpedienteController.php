@@ -102,7 +102,7 @@ class ExpedienteController extends Controller
             }
         }
     
-        return $this->renderAjax('_form', [
+        return $this->renderAjax('create', [
             'model' => $model,
         ]);
     }
@@ -159,6 +159,25 @@ public function actionOpen($id)
     Yii::$app->session->setFlash('error', 'El archivo solicitado no se encuentra disponible.');
     return $this->redirect(['trabajador/index']); // Cambia esto por la acción o la vista que desees
 }
+
+public function actionDownload($id)
+{
+    $model = Expediente::findOne($id);
+    if ($model) {
+        $rutaArchivo = $model->ruta;
+        if (file_exists($rutaArchivo)) {
+            $nombreArchivo = $model->nombre; // Nombre del archivo sin la extensión
+            $extension = pathinfo($rutaArchivo, PATHINFO_EXTENSION); // Obtener la extensión del archivo
+            $nombreCompleto = $nombreArchivo . '.' . $extension; // Nombre completo con la extensión
+            return Yii::$app->response->sendFile($rutaArchivo, $nombreCompleto);
+        }
+    }
+    // Si el archivo no se encuentra, puedes redirigir o mostrar un mensaje de error
+    Yii::$app->session->setFlash('error', 'El archivo solicitado no se encuentra disponible.');
+    return $this->redirect(['trabajador/index']); // Cambia esto por la acción o la vista que desees
+}
+
+
 
     /**
      * Finds the Expediente model based on its primary key value.

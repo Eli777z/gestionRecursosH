@@ -76,6 +76,7 @@ $config = [
             'enablePrettyUrl' => true,
            // 'showScriptName' => false,
             'rules' => [
+                'expediente/download/<id:\d+>' => 'expediente/download',
             ],
         ],
         'assetManager' => [
