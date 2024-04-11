@@ -16,10 +16,19 @@ use yii\widgets\Pjax;;
     <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
 
     <!-- Campo oculto para el nombre del archivo -->
-    <?= $form->field($model, 'nombre')->hiddenInput(['maxlength' => true, 'id' => 'nombre-archivo'])->label(false) ?>
+    <?= $form->field($model, 'nombre')->textInput(['maxlength' => true, 'id' => 'nombre-archivo'])->label(false) ?>
 
-    <?= $form->field($model, 'ruta')->widget(FileInput::classname(), ['options' => ['accept' => 'file/*'],]) ?>
-    <?= $form->field($model, 'tipo')->hiddenInput(['maxlength' => true, 'id' => 'tipo-archivo'])-> label(false) ?>
+    <?= $form->field($model, 'ruta')->widget(FileInput::classname(), [
+    'options' => ['accept' => 'file/*'],
+    'pluginEvents' => [
+        'fileclear' => "function() {
+            $('#nombre-archivo').val('');
+            $('#tipo-archivo').val('');
+        }",
+    ],
+]) ?>
+
+    <?= $form->field($model, 'tipo')->textInput(['maxlength' => true, 'id' => 'tipo-archivo']) ?>
     <div class="form-group">
         <?= Html::submitButton('Guardar', ['class' => 'btn btn-success', 'id' => 'btn-agregar-expediente']) ?>
     </div>
@@ -30,14 +39,22 @@ use yii\widgets\Pjax;;
 
 <script>
 $(document).ready(function() {
-    // Cuando se selecciona un archivo, establece el nombre del archivo y la extensión en los campos correspondientes
-    $('#expediente-ruta').on('change', function() {
-        var fileName = $(this).val().split('\\').pop();
+    // Cuando se arrastra y suelta un archivo en el área del widget de entrada de archivo
+    $('#expediente-ruta').on('filebatchselected', function(event, files) {
+        // Se asume que solo se selecciona un archivo a la vez
+        var file = files[0];
+        
+        // Obtener el nombre del archivo sin la extensión
+        var fileName = file.name.replace(/\.[^/.]+$/, "");
         $('#nombre-archivo').val(fileName);
+
         // Obtener la extensión del archivo
-        var fileExt = fileName.split('.').pop();
+        var fileExt = file.name.split('.').pop();
         $('#tipo-archivo').val(fileExt);
     });
 });
+
+
 </script>
+
 </div>

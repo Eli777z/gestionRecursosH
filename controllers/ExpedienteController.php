@@ -36,6 +36,7 @@ class ExpedienteController extends Controller
      */
     public function actionIndex()
     {
+        
         $searchModel = new ExpedienteSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -97,6 +98,7 @@ class ExpedienteController extends Controller
                 $model->fechasubida = date('Y-m-d H:i:s'); // O la fecha que desees registrar
               //  $model->idusuario = idtrabajador;
                 if ($model->save()) {
+                    
                     return $this->redirect(['trabajador/view','id' => $trabajador->id]);
                 }
             }
@@ -130,7 +132,9 @@ class ExpedienteController extends Controller
         ]);
     }
 
-    /**
+
+
+    /**  quiero que al momento de eliminar el registro, el archivo de la carpeta se 'borre', es decir se quitara de la carpeta expedientes y pasara a una carpeta 'papelera' (si no esta creada, se crea) dicha carpeta estara dentro de la carpeta que tiene como nombre el nombre del trabajador. Este es el action delete en cuestion, es de ExpedienteController y te muestro el actionCreate para que observes que logica de carpetas existe, ya que se guardan en runtime que no es carpeta de acceso publico
      * Deletes an existing Expediente model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param int $id ID
@@ -140,10 +144,38 @@ class ExpedienteController extends Controller
      */
     public function actionDelete($id, $idtrabajador)
     {
-        $this->findModel($id, $idtrabajador)->delete();
-
-        return $this->redirect(['index']);
+        $model = $this->findModel($id, $idtrabajador);
+        
+        // Obtener la ruta del archivo a eliminar
+        $rutaArchivo = $model->ruta;
+        
+        // Mover el archivo a la carpeta de la papelera
+        $trabajador = Trabajador::findOne($model->idtrabajador);
+        $nombreCarpetaTrabajador = Yii::getAlias('@runtime') . '/trabajadores/' . $trabajador->nombre . '_' . $trabajador->apellido;
+        $nombreCarpetaPapelera = $nombreCarpetaTrabajador . '/papelera';
+        
+        // Verificar si la carpeta de la papelera existe, si no, crearla
+        if (!is_dir($nombreCarpetaPapelera)) {
+            mkdir($nombreCarpetaPapelera, 0775, true);
+        }
+        
+        // Obtener el nombre del archivo
+        $nombreArchivo = basename($rutaArchivo);
+        
+        // Mover el archivo a la carpeta de la papelera
+        $rutaPapelera = $nombreCarpetaPapelera . '/' . $nombreArchivo;
+        rename($rutaArchivo, $rutaPapelera);
+        
+        // Eliminar el modelo de expediente
+        $model->delete();
+    
+        // Redireccionar a la vista de trabajador pasando el ID del trabajador
+        return $this->redirect(['trabajador/view', 'id' => $idtrabajador]);
     }
+    
+
+
+
 
 
 public function actionOpen($id)

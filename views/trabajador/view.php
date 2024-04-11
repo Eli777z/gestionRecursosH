@@ -7,6 +7,7 @@ use yii\bootstrap5\Tabs;
 use yii\grid\GridView;
 use yii\bootstrap4\Modal;
 use yii\web\YiiAsset;
+use yii\widgets\Pjax;
 /* @var $this yii\web\View */
 /* @var $model app\models\Trabajador */
 
@@ -72,7 +73,7 @@ echo Html::button('Agregar Expediente', [
     'value' => Url::to(['expediente/create', 'idtrabajador' => $model->id]),
 ]);
 
-
+echo '<br>';
 
 // Modal para cargar el formulario de creación de expediente
 Modal::begin([
@@ -125,6 +126,7 @@ $(document).on("beforeSubmit", "#expediente-form", function(event) {
 ');
 ?>
 
+<?php Pjax::begin(); ?>
 
 <?= GridView::widget([
     'dataProvider' => new \yii\data\ActiveDataProvider([
@@ -146,6 +148,7 @@ $(document).on("beforeSubmit", "#expediente-form", function(event) {
                         'target' => '_blank',
                         'title' => 'Ver archivo',
                         'class' => 'btn btn-info btn-xs', // Clase de Bootstrap para un botón de información pequeño
+                        'data-pjax' => "0"
                     ]);
                 },
                 'delete' => function ($url, $model) {
@@ -153,7 +156,7 @@ $(document).on("beforeSubmit", "#expediente-form", function(event) {
                         'title' => Yii::t('yii', 'Eliminar'),
                         'data-confirm' => Yii::t('yii', '¿Estás seguro de que deseas eliminar este elemento?'),
                         'data-method' => 'post',
-                        'data-pjax' => '0',
+                        
                         'class' => 'btn btn-danger btn-xs', // Clase de Bootstrap para un botón de peligro pequeño
                     ]);
                 },
@@ -161,6 +164,7 @@ $(document).on("beforeSubmit", "#expediente-form", function(event) {
                     return Html::a('<i class="fas fa-download"></i>', ['expediente/download', 'id' => $model->id], [
                         'title' => 'Descargar archivo',
                         'class' => 'btn btn-success btn-xs', // Clase de Bootstrap para un botón de éxito pequeño
+                        'data-pjax' => "0"
                     ]);
                 },
             ],
@@ -173,7 +177,9 @@ $(document).on("beforeSubmit", "#expediente-form", function(event) {
         'class' => 'yii\bootstrap4\LinkPager',
     ]
 ]); ?>
+  <?php Pjax::end(); ?>
 <?php $this->endBlock();?>
+
                 </div>
                 <!--.col-md-12-->
             </div>
@@ -190,13 +196,13 @@ $(document).on("beforeSubmit", "#expediente-form", function(event) {
                 'label' => 'Información',
                 'content' => $this->blocks['datos'],
 
-                'active' => true,
+                
                
             ],
             [
                 'label' => 'Expediente',
                 'content' => $this->blocks['expediente'],
-
+                'active' => true,
 
             ],
            
