@@ -26,7 +26,9 @@
         "kartik-v/yii2-widget-datepicker": "dev-master",
         "yiisoft/yii2-jui": "^2.0",
         "yiisoft/yii2-swiftmailer": "^2.0",
-        "kartik-v/yii2-widget-fileinput": "dev-master"
+        "kartik-v/yii2-widget-fileinput": "dev-master",
+        "kartik-v/yii2-field-range": "dev-master"
+        
        
        
        

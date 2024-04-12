@@ -11,6 +11,7 @@ use app\models\Expediente;
  */
 class ExpedienteSearch extends Expediente
 {
+    public $nombre; // A
     /**
      * {@inheritdoc}
      */
@@ -63,9 +64,7 @@ class ExpedienteSearch extends Expediente
             'idtrabajador' => $this->idtrabajador,
         ]);
 
-        $query->andFilterWhere(['like', 'nombre', $this->nombre])
-            ->andFilterWhere(['like', 'ruta', $this->ruta])
-            ->andFilterWhere(['like', 'tipo', $this->tipo]);
+        $query->andFilterWhere(['like', 'nombre', $this->nombre]);
 
         return $dataProvider;
     }

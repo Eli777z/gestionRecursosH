@@ -19,14 +19,18 @@ use yii\widgets\Pjax;;
     <?= $form->field($model, 'nombre')->textInput(['maxlength' => true, 'id' => 'nombre-archivo'])->label(false) ?>
 
     <?= $form->field($model, 'ruta')->widget(FileInput::classname(), [
-    'options' => ['accept' => 'file/*'],
-    'pluginEvents' => [
-        'fileclear' => "function() {
-            $('#nombre-archivo').val('');
-            $('#tipo-archivo').val('');
-        }",
-    ],
-]) ?>
+        'options' => ['accept' => 'file/*'],
+        'pluginEvents' => [
+            
+            'fileclear' => "function() {
+                $('#nombre-archivo').val('');
+                $('#tipo-archivo').val('');
+            }",
+        ],
+        'pluginOptions' => [
+            'showUpload' => false,
+        ],
+    ]) ?>
 
     <?= $form->field($model, 'tipo')->textInput(['maxlength' => true, 'id' => 'tipo-archivo']) ?>
     <div class="form-group">
@@ -46,15 +50,18 @@ $(document).ready(function() {
         
         // Obtener el nombre del archivo sin la extensión
         var fileName = file.name.replace(/\.[^/.]+$/, "");
-        $('#nombre-archivo').val(fileName);
+        
+        // Verificar si el nombre del archivo comienza con "CURP" o "curp"
+        if (fileName.toLowerCase().startsWith("curp")) {
+            $('#nombre-archivo').val('CURP');
+        } else {
+            $('#nombre-archivo').val(fileName);
+        }
 
         // Obtener la extensión del archivo
         var fileExt = file.name.split('.').pop();
         $('#tipo-archivo').val(fileExt);
     });
 });
-
-
 </script>
-
 </div>

@@ -2,12 +2,18 @@
 
 use yii\helpers\Html;
 use yii\bootstrap4\ActiveForm;
-
+use kartik\file\FileInput;
 /* @var $this yii\web\View */
 /* @var $model app\models\Trabajador */
 /* @var $form yii\bootstrap4\ActiveForm */
 ?>
-
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+           
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
 <div class="trabajador-form">
 
 <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
@@ -47,7 +53,13 @@ use yii\bootstrap4\ActiveForm;
 
     <?= $form->field($model, 'colonia')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'foto')->fileInput(['class'=>'form-control']) ?>
+    <?= $form->field($model, 'foto')->widget(FileInput::classname(), [
+    'options' => ['accept' => 'file/*'],
+    'pluginOptions' => [
+        'showUpload' => false,
+    ],
+]) ?>
+
 
    
 
@@ -58,3 +70,21 @@ use yii\bootstrap4\ActiveForm;
     <?php ActiveForm::end(); ?>
 
 </div>
+ </div>
+                        <!--.col-md-12-->
+                        
+                    </div>
+                    <!--.row-->
+                    
+                </div>
+                <!--.card-body-->
+                
+          
+            <!--.card-->
+         
+        </div>
+        <!--.col-md-10-->
+    </div>
+    <!--.row-->
+</div>
+<!--.container-fluid-->

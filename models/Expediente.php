@@ -36,6 +36,7 @@ class Expediente extends \yii\db\ActiveRecord
             [['idtrabajador'], 'integer'],
             [['nombre'], 'string', 'max' => 85],
             [['tipo'], 'string', 'max' => 10],
+            [['ruta'], 'string', 'max' => 255],
             [['archivoSubido'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg, pdf, doc, docx'],
             [['idtrabajador'], 'exist', 'skipOnError' => true, 'targetClass' => Trabajador::class, 'targetAttribute' => ['idtrabajador' => 'id']],
         ];
