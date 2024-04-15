@@ -102,5 +102,26 @@ a.desc:after {
     /* Estilos personalizados para los paneles de los tabs */
     
 }
+/* Modificar el color de fondo de los tabs */
+.nav-tabs .nav-item .nav-link {
+    background-color: #ffffff;
+}
+
+/* Modificar el color del texto de los tabs */
+.nav-tabs .nav-item .nav-link {
+    color: #930808;
+}
+
+/* Modificar el tamaño del texto de los tabs */
+.nav-tabs .nav-item .nav-link {
+    font-size: 16px;
+}
+
+/* Modificar el estilo de borde de los tabs */
+.nav-tabs .nav-item .nav-link {
+   
+    border: none;
+}
+
 
 /* Agregar más estilos según sea necesario */
