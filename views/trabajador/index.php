@@ -32,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
     'tableOptions' => ['class' => 'table table-striped table-bordered table-condensed'], // Agrega clases de Bootstrap para un diseño más compacto
     'rowOptions' => function ($model, $key, $index, $grid) {
         if ($index % 2 === 0) {
-            return ['style' => 'background-color: #D5E5FF;'];
+            return ['style' => 'background-color: #D1F2EB;'];
             // Fila blanca
         } else {
             return ['style' => 'background-color: #FFFFFF;']; // Fila azul claro

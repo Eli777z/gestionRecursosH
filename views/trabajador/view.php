@@ -37,13 +37,14 @@ $this->params['breadcrumbs'][] = $this->title;
                         echo Html::tag('div', 'No hay foto disponible', ['class' => 'mr-3']);
                     }
                     ?>
-                    <h2 class="mb-0">Trabajador: <?= $model->nombre ?></h2>
+                    <h2 class="mb-0">Trabajador: <?= $model->nombre ?>  <?= $model->apellido ?></h2>
                 </div>
                             <?php $this->beginBlock('datos');?>
 
                             <?= DetailView::widget([
                                 'model' => $model,
                                 'template' => '<tr><th style="width: 20%">{label}</th><td style="width: 30%">{value}</td></tr>', // Ajusta el ancho de las columnas
+                                
                                 'attributes' => [
                                     'id',
                                     'nombre',
@@ -139,6 +140,8 @@ $dataProvider = $searchModel->search($params);
     'filterModel' => $searchModel,
     'options' => ['class' => 'grid-view', 'style' => 'width: 80%; margin: auto;'], // Ajusta el ancho del GridView y lo centra horizontalmente
     'tableOptions' => ['class' => 'table table-striped table-bordered table-condensed'], // Agrega clases de Bootstrap para un diseño más compacto
+    
+    
     'columns' => [
         [
             'attribute' => 'nombre',
