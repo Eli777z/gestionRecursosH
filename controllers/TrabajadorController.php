@@ -12,6 +12,9 @@ use yii\filters\VerbFilter;
 use yii\db\Exception;
 use yii\web\UploadedFile;
 use app\models\Expediente;
+use yii\helpers\FileHelper;
+use app\models\Infolaboral;
+use app\models\Departamento;
 
 /**
  * TrabajadorController implements the CRUD actions for Trabajador model.
@@ -55,30 +58,38 @@ class TrabajadorController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
- 
+
 
     public function actionView($id)
-{
-    $modelTrabajador = $this->findModel2($id);
-    
-    return $this->render('view', [
-        'model' => $modelTrabajador,
-    ]);
-}
+    {
+        $modelTrabajador = $this->findModel2($id);
 
-    
-    
+        return $this->render('view', [
+            'model' => $modelTrabajador,
+        ]);
+    }
+
+
+
     /**
      * Creates a new Trabajador model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
+
+
+
+
+
+
     public function actionCreate()
     {
         $model = new Trabajador();
         $user = new Usuario();
+        $infolaboral = new Infolaboral();
+        $departamento = new Departamento();
         $user->scenario = Usuario::SCENARIO_CREATE;
-        if ($model->load(Yii::$app->request->post()) && $user->load(Yii::$app->request->post())) {
+        if ($model->load(Yii::$app->request->post()) && $user->load(Yii::$app->request->post()) && $infolaboral->load(Yii::$app->request->post()) && $departamento->load(Yii::$app->request->post())) {
             $transaction = Yii::$app->db->beginTransaction();
             $user->username = $model->nombre . $model->apellido;
             $nombres = explode(" ", $model->nombre);
@@ -96,41 +107,45 @@ class TrabajadorController extends Controller
             $hash = Yii::$app->security->generatePasswordHash($user->password);
             $user->password = $hash;
             try {
+                $infolaboral->iddepartamento = $departamento->nombre;
+
+                
+                if (!$infolaboral->save()) {
+                    throw new \yii\db\Exception('Error al guardar Infolaboral');
+                }
+
+               
+                $model->idinfolaboral = $infolaboral->id;
+
                 if ($user->save()) {
                     $model->idusuario = $user->id;
                     $auth = \Yii::$app->authManager;
                     $authorRole = $auth->getRole('trabajador');
                     $auth->assign($authorRole, $user->id);
-                    $upload = UploadedFile::getInstance($model, 'foto');
-                  //  if (is_object($upload)) {
-                    //    $upload_filename = 'uploads/user_profile/' . $upload->baseName . '.' . $upload->extension;
-                      //  $upload->saveAs($upload_filename);
-                        //$model->foto = $upload_filename;
-                    //}
-                   // $nombreCarpeta = Yii::getAlias('@runtime') . '/trabajadores/' . $model->nombre . '_' . $model->apellido;
-                    //if (!is_dir($nombreCarpeta)) {
-                      //  mkdir($nombreCarpeta, 0775, true);
-                   // }
 
-                   if (is_object($upload)) {
-                    // Crea la carpeta del trabajador si no existe
-                    $nombreCarpetaTrabajador = Yii::getAlias('@runtime') . '/trabajadores/' . $model->nombre . '_' . $model->apellido;
-                    if (!is_dir($nombreCarpetaTrabajador)) {
-                        mkdir($nombreCarpetaTrabajador, 0775, true);
+                   
+
+                    $upload = UploadedFile::getInstance($model, 'foto');
+
+                    if (is_object($upload)) {
+                      
+                        $nombreCarpetaTrabajador = Yii::getAlias('@runtime') . '/trabajadores/' . $model->nombre . '_' . $model->apellido;
+                        if (!is_dir($nombreCarpetaTrabajador)) {
+                            mkdir($nombreCarpetaTrabajador, 0775, true);
+                        }
+
+                     
+                        $nombreCarpetaUserProfile = $nombreCarpetaTrabajador . '/foto_Trabajador';
+                        if (!is_dir($nombreCarpetaUserProfile)) {
+                            mkdir($nombreCarpetaUserProfile, 0775, true);
+                        }
+
+                      
+                        $upload_filename = $nombreCarpetaUserProfile . '/' . $upload->baseName . '.' . $upload->extension;
+                        $upload->saveAs($upload_filename);
+                        $model->foto = $upload_filename;
                     }
-                    
-                    // Crea la subcarpeta 'user_profile' dentro de la carpeta del trabajador si no existe
-                    $nombreCarpetaUserProfile = $nombreCarpetaTrabajador . '/foto_Trabajador';
-                    if (!is_dir($nombreCarpetaUserProfile)) {
-                        mkdir($nombreCarpetaUserProfile, 0775, true);
-                    }
-                
-                    // Guarda la foto del perfil en la subcarpeta 'user_profile' de la carpeta del trabajador
-                    $upload_filename = $nombreCarpetaUserProfile . '/' . $upload->baseName . '.' . $upload->extension;
-                    $upload->saveAs($upload_filename);
-                    $model->foto = $upload_filename;   
-                }
-                
+
 
 
                     if ($model->save()) {
@@ -147,6 +162,7 @@ class TrabajadorController extends Controller
                     } else {
                         $transaction->rollBack();
                     }
+                    //
                 }
             } catch (\Exception $e) {
                 $transaction->rollBack();
@@ -156,6 +172,8 @@ class TrabajadorController extends Controller
         return $this->render('create', [
             'model' => $model,
             'user' => $user,
+            'infolaboral' => $infolaboral,
+            'departamento' => $departamento,
         ]);
     }
 
@@ -174,7 +192,7 @@ class TrabajadorController extends Controller
         $previous_photo = $model->foto;
 
         if ($model->load(Yii::$app->request->post()) && $user->load(Yii::$app->request->post())) {
-            $transaction = Yii::$app->db->beginTransaction(); // Iniciar transacción
+            $transaction = Yii::$app->db->beginTransaction(); 
 
             try {
                 $user->username = $user->getOldAttribute('username');
@@ -189,37 +207,36 @@ class TrabajadorController extends Controller
 
                 if ($user->save()) {
                     $upload = UploadedFile::getInstance($model, 'foto');
-        if (is_object($upload)) {
-            // Define la ruta de la carpeta del trabajador
-            $nombreCarpetaTrabajador = Yii::getAlias('@runtime') . '/trabajadores/' . $model->nombre . '_' . $model->apellido;
-            if (!is_dir($nombreCarpetaTrabajador)) {
-                mkdir($nombreCarpetaTrabajador, 0775, true);
-            }
+                    if (is_object($upload)) {
+                        
+                        $nombreCarpetaTrabajador = Yii::getAlias('@runtime') . '/trabajadores/' . $model->nombre . '_' . $model->apellido;
+                        if (!is_dir($nombreCarpetaTrabajador)) {
+                            mkdir($nombreCarpetaTrabajador, 0775, true);
+                        }
 
-            // Define la ruta de la subcarpeta 'foto_Trabajador'
-            $nombreCarpetaUserProfile = $nombreCarpetaTrabajador . '/foto_Trabajador';
-            if (!is_dir($nombreCarpetaUserProfile)) {
-                mkdir($nombreCarpetaUserProfile, 0775, true);
-            }
+                        $nombreCarpetaUserProfile = $nombreCarpetaTrabajador . '/foto_Trabajador';
+                        if (!is_dir($nombreCarpetaUserProfile)) {
+                            mkdir($nombreCarpetaUserProfile, 0775, true);
+                        }
 
-            // Define la ruta del archivo de la foto
-            $upload_filename = $nombreCarpetaUserProfile . '/' . $upload->baseName . '.' . $upload->extension;
+                     
+                        $upload_filename = $nombreCarpetaUserProfile . '/' . $upload->baseName . '.' . $upload->extension;
 
-            // Guarda la nueva foto y actualiza la ruta en el modelo
-            if ($upload->saveAs($upload_filename)) {
-                // Si hay una foto anterior y es diferente a la nueva, considera eliminar la anterior
-                if ($previous_photo && $previous_photo !== $upload_filename && file_exists($previous_photo)) {
-                    @unlink($previous_photo);
-                }
-                $model->foto = $upload_filename;
-            }
-        } else {
-            $model->foto = $previous_photo; // Si no se subió una nueva foto, mantiene la anterior
-        }
+                     
+                        if ($upload->saveAs($upload_filename)) {
+                            
+                            if ($previous_photo && $previous_photo !== $upload_filename && file_exists($previous_photo)) {
+                                @unlink($previous_photo);
+                            }
+                            $model->foto = $upload_filename;
+                        }
+                    } else {
+                        $model->foto = $previous_photo; 
+                    }
 
 
                     if ($model->save()) {
-                        $transaction->commit(); // Si todo está bien, hacer commit
+                        $transaction->commit(); 
                         return $this->redirect(['view', 'id' => $model->id]);
                     } else {
                         throw new \Exception('Error al guardar el modelo Trabajador');
@@ -228,14 +245,14 @@ class TrabajadorController extends Controller
                     throw new \Exception('Error al guardar el modelo Usuario');
                 }
             } catch (\Exception $e) {
-                $transaction->rollBack(); // Si algo sale mal, hacer rollback
+                $transaction->rollBack(); 
                 Yii::$app->session->setFlash('error', $e->getMessage());
             }
         }
         $user->password = '';
         return $this->render('update', [
             'model' => $model,
-            'user' => $user, // Pasar el modelo Usuario a la vista
+            'user' => $user, 
         ]);
     }
 
@@ -248,34 +265,60 @@ class TrabajadorController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
+
     public function actionDelete($id, $idusuario)
     {
+        // Busca el trabajador
         $trabajador = $this->findModel($id, $idusuario);
 
         // Obtén el ID del usuario asociado al trabajador
         $idUsuario = $trabajador->idusuario;
 
-        // Elimina tanto el trabajador como su usuario asociado
+        // Inicia una transacción
         $transaction = Yii::$app->db->beginTransaction();
 
         try {
-            // Primero elimina el trabajador
+            // Elimina todos los expedientes asociados al trabajador
+            foreach ($trabajador->expedientes as $expediente) {
+                // Elimina la carpeta asociada al expediente
+
+                $nombreCarpetaTrabajador = Yii::getAlias('@runtime') . '/trabajadores/' . $trabajador->nombre . '_' . $trabajador->apellido;
+                if (is_dir($nombreCarpetaTrabajador)) {
+                    // Elimina recursivamente la carpeta y su contenido
+                    FileHelper::removeDirectory($nombreCarpetaTrabajador);
+                }
+                // Elimina el expediente de la base de datos
+                $expediente->delete();
+            }
+
+            // Elimina la carpeta del trabajador dentro de la carpeta de expedientes
+
+
+            // Luego elimina el trabajador
             $trabajador->delete();
 
-            // Luego elimina su usuario asociado
-            Usuario::findOne($idUsuario)->delete();
+            // Busca y elimina el usuario asociado
+            $usuario = Usuario::findOne($idUsuario);
+            if ($usuario) {
+                $usuario->delete();
+            }
 
+            // Confirma la transacción
             $transaction->commit();
 
-            Yii::$app->session->setFlash('success', 'Trabajador eliminado exitosamente.');
+            Yii::$app->session->setFlash('success', 'Trabajador, expedientes, carpeta asociada y usuario eliminados exitosamente.');
         } catch (Exception $e) {
+            // Si hay un error, revierte la transacción
             $transaction->rollBack();
 
-            Yii::$app->session->setFlash('error', 'Error al eliminar el trabajadory su usuario.');
+            Yii::$app->session->setFlash('error', 'Error al eliminar el trabajador, sus expedientes, la carpeta asociada y el usuario.');
         }
 
         return $this->redirect(['index']);
     }
+
+
+
 
     /**
      * Finds the Trabajador model based on its primary key value.
@@ -287,17 +330,17 @@ class TrabajadorController extends Controller
      */
 
 
-     public function actionFotoTrabajador($id)
-{
-    $model = $this->findModel2($id); // Encuentra el modelo del trabajador basado en el ID
+    public function actionFotoTrabajador($id)
+    {
+        $model = $this->findModel2($id); // Encuentra el modelo del trabajador basado en el ID
 
-    // Asegúrate de que el archivo exista y de que sea una imagen
-    if (file_exists($model->foto) && @getimagesize($model->foto)) {
-        return Yii::$app->response->sendFile($model->foto);
-    } else {
-        throw new \yii\web\NotFoundHttpException('La imagen no existe.');
+        // Asegúrate de que el archivo exista y de que sea una imagen
+        if (file_exists($model->foto) && @getimagesize($model->foto)) {
+            return Yii::$app->response->sendFile($model->foto);
+        } else {
+            throw new \yii\web\NotFoundHttpException('La imagen no existe.');
+        }
     }
-}
 
     protected function findModel2($id)
     {
@@ -315,10 +358,71 @@ class TrabajadorController extends Controller
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+
+
+    
     //public function actionView($id, $idusuario)
     //{
     //  return $this->render('view', [
     //    'model' => $this->findModel($id, $idusuario),
     //]);
     //}
+
+
+    public function actionDesactivarUsuario($id)
+    {
+        // Buscar el modelo Trabajador por su ID
+        $trabajador = Trabajador::findOne($id);
+
+        if (!$trabajador) {
+            throw new NotFoundHttpException('El trabajador no existe.');
+        }
+
+        // Obtener el ID del usuario asociado al trabajador
+        $usuarioId = $trabajador->idusuario;
+
+        // Buscar el modelo Usuario por su ID
+        $usuario = Usuario::findOne($usuarioId);
+
+        if (!$usuario) {
+            throw new NotFoundHttpException('El usuario asociado al trabajador no existe.');
+        }
+
+        // Desactivar al usuario (actualizar su campo 'status' a 0)
+        $usuario->status = 0;
+
+        // Guardar los cambios
+        if ($usuario->save()) {
+            Yii::$app->session->setFlash('success', 'El usuario ha sido desactivado correctamente.');
+        } else {
+            Yii::$app->session->setFlash('error', 'Hubo un error al desactivar el usuario.');
+        }
+
+        // Redirigir a la vista del trabajador o a cualquier otra vista deseada
+        return $this->redirect(['view', 'id' => $id]);
+    }
+
+    public function actionToggleActivation($id)
+    {
+        $model = $this->findModel2($id);
+        
+        // Cambia el estado del usuario
+        if ($model->idusuario0->status == 10) {
+            $model->idusuario0->status = 0; // Inactiva el usuario
+        } else {
+            $model->idusuario0->status = 10; // Activa el usuario
+        }
+
+        // Guarda el cambio
+        if ($model->idusuario0->save()) {
+            Yii::$app->session->setFlash('success', 'El estado del usuario se ha cambiado correctamente.');
+        } else {
+            Yii::$app->session->setFlash('error', 'Se produjo un error al cambiar el estado del usuario.');
+        }
+
+        return $this->redirect(['index']);
+    }
+
 }
+
+

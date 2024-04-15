@@ -57,8 +57,22 @@ $this->params['breadcrumbs'][] = $this->title;
         'apellido',
         'email:email',
         ['class' => 'hail812\adminlte3\yii\grid\ActionColumn',
-            'template' => '{view} {delete} {update}', // Incluye solo los botones que deseas
+            'template' => '{view} {delete} {update} {toggle-activation}', // Incluye solo los botones que deseas
             'buttons' => [
+                'toggle-activation' => function ($url, $model) {
+                    
+                    $isActive = $model->idusuario0->status == 10;
+                 
+                    $icon = $isActive ? 'fas fa-ban' : 'far fa-check-circle';
+                    $title = $isActive ? 'Desactivar Usuario' : 'Activar Usuario';
+    
+                    return Html::a('<i class="' . $icon . '"></i>', ['trabajador/toggle-activation', 'id' => $model->id], [
+                        'title' => Yii::t('yii', $title),
+                        'data-confirm' => Yii::t('yii', '¿Estás seguro de que deseas cambiar el estado de este usuario?'),
+                        'data-method' => 'post',
+                        'class' => 'btn btn-xs ' . ($isActive ? 'btn-warning' : 'btn-success'),
+                    ]);
+                },
                 'view' => function ($url, $model) {
                     return Html::a('<i class="far fa-eye"></i>', $url, [
                        // 'target' => '_blank',
@@ -81,6 +95,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'class' => 'btn btn-primary btn-xs',
                     ]);
                 },
+                
             ],
             'options' => ['style' => 'width: 15%;'], // Ajusta el ancho de la columna
         ],

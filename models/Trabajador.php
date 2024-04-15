@@ -39,7 +39,7 @@ class Trabajador extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['nombre', 'apellido', 'email', 'fecha_nacimiento', 'codigo_postal', 'calle', 'numero_casa', 'telefono', 'colonia', 'idusuario'], 'required'],
+            [['nombre', 'apellido', 'email', 'idusuario'], 'required'],
             [['fecha_nacimiento'], 'safe'],
             [['codigo_postal', 'numero_casa', 'idusuario'], 'integer'],
             [['nombre'], 'string', 'max' => 30],
@@ -95,5 +95,10 @@ class Trabajador extends \yii\db\ActiveRecord
     public function getIdusuario0()
     {
         return $this->hasOne(Usuario::class, ['id' => 'idusuario']);
+    }
+
+    public function getIdinfolaboral0()
+    {
+        return $this->hasOne(Infolaboral::class, ['id' => 'idinfolaboral']);
     }
 }

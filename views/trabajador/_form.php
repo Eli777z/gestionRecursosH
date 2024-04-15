@@ -3,6 +3,8 @@
 use yii\helpers\Html;
 use yii\bootstrap4\ActiveForm;
 use kartik\file\FileInput;
+use app\models\Departamento;
+use yii\helpers\ArrayHelper;
 /* @var $this yii\web\View */
 /* @var $model app\models\Trabajador */
 /* @var $form yii\bootstrap4\ActiveForm */
@@ -17,57 +19,49 @@ use kartik\file\FileInput;
 <div class="trabajador-form">
 
 <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
+
 <?= $form->field($user, 'rol')->dropDownList([
-        1 => 'Trabajador',
-        2 => 'Gestor de recursos humanos',
-    ]) ?>
-    <?= $form->field($model, 'nombre')->textInput(['maxlength' => true]) ?>
+    1 => 'Trabajador',
+    2 => 'Gestor de recursos humanos',
+]) ?>
 
-    <?= $form->field($model, 'apellido')->textInput(['maxlength' => true]) ?>
+<?= $form->field($model, 'nombre')->textInput(['maxlength' => true]) ?>
+<?= $form->field($model, 'apellido')->textInput(['maxlength' => true]) ?>
+<?= $form->field($model, 'email')->textInput() ?>
 
-    <?= $form->field($model, 'email')->textInput() ?>
+<?= $form->field($infolaboral, 'numero_trabajador')->textInput() ?>
+<?= $form->field($infolaboral, 'fecha_inicio')->widget(\yii\jui\DatePicker::className(), [
+    'language' => 'es',
+    'dateFormat' => 'php:Y-m-d',
+    'options' => ['class' => 'form-control'],
+    'clientOptions' => [
+        'changeYear' => true,
+        'changeMonth' => true,
+        'yearRange' => '-100:+0',
+    ],
+]) ?>
 
-    <?= $form->field($model, 'fecha_nacimiento')->widget(\yii\jui\DatePicker::className(), [
-        'language' => 'es',
-        'dateFormat' => 'php:Y-m-d',
-        'options' => ['class' => 'form-control'],
-        'clientOptions' => [
-            'changeYear' => true,
-            'changeMonth' => true,
-            'yearRange' => '-100:+0',
-        ],
-    ]) ?>
-    <?= $form->field($model, 'codigo_postal')->textInput() ?>
+<?= $form->field($departamento, 'nombre')->dropDownList(ArrayHelper::map(Departamento::find()->all(), 'id', 'nombre'), ['prompt' => 'Seleccione departamento']) ?>
 
-    <?= $form->field($model, 'calle')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'numero_casa')->textInput() ?>
-
-    <?= $form->field($model, 'telefono')->textInput([
+<?= $form->field($model, 'telefono')->textInput([
     'maxlength' => true,
     'pattern' => '\d*',
     'inputmode' => 'numeric',
-   // 'placeholder' => 'Ingresa 10 dígitos'
 ]) ?>
 
-
-    <?= $form->field($model, 'colonia')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'foto')->widget(FileInput::classname(), [
+<?= $form->field($model, 'foto')->widget(FileInput::classname(), [
     'options' => ['accept' => 'file/*'],
     'pluginOptions' => [
         'showUpload' => false,
     ],
 ]) ?>
 
+<div class="form-group">
+    <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+</div>
 
-   
+<?php ActiveForm::end(); ?>
 
-    <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
-    </div>
-
-    <?php ActiveForm::end(); ?>
 
 </div>
  </div>

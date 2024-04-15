@@ -86,3 +86,21 @@ a.desc:after {
 .form-group {
     margin-bottom: 1rem;
 }
+
+.custom-tabs {
+    margin-top: 20px; /* Agregar margen superior */
+    /*background-color: #D1F2EB;*/
+    
+}
+
+.custom-tab-content {
+    /* Estilos personalizados para el contenido de los tabs */
+    
+}
+
+.custom-tab-pane {
+    /* Estilos personalizados para los paneles de los tabs */
+    
+}
+
+/* Agregar más estilos según sea necesario */

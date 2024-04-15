@@ -3,10 +3,10 @@
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\Trabajador */
+/* @var $model app\models\Departamento */
 
-$this->title = 'Create Trabajador';
-$this->params['breadcrumbs'][] = ['label' => 'Trabajadors', 'url' => ['index']];
+$this->title = 'Create Departamento';
+$this->params['breadcrumbs'][] = ['label' => 'Departamentos', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
@@ -16,10 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="row">
                 <div class="col-md-12">
                     <?=$this->render('_form', [
-                           'model' => $model,
-                           'user' => $user,
-                           'infolaboral' => $infolaboral,
-                           'departamento' => $departamento,
+                        'model' => $model
                     ]) ?>
                 </div>
             </div>
