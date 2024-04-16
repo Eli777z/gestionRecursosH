@@ -99,12 +99,10 @@ class SiteController extends Controller
     public function actionLogin()
     {
         if (!Yii::$app->user->isGuest) {
-            // Si el usuario ya está autenticado, redirige según su rol
             $userId = Yii::$app->user->identity->id;
             $user = Usuario::findOne($userId);
             // Verifica si es el primer inicio de sesión
             if ($user->nuevo == 4) {
-                // Redirige al usuario a la acción de cambio de contraseña
                 return $this->redirect(['usuario/cambiarcontrasena']);
             }
             if (Usuario::isUserAdmin($userId)) {
@@ -117,13 +115,11 @@ class SiteController extends Controller
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
             $userId = Yii::$app->user->identity->id;
             $user = Usuario::findOne($userId);
-            // Si el inicio de sesión es exitoso, redirige según el rol
             $userId = Yii::$app->user->identity->id;
             if (Usuario::isUserAdmin($userId)) {
                 return $this->redirect(["site/portalgestionrh"]);
             } else {
                 if ($user->nuevo == 4) {
-                    // Redirige al usuario a la acción de cambio de contraseña
                     return $this->redirect(['usuario/cambiarcontrasena']);
                 }else{
 
@@ -133,7 +129,6 @@ class SiteController extends Controller
                
             }
         } else {
-            // Si hay errores en el inicio de sesión, muestra la vista de login
             $model->password = '';
             return $this->render('login', [
                 'model' => $model,

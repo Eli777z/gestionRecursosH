@@ -268,47 +268,34 @@ class TrabajadorController extends Controller
 
     public function actionDelete($id, $idusuario)
     {
-        // Busca el trabajador
         $trabajador = $this->findModel($id, $idusuario);
 
-        // Obtén el ID del usuario asociado al trabajador
         $idUsuario = $trabajador->idusuario;
 
-        // Inicia una transacción
         $transaction = Yii::$app->db->beginTransaction();
 
         try {
-            // Elimina todos los expedientes asociados al trabajador
             foreach ($trabajador->expedientes as $expediente) {
-                // Elimina la carpeta asociada al expediente
 
                 $nombreCarpetaTrabajador = Yii::getAlias('@runtime') . '/trabajadores/' . $trabajador->nombre . '_' . $trabajador->apellido;
                 if (is_dir($nombreCarpetaTrabajador)) {
-                    // Elimina recursivamente la carpeta y su contenido
                     FileHelper::removeDirectory($nombreCarpetaTrabajador);
                 }
-                // Elimina el expediente de la base de datos
                 $expediente->delete();
             }
 
-            // Elimina la carpeta del trabajador dentro de la carpeta de expedientes
-
-
-            // Luego elimina el trabajador
+            
             $trabajador->delete();
 
-            // Busca y elimina el usuario asociado
             $usuario = Usuario::findOne($idUsuario);
             if ($usuario) {
                 $usuario->delete();
             }
 
-            // Confirma la transacción
             $transaction->commit();
 
             Yii::$app->session->setFlash('success', 'Trabajador, expedientes, carpeta asociada y usuario eliminados exitosamente.');
         } catch (Exception $e) {
-            // Si hay un error, revierte la transacción
             $transaction->rollBack();
 
             Yii::$app->session->setFlash('error', 'Error al eliminar el trabajador, sus expedientes, la carpeta asociada y el usuario.');
@@ -332,9 +319,8 @@ class TrabajadorController extends Controller
 
     public function actionFotoTrabajador($id)
     {
-        $model = $this->findModel2($id); // Encuentra el modelo del trabajador basado en el ID
+        $model = $this->findModel2($id); 
 
-        // Asegúrate de que el archivo exista y de que sea una imagen
         if (file_exists($model->foto) && @getimagesize($model->foto)) {
             return Yii::$app->response->sendFile($model->foto);
         } else {
@@ -371,34 +357,28 @@ class TrabajadorController extends Controller
 
     public function actionDesactivarUsuario($id)
     {
-        // Buscar el modelo Trabajador por su ID
         $trabajador = Trabajador::findOne($id);
 
         if (!$trabajador) {
             throw new NotFoundHttpException('El trabajador no existe.');
         }
 
-        // Obtener el ID del usuario asociado al trabajador
         $usuarioId = $trabajador->idusuario;
 
-        // Buscar el modelo Usuario por su ID
         $usuario = Usuario::findOne($usuarioId);
 
         if (!$usuario) {
             throw new NotFoundHttpException('El usuario asociado al trabajador no existe.');
         }
 
-        // Desactivar al usuario (actualizar su campo 'status' a 0)
         $usuario->status = 0;
 
-        // Guardar los cambios
         if ($usuario->save()) {
             Yii::$app->session->setFlash('success', 'El usuario ha sido desactivado correctamente.');
         } else {
             Yii::$app->session->setFlash('error', 'Hubo un error al desactivar el usuario.');
         }
 
-        // Redirigir a la vista del trabajador o a cualquier otra vista deseada
         return $this->redirect(['view', 'id' => $id]);
     }
 
@@ -413,7 +393,6 @@ class TrabajadorController extends Controller
             $model->idusuario0->status = 10; // Activa el usuario
         }
 
-        // Guarda el cambio
         if ($model->idusuario0->save()) {
             Yii::$app->session->setFlash('success', 'El estado del usuario se ha cambiado correctamente.');
         } else {

@@ -77,7 +77,6 @@ class Usuario extends  \yii\db\ActiveRecord implements \yii\web\IdentityInterfac
  
  
  
-       //Este lo pide pero lo dejamos como null por que no lo usamos por el momento
        public function getAuthKey() {
          return null;
         //return $this->auth_key;
@@ -102,7 +101,6 @@ class Usuario extends  \yii\db\ActiveRecord implements \yii\web\IdentityInterfac
          return static::findOne(['id' => $id]);
      }
      
-    // Utilizamos el mismo nombre de método que definimos como el nombre de usuario
      public static function findByUserName($username) {
          return static::findOne(['username' => $username]);
      }

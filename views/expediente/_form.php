@@ -15,7 +15,7 @@ use yii\widgets\Pjax;;
 
     <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
 
-    <!-- Campo oculto para el nombre del archivo -->
+   
     <?= $form->field($model, 'nombre')->textInput(['maxlength' => true, 'id' => 'nombre-archivo'])->label(false) ?>
 
     <?= $form->field($model, 'ruta')->widget(FileInput::classname(), [
@@ -43,22 +43,17 @@ use yii\widgets\Pjax;;
 
 <script>
 $(document).ready(function() {
-    // Cuando se arrastra y suelta un archivo en el área del widget de entrada de archivo
     $('#expediente-ruta').on('filebatchselected', function(event, files) {
-        // Se asume que solo se selecciona un archivo a la vez
         var file = files[0];
         
-        // Obtener el nombre del archivo sin la extensión
         var fileName = file.name.replace(/\.[^/.]+$/, "");
         
-        // Verificar si el nombre del archivo comienza con "CURP" o "curp"
         if (fileName.toLowerCase().startsWith("curp")) {
             $('#nombre-archivo').val('CURP');
         } else {
             $('#nombre-archivo').val(fileName);
         }
 
-        // Obtener la extensión del archivo
         var fileExt = file.name.split('.').pop();
         $('#tipo-archivo').val(fileExt);
     });

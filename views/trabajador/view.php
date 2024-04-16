@@ -34,11 +34,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         <div class="col-md-12">
                             <div class="d-flex align-items-center mb-3">
                                 <?php
-                                // Mostrar la foto del trabajador si está disponible
                                 if ($model->foto) {
                                     echo Html::img(['trabajador/foto-trabajador', 'id' => $model->id], ['class' => 'mr-3', 'style' => 'width: 100px; height: 100px;']);
                                 } else {
-                                    // Si no hay foto, muestra un marcador de posición o un mensaje
                                     echo Html::tag('div', 'No hay foto disponible', ['class' => 'mr-3']);
                                 }
                                 ?>
@@ -50,7 +48,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             
         <?= DetailView::widget([
             'model' => $model,
-            'template' => '<tr><th style="width: 20%">{label}</th><td style="width: 30%">{value}</td></tr>', // Ajusta el ancho de las columnas
+            'template' => '<tr><th style="width: 20%">{label}</th><td style="width: 30%">{value}</td></tr>', // ancho de las columnas
 
             'attributes' => [
                 'nombre',
@@ -69,7 +67,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             
         <?= DetailView::widget([
             'model' => $model,
-            'template' => '<tr><th style="width: 20%">{label}</th><td style="width: 30%">{value}</td></tr>', // Ajusta el ancho de las columnas
+            'template' => '<tr><th style="width: 20%">{label}</th><td style="width: 30%">{value}</td></tr>',
 
             'attributes' => [
                'email:email',
@@ -81,8 +79,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?php $this->beginBlock('info_l'); ?>
     <?= DetailView::widget([
-        'model' => $model->idinfolaboral0, // Usar la relación idinfolaboral0
-        'template' => '<tr><th style="width: 20%">{label}</th><td style="width: 30%">{value}</td></tr>', // Ajusta el ancho de las columnas
+        'model' => $model->idinfolaboral0, //  relación idinfolaboral0
+        'template' => '<tr><th style="width: 20%">{label}</th><td style="width: 30%">{value}</td></tr>', 
         'attributes' => [
             'numero_trabajador',
             [
@@ -97,7 +95,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
 <?= Tabs::widget([
-    'options' => ['class' => 'custom-tabs'], // Agregar una clase personalizada al contenedor de tabs
+    'options' => ['class' => 'custom-tabs'], 
     'items' => [
         [
             'label' => 'Información personal',
@@ -124,14 +122,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
                             <?php
 
-                            // Botón para abrir el modal
                             echo Html::button('Agregar Documento', [
-                                'class' => 'btn btn-primary mb-3 ', // Agrega la clase mb-2 para margen inferior
+                                'class' => 'btn btn-primary mb-3 ', 
                                 'id' => 'btn-agregar-expediente',
                                 'value' => Url::to(['expediente/create', 'idtrabajador' => $model->id]),
                             ]);
 
-                            // Modal para cargar el formulario de creación de expediente
                             Modal::begin([
                                 'title' => '<h4>Agregar Expediente</h4>',
                                 'id' => 'modal-agregar-expediente',
@@ -142,7 +138,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
                             ?>
                             <?php
-                            // JavaScript para manejar el modal y la carga del formulario
                             $this->registerJs('
                             $(document).ready(function() {
                                 $("#btn-agregar-expediente").click(function() {
@@ -184,7 +179,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             <?php
                             $searchModel = new ExpedienteSearch();
                             $params = Yii::$app->request->queryParams;
-                            $params[$searchModel->formName()]['idtrabajador'] = $model->id; // Agrega el filtro por idtrabajador
+                            $params[$searchModel->formName()]['idtrabajador'] = $model->id; 
                             $dataProvider = $searchModel->search($params);
                             ?>
 
@@ -192,20 +187,20 @@ $this->params['breadcrumbs'][] = $this->title;
                             <?= GridView::widget([
                                 'dataProvider' => $dataProvider,
                                 'filterModel' => $searchModel,
-                                'options' => ['class' => 'grid-view', 'style' => 'width: 80%; margin: auto;'], // Ajusta el ancho del GridView y lo centra horizontalmente
-                                'tableOptions' => ['class' => 'table table-striped table-bordered table-condensed'], // Agrega clases de Bootstrap para un diseño más compacto
+                                'options' => ['class' => 'grid-view', 'style' => 'width: 80%; margin: auto;'], 
+                                'tableOptions' => ['class' => 'table table-striped table-bordered table-condensed'], 
 
 
                                 'columns' => [
                                     [
                                         'attribute' => 'nombre',
                                         'value' => 'nombre',
-                                        'options' => ['style' => 'width: 30%;'], // Ajusta el ancho de la columna
+                                        'options' => ['style' => 'width: 30%;'], 
                                     ],
                                     [
                                         'attribute' => 'fechasubida',
                                         'filter' => false,
-                                        'options' => ['style' => 'width: 30%;'], // Ajusta el ancho de la columna
+                                        'options' => ['style' => 'width: 30%;'],
                                     ],
                                     [
                                         'class' => ActionColumn::class,
@@ -235,7 +230,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                                 ]);
                                             },
                                         ],
-                                        'options' => ['style' => 'width: 15%;'], // Ajusta el ancho de la columna
+                                        'options' => ['style' => 'width: 15%;'], //ancho de la columna
                                     ],
                                 ],
                                 'summaryOptions' => ['class' => 'summary mb-2'],

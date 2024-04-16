@@ -77,25 +77,21 @@ class ExpedienteController extends Controller
                 $trabajador = Trabajador::findOne($model->idtrabajador);
                 $nombreCarpetaTrabajador = Yii::getAlias('@runtime') . '/trabajadores/' . $trabajador->nombre . '_' . $trabajador->apellido;
                 
-                // Verifica si la carpeta del trabajador existe, si no, la crea
                 if (!is_dir($nombreCarpetaTrabajador)) {
                     mkdir($nombreCarpetaTrabajador, 0775, true);
                 }
                 
-                // Define la ruta de la carpeta de expedientes dentro de la carpeta del trabajador
                 $nombreCarpetaExpedientes = $nombreCarpetaTrabajador . '/expedientes';
                 if (!is_dir($nombreCarpetaExpedientes)) {
                     mkdir($nombreCarpetaExpedientes, 0775, true);
                 }
                 
-                // Guarda el archivo en la carpeta de expedientes del trabajador
                 $rutaArchivo = $nombreCarpetaExpedientes . '/' . $file->baseName . '.' . $file->extension;
                 $file->saveAs($rutaArchivo);
                 
-                // Guarda la ruta del archivo en el modelo
                 $model->ruta = $rutaArchivo;
                 $model->tipo = $file->extension;
-                $model->fechasubida = date('Y-m-d H:i:s'); // O la fecha que desees registrar
+                $model->fechasubida = date('Y-m-d H:i:s'); 
               //  $model->idusuario = idtrabajador;
                 if ($model->save()) {
                     
@@ -146,30 +142,28 @@ class ExpedienteController extends Controller
     {
         $model = $this->findModel($id, $idtrabajador);
         
-        // Obtener la ruta del archivo a eliminar
         $rutaArchivo = $model->ruta;
         
-        // Mover el archivo a la carpeta de la papelera
         $trabajador = Trabajador::findOne($model->idtrabajador);
         $nombreCarpetaTrabajador = Yii::getAlias('@runtime') . '/trabajadores/' . $trabajador->nombre . '_' . $trabajador->apellido;
         $nombreCarpetaPapelera = $nombreCarpetaTrabajador . '/papelera';
         
-        // Verificar si la carpeta de la papelera existe, si no, crearla
+        
         if (!is_dir($nombreCarpetaPapelera)) {
             mkdir($nombreCarpetaPapelera, 0775, true);
         }
         
-        // Obtener el nombre del archivo
+        
         $nombreArchivo = basename($rutaArchivo);
         
-        // Mover el archivo a la carpeta de la papelera
+   
         $rutaPapelera = $nombreCarpetaPapelera . '/' . $nombreArchivo;
         rename($rutaArchivo, $rutaPapelera);
         
-        // Eliminar el modelo de expediente
+        
         $model->delete();
     
-        // Redireccionar a la vista de trabajador pasando el ID del trabajador
+        
         return $this->redirect(['trabajador/view', 'id' => $idtrabajador]);
     }
     

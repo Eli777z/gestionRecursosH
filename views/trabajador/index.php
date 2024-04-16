@@ -28,14 +28,14 @@ $this->params['breadcrumbs'][] = $this->title;
                     <?= GridView::widget([
     'dataProvider' => $dataProvider,
     'filterModel' => $searchModel,
-    'options' => ['class' => 'grid-view', 'style' => 'width: 80%; margin: auto;'], // Ajusta el ancho del GridView y lo centra horizontalmente
-    'tableOptions' => ['class' => 'table table-striped table-bordered table-condensed'], // Agrega clases de Bootstrap para un diseño más compacto
+    'options' => ['class' => 'grid-view', 'style' => 'width: 80%; margin: auto;'], 
+    'tableOptions' => ['class' => 'table table-striped table-bordered table-condensed'], 
     'rowOptions' => function ($model, $key, $index, $grid) {
         if ($index % 2 === 0) {
             return ['style' => 'background-color: #D1F2EB;'];
             // Fila blanca
         } else {
-            return ['style' => 'background-color: #FFFFFF;']; // Fila azul claro
+            return ['style' => 'background-color: #FFFFFF;']; 
         }
     },
     'columns' => [
@@ -46,18 +46,17 @@ $this->params['breadcrumbs'][] = $this->title;
             'filter' => false,
             'value' => function ($model) {
                 if ($model->foto) {
-                    // Asegúrate de que la ruta de la acción del controlador sea correcta
                     $urlImagen = Yii::$app->urlManager->createUrl(['trabajador/foto-trabajador', 'id' => $model->id]);
                     return Html::img($urlImagen, ['width' => '80px', 'height' => '80px']);
                 }
-                return null; // O puedes retornar una imagen por defecto si no hay foto
+                return null; 
             },
         ],
         'nombre',
         'apellido',
         'email:email',
         ['class' => 'hail812\adminlte3\yii\grid\ActionColumn',
-            'template' => '{view} {delete} {update} {toggle-activation}', // Incluye solo los botones que deseas
+            'template' => '{view} {delete} {update} {toggle-activation}', //botones deseados
             'buttons' => [
                 'toggle-activation' => function ($url, $model) {
                     
@@ -97,7 +96,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 },
                 
             ],
-            'options' => ['style' => 'width: 15%;'], // Ajusta el ancho de la columna
+            'options' => ['style' => 'width: 15%;'], 
         ],
     ],
     'summaryOptions' => ['class' => 'summary mb-2'],

@@ -5,7 +5,7 @@ use Yii;
 use yii\base\Model;
 
 /**
- * CambiarContrasenaForm es el modelo detrás del formulario de cambio de contraseña.
+ * 
  */
 class CambiarContrasenaForm extends Model
 {
@@ -19,13 +19,9 @@ class CambiarContrasenaForm extends Model
     public function rules()
     {
         return [
-            // oldPassword, newPassword y repeatNewPassword son requeridos
             [['oldPassword', 'newPassword', 'repeatNewPassword'], 'required'],
-            // oldPassword es validado por validateOldPassword()
             ['oldPassword', 'validateOldPassword'],
-            // newPassword debe ser al menos 8 caracteres
             ['newPassword', 'string', 'min' => 8],
-            // repeatNewPassword debe ser igual a newPassword
             ['repeatNewPassword', 'compare', 'compareAttribute' => 'newPassword', 'message' => "Las contraseñas no coinciden."],
         ];
     }
