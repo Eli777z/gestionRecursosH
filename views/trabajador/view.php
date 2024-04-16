@@ -2,7 +2,7 @@
 
 use hail812\adminlte3\yii\grid\ActionColumn;
 use yii\helpers\Html;
-use yii\widgets\DetailView;
+//use yii\widgets\DetailView;
 use yii\helpers\Url;
 use yii\bootstrap5\Tabs;
 use yii\grid\GridView;
@@ -10,14 +10,16 @@ use yii\bootstrap4\Modal;
 use yii\web\YiiAsset;
 use yii\widgets\Pjax;
 use yii\web\View;
+use kartik\detail\DetailView;
 use app\models\ExpedienteSearch;
+use yii\bootstrap4\ActiveForm;
 use kartik\daterange\DateRangePicker;
 /* @var $this yii\web\View */
 /* @var $model app\models\Trabajador */
 
 
-   
-    $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
+
+$this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
 
 $this->title = $model->id;
 $this->params['breadcrumbs'][] = ['label' => 'Trabajadors', 'url' => ['index']];
@@ -34,96 +36,127 @@ $this->params['breadcrumbs'][] = $this->title;
                         <div class="col-md-12">
                             <div class="d-flex align-items-center mb-3">
                                 <?php
-                                if ($model->foto) {
-                                    echo Html::img(['trabajador/foto-trabajador', 'id' => $model->id], ['class' => 'mr-3', 'style' => 'width: 100px; height: 100px;']);
-                                } else {
-                                    echo Html::tag('div', 'No hay foto disponible', ['class' => 'mr-3']);
-                                }
-                                ?>
+                               // Registro de script
+$this->registerJs("
+// Función para abrir el cuadro de diálogo de carga de archivos cuando se hace clic en la imagen
+$('#foto').click(function() {
+    $('#foto-input').trigger('click');
+});
+
+// Función para enviar el formulario cuando se selecciona una nueva imagen
+$('#foto-input').change(function() {
+    $('#foto-form').submit();
+});
+", View::POS_READY);
+?>
+
+<div id="foto" title="Cambiar foto de perfil" style="position: relative;">
+    <?php if ($model->foto): ?>
+        <?= Html::img(['trabajador/foto-trabajador', 'id' => $model->id], ['class' => 'mr-3', 'style' => 'width: 100px; height: 100px;']) ?>
+    <?php else: ?>
+        <?= Html::tag('div', 'No hay foto disponible', ['class' => 'mr-3']) ?>
+    <?php endif; ?>
+    <i class="fas fa-pencil-alt" style="position: absolute; bottom: 5px; right: 5px; cursor: pointer;"></i>
+</div>
+
+
+
+<?php $form = ActiveForm::begin(['id' => 'foto-form', 'options' => ['enctype' => 'multipart/form-data']]); ?>
+
+<?= $form->field($model, 'foto')->fileInput(['id' => 'foto-input', 'style' => 'display:none'])->label(false) ?>
+
+<?php ActiveForm::end(); ?>
+                                
                                 <h2 class="mb-0">Trabajador: <?= $model->nombre ?> <?= $model->apellido ?></h2>
                             </div>
                             <?php $this->beginBlock('datos'); ?>
-        
+                            
                             <?php $this->beginBlock('info_p'); ?>
-                            
-        <?= DetailView::widget([
-            'model' => $model,
-            'template' => '<tr><th style="width: 20%">{label}</th><td style="width: 30%">{value}</td></tr>', // ancho de las columnas
+                            <br>
+                            <?= DetailView::widget([
+                                 'model'=>$model,
+                                 'condensed'=>true,
+                                 'hover'=>true,
+                                 'mode'=>DetailView::MODE_EDIT,
+                                 'panel'=>[
+                                     'heading'=>'' . $model->id,
+                                     'type'=>DetailView::TYPE_INFO,
+                                 ],
+                               
+                                'attributes' => [
+                                    'nombre',
+                                    'apellido',
+                                    //'fecha_nacimiento',
+                                    'codigo_postal',
+                                    'calle',
+                                    'numero_casa',
+                                    'colonia',
+                                    ['attribute'=>'fecha_nacimiento', 'type'=>DetailView::INPUT_DATE],
+                                ],
+                            ]) ?>
+                            <?php $this->endBlock(); ?>
 
-            'attributes' => [
-                'nombre',
-                'apellido',
-                'fecha_nacimiento',
-                'codigo_postal',
-                'calle',
-                'numero_casa',
-                'colonia',
-               
-            ],
-        ]) ?>
-    <?php $this->endBlock(); ?>
+                            <?php $this->beginBlock('info_c'); ?>
+                            <br>
+                            <?= DetailView::widget([
+                                'model' => $model,
+                                'template' => '<tr><th style="width: 20%">{label}</th><td style="width: 30%">{value}</td></tr>',
 
-    <?php $this->beginBlock('info_c'); ?>
-                            
-        <?= DetailView::widget([
-            'model' => $model,
-            'template' => '<tr><th style="width: 20%">{label}</th><td style="width: 30%">{value}</td></tr>',
+                                'attributes' => [
+                                    'email:email',
+                                    'telefono',
 
-            'attributes' => [
-               'email:email',
-                'telefono',
-                
-            ],
-        ]) ?>
-    <?php $this->endBlock(); ?>
-
-    <?php $this->beginBlock('info_l'); ?>
-    <?= DetailView::widget([
-        'model' => $model->idinfolaboral0, //  relación idinfolaboral0
-        'template' => '<tr><th style="width: 20%">{label}</th><td style="width: 30%">{value}</td></tr>', 
-        'attributes' => [
-            'numero_trabajador',
-            [
-                'label' => 'Departamento',
-                'value' => isset($model->idinfolaboral0->iddepartamento0) ? $model->idinfolaboral0->iddepartamento0->nombre : null,
-            ],
-            'fecha_inicio',
-        ],
-    ]) ?>
-<?php $this->endBlock(); ?>
-
-
-
-<?= Tabs::widget([
-    'options' => ['class' => 'custom-tabs'], 
-    'items' => [
-        [
-            'label' => 'Información personal',
-            'content' => $this->blocks['info_p'],
-            'active' => true,
-        ],
-        [
-            'label' => 'Información de contacto',
-            'content' => $this->blocks['info_c'],
-            //'active' => true,
-        ],
-        [
-            'label' => 'Información laboral',
-            'content' => $this->blocks['info_l'],
-            //'active' => true,
-        ],
-    ],
-]); ?>
+                                ],
+                            ]) ?>
+                            <?php $this->endBlock(); ?>
+                            <br>
+                            <?php $this->beginBlock('info_l'); ?>
+                            <?= DetailView::widget([
+                                'model' => $model->idinfolaboral0, //  relación idinfolaboral0
+                                'template' => '<tr><th style="width: 20%">{label}</th><td style="width: 30%">{value}</td></tr>',
+                                'attributes' => [
+                                    'numero_trabajador',
+                                    [
+                                        'label' => 'Departamento',
+                                        'value' => isset($model->idinfolaboral0->iddepartamento0) ? $model->idinfolaboral0->iddepartamento0->nombre : null,
+                                    ],
+                                    'fecha_inicio',
+                                ],
+                            ]) ?>
+                            <?php $this->endBlock(); ?>
 
 
-<?php $this->endBlock(); ?>
-<?php $this->beginBlock('expediente'); ?>
-  <br>
+
+                            <?= Tabs::widget([
+                                'options' => ['class' => 'custom-tabs'],
+                                'items' => [
+                                    [
+                                        'label' => 'Información personal',
+                                        'content' => $this->blocks['info_p'],
+                                        'active' => true,
+                                    ],
+                                    [
+                                        'label' => 'Información de contacto',
+                                        'content' => $this->blocks['info_c'],
+                                        //'active' => true,
+                                    ],
+                                    [
+                                        'label' => 'Información laboral',
+                                        'content' => $this->blocks['info_l'],
+                                        //'active' => true,
+                                    ],
+                                ],
+                            ]); ?>
+
+
+                            <?php $this->endBlock(); ?>
+                            <?php $this->beginBlock('expediente'); ?>
+                            <br>
 
                             <?php
 
                             echo Html::button('Agregar Documento', [
-                                'class' => 'btn btn-primary mb-3 ', 
+                                'class' => 'btn btn-primary mb-3 ',
                                 'id' => 'btn-agregar-expediente',
                                 'value' => Url::to(['expediente/create', 'idtrabajador' => $model->id]),
                             ]);
@@ -179,7 +212,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             <?php
                             $searchModel = new ExpedienteSearch();
                             $params = Yii::$app->request->queryParams;
-                            $params[$searchModel->formName()]['idtrabajador'] = $model->id; 
+                            $params[$searchModel->formName()]['idtrabajador'] = $model->id;
                             $dataProvider = $searchModel->search($params);
                             ?>
 
@@ -187,15 +220,16 @@ $this->params['breadcrumbs'][] = $this->title;
                             <?= GridView::widget([
                                 'dataProvider' => $dataProvider,
                                 'filterModel' => $searchModel,
-                                'options' => ['class' => 'grid-view', 'style' => 'width: 80%; margin: auto;'], 
-                                'tableOptions' => ['class' => 'table table-striped table-bordered table-condensed'], 
+                                'options' => ['class' => 'grid-view', 'style' => 'width: 80%; margin: auto;'],
+                                'tableOptions' => ['class' => 'table table-striped table-bordered table-condensed'],
+
 
 
                                 'columns' => [
                                     [
                                         'attribute' => 'nombre',
                                         'value' => 'nombre',
-                                        'options' => ['style' => 'width: 30%;'], 
+                                        'options' => ['style' => 'width: 30%;'],
                                     ],
                                     [
                                         'attribute' => 'fechasubida',
@@ -241,6 +275,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             <?php Pjax::end(); ?>
                             <?php $this->endBlock(); ?>
                             <?= Tabs::widget([
+                                  'options' => ['class' => 'custom-tabs-2'], 
                                 'items' => [
                                     [
                                         'label' => 'Información',
@@ -258,6 +293,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
                                 ],
+                              
                             ]);
 
                             ?>

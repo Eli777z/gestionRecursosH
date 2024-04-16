@@ -41,7 +41,12 @@ use yii\helpers\ArrayHelper;
     ],
 ]) ?>
 
-<?= $form->field($departamento, 'nombre')->dropDownList(ArrayHelper::map(Departamento::find()->all(), 'id', 'nombre'), ['prompt' => 'Seleccione departamento']) ?>
+
+
+<?= $form->field($infolaboral, 'iddepartamento')->dropDownList(
+    ArrayHelper::map(Departamento::find()->all(), 'id', 'nombre'), 
+    ['prompt' => 'Seleccione departamento']
+) ?>
 
 <?= $form->field($model, 'telefono')->textInput([
     'maxlength' => true,

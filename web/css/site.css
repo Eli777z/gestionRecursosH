@@ -94,34 +94,31 @@ a.desc:after {
 }
 
 .custom-tab-content {
-    /* Estilos personalizados para el contenido de los tabs */
-    
+    margin-top: 20px; /* Agregar margen superior */
 }
 
 .custom-tab-pane {
     /* Estilos personalizados para los paneles de los tabs */
     
 }
-/* Modificar el color de fondo de los tabs */
+/* Agregar borde a las pestañas */
 .nav-tabs .nav-item .nav-link {
-    background-color: #ffffff;
-}
+    border-bottom: 8px solid #ced4da; /* Color del borde */
+    color:#007bff;
 
-/* Modificar el color del texto de los tabs */
-.nav-tabs .nav-item .nav-link {
-    color: #930808;
-}
-
-/* Modificar el tamaño del texto de los tabs */
-.nav-tabs .nav-item .nav-link {
-    font-size: 16px;
-}
-
-/* Modificar el estilo de borde de los tabs */
-.nav-tabs .nav-item .nav-link {
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    /*border-bottom-left-radius: 0.25rem; /* Redondear la esquina superior izquierda */
+ /*  border-bottom-right-radius: 0.25rem; /* Redondear la esquina superior derecha */
    
-    border: none;
 }
+
+/* Estilo del borde de la pestaña activa */
+.nav-tabs .nav-item .nav-link.active {
+    border-bottom-color:#007bff; /* Ocultar el borde inferior */
+}
+
 
 
 /* Agregar más estilos según sea necesario */

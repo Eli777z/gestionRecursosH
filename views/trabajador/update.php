@@ -17,6 +17,10 @@ $this->params['breadcrumbs'][] = 'Update';
                     <?=$this->render('_form', [
                          'model' => $model,
                          'user' => $user, // Pasar el modelo Usuario a la vista
+                         'infolaboral' => $infolaboral,
+                         'departamento' => $departamento,
+                     ///    'departamentoDropdownValue' => $departamentoDropdownValue,
+
                     ]) ?>
                 </div>
             </div>

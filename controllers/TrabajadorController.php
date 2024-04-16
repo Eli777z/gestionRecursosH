@@ -87,9 +87,11 @@ class TrabajadorController extends Controller
         $model = new Trabajador();
         $user = new Usuario();
         $infolaboral = new Infolaboral();
-        $departamento = new Departamento();
+       // $departamento = new Departamento();
         $user->scenario = Usuario::SCENARIO_CREATE;
-        if ($model->load(Yii::$app->request->post()) && $user->load(Yii::$app->request->post()) && $infolaboral->load(Yii::$app->request->post()) && $departamento->load(Yii::$app->request->post())) {
+        
+     
+        if ($model->load(Yii::$app->request->post()) && $user->load(Yii::$app->request->post()) && $infolaboral->load(Yii::$app->request->post())) {
             $transaction = Yii::$app->db->beginTransaction();
             $user->username = $model->nombre . $model->apellido;
             $nombres = explode(" ", $model->nombre);
@@ -107,24 +109,18 @@ class TrabajadorController extends Controller
             $hash = Yii::$app->security->generatePasswordHash($user->password);
             $user->password = $hash;
             try {
-                $infolaboral->iddepartamento = $departamento->nombre;
+               
 
-                
+               //$infolaboral->iddepartamento = $departamento->nombre;
                 if (!$infolaboral->save()) {
                     throw new \yii\db\Exception('Error al guardar Infolaboral');
                 }
-
-               
                 $model->idinfolaboral = $infolaboral->id;
-
                 if ($user->save()) {
                     $model->idusuario = $user->id;
                     $auth = \Yii::$app->authManager;
                     $authorRole = $auth->getRole('trabajador');
                     $auth->assign($authorRole, $user->id);
-
-                   
-
                     $upload = UploadedFile::getInstance($model, 'foto');
 
                     if (is_object($upload)) {
@@ -133,21 +129,14 @@ class TrabajadorController extends Controller
                         if (!is_dir($nombreCarpetaTrabajador)) {
                             mkdir($nombreCarpetaTrabajador, 0775, true);
                         }
-
-                     
                         $nombreCarpetaUserProfile = $nombreCarpetaTrabajador . '/foto_Trabajador';
                         if (!is_dir($nombreCarpetaUserProfile)) {
                             mkdir($nombreCarpetaUserProfile, 0775, true);
                         }
-
-                      
                         $upload_filename = $nombreCarpetaUserProfile . '/' . $upload->baseName . '.' . $upload->extension;
                         $upload->saveAs($upload_filename);
                         $model->foto = $upload_filename;
                     }
-
-
-
                     if ($model->save()) {
 
                         Yii::$app->mailer->compose()
@@ -173,7 +162,8 @@ class TrabajadorController extends Controller
             'model' => $model,
             'user' => $user,
             'infolaboral' => $infolaboral,
-            'departamento' => $departamento,
+            //'departamento' => $departamento,
+          // 'departamentosArray' => $departamentosArray,
         ]);
     }
 
@@ -189,42 +179,46 @@ class TrabajadorController extends Controller
     {
         $model = $this->findModel2($id);
         $user = Usuario::findOne($model->idusuario); // Encuentra el usuario asociado
+        $infolaboral = Infolaboral::findOne($model->idinfolaboral);
+        $departamento = Departamento::findOne($infolaboral->iddepartamento);
         $previous_photo = $model->foto;
 
-        if ($model->load(Yii::$app->request->post()) && $user->load(Yii::$app->request->post())) {
-            $transaction = Yii::$app->db->beginTransaction(); 
+      // $departamentoId = $infolaboral->iddepartamento;
+        //$departamento = Departamento::findOne($departamentoId);
+        //$departamentoDropdownValue = $departamento ? $departamento->id : null;
 
+     // Obtener todos los departamentos
+
+
+        if ($model->load(Yii::$app->request->post()) && $user->load(Yii::$app->request->post()) && $infolaboral->load(Yii::$app->request->post())) {
+
+            $transaction = Yii::$app->db->beginTransaction(); 
             try {
+                $infolaboral->iddepartamento = Yii::$app->request->post('Infolaboral')['iddepartamento'];
+
                 $user->username = $user->getOldAttribute('username');
                 $user->status = $user->getOldAttribute('status');
+             
                 if (!empty($user->password)) {
                     $hash = Yii::$app->security->generatePasswordHash($user->password);
                     $user->password = $hash;
                 } else {
-
                     $user->password = $user->getOldAttribute('password');
                 }
-
-                if ($user->save()) {
+                if ($user->save() && $infolaboral->save()) {
                     $upload = UploadedFile::getInstance($model, 'foto');
                     if (is_object($upload)) {
-                        
                         $nombreCarpetaTrabajador = Yii::getAlias('@runtime') . '/trabajadores/' . $model->nombre . '_' . $model->apellido;
                         if (!is_dir($nombreCarpetaTrabajador)) {
                             mkdir($nombreCarpetaTrabajador, 0775, true);
                         }
-
                         $nombreCarpetaUserProfile = $nombreCarpetaTrabajador . '/foto_Trabajador';
                         if (!is_dir($nombreCarpetaUserProfile)) {
                             mkdir($nombreCarpetaUserProfile, 0775, true);
                         }
-
-                     
                         $upload_filename = $nombreCarpetaUserProfile . '/' . $upload->baseName . '.' . $upload->extension;
-
-                     
                         if ($upload->saveAs($upload_filename)) {
-                            
+                            // Eliminar la foto anterior solo si se proporciona una nueva imagen
                             if ($previous_photo && $previous_photo !== $upload_filename && file_exists($previous_photo)) {
                                 @unlink($previous_photo);
                             }
@@ -233,8 +227,7 @@ class TrabajadorController extends Controller
                     } else {
                         $model->foto = $previous_photo; 
                     }
-
-
+                    
                     if ($model->save()) {
                         $transaction->commit(); 
                         return $this->redirect(['view', 'id' => $model->id]);
@@ -253,7 +246,11 @@ class TrabajadorController extends Controller
         return $this->render('update', [
             'model' => $model,
             'user' => $user, 
+            'infolaboral' => $infolaboral,
+            'departamento' => $departamento,
+
         ]);
+
     }
 
 
@@ -401,6 +398,25 @@ class TrabajadorController extends Controller
 
         return $this->redirect(['index']);
     }
+
+    public function actionSaveEditable($id)
+{
+    if (Yii::$app->request->isAjax) {
+        $model = $this->findModel2($id);
+        $attribute = Yii::$app->request->post('name');
+        $value = Yii::$app->request->post('value');
+
+        $model->$attribute = $value;
+
+        if ($model->save()) {
+            return json_encode(['status' => 'success']);
+        } else {
+            return json_encode(['status' => 'error', 'msg' => 'Error al guardar']);
+        }
+    }
+}
+
+
 
 }
 
