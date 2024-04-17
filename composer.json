@@ -28,7 +28,8 @@
         "yiisoft/yii2-swiftmailer": "^2.0",
         "kartik-v/yii2-widget-fileinput": "dev-master",
         "kartik-v/yii2-field-range": "dev-master",
-        "kartik-v/yii2-detail-view": "dev-master"
+        "kartik-v/yii2-detail-view": "dev-master",
+        "kartik-v/yii2-widget-select2": "dev-master"
         
         
        
