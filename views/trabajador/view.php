@@ -100,7 +100,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'buttons1' => '{update}',
                                 'mode' => DetailView::MODE_VIEW,
                                 'panel' => [
-                                    'heading' => 'Información del Trabajador',
+                                    'heading' => 'Información Personal',
                                     'type' => DetailView::TYPE_INFO,
                                 ],
                                 'attributes' => [
@@ -141,7 +141,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'buttons1' => '{update}',
                                 'mode' => DetailView::MODE_VIEW,
                                 'panel' => [
-                                    'heading' => '' . $model->id,
+                                    'heading' => 'Información de Contacto ',
                                     'type' => DetailView::TYPE_INFO,
                                 ],
 
@@ -164,7 +164,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'hover' => true,
                                 'mode' => DetailView::MODE_VIEW,
                                 'panel' => [
-                                    'heading' => 'Información Laboral del Trabajador',
+                                    'heading' => 'Información Laboral ',
                                     'type' => DetailView::TYPE_INFO,
                                 ],
                                 'buttons1' => '{update}',
@@ -181,6 +181,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                             'options' => ['prompt' => 'Seleccionar Departamento'], // Opción por defecto
                                         ],
                                     ],
+                                    
                                     [
                                         'attribute' => 'fecha_inicio',
                                         'type' => DetailView::INPUT_DATE,

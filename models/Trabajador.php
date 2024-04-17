@@ -64,7 +64,7 @@ class Trabajador extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'nombre' => 'Nombre',
-            'apellido' => 'Apellido',
+            'apellido' => 'Apellidos',
             'email' => 'Email',
             'fecha_nacimiento' => 'Fecha Nacimiento',
             'codigo_postal' => 'Codigo Postal',
