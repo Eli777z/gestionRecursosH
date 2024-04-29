@@ -9,6 +9,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use app\models\CambiarContrasenaForm;
+
 /**
  * UsuarioController implements the CRUD actions for Usuario model.
  */
@@ -65,13 +66,13 @@ class UsuarioController extends Controller
     public function actionCreate()
     {
         $model = new Usuario();
-        $model->scenario = Usuario:: SCENARIO_CREATE;
+        $model->scenario = Usuario::SCENARIO_CREATE;
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            
+
             $hash =  Yii::$app->security->generatePasswordHash($model->password);
             // echo "hash:" . $hash;
-            $model->password = $hash;                                               
-            if ($model->save()) {  
+            $model->password = $hash;
+            if ($model->save()) {
                 $auth = \Yii::$app->authManager;
                 $authorRole = $auth->getRole('trabajador');
                 $auth->assign($authorRole, $model->id);
@@ -97,30 +98,30 @@ class UsuarioController extends Controller
     {
         $model = $this->findModel($id);
 
-       // $previous_photo = $model->photo;   
+        // $previous_photo = $model->photo;   
         if ($this->request->isPost && $model->load($this->request->post())) {
-          //  $upload = UploadedFile::getInstance($model, 'photo');   
-          //  if(is_object($upload)){
+            //  $upload = UploadedFile::getInstance($model, 'photo');   
+            //  if(is_object($upload)){
             //    $upload_filename = 'uploads/user_profile/' . $upload->baseName . '.' . $upload->extension;
-              //  $upload->saveAs($upload_filename);
-               // $model->photo = $upload_filename;   
-           // }else{
-             //   $model->photo = $previous_photo;                    
+            //  $upload->saveAs($upload_filename);
+            // $model->photo = $upload_filename;   
+            // }else{
+            //   $model->photo = $previous_photo;                    
             //}
-            
+
             if (!empty($model->password)) {
                 $hash = Yii::$app->security->generatePasswordHash($model->password);
                 $model->password = $hash;
             } else {
-               
+
                 $model->password = $model->getOldAttribute('password');
             }
-    
+
             if ($model->save()) {
                 return $this->redirect(['view', 'id' => $model->id]);
             }
         }
-     $model->password='';
+        $model->password = '';
         return $this->render('update', [
             'model' => $model,
         ]);
@@ -140,34 +141,45 @@ class UsuarioController extends Controller
         return $this->redirect(['index']);
     }
 
-   
 
 
 
-public function actionCambiarcontrasena()
-{
-    $user = Usuario::findOne(Yii::$app->user->identity->id);
-    if ($user->nuevo != 4) {
-        return $this->redirect(['site/portaltrabajador']);
-    }
 
-    $model = new CambiarContrasenaForm(); 
+    public function actionCambiarcontrasena()
+    {
+        $userId = Yii::$app->user->identity->id;
+        $user = Usuario::findOne($userId);
 
-    if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-        $user->password = Yii::$app->security->generatePasswordHash($model->newPassword);
-        $user->nuevo = 0; 
-        if ($user->save()) {
-            Yii::$app->session->setFlash('success', 'Tu contraseña ha sido cambiada.');
-            return $this->redirect(['site/portaltrabajador']); 
+        // Verifica si el usuario es un administrador
+        if (Usuario::isUserAdmin($userId)) {
+            $redirectUrl = ['site/portalgestionrh'];
         } else {
-            Yii::$app->session->setFlash('error', 'Hubo un error al cambiar tu contraseña.');
+            $redirectUrl = ['site/portaltrabajador'];
         }
+
+        // Si el usuario no es nuevo y no es administrador, redirígelo a portaltrabajador
+        if ($user->nuevo != 4 && !Usuario::isUserAdmin($userId)) {
+            return $this->redirect(['site/portaltrabajador']);
+        }
+
+        $model = new CambiarContrasenaForm();
+
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            $user->password = Yii::$app->security->generatePasswordHash($model->newPassword);
+            $user->nuevo = 0;
+            if ($user->save()) {
+                Yii::$app->session->setFlash('success', 'Tu contraseña ha sido cambiada.');
+                return $this->redirect($redirectUrl);
+            } else {
+                Yii::$app->session->setFlash('error', 'Hubo un error al cambiar tu contraseña.');
+            }
+        }
+
+        return $this->render('cambiarcontrasena', [
+            'model' => $model,
+        ]);
     }
 
-    return $this->render('cambiarcontrasena', [
-        'model' => $model,
-    ]);
-}
 
 
 

@@ -105,7 +105,7 @@ class SiteController extends Controller
             if ($user->nuevo == 4) {
                 return $this->redirect(['usuario/cambiarcontrasena']);
             }
-            if (Usuario::isUserAdmin($userId)) {
+            elseif (Usuario::isUserAdmin($userId)) {
                 return $this->redirect(["site/portalgestionrh"]);
             } else {
                 return $this->redirect(["site/portaltrabajador"]);
@@ -116,11 +116,11 @@ class SiteController extends Controller
             $userId = Yii::$app->user->identity->id;
             $user = Usuario::findOne($userId);
             $userId = Yii::$app->user->identity->id;
-            if (Usuario::isUserAdmin($userId)) {
-                return $this->redirect(["site/portalgestionrh"]);
+            if  ($user->nuevo == 4) {
+                return $this->redirect(["usuario/cambiarcontrasena"]);
             } else {
-                if ($user->nuevo == 4) {
-                    return $this->redirect(['usuario/cambiarcontrasena']);
+                if (Usuario::isUserAdmin($userId)) {
+                    return $this->redirect(['site/portalgestionrh']);
                 }else{
 
                     return $this->redirect(["site/portaltrabajador"]);
