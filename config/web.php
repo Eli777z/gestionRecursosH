@@ -17,7 +17,10 @@ $config = [
         'admin' => [
             'class' => 'mdm\admin\Module',
             'layout' => 'left-menu',
-        ]
+        ],
+        'gridview' =>  [
+            'class' => '\kartik\grid\Module'
+        ] 
     ],
     'components' => [
        
@@ -110,6 +113,7 @@ $config = [
             'archivo/*',
             'expediente/*',
             'some-controller/some-action',
+            'prueba/*'
             // The actions listed here will be allowed to everyone including guests.
             // So, 'admin/*' should not appear here in the production, of course.
             // But in the earlier stages of your development, you may probably want to
