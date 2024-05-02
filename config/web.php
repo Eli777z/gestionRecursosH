@@ -80,6 +80,7 @@ $config = [
            // 'showScriptName' => false,
             'rules' => [
                 'expediente/download/<id:\d+>' => 'expediente/download',
+               
             ],
         ],
         'assetManager' => [
@@ -107,8 +108,9 @@ $config = [
             'admin/*',
             'usuario/*',
             'trabajador/*',
-            'departamento/*',
+          'empleado/*',
             'infolaboral/*',
+            'cat-departamento/*',
             //'infolaboral/*',
             'archivo/*',
             'expediente/*',

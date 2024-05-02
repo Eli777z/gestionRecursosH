@@ -8,17 +8,17 @@ use Yii;
  * This is the model class for table "usuario".
  *
  * @property int $id
- * @property string $username
  * @property string $password
  * @property int $status
  * @property int $rol
+ * @property int $nuevo
+ * @property string $username
  *
- * @property Trabajador[] $trabajadors
+ * @property Empleado[] $empleados
  */
 class Usuario extends  \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 {
     const SCENARIO_CREATE = 'create';
-    //public $primer_login;
     /**
      * {@inheritdoc}
      */
@@ -32,7 +32,7 @@ class Usuario extends  \yii\db\ActiveRecord implements \yii\web\IdentityInterfac
      */
     public function rules()
     {
-        return [
+         return [
             [['username','status', 'rol'], 'required'],
             [['status', 'rol', 'nuevo'], 'integer'],
             [['username'], 'string', 'max' => 30],
@@ -49,11 +49,11 @@ class Usuario extends  \yii\db\ActiveRecord implements \yii\web\IdentityInterfac
     {
         return [
             'id' => 'ID',
-            'username' => 'Username',
             'password' => 'Password',
             'status' => 'Status',
             'rol' => 'Rol',
             'nuevo' => 'Nuevo',
+            'username' => 'Username',
         ];
     }
     public static function isUserAdmin($id)
@@ -111,12 +111,12 @@ class Usuario extends  \yii\db\ActiveRecord implements \yii\web\IdentityInterfac
      }
 
     /**
-     * Gets query for [[Trabajadors]].
+     * Gets query for [[Empleados]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getTrabajadors()
+    public function getEmpleados()
     {
-        return $this->hasMany(Trabajador::class, ['idusuario' => 'id']);
+        return $this->hasMany(Empleado::class, ['usuario_id' => 'id']);
     }
 }

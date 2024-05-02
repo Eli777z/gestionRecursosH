@@ -1,0 +1,135 @@
+<?php
+
+namespace app\models;
+
+use Yii;
+
+/**
+ * This is the model class for table "empleado".
+ *
+ * @property int $id
+ * @property int $numero_empleado
+ * @property int $usuario_id
+ * @property int $informacion_laboral_id
+ * @property int|null $cat_nivel_estudio_id
+ * @property int|null $parametro_formato_id
+ * @property string $nombre
+ * @property string $apellido
+ * @property string|null $fecha_nacimiento
+ * @property int|null $edad
+ * @property int|null $sexo
+ * @property string|null $foto
+ * @property string|null $telefono
+ * @property string $email
+ * @property int|null $estado_civil
+ * @property string|null $colonia
+ * @property string|null $calle
+ * @property int|null $numero_casa
+ * @property int|null $codigo_postal
+ * @property string|null $nombre_contacto_emergencia
+ * @property int|null $relacion_contacto_emergencia
+ * @property string|null $telefono_contacto_emergencia
+ * @property string|null $institucion_educativa
+ * @property string|null $titulo_grado
+ *
+ * @property Documento[] $documentos
+ * @property InformacionLaboral $informacionLaboral
+ * @property Usuario $usuario
+ */
+class Empleado extends \yii\db\ActiveRecord
+{
+    /**
+     * {@inheritdoc}
+     */
+    public static function tableName()
+    {
+        return 'empleado';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rules()
+    {
+        return [
+            [['numero_empleado', 'usuario_id', 'informacion_laboral_id', 'nombre', 'apellido', 'email'], 'required'],
+            [['numero_empleado', 'usuario_id', 'informacion_laboral_id', 'cat_nivel_estudio_id', 'parametro_formato_id', 'edad', 'sexo', 'estado_civil', 'numero_casa', 'codigo_postal', 'relacion_contacto_emergencia'], 'integer'],
+            [['fecha_nacimiento'], 'safe'],
+            [['nombre'], 'string', 'max' => 30],
+            [['apellido'], 'string', 'max' => 60],
+            [['foto', 'email'], 'string', 'max' => 100],
+            [['telefono', 'telefono_contacto_emergencia'], 'string', 'max' => 15],
+            [['colonia'], 'string', 'max' => 50],
+            [['calle'], 'string', 'max' => 85],
+            [['nombre_contacto_emergencia'], 'string', 'max' => 90],
+            [['institucion_educativa', 'titulo_grado'], 'string', 'max' => 65],
+            [['foto'], 'file', 'skipOnEmpty' => TRUE, 'extensions' => 'png, jpg'],
+
+            [['informacion_laboral_id'], 'exist', 'skipOnError' => true, 'targetClass' => InformacionLaboral::class, 'targetAttribute' => ['informacion_laboral_id' => 'id']],
+            [['usuario_id'], 'exist', 'skipOnError' => true, 'targetClass' => Usuario::class, 'targetAttribute' => ['usuario_id' => 'id']],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => 'ID',
+            'numero_empleado' => 'Numero Empleado',
+            'usuario_id' => 'Usuario ID',
+            'informacion_laboral_id' => 'Informacion Laboral ID',
+            'cat_nivel_estudio_id' => 'Cat Nivel Estudio ID',
+            'parametro_formato_id' => 'Parametro Formato ID',
+            'nombre' => 'Nombre',
+            'apellido' => 'Apellido',
+            'fecha_nacimiento' => 'Fecha Nacimiento',
+            'edad' => 'Edad',
+            'sexo' => 'Sexo',
+            'foto' => 'Foto',
+            'telefono' => 'Telefono',
+            'email' => 'Email',
+            'estado_civil' => 'Estado Civil',
+            'colonia' => 'Colonia',
+            'calle' => 'Calle',
+            'numero_casa' => 'Numero Casa',
+            'codigo_postal' => 'Codigo Postal',
+            'nombre_contacto_emergencia' => 'Nombre Contacto Emergencia',
+            'relacion_contacto_emergencia' => 'Relacion Contacto Emergencia',
+            'telefono_contacto_emergencia' => 'Telefono Contacto Emergencia',
+            'institucion_educativa' => 'Institucion Educativa',
+            'titulo_grado' => 'Titulo Grado',
+        ];
+    }
+
+    /**
+     * Gets query for [[Documentos]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDocumentos()
+    {
+        return $this->hasMany(Documento::class, ['empleado_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[InformacionLaboral]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getInformacionLaboral()
+    {
+        return $this->hasOne(InformacionLaboral::class, ['id' => 'informacion_laboral_id']);
+    }
+
+    /**
+     * Gets query for [[Usuario]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUsuario()
+    {
+        return $this->hasOne(Usuario::class, ['id' => 'usuario_id']);
+    }
+}

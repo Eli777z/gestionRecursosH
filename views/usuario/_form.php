@@ -15,6 +15,7 @@ use yii\bootstrap4\ActiveForm;
     <?= $form->field($model, 'username')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'password')->passwordInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'nuevo')->passwordInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'status')->dropDownList([
      10 => 'Activo',
