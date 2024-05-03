@@ -28,16 +28,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     <?= GridView::widget([
                         'dataProvider' => $dataProvider,
                         'filterModel' => $searchModel,
-                        'options' => ['class' => 'grid-view', 'style' => 'width: 80%; margin: auto;'], 
-                        'tableOptions' => ['class' => 'table table-striped table-bordered table-condensed'], 
-                        'rowOptions' => function ($model, $key, $index, $grid) {
-                            if ($index % 2 === 0) {
-                                return ['style' => 'background-color: #D1F2EB;'];
-                                // Fila blanca
-                            } else {
-                                return ['style' => 'background-color: #FFFFFF;']; 
-                            }
-                        },
+                      //  'options' => ['class' => 'grid-view', 'style' => 'width: 80%; margin: auto;'], 
+                       // 'tableOptions' => ['class' => 'table table-striped table-bordered table-condensed'], 
+                        
                         'columns' => [
                             ['class' => 'yii\grid\SerialColumn'],
                             [

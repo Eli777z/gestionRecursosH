@@ -53,8 +53,9 @@ class Empleado extends \yii\db\ActiveRecord
     {
         return [
             [['numero_empleado', 'usuario_id', 'informacion_laboral_id', 'nombre', 'apellido', 'email'], 'required'],
-            [['numero_empleado', 'usuario_id', 'informacion_laboral_id', 'cat_nivel_estudio_id', 'parametro_formato_id', 'edad', 'sexo', 'estado_civil', 'numero_casa', 'codigo_postal', 'relacion_contacto_emergencia'], 'integer'],
+            [['numero_empleado', 'usuario_id', 'informacion_laboral_id', 'cat_nivel_estudio_id', 'parametro_formato_id', 'edad', 'numero_casa', 'codigo_postal'], 'integer'],
             [['fecha_nacimiento'], 'safe'],
+            [['estado_civil', 'sexo'], 'string', 'max' => 12],
             [['nombre'], 'string', 'max' => 30],
             [['apellido'], 'string', 'max' => 60],
             [['foto', 'email'], 'string', 'max' => 100],
@@ -62,6 +63,8 @@ class Empleado extends \yii\db\ActiveRecord
             [['colonia'], 'string', 'max' => 50],
             [['calle'], 'string', 'max' => 85],
             [['nombre_contacto_emergencia'], 'string', 'max' => 90],
+            [['relacion_contacto_emergencia'], 'string', 'max' => 25],
+
             [['institucion_educativa', 'titulo_grado'], 'string', 'max' => 65],
             [['foto'], 'file', 'skipOnEmpty' => TRUE, 'extensions' => 'png, jpg'],
 
@@ -77,14 +80,14 @@ class Empleado extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'numero_empleado' => 'Numero Empleado',
+            'numero_empleado' => 'Numero de empleado',
             'usuario_id' => 'Usuario ID',
             'informacion_laboral_id' => 'Informacion Laboral ID',
             'cat_nivel_estudio_id' => 'Cat Nivel Estudio ID',
             'parametro_formato_id' => 'Parametro Formato ID',
             'nombre' => 'Nombre',
             'apellido' => 'Apellido',
-            'fecha_nacimiento' => 'Fecha Nacimiento',
+            'fecha_nacimiento' => 'Fecha de nacimiento',
             'edad' => 'Edad',
             'sexo' => 'Sexo',
             'foto' => 'Foto',
@@ -95,9 +98,9 @@ class Empleado extends \yii\db\ActiveRecord
             'calle' => 'Calle',
             'numero_casa' => 'Numero Casa',
             'codigo_postal' => 'Codigo Postal',
-            'nombre_contacto_emergencia' => 'Nombre Contacto Emergencia',
-            'relacion_contacto_emergencia' => 'Relacion Contacto Emergencia',
-            'telefono_contacto_emergencia' => 'Telefono Contacto Emergencia',
+            'nombre_contacto_emergencia' => 'Nombre',
+            'relacion_contacto_emergencia' => 'Parentesco',
+            'telefono_contacto_emergencia' => 'Telefono',
             'institucion_educativa' => 'Institucion Educativa',
             'titulo_grado' => 'Titulo Grado',
         ];
@@ -132,4 +135,7 @@ class Empleado extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Usuario::class, ['id' => 'usuario_id']);
     }
+
+
+
 }

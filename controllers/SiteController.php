@@ -194,5 +194,15 @@ class SiteController extends Controller
     {
         return $this->render('usuario/cambiarcontrasena');
     }
-
+    public function actionSetActiveTab()
+    {
+        $request = Yii::$app->request;
+        if ($request->isAjax) {
+            $activeTabIndex = $request->post('activeTabIndex');
+            Yii::$app->session->set('activeTabIndex', $activeTabIndex);
+            return true;
+        }
+        return false;
+    }
+    
 }

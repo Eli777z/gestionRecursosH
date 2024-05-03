@@ -397,15 +397,27 @@ class EmpleadoController extends Controller
     public function actionActualizarInformacion($id)
     {
         $model = $this->findModel2($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            // Yii::$app->session->setFlash('success', 'La información del trabajador ha sido actualizada correctamente.');
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            Yii::$app->session->setFlash('error', 'Hubo un error al actualizar la información del trabajador.');
-            return $this->redirect(['view', 'id' => $model->id]);
+    
+        if ($model->load(Yii::$app->request->post())) {
+            // Calcula la edad en base a la fecha de nacimiento
+            $fechaNacimiento = new \DateTime($model->fecha_nacimiento);
+            $hoy = new \DateTime();
+            $diferencia = $hoy->diff($fechaNacimiento);
+            $model->edad = $diferencia->y; // Asigna la edad al modelo
+    
+            if ($model->save()) {
+                // Redirige a la vista de detalles o a otra página
+                return $this->redirect(['view', 'id' => $model->id]);
+            } else {
+                Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información del trabajador.');
+            }
         }
+    
+        return $this->render('update', [
+            'model' => $model,
+        ]);
     }
+    
 
     public function actionActualizarInformacionContacto($id)
     {
