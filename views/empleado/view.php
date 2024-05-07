@@ -17,7 +17,9 @@ use yii\bootstrap4\ActiveForm;
 use kartik\daterange\DateRangePicker;
 use yii\helpers\ArrayHelper;
 use app\models\Departamento;
+use app\models\Documento;
 use kartik\tabs\TabsX;
+use app\models\DocumentoSearch;
 use yii\web\JsExpression;
 use kartik\select2\Select2;
 /* @var $this yii\web\View */
@@ -331,9 +333,152 @@ echo TabsX::widget([
 ?>
 
 
+<?php $this->endBlock(); ?>
+
+<?php $this->beginBlock('expediente'); ?>
+                            <br>
+                            <?php
+echo Html::button('Agregar Documento', [
+    'class' => 'btn btn-primary mb-3 float-end', // Clase float-end agregada aquí
+    'id' => 'btn-agregar-expediente',
+    'value' => Url::to(['documento/create', 'empleado_id' => $model->id]),
+]);
+
+Modal::begin([
+    
+    'id' => 'modal-agregar-expediente',
+    'size' => Modal::SIZE_LARGE,
+    'headerOptions' => [
+        'class' => 'bg-primary text-white d-flex justify-content-between align-items-center', // Clases de estilo para la barra de título del modal
+    ],
+    'closeButton' => false, // Desactiva el botón de cierre predeterminado
 
 
+]);
+// Botón de cierre personalizado con clase float-end
+echo Html::button('<span aria-hidden="true"></span>', [
+    'type' => 'button',
+    'class' => 'btn-close text-white ms-auto float-end btn-primary', // Clases float-end y btn-danger agregadas aquí
+    'data-bs-dismiss' => 'modal',
+    'aria-label' => 'Close',
+]);
+echo '<br>';
+echo '<br>';
+echo '<div id="modalContent"></div>';
+
+// Botón de cerrar en la barra de título del modal
+
+
+Modal::end();
+
+$this->registerJs('
+$(document).ready(function() {
+    $("#btn-agregar-expediente").click(function() {
+        $("#modal-agregar-expediente").modal("show")
+            .find("#modalContent")
+            .load($(this).attr("value"));
+    });
+});
+
+// JavaScript para manejar el envío del formulario dentro del modal
+$(document).on("beforeSubmit", "#documento-form", function(event) {
+    event.preventDefault(); // Evitar envío de formulario por defecto
+
+    var form = $(this);
+
+    $.ajax({
+        url: form.attr("action"),
+        type: form.attr("method"),
+        data: form.serialize(),
+        dataType: "json",
+        success: function(response) {
+            if (response.success) {
+                // Mostrar mensaje de éxito
+                $("#modal-agregar-expediente").modal("hide");
+                alert("El expediente se ha creado correctamente.");
+            } else {
+                // Mostrar mensaje de error si es necesario
+                alert("Hubo un error al crear el expediente.");
+            }
+        },
+        error: function() {
+            // Mostrar mensaje de error en caso de fallo en la solicitud AJAX
+            alert("Error al enviar el formulario.");
+        }
+    });
+});
+');
+?>
+
+   <?php
+                            $searchModel = new DocumentoSearch();
+                            $params = Yii::$app->request->queryParams;
+                            $params[$searchModel->formName()]['empleado_id'] = $model->id;
+                            $dataProvider = $searchModel->search($params);
+                            ?>
+
+                            <?php Pjax::begin(); ?>
+                            <?= GridView::widget([
+                                'dataProvider' => $dataProvider,
+                                'filterModel' => $searchModel,
+                                'options' => ['class' => 'grid-view', 'style' => 'width: 80%; margin: auto;'],
+                                'tableOptions' => ['class' => 'table table-striped table-bordered table-condensed'],
+
+
+
+                                'columns' => [
+                                    [
+                                        'attribute' => 'nombre',
+                                        'value' => 'nombre',
+                                        'options' => ['style' => 'width: 30%;'],
+                                    ],
+                                    [
+                                        'attribute' => 'fecha_subida',
+                                        'filter' => false,
+                                        'options' => ['style' => 'width: 30%;'],
+                                    ],
+                                    [
+                                        'class' => ActionColumn::class,
+                                        'template' => '{view} {delete} {download}',
+                                        'buttons' => [
+                                            'view' => function ($url, $model) {
+                                                return Html::a('<i class="far fa-eye"></i>', ['documento/open', 'id' => $model->id], [
+                                                    'target' => '_blank',
+                                                    'title' => 'Ver archivo',
+                                                    'class' => 'btn btn-info btn-xs',
+                                                    'data-pjax' => "0"
+                                                ]);
+                                            },
+                                            'delete' => function ($url, $model) {
+                                                return Html::a('<i class="fas fa-trash"></i>', ['documento/delete', 'id' => $model->id, 'empleado_id' => $model->empleado_id], [
+                                                    'title' => Yii::t('yii', 'Eliminar'),
+                                                    'data-confirm' => Yii::t('yii', '¿Estás seguro de que deseas eliminar este elemento?'),
+                                                    'data-method' => 'post',
+                                                    'class' => 'btn btn-danger btn-xs',
+                                                ]);
+                                            },
+                                            'download' => function ($url, $model) {
+                                                return Html::a('<i class="fas fa-download"></i>', ['documento/download', 'id' => $model->id], [
+                                                    'title' => 'Descargar archivo',
+                                                    'class' => 'btn btn-success btn-xs',
+                                                    'data-pjax' => "0"
+                                                ]);
+                                            },
+                                        ],
+                                        'options' => ['style' => 'width: 15%;'], //ancho de la columna
+                                    ],
+                                ],
+                                'summaryOptions' => ['class' => 'summary mb-2'],
+                                'pager' => [
+                                    'class' => 'yii\bootstrap4\LinkPager',
+                                ]
+                            ]); ?>
+                            <?php Pjax::end(); ?>
                             <?php $this->endBlock(); ?>
+                        
+
+
+
                             <?php echo TabsX::widget([
                                 'options' => ['class' => 'custom-tabs-2'],
                                 'items' => [
@@ -346,7 +491,7 @@ echo TabsX::widget([
                                     ],
                                       [
                                             'label' => 'Expediente',
-                                    //    'content' => $this->blocks['expediente'],
+                                      'content' => $this->blocks['expediente'],
 
 
                                     ],

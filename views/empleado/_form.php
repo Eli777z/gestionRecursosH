@@ -34,10 +34,10 @@ use yii\helpers\ArrayHelper;
 
 <?= $form->field($informacion_laboral, 'cat_departamento_id')->widget(Select2::classname(), [
     'data' => ArrayHelper::map(CatDepartamento::find()->all(), 'id', 'nombre_departamento'),
-    'language' => 'es', // Ajusta el idioma según tus necesidades
+    'language' => 'es', 
     'options' => ['placeholder' => 'Seleccione departamento'],
     'pluginOptions' => [
-        'allowClear' => true // Esto permite borrar la selección actual
+        'allowClear' => true 
     ],
 ]) ?>
 

@@ -64,6 +64,7 @@ class EmpleadoController extends Controller
     {
 
         $modelEmpleado = $this->findModel2($id);
+        
         return $this->render('view', [
             'model' => $modelEmpleado,
         ]);
