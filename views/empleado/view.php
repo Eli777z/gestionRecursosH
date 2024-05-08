@@ -27,6 +27,7 @@ use app\models\Departamento;
 use app\models\Documento;
 use kartik\tabs\TabsX;
 use app\models\DocumentoSearch;
+use app\models\JuntaGobierno;
 use yii\web\JsExpression;
 use kartik\select2\Select2;
 /* @var $this yii\web\View */
@@ -344,6 +345,18 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
                                         'widgetOptions' => [
                                             'data' => ArrayHelper::map(CatTipoContrato::find()->all(), 'id', 'nombre_tipo'), // Obtener los departamentos para el dropdown
                                             'options' => ['prompt' => 'Seleccionar Tipo de Contrato'], 
+                                        ],
+                                    ],
+                                    [
+                                        'attribute' => 'junta_gobierno_id',
+                                        'label' => 'Jefe o director a cargo',
+                                        'value' => isset($model->informacionLaboral->juntaGobierno->empleado) ? $model->informacionLaboral->juntaGobierno->empleado->nombre . ' ' . $model->informacionLaboral->juntaGobierno->empleado->apellido : null,
+                                        'type' => DetailView::INPUT_SELECT2,
+                                        'widgetOptions' => [
+                                            'data' => ArrayHelper::map(JuntaGobierno::find()->all(), 'id', function($model) {
+                                                return $model->empleado->nombre . ' ' . $model->empleado->apellido;
+                                            }),                                            
+                                            'options' => ['prompt' => 'Seleccionar Jefe o director a cargo'], 
                                         ],
                                     ],
                                   

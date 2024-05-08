@@ -18,12 +18,13 @@ use Yii;
  * @property string|null $horario_laboral_inicio
  * @property string|null $horario_laboral_fin
  * @property string|null $horario_dias_trabajo
-
+ *
  * @property CatDepartamento $catDepartamento
  * @property CatDireccion $catDireccion
  * @property CatPuesto $catPuesto
  * @property CatTipoContrato $catTipoContrato
  * @property Empleado[] $empleados
+ * @property JuntaGobierno $juntaGobierno
  */
 class InformacionLaboral extends \yii\db\ActiveRecord
 {
@@ -45,11 +46,11 @@ class InformacionLaboral extends \yii\db\ActiveRecord
             [['cat_departamento_id', 'fecha_ingreso'], 'required'],
             [['fecha_ingreso', 'horario_laboral_inicio', 'horario_laboral_fin'], 'safe'],
             [['horario_dias_trabajo'], 'string', 'max' => 150],
-
             [['cat_tipo_contrato_id'], 'exist', 'skipOnError' => true, 'targetClass' => CatTipoContrato::class, 'targetAttribute' => ['cat_tipo_contrato_id' => 'id']],
             [['cat_departamento_id'], 'exist', 'skipOnError' => true, 'targetClass' => CatDepartamento::class, 'targetAttribute' => ['cat_departamento_id' => 'id']],
             [['cat_direccion_id'], 'exist', 'skipOnError' => true, 'targetClass' => CatDireccion::class, 'targetAttribute' => ['cat_direccion_id' => 'id']],
             [['cat_puesto_id'], 'exist', 'skipOnError' => true, 'targetClass' => CatPuesto::class, 'targetAttribute' => ['cat_puesto_id' => 'id']],
+            [['junta_gobierno_id'], 'exist', 'skipOnError' => true, 'targetClass' => JuntaGobierno::class, 'targetAttribute' => ['junta_gobierno_id' => 'id']],
         ];
     }
 
@@ -70,7 +71,6 @@ class InformacionLaboral extends \yii\db\ActiveRecord
             'horario_laboral_inicio' => 'Horario Laboral Inicio',
             'horario_laboral_fin' => 'Horario Laboral Fin',
             'horario_dias_trabajo' => 'Horario Dias Trabajo',
-
         ];
     }
 
@@ -122,5 +122,15 @@ class InformacionLaboral extends \yii\db\ActiveRecord
     public function getEmpleados()
     {
         return $this->hasMany(Empleado::class, ['informacion_laboral_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[JuntaGobierno]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getJuntaGobierno()
+    {
+        return $this->hasOne(JuntaGobierno::class, ['id' => 'junta_gobierno_id']);
     }
 }

@@ -21,6 +21,7 @@ $config = [
         'gridview' =>  [
             'class' => '\kartik\grid\Module'
         ] 
+        
     ],
     'components' => [
        
