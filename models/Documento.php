@@ -61,7 +61,7 @@ class Documento extends \yii\db\ActiveRecord
             'empleado_id' => 'Empleado ID',
             'cat_tipo_documento_id' => 'Cat Tipo Documento ID',
             'nombre' => 'Nombre',
-            'ruta' => 'Ruta',
+            'ruta' => 'Archivo',
             'fecha_subida' => 'Fecha Subida',
             'archivoSubido' => 'Archivo a Subir',
 

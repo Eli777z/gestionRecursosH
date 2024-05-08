@@ -39,7 +39,7 @@ class CatTipoDocumento extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
+            'id' => 'Tipo de documento',
             'nombre_tipo' => 'Nombre Tipo',
         ];
     }

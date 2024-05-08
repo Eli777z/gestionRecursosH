@@ -30,7 +30,7 @@ use kartik\select2\Select2;
 
 $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
 
-$this->title = $model->id;
+$this->title = 'Empleado '.$model->numero_empleado;
 $this->params['breadcrumbs'][] = ['label' => 'Empleados', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
@@ -78,7 +78,7 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
 
                                 <?php ActiveForm::end(); ?>
 
-                                <h2 class="mb-0">Empleado: <?= $model->nombre ?> <?= $model->apellido ?></h2>
+                                <h2 class="mb-0">  Empleado: <?= $model->nombre ?> <?= $model->apellido ?></h2>
                             </div>
                             <?php $this->beginBlock('datos'); ?>
 
@@ -479,7 +479,18 @@ $(document).on("beforeSubmit", "#documento-form", function(event) {
 
 
 
-                            <?php echo TabsX::widget([
+                           
+
+                        </div>
+                        <!--.col-md-12-->
+
+                    </div>
+                    <!--.row-->
+                    
+
+                </div>
+                <!--.card-body-->
+                <?php echo TabsX::widget([
                                 'options' => ['class' => 'custom-tabs-2'],
                                 'items' => [
                                     [
@@ -507,20 +518,13 @@ $(document).on("beforeSubmit", "#documento-form", function(event) {
 
                             ?>
 
-                        </div>
-                        <!--.col-md-12-->
-
-                    </div>
-                    <!--.row-->
-
-                </div>
-                <!--.card-body-->
-
             </div>
             <!--.card-->
+            
 
         </div>
         <!--.col-md-10-->
+        
     </div>
     <!--.row-->
 </div>

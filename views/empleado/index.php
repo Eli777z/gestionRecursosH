@@ -80,7 +80,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     $icon = $isActive ? 'fas fa-ban' : 'far fa-check-circle';
                     $title = $isActive ? 'Desactivar Usuario' : 'Activar Usuario';
     
-                    return Html::a('<i class="' . $icon . '"></i>', ['trabajador/toggle-activation', 'id' => $model->id], [
+                    return Html::a('<i class="' . $icon . '"></i>', ['empleado/toggle-activation', 'id' => $model->id], [
                         'title' => Yii::t('yii', $title),
                         'data-confirm' => Yii::t('yii', '¿Estás seguro de que deseas cambiar el estado de este usuario?'),
                         'data-method' => 'post',
