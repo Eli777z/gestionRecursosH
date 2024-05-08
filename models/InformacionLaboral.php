@@ -17,8 +17,12 @@ use Yii;
  * @property string $fecha_ingreso
  * @property string|null $horario_laboral_inicio
  * @property string|null $horario_laboral_fin
- *
+ * @property string|null $horario_dias_trabajo
+
  * @property CatDepartamento $catDepartamento
+ * @property CatDireccion $catDireccion
+ * @property CatPuesto $catPuesto
+ * @property CatTipoContrato $catTipoContrato
  * @property Empleado[] $empleados
  */
 class InformacionLaboral extends \yii\db\ActiveRecord
@@ -40,7 +44,12 @@ class InformacionLaboral extends \yii\db\ActiveRecord
             [['cat_tipo_contrato_id', 'cat_puesto_id', 'cat_departamento_id', 'vacaciones_id', 'cat_direccion_id', 'junta_gobierno_id'], 'integer'],
             [['cat_departamento_id', 'fecha_ingreso'], 'required'],
             [['fecha_ingreso', 'horario_laboral_inicio', 'horario_laboral_fin'], 'safe'],
+            [['horario_dias_trabajo'], 'string', 'max' => 150],
+
+            [['cat_tipo_contrato_id'], 'exist', 'skipOnError' => true, 'targetClass' => CatTipoContrato::class, 'targetAttribute' => ['cat_tipo_contrato_id' => 'id']],
             [['cat_departamento_id'], 'exist', 'skipOnError' => true, 'targetClass' => CatDepartamento::class, 'targetAttribute' => ['cat_departamento_id' => 'id']],
+            [['cat_direccion_id'], 'exist', 'skipOnError' => true, 'targetClass' => CatDireccion::class, 'targetAttribute' => ['cat_direccion_id' => 'id']],
+            [['cat_puesto_id'], 'exist', 'skipOnError' => true, 'targetClass' => CatPuesto::class, 'targetAttribute' => ['cat_puesto_id' => 'id']],
         ];
     }
 
@@ -57,9 +66,11 @@ class InformacionLaboral extends \yii\db\ActiveRecord
             'vacaciones_id' => 'Vacaciones ID',
             'cat_direccion_id' => 'Cat Direccion ID',
             'junta_gobierno_id' => 'Junta Gobierno ID',
-            'fecha_ingreso' => 'Fecha Ingreso',
+            'fecha_ingreso' => 'Fecha de ingreso',
             'horario_laboral_inicio' => 'Horario Laboral Inicio',
             'horario_laboral_fin' => 'Horario Laboral Fin',
+            'horario_dias_trabajo' => 'Horario Dias Trabajo',
+
         ];
     }
 
@@ -71,6 +82,36 @@ class InformacionLaboral extends \yii\db\ActiveRecord
     public function getCatDepartamento()
     {
         return $this->hasOne(CatDepartamento::class, ['id' => 'cat_departamento_id']);
+    }
+
+    /**
+     * Gets query for [[CatDireccion]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCatDireccion()
+    {
+        return $this->hasOne(CatDireccion::class, ['id' => 'cat_direccion_id']);
+    }
+
+    /**
+     * Gets query for [[CatPuesto]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCatPuesto()
+    {
+        return $this->hasOne(CatPuesto::class, ['id' => 'cat_puesto_id']);
+    }
+
+    /**
+     * Gets query for [[CatTipoContrato]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCatTipoContrato()
+    {
+        return $this->hasOne(CatTipoContrato::class, ['id' => 'cat_tipo_contrato_id']);
     }
 
     /**

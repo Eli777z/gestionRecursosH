@@ -199,24 +199,24 @@ class EmpleadoController extends Controller
      */
     public function actionDelete($id, $usuario_id)
     {
-        $trabajador = $this->findModel3($id, $usuario_id);
+        $empleado = $this->findModel3($id, $usuario_id);
 
-        $usuario_id = $trabajador->usuario_id;
+        $usuario_id = $empleado->usuario_id;
 
         $transaction = Yii::$app->db->beginTransaction();
 
         try {
-            foreach ($trabajador->expedientes as $expediente) {
+            foreach ($empleado->documentos as $documento) {
 
-                $nombreCarpetaTrabajador = Yii::getAlias('@runtime') . '/empleados/' . $trabajador->nombre . '_' . $trabajador->apellido;
+                $nombreCarpetaTrabajador = Yii::getAlias('@runtime') . '/empleados/' . $empleado->nombre . '_' . $empleado->apellido;
                 if (is_dir($nombreCarpetaTrabajador)) {
                     FileHelper::removeDirectory($nombreCarpetaTrabajador);
                 }
-                $expediente->delete();
+                $documento->delete();
             }
 
 
-            $trabajador->delete();
+            $empleado->delete();
 
             $usuario = Usuario::findOne($usuario_id);
             if ($usuario) {

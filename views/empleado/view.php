@@ -1,9 +1,15 @@
 <?php
 
 use app\models\CatDepartamento;
+
+use app\models\CatDireccion;
+
+use app\models\CatPuesto;
+use app\models\CatTipoContrato;
 use hail812\adminlte3\yii\grid\ActionColumn;
 use yii\helpers\Html;
 //use yii\widgets\DetailView;
+
 use yii\helpers\Url;
 use yii\bootstrap5\Tabs;
 use yii\grid\GridView;
@@ -13,7 +19,8 @@ use yii\widgets\Pjax;
 use yii\web\View;
 use kartik\detail\DetailView;
 use app\models\ExpedienteSearch;
-use yii\bootstrap4\ActiveForm;
+//use yii\bootstrap4\ActiveForm;
+use kartik\form\ActiveForm;
 use kartik\daterange\DateRangePicker;
 use yii\helpers\ArrayHelper;
 use app\models\Departamento;
@@ -284,17 +291,82 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
                                             'options' => ['prompt' => 'Seleccionar Departamento'], 
                                         ],
                                     ],
-
                                     [
-                                        'attribute' => 'fecha_ingreso',
-                                        'type' => DetailView::INPUT_DATE,
-                                        'format' => ['date', 'php:Y-m-d'], 
-                                        'displayFormat' => 'php:Y-m-d',  'widgetOptions' => [
+                                        'attribute' => 'horario_laboral_inicio',
+                                        'type' => DetailView::INPUT_TIME,
+                                        'format' => ['time', 'php:H:i'], // Formato de hora (HH:mm)
+                                        'widgetOptions' => [
                                             'pluginOptions' => [
-                                                'format' => 'yyyy-mm-dd',                                                 'autoclose' => true,
-                                            ]
+                                                'showMeridian' => false, // No mostrar AM/PM
+                                               
+                                            ],
                                         ],
                                     ],
+                                    [
+                                        'attribute' => 'horario_laboral_fin',
+                                        'type' => DetailView::INPUT_TIME,
+                                        'format' => ['time', 'php:H:i'], // Formato de hora (HH:mm)
+                                        'widgetOptions' => [
+                                            'pluginOptions' => [
+                                                'showMeridian' => false, // No mostrar AM/PM
+                                               
+                                            ],
+                                        ],
+                                    ],
+                                    
+                                    
+                                    
+                                    [
+                                        'attribute' => 'cat_direccion_id',
+                                        'label' => 'Dirección',
+                                        'value' => isset($model->informacionLaboral->catDireccion) ? $model->informacionLaboral->catDireccion->nombre_direccion : null,
+                                        'type' => DetailView::INPUT_SELECT2,
+                                        'widgetOptions' => [
+                                            'data' => ArrayHelper::map(CatDireccion::find()->all(), 'id', 'nombre_direccion'), // Obtener los departamentos para el dropdown
+                                            'options' => ['prompt' => 'Seleccionar Direccion'], 
+                                        ],
+                                    ],
+                                    [
+                                        'attribute' => 'cat_puesto_id',
+                                        'label' => 'Puesto',
+                                        'value' => isset($model->informacionLaboral->catPuesto) ? $model->informacionLaboral->catPuesto->nombre_puesto : null,
+                                        'type' => DetailView::INPUT_SELECT2,
+                                        'widgetOptions' => [
+                                            'data' => ArrayHelper::map(CatPuesto::find()->all(), 'id', 'nombre_puesto'), // Obtener los departamentos para el dropdown
+                                            'options' => ['prompt' => 'Seleccionar Puesto'], 
+                                        ],
+                                    ],
+                                    [
+                                        'attribute' => 'cat_tipo_contrato_id',
+                                        'label' => 'Tipo de contrato',
+                                        'value' => isset($model->informacionLaboral->catTipoContrato) ? $model->informacionLaboral->catTipoContrato->nombre_tipo : null,
+                                        'type' => DetailView::INPUT_SELECT2,
+                                        'widgetOptions' => [
+                                            'data' => ArrayHelper::map(CatTipoContrato::find()->all(), 'id', 'nombre_tipo'), // Obtener los departamentos para el dropdown
+                                            'options' => ['prompt' => 'Seleccionar Tipo de Contrato'], 
+                                        ],
+                                    ],
+                                  
+                                    
+
+
+
+                               [
+    'attribute' => 'fecha_ingreso',
+    'type' => DetailView::INPUT_DATE,
+    'format' => ['date', 'php:Y-m-d'], 
+    'displayFormat' => 'php:Y-m-d',  
+    'widgetOptions' => [
+        'pluginOptions' => [
+            'format' => 'yyyy-mm-dd',                                                 
+            'autoclose' => true,
+            'viewMode' => 'months', // o 'years'
+        ]
+    ],
+],
+
+                                  
+                                    
 
                                 ],
                                 'formOptions' => [
@@ -306,6 +378,7 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
 
 
 <?php
+
                            
 echo TabsX::widget([
     'options' => ['class' => 'nav-tabs-custom'],

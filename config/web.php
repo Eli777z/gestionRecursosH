@@ -112,6 +112,7 @@ $config = [
             'infolaboral/*',
             'cat-departamento/*',
             'cat-direccion/*',
+            'junta-gobierno/*',
             //'infolaboral/*',
             'cat-puesto/*',
             'cat-tipo-contrato/*',
