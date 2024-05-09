@@ -3,12 +3,16 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
+use hail812\adminlte3\yii\grid\ActionColumn;
+use yii\web\View;
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\EmpleadoSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+$this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
 
 $this->title = 'Empleados';
 $this->params['breadcrumbs'][] = $this->title;
+\yii\web\YiiAsset::register($this);
 ?>
 <div class="container-fluid">
     <div class="row">
@@ -28,11 +32,11 @@ $this->params['breadcrumbs'][] = $this->title;
                     <?= GridView::widget([
                         'dataProvider' => $dataProvider,
                         'filterModel' => $searchModel,
-                      //  'options' => ['class' => 'grid-view', 'style' => 'width: 80%; margin: auto;'], 
-                       // 'tableOptions' => ['class' => 'table table-striped table-bordered table-condensed'], 
+                        'options' => ['class' => 'grid-view', 'style' => 'width: 80%; margin: auto;'],
+                        'tableOptions' => ['class' => 'table table-striped table-bordered table-condensed'],
                         
                         'columns' => [
-                            ['class' => 'yii\grid\SerialColumn'],
+                            
                             [
                                 'attribute' => 'foto',
                                 'format' => 'html',
@@ -70,8 +74,9 @@ $this->params['breadcrumbs'][] = $this->title;
                             //'institucion_educativa',
                             //'titulo_grado',
 
-                            ['class' => 'hail812\adminlte3\yii\grid\ActionColumn',
-            'template' => '{view} {delete} {update} {toggle-activation}', //botones deseados
+                            [
+                                'class' => ActionColumn::class,
+            'template' => '{view} {delete}  {toggle-activation}', //botones deseados
             'buttons' => [
                 'toggle-activation' => function ($url, $model) {
                     
@@ -103,12 +108,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'class' => 'btn btn-danger btn-xs',
                     ]);
                 },
-                'update' => function ($url, $model) {
-                    return Html::a('<i class="fas fa-pencil-alt"></i>', $url, [
-                        'title' => Yii::t('yii', 'Actualizar'),
-                        'class' => 'btn btn-primary btn-xs',
-                    ]);
-                },
+              
                 
             ],
             'options' => ['style' => 'width: 15%;'], 

@@ -200,40 +200,41 @@ class EmpleadoController extends Controller
     public function actionDelete($id, $usuario_id)
     {
         $empleado = $this->findModel3($id, $usuario_id);
-
-        $usuario_id = $empleado->usuario_id;
-
+    
         $transaction = Yii::$app->db->beginTransaction();
-
+    
         try {
+            // Eliminar los documentos asociados al empleado y su carpeta
             foreach ($empleado->documentos as $documento) {
-
                 $nombreCarpetaTrabajador = Yii::getAlias('@runtime') . '/empleados/' . $empleado->nombre . '_' . $empleado->apellido;
                 if (is_dir($nombreCarpetaTrabajador)) {
                     FileHelper::removeDirectory($nombreCarpetaTrabajador);
                 }
                 $documento->delete();
             }
-
-
-            $empleado->delete();
-
-            $usuario = Usuario::findOne($usuario_id);
-            if ($usuario) {
-                $usuario->delete();
+    
+           
+    
+            // Eliminar al usuario asociado al empleado si existe
+            if ($empleado->usuario) {
+                $empleado->usuario->delete();
             }
-
+    
+            // Eliminar al empleado
+            $empleado->delete();
+    
             $transaction->commit();
-
+    
             Yii::$app->session->setFlash('success', 'Trabajador, expedientes, carpeta asociada y usuario eliminados exitosamente.');
         } catch (Exception $e) {
             $transaction->rollBack();
-
             Yii::$app->session->setFlash('error', 'Error al eliminar el trabajador, sus expedientes, la carpeta asociada y el usuario.');
         }
-
+    
         return $this->redirect(['index']);
     }
+    
+
 
     /**
      * Finds the Empleado model based on its primary key value.
