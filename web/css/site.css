@@ -119,6 +119,32 @@ a.desc:after {
     border-bottom-color:#007bff; /* Ocultar el borde inferior */
 }
 
+    .narrow-form {
+        max-width: 600px; /* Ajusta este valor según lo estrecho que quieras que sea el formulario */
+        margin: auto; /* Centra el formulario horizontalmente */
+    }
+    .card-container {
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden; /* Para que las esquinas redondeadas no se vean cortadas */
+    }
+
 
 
 /* Agregar más estilos según sea necesario */
+.borderless td, .borderless th {
+    border: none !important;
+}
+
+
+.grid-view .table thead th {
+    border: none !important; /* Eliminar los bordes del encabezado */
+    background-color: #f8f9fa; /* Cambiar el color de fondo del encabezado si es necesario */
+ 
+}
+
+
+
+/* Eliminar bordes de las celdas y establecer color de fondo */
+
+

@@ -66,49 +66,51 @@ class DocumentoController extends Controller
      * @return mixed
      */
     public function actionCreate($empleado_id)
-    {
-        $model = new Documento();
-        $cat_tipo_documento = new CatTipoDocumento();
+{
+    $model = new Documento();
+    $cat_tipo_documento = new CatTipoDocumento();
 
-       $model->empleado_id = $empleado_id;
-        if (Yii::$app->request->isPost) {
-            $model->load(Yii::$app->request->post());
-            $file = UploadedFile::getInstance($model, 'ruta');
+    $model->empleado_id = $empleado_id;
+
+    if (Yii::$app->request->isPost) {
+        $model->load(Yii::$app->request->post());
+        $file = UploadedFile::getInstance($model, 'ruta');
+        
+        // Obtener el ID del tipo de documento seleccionado del formulario
+        $tipoDocumentoIdSeleccionado = Yii::$app->request->post('Documento')['cat_tipo_documento_id'];
+
+        if ($file && $tipoDocumentoIdSeleccionado !== null) {
+            // Asignar el ID del tipo de documento seleccionado al modelo Documento
+            $model->cat_tipo_documento_id = $tipoDocumentoIdSeleccionado;
+
+            $empleado = Empleado::findOne($model->empleado_id);
+            $nombreCarpetaTrabajador = Yii::getAlias('@runtime') . '/empleados/' . $empleado->nombre . '_' . $empleado->apellido;
+            if (!is_dir($nombreCarpetaTrabajador)) {
+                mkdir($nombreCarpetaTrabajador, 0775, true);
+            }
+            $nombreCarpetaExpedientes = $nombreCarpetaTrabajador . '/documentos';
+            if (!is_dir($nombreCarpetaExpedientes)) {
+                mkdir($nombreCarpetaExpedientes, 0775, true);
+            }
+            $rutaArchivo = $nombreCarpetaExpedientes . '/' . $file->baseName . '.' . $file->extension;
+            $file->saveAs($rutaArchivo);
             
-            // Obtener el ID del tipo de documento seleccionado del formulario
-            $tipoDocumentoIdSeleccionado = Yii::$app->request->post('CatTipoDocumento')['id'];
-    
-            if ($file && $tipoDocumentoIdSeleccionado !== null) {
-                // Asignar el ID del tipo de documento seleccionado al modelo Documento
-                $model->cat_tipo_documento_id = $tipoDocumentoIdSeleccionado;
-    
-                $empleado = Empleado::findOne($model->empleado_id);
-                $nombreCarpetaTrabajador = Yii::getAlias('@runtime') . '/empleados/' . $empleado->nombre . '_' . $empleado->apellido;
-                if (!is_dir($nombreCarpetaTrabajador)) {
-                    mkdir($nombreCarpetaTrabajador, 0775, true);
-                }
-                $nombreCarpetaExpedientes = $nombreCarpetaTrabajador . '/documentos';
-                if (!is_dir($nombreCarpetaExpedientes)) {
-                    mkdir($nombreCarpetaExpedientes, 0775, true);
-                }
-                $rutaArchivo = $nombreCarpetaExpedientes . '/' . $file->baseName . '.' . $file->extension;
-                $file->saveAs($rutaArchivo);
-                
-                $model->ruta = $rutaArchivo;
-           
-                $model->fecha_subida = date('Y-m-d H:i:s'); 
-            
-                if ($model->save()) {
-                    return $this->redirect(['empleado/view', 'id' => $empleado->id]);
-                }
+            $model->ruta = $rutaArchivo;
+       
+            $model->fecha_subida = date('Y-m-d H:i:s'); 
+        
+            if ($model->save()) {
+                return $this->redirect(['empleado/view', 'id' => $empleado->id]);
             }
         }
-    
-        return $this->renderAjax('create', [
-            'model' => $model,
-            'cat_tipo_documento'=> $cat_tipo_documento,
-        ]);
     }
+
+    return $this->renderAjax('create', [
+        'model' => $model,
+        'cat_tipo_documento'=> $cat_tipo_documento,
+    ]);
+}
+
     
 
     /**

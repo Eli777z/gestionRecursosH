@@ -14,6 +14,7 @@ use app\models\InformacionLaboral;
 use app\models\CatDepartamento;
 use yii\helpers\FileHelper;
 use yii\db\Exception;
+use app\models\Documento;
 
 
 
@@ -62,11 +63,20 @@ class EmpleadoController extends Controller
      */
     public function actionView($id)
     {
-
+        // Encuentra el modelo de empleado
         $modelEmpleado = $this->findModel2($id);
-        
+    
+        // Encuentra los documentos asociados al empleado
+        $documentos = $modelEmpleado->documentos;
+    
+        // Crea un nuevo modelo de Documento para usar en el formulario
+        $documentoModel = new Documento();
+    
+        // Renderiza la vista 'view' y pasa los datos necesarios
         return $this->render('view', [
             'model' => $modelEmpleado,
+            'documentos' => $documentos,
+            'documentoModel' => $documentoModel,
         ]);
     }
 
