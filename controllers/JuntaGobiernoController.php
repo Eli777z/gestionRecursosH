@@ -70,7 +70,7 @@ class JuntaGobiernoController extends Controller
         $model = new JuntaGobierno();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id, 'cat_direccion_id' => $model->cat_direccion_id, 'cat_departamento_id' => $model->cat_departamento_id, 'empleado_id' => $model->empleado_id]);
+            return $this->redirect(['empleado/index']);
         }
 
         return $this->render('create', [
@@ -88,12 +88,12 @@ class JuntaGobiernoController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id, $cat_direccion_id, $cat_departamento_id, $empleado_id)
+    public function actionUpdate($id, $cat_direccion_id, $cat_departamento_id)
     {
-        $model = $this->findModel($id, $cat_direccion_id, $cat_departamento_id, $empleado_id);
+        $model = $this->findModel2($id, $cat_direccion_id, $cat_departamento_id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id, 'cat_direccion_id' => $model->cat_direccion_id, 'cat_departamento_id' => $model->cat_departamento_id, 'empleado_id' => $model->empleado_id]);
+            return $this->redirect(['view', 'id' => $model->id, 'cat_direccion_id' => $model->cat_direccion_id, 'cat_departamento_id' => $model->cat_departamento_id]);
         }
 
         return $this->render('update', [
@@ -115,7 +115,7 @@ class JuntaGobiernoController extends Controller
     {
         $this->findModel($id, $cat_direccion_id, $cat_departamento_id, $empleado_id)->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect(['empleado/index']);
     }
 
     /**
@@ -136,4 +136,15 @@ class JuntaGobiernoController extends Controller
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+
+    protected function findModel2($id, $cat_direccion_id, $cat_departamento_id)
+    {
+        if (($model = JuntaGobierno::findOne(['id' => $id, 'cat_direccion_id' => $cat_direccion_id, 'cat_departamento_id' => $cat_departamento_id])) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    
 }

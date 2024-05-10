@@ -15,8 +15,8 @@ use app\models\CatDepartamento;
 use yii\helpers\FileHelper;
 use yii\db\Exception;
 use app\models\Documento;
-
-
+use app\models\JuntaGobierno;
+use yii\helpers\Json;
 
 /**
  * EmpleadoController implements the CRUD actions for Empleado model.
@@ -46,10 +46,12 @@ class EmpleadoController extends Controller
     {
         $searchModel = new EmpleadoSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $juntaGobiernoModel = new JuntaGobierno();
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'juntaGobiernoModel' => $juntaGobiernoModel
         ]);
     }
 
@@ -210,7 +212,10 @@ class EmpleadoController extends Controller
     public function actionDelete($id, $usuario_id)
     {
         $empleado = $this->findModel3($id, $usuario_id);
-    
+        $usuario_id = $empleado->usuario_id;
+        $informacion_laboral_id = $empleado->informacion_laboral_id;
+
+       // $junta_gobierno_id = $empleado->informacionLaboral->junta_gobierno_id;
         $transaction = Yii::$app->db->beginTransaction();
     
         try {
@@ -223,15 +228,30 @@ class EmpleadoController extends Controller
                 $documento->delete();
             }
     
-           
-    
+            // Eliminar la información laboral del empleado
+          //  $empleado->informacionLaboral->delete();
+          $empleado->delete();
+
             // Eliminar al usuario asociado al empleado si existe
-            if ($empleado->usuario) {
-                $empleado->usuario->delete();
+            $usuario = Usuario::findOne($usuario_id);
+            if ($usuario) {
+                $usuario->delete();
             }
+
+           // $junta_gobierno = JuntaGobierno::findOne($junta_gobierno_id);
+            //if ($junta_gobierno) {
+              //  $junta_gobierno->delete();
+           // }
+
+            $informacion_laboral = InformacionLaboral::findOne($informacion_laboral_id);
+            if ($informacion_laboral) {
+                $informacion_laboral->delete();
+            }
+
+
     
-            // Eliminar al empleado
-            $empleado->delete();
+            // Por último, eliminar al empleado
+           
     
             $transaction->commit();
     
@@ -243,6 +263,9 @@ class EmpleadoController extends Controller
     
         return $this->redirect(['index']);
     }
+    
+    
+    
     
 
 
@@ -461,5 +484,28 @@ class EmpleadoController extends Controller
         }
     }
 
+    public function actionDatosJuntaGobierno($direccion_id)
+    {
+        // Obtener los datos de JuntaGobierno basados en la dirección seleccionada
+        $datosJuntaGobierno = JuntaGobierno::find()
+            ->where(['nivel_jerarquico' => 'Jefe de unidad'])
+            ->andWhere(['cat_direccion_id' => $direccion_id])
+            ->all();
+
+        // Formatear los datos en el formato necesario para Select2
+        $result = [];
+        foreach ($datosJuntaGobierno as $juntaGobierno) {
+            $result[] = [
+                'id' => $juntaGobierno->id,
+                'text' => $juntaGobierno->empleado->nombre . ' ' . $juntaGobierno->empleado->apellido,
+            ];
+        }
+
+        // Devolver los datos en formato JSON
+        return Json::encode(['results' => $result]);
+    }
 }
+
+
+
 

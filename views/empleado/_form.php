@@ -1,6 +1,7 @@
 <?php
 
 use app\models\CatDepartamento;
+use app\models\CatDireccion;
 use yii\helpers\Html;
 use yii\bootstrap4\ActiveForm;
 use kartik\file\FileInput;
@@ -41,6 +42,15 @@ use yii\helpers\ArrayHelper;
     ],
 ]) ?>
 
+
+<?= $form->field($informacion_laboral, 'cat_direccion_id')->widget(Select2::classname(), [
+    'data' => ArrayHelper::map(CatDireccion::find()->all(), 'id', 'nombre_direccion'),
+    'language' => 'es', 
+    'options' => ['placeholder' => 'Seleccione la dirección'],
+    'pluginOptions' => [
+        'allowClear' => true 
+    ],
+]) ?>
 
   
     <?= $form->field($model, 'nombre')->textInput(['maxlength' => true]) ?>
