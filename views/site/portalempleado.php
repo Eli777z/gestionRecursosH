@@ -1,74 +1,101 @@
 <?php
-use yii\helpers\Html;
+use yii\web\View;
 
-$this->title = 'PAGINA DE INICIO-USUARIO';
+
+$this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
+
+$this->title = 'PAGINA DE INICIO- EMPLEADO';
 $this->params['breadcrumbs'] = [['label' => $this->title]];
-\yii\web\YiiAsset::register($this);
-
-$user = Yii::$app->user->identity;
-
-// Imprime el rol
-echo "Rol del usuario: " . Html::encode($user->rol);
 ?>
 <div class="container-fluid">
+<div id="dynamic-content">
+
+
+
+</div>
+
+    
+<div class="row">
+    <div class="col-md-4"> <!-- Cambiado de col-md-6 a col-md-4 -->
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+            <h5 class="card-title text-white">Formatos de Incidencias</h5> <!-- Cambio del color del texto del título a blanco -->
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <a href="#" class="dropdown-item">PERMISO FUERA DEL TRABAJO</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="#" class="dropdown-item">COMISION ESPECIAL</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="#" class="dropdown-item">PERMISO ECONÓMICO</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="#" class="dropdown-item">PERMISO SIN GOCE DE SUELDO</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="#" class="dropdown-item">CAMBIO DE DÍA LABORAL</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="#" class="dropdown-item">CAMBIO DE HORARIO DE TRABAJO</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="#" class="dropdown-item">CAMBIO DE PERIODO VACACIONAL</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="#" class="dropdown-item">REPORTE DE TIEMPO EXTRA</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="#" class="dropdown-item">REPORTE GENERAL DE TIEMPO EXTRA</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div id="formulario-container"> <!-- Div para mostrar el formulario -->
+        <!-- Aquí se insertará dinámicamente el formulario -->
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('.dropdown-item').click(function(e) {
+        e.preventDefault(); // Evita el comportamiento predeterminado del enlace
+        
+        // Obtener el texto del enlace clicado
+        var motivo = $(this).text();
+        
+        // Realizar una solicitud AJAX para obtener el formulario correspondiente
+        $.ajax({
+            url: 'obtener-formulario', // Usando la URL amigable// Reemplazar 'url_del_controlador' por la URL de tu controlador
+            type: 'GET',
+            data: { motivo: motivo }, // Pasar el motivo como parámetro
+            success: function(response) {
+                // Mostrar el formulario obtenido dentro del contenedor
+                $('#formulario-container').html(response);
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+            }
+        });
+    });
+});
+</script>
+
+
+
+
     <div class="row">
-        <div class="col-lg-6">
-            <?= \hail812\adminlte\widgets\Alert::widget([
-                'type' => 'success',
-                'body' => '<h3>Congratulations!</h3>',
-            ]) ?>
-            <?= \hail812\adminlte\widgets\Callout::widget([
-                'type' => 'danger',
-                'head' => 'I am a danger callout!',
-                'body' => 'There is a problem that we need to fix. A wonderful serenity has taken possession of my entire soul, like these sweet mornings of spring which I enjoy with my whole heart.'
+        <div class="col-12 col-sm-6 col-md-3">
+            <?= \hail812\adminlte\widgets\InfoBox::widget([
+                'text' => 'CPU Traffic',
+                'number' => '10 <small>%</small>',
+                'icon' => 'fas fa-cog',
             ]) ?>
         </div>
     </div>
-    
-
-
-
-
-    <div class="card">
-    <div class="card-header">
-        <h5 class="card-title">Menú de Incidencias</h5>
-    </div>
-    <div class="card-body">
-        <nav class="mt-2">
-            <?php
-            echo \hail812\adminlte\widgets\Menu::widget([
-                'items' => [
-                    [
-                        'label' => 'FORMATOS DE INCIDENCIAS',
-                        'items' => [
-                            ['label' => 'PERMISO FUERA DEL TRABAJO', 'iconStyle' => 'far'],
-                            ['label' => 'COMISION ESPECIAL', 'iconStyle' => 'far'],
-                            ['label' => 'PERMISO ECONOMICO', 'iconStyle' => 'far'],
-                            ['label' => 'PERMISO SIN GOCE DE SUELDO', 'iconStyle' => 'far'],
-                            ['label' => 'CAMBIO DE DIA LABORAL', 'iconStyle' => 'far'],
-                            ['label' => 'CAMBIO DE HORARIO DE TRABAJO', 'iconStyle' => 'far'],
-                            ['label' => 'CAMBIO DE PERIODO VACACIONAL', 'iconStyle' => 'far'],
-                            ['label' => 'REPORTE DE TIEMPO EXTRA', 'iconStyle' => 'far'],
-                            ['label' => 'REPORTE GENEREAL DE TIEMPO EXTRA', 'iconStyle' => 'far'],
-                        ]
-                    ],
-                ],
-            ]);
-            ?>
-        </nav>
-    </div>
-</div>
-
-
-
-
-
-
-
-
-
-
-
 
     <div class="row">
         <div class="col-md-4 col-sm-6 col-12">

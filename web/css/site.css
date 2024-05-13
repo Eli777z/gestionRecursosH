@@ -150,3 +150,16 @@ a.desc:after {
 /* Eliminar bordes de las celdas y establecer color de fondo */
 
 
+.card-title {
+    color: #333;
+}
+
+.list-group-item a {
+    color: #555;
+    transition: color 0.3s ease;
+}
+
+.list-group-item a:hover {
+    color: #007bff; /* Cambiar al color primary al pasar el cursor */
+    text-decoration: none; /* Opcional: eliminar el subrayado al pasar el cursor */
+}

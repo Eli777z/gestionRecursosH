@@ -69,6 +69,8 @@ use yii\helpers\Html;
                    // ['label' => 'Empleados', 'icon' => 'user', 'url' => ['empleado/index']],
                    
                    
+              
+                   
                 ],
             ]);
             ?>

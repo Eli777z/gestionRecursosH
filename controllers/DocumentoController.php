@@ -105,7 +105,7 @@ class DocumentoController extends Controller
         }
     }
 
-    return $this->renderAjax('create', [
+    return $this->render('create', [
         'model' => $model,
         'cat_tipo_documento'=> $cat_tipo_documento,
     ]);

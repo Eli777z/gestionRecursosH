@@ -10,6 +10,7 @@ use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
 //use app\models\User;
+use app\models\PermisoFueraTrabajo;
 use app\models\Usuario;
 
 class SiteController extends Controller
@@ -183,11 +184,33 @@ class SiteController extends Controller
     {
         return $this->render('portalgestionrh');
     }
-    
+
+    public function actionPortalempleado()
+    {
+        return $this->render('portalempleado');
+    }
+
+
     public function actionPortaltrabajador()
     {
-        return $this->render('portaltrabajador');
+        // Crear una instancia del modelo
+        $modelPermisoFueraTrabajo = new PermisoFueraTrabajo();
+    
+        // Aquí puedes realizar cualquier configuración adicional del modelo si es necesario
+    
+        // Pasar el modelo a la vista al renderizarla
+        return $this->render('portaltrabajador', [
+            'modelPermisoFueraTrabajo' => $modelPermisoFueraTrabajo,
+        ]);
     }
+    public function actionObtenerFormulario()
+{
+    $model = new PermisoFueraTrabajo();
+    $formularioHtml = $this->renderPartial('form_permiso_fuera_trabajo', ['model' => $model]);
+    Yii::$app->response->format = \yii\web\Response::FORMAT_HTML;
+    return $formularioHtml;
+}
+
     
 
     public function actionCambiarcontrasena()
