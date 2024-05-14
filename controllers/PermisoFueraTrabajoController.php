@@ -11,6 +11,10 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use app\models\Solicitud;
 use app\models\Empleado;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use yii\web\Response;
+
 /**
  * PermisoFueraTrabajoController implements the CRUD actions for PermisoFueraTrabajo model.
  */
@@ -178,5 +182,30 @@ class PermisoFueraTrabajoController extends Controller
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
+ 
+    }
+
+    public function actionExport()
+    {
+        // Ruta a tu plantilla de Excel
+        $templatePath = Yii::getAlias('@app/templates/formato_permiso_fuera_trabajo.xlsx');
+
+        // Cargar la plantilla de Excel
+        $spreadsheet = IOFactory::load($templatePath);
+
+        // Modificar la plantilla (ejemplo: cambiar el valor de una celda)
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setCellValue('A1', 'Nuevo valor'); // Cambia 'A1' y 'Nuevo valor' según tus necesidades
+
+        // Preparar el archivo para la descarga
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+
+        // Enviar el archivo al navegador para su descarga
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="permiso_fuera_trabajo.xlsx"');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        Yii::$app->end();
     }
 }

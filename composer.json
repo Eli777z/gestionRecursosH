@@ -35,7 +35,8 @@
         "kartik-v/yii2-tabs-x": "dev-master",
         "kartik-v/yii2-date-range": "dev-master",
         "kartik-v/yii2-widget-timepicker": "dev-master",
-        "kartik-v/yii2-widget-activeform": "*"
+        "kartik-v/yii2-widget-activeform": "*",
+        "phpoffice/phpspreadsheet": "^2.1"
        
         
         
