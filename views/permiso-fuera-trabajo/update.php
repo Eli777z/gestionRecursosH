@@ -1,13 +1,12 @@
 <?php
 
-use yii\helpers\Html;
-
 /* @var $this yii\web\View */
-/* @var $model app\models\Countries */
+/* @var $model app\models\PermisoFueraTrabajo */
 
-$this->title = 'Create Countries';
-$this->params['breadcrumbs'][] = ['label' => 'Countries', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+$this->title = 'Update Permiso Fuera Trabajo: ' . $model->id;
+$this->params['breadcrumbs'][] = ['label' => 'Permiso Fuera Trabajos', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
+$this->params['breadcrumbs'][] = 'Update';
 ?>
 
 <div class="container-fluid">
@@ -17,7 +16,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="col-md-12">
                     <?=$this->render('_form', [
                         'model' => $model
-                        
                     ]) ?>
                 </div>
             </div>

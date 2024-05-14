@@ -14,75 +14,8 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
 
 </div>
 
-    
-<div class="row">
-    <div class="col-md-4"> <!-- Cambiado de col-md-6 a col-md-4 -->
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-            <h5 class="card-title text-white">Formatos de Incidencias</h5> <!-- Cambio del color del texto del título a blanco -->
-            </div>
-            <div class="card-body">
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">
-                        <a href="#" class="dropdown-item">PERMISO FUERA DEL TRABAJO</a>
-                    </li>
-                    <li class="list-group-item">
-                        <a href="#" class="dropdown-item">COMISION ESPECIAL</a>
-                    </li>
-                    <li class="list-group-item">
-                        <a href="#" class="dropdown-item">PERMISO ECONÓMICO</a>
-                    </li>
-                    <li class="list-group-item">
-                        <a href="#" class="dropdown-item">PERMISO SIN GOCE DE SUELDO</a>
-                    </li>
-                    <li class="list-group-item">
-                        <a href="#" class="dropdown-item">CAMBIO DE DÍA LABORAL</a>
-                    </li>
-                    <li class="list-group-item">
-                        <a href="#" class="dropdown-item">CAMBIO DE HORARIO DE TRABAJO</a>
-                    </li>
-                    <li class="list-group-item">
-                        <a href="#" class="dropdown-item">CAMBIO DE PERIODO VACACIONAL</a>
-                    </li>
-                    <li class="list-group-item">
-                        <a href="#" class="dropdown-item">REPORTE DE TIEMPO EXTRA</a>
-                    </li>
-                    <li class="list-group-item">
-                        <a href="#" class="dropdown-item">REPORTE GENERAL DE TIEMPO EXTRA</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-    <div id="formulario-container"> <!-- Div para mostrar el formulario -->
-        <!-- Aquí se insertará dinámicamente el formulario -->
-    </div>
-</div>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-$(document).ready(function() {
-    $('.dropdown-item').click(function(e) {
-        e.preventDefault(); // Evita el comportamiento predeterminado del enlace
-        
-        // Obtener el texto del enlace clicado
-        var motivo = $(this).text();
-        
-        // Realizar una solicitud AJAX para obtener el formulario correspondiente
-        $.ajax({
-            url: 'obtener-formulario', // Usando la URL amigable// Reemplazar 'url_del_controlador' por la URL de tu controlador
-            type: 'GET',
-            data: { motivo: motivo }, // Pasar el motivo como parámetro
-            success: function(response) {
-                // Mostrar el formulario obtenido dentro del contenedor
-                $('#formulario-container').html(response);
-            },
-            error: function(xhr, status, error) {
-                console.error(error);
-            }
-        });
-    });
-});
-</script>
+
+
 
 
 

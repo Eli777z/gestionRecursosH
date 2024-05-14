@@ -4,7 +4,7 @@ use app\models\Usuario;
 /* @var $content string */
 
 use yii\helpers\Html;
-if(Yii:: $app->controller->action->id === 'portalempleado'){
+if(Yii:: $app->controller->action->id === 'portalempleado' ){
     echo $this-> render(
     'main-trabajador',
     ['content' => $content]

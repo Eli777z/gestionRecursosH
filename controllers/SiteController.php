@@ -26,37 +26,29 @@ class SiteController extends Controller
                 'only' => ['logout', 'user', 'admin'],
                 'rules' => [
                     [
-                        //El administrador tiene permisos sobre las siguientes acciones
+                       
                         'actions' => ['logout', 'admin'],
-                        //Esta propiedad establece que tiene permisos
+
                         'allow' => true,
-                        //Usuarios autenticados, el signo ? es para invitados
                         'roles' => ['@'],
-                        //Este método nos permite crear un filtro sobre la identidad del usuario
-                        //y así establecer si tiene permisos o no
                         'matchCallback' => function ($rule, $action) {
-                            //Llamada al método que comprueba si es un administrador
                             return Usuario::isUserAdmin(Yii::$app->user->identity->id);
                         },
                     ],
                     [
-                       //Los usuarios simples tienen permisos sobre las siguientes acciones
                        'actions' => ['logout', 'user'],
-                       //Esta propiedad establece que tiene permisos
                        'allow' => true,
-                       //Usuarios autenticados, el signo ? es para invitados
+                      
                        'roles' => ['@'],
-                       //Este método nos permite crear un filtro sobre la identidad del usuario
-                       //y así establecer si tiene permisos o no
+                      
                        'matchCallback' => function ($rule, $action) {
-                          //Llamada al método que comprueba si es un usuario simple
+
                           return Usuario::isUserSimple(Yii::$app->user->identity->id);
                       },
                    ],
                 ],
             ],
-     //Controla el modo en que se accede a las acciones, en este ejemplo a la acción logout
-     //sólo se puede acceder a través del método post
+    
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
@@ -102,7 +94,7 @@ class SiteController extends Controller
         if (!Yii::$app->user->isGuest) {
             $userId = Yii::$app->user->identity->id;
             $user = Usuario::findOne($userId);
-            // Verifica si es el primer inicio de sesión
+           
             if ($user->nuevo == 4) {
                 return $this->redirect(['usuario/cambiarcontrasena']);
             }
@@ -190,26 +182,20 @@ class SiteController extends Controller
         return $this->render('portalempleado');
     }
 
+   
+
 
     public function actionPortaltrabajador()
     {
-        // Crear una instancia del modelo
+        
         $modelPermisoFueraTrabajo = new PermisoFueraTrabajo();
     
-        // Aquí puedes realizar cualquier configuración adicional del modelo si es necesario
-    
-        // Pasar el modelo a la vista al renderizarla
+       
         return $this->render('portaltrabajador', [
             'modelPermisoFueraTrabajo' => $modelPermisoFueraTrabajo,
         ]);
     }
-    public function actionObtenerFormulario()
-{
-    $model = new PermisoFueraTrabajo();
-    $formularioHtml = $this->renderPartial('form_permiso_fuera_trabajo', ['model' => $model]);
-    Yii::$app->response->format = \yii\web\Response::FORMAT_HTML;
-    return $formularioHtml;
-}
+
 
     
 

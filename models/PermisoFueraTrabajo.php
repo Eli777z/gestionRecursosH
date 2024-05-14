@@ -22,6 +22,9 @@ use Yii;
  */
 class PermisoFueraTrabajo extends \yii\db\ActiveRecord
 {
+    public $fecha_rango; // Este es el atributo temporal para el rango de fechas
+    public $fecha_hora_reponer; // Este es el atributo temporal para la fecha y hora combinada
+
     /**
      * {@inheritdoc}
      */
@@ -41,6 +44,11 @@ class PermisoFueraTrabajo extends \yii\db\ActiveRecord
             [['nota'], 'string'],
             [['motivo_fecha_permiso_id'], 'exist', 'skipOnError' => true, 'targetClass' => MotivoFechaPermiso::class, 'targetAttribute' => ['motivo_fecha_permiso_id' => 'id']],
             [['empleado_id'], 'exist', 'skipOnError' => true, 'targetClass' => Empleado::class, 'targetAttribute' => ['empleado_id' => 'id']],
+            [['fecha_rango'], 'string'], // Cambia a una regla de tipo string
+        [['fecha_rango'], 'required'], // Asegúrate de que el campo sea requerido si lo necesitas
+        // Otros atributos y reglas...
+            [['fecha_hora_reponer'], 'safe'], // Agrega esta regla
+
         ];
     }
 
@@ -80,5 +88,33 @@ class PermisoFueraTrabajo extends \yii\db\ActiveRecord
     public function getMotivoFechaPermiso()
     {
         return $this->hasOne(MotivoFechaPermiso::class, ['id' => 'motivo_fecha_permiso_id']);
+    }
+
+    public function afterValidate()
+    {
+        parent::afterValidate();
+    
+        if ($this->fecha_rango) {
+            list($fechaSalida, $fechaRegreso) = explode(' a ', $this->fecha_rango);
+            // Convertir las fechas a formato Y-m-d H:i:s
+            $this->fecha_salida = date('Y-m-d H:i:s', strtotime($fechaSalida));
+            $this->fecha_regreso = date('Y-m-d H:i:s', strtotime($fechaRegreso));
+        }
+    }
+    
+
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave($insert)) {
+            if ($this->fecha_hora_reponer) {
+                $dateTime = \DateTime::createFromFormat('Y-m-d h:i A', $this->fecha_hora_reponer);
+                if ($dateTime) {
+                    $this->fecha_salida = $dateTime->format('Y-m-d');
+                    $this->horario_fecha_a_reponer = $dateTime->format('H:i:s');
+                }
+            }
+            return true;
+        }
+        return false;
     }
 }

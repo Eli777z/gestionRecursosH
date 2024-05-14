@@ -3,10 +3,10 @@
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\Countries */
+/* @var $model app\models\PermisoFueraTrabajo */
 
-$this->title = 'Create Countries';
-$this->params['breadcrumbs'][] = ['label' => 'Countries', 'url' => ['index']];
+$this->title = 'Create Permiso Fuera Trabajo';
+$this->params['breadcrumbs'][] = ['label' => 'Permiso Fuera Trabajos', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
@@ -16,8 +16,10 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="row">
                 <div class="col-md-12">
                     <?=$this->render('_form', [
-                        'model' => $model
-                        
+                        'model' => $model,
+                        'motivoFechaPermisoModel' => $motivoFechaPermisoModel,
+
+                        'solicitudModel' => $solicitudModel,
                     ]) ?>
                 </div>
             </div>

@@ -24,6 +24,7 @@ $config = [
         
     ],
     'components' => [
+        
        
         'view' => [
             'theme' => [
@@ -51,7 +52,7 @@ $config = [
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
         'viewPath' => '@app/mail',
-        'useFileTransport' => false, // Cambiar a false para enviar correos reales
+        'useFileTransport' => false, 
         'transport' => [
             'class' => 'Swift_SmtpTransport',
             'host' => 'smtp.gmail.com',
@@ -127,8 +128,8 @@ $config = [
             'prueba/*',
 'documento/*',
 'countries/*',
-'debug/*',
-'site/obtener-formulario' // Agregar la acción obtener-formulario aquí
+//'debug/*',
+'permiso-fuera-trabajo/*' 
 
             // The actions listed here will be allowed to everyone including guests.
             // So, 'admin/*' should not appear here in the production, of course.

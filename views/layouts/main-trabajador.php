@@ -71,6 +71,7 @@ $this->registerJsFile($publishedRes[1].'/control_sidebar.js', ['depends' => '\ha
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?php $this->registerCsrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
+    
     <?php $this->head() ?>
 </head>
 <body class="hold-transition sidebar-mini">
@@ -80,7 +81,7 @@ $this->registerJsFile($publishedRes[1].'/control_sidebar.js', ['depends' => '\ha
 
 <div class="wrapper">
     <!-- Navbar -->
-    <?= $this->render('navbar', ['assetDir' => $assetDir]) ?>
+    <?= $this->render('navbar-empleado', ['assetDir' => $assetDir]) ?>
     <!-- /.navbar -->
 
     <!-- Main Sidebar Container -->

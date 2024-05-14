@@ -67,7 +67,21 @@ use yii\helpers\Html;
                     ['label' => 'Gii',  'icon' => 'file-code', 'url' => ['/gii'], 'target' => '_blank'],
                     ['label' => 'Debug', 'icon' => 'bug', 'url' => ['/debug'], 'target' => '_blank'],
                    // ['label' => 'Empleados', 'icon' => 'user', 'url' => ['empleado/index']],
-                   
+                //   [
+                  //  'label' => 'Formatos De Incidencias',
+                    //'items' => [
+                      //  ['label' => 'PERMISO FUERA DEL TRABAJO', 'iconStyle' => 'far'],
+            //            ['label' => 'COMISION ESPECIAL', 'iconStyle' => 'far'],
+              //          ['label' => 'PERMISO ECONÓMICO', 'iconStyle' => 'far'],
+                //        ['label' => 'PERMISO SIN GOCE DE SUELDO', 'iconStyle' => 'far'],
+                  //      ['label' => 'CAMBIO DE DÍA LABORAL', 'iconStyle' => 'far'],
+                    //    ['label' => 'CAMBIO DE HORARIO DE TRABAJO', 'iconStyle' => 'far'],
+                    //    ['label' => 'CAMBIO DE PERIODO VACACIONAL', 'iconStyle' => 'far'],
+                  //      ['label' => 'REPORTE DE TIEMPO EXTRA', 'iconStyle' => 'far'],
+                      //  ['label' => 'REPORTE GENERAL DE TIEMPO EXTRA', 'iconStyle' => 'far'],
+                        
+              //      ]
+            //    ],
                    
               
                    
