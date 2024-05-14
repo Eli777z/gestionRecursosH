@@ -40,24 +40,25 @@ use kartik\time\TimePicker;
     <?= $form->field($motivoFechaPermisoModel, 'motivo')->textarea(['rows' => 4]) ?>
 
 
-    <?= $form->field($model, 'fecha_rango')->widget(DateRangePicker::classname(), [
-    'model' => $model,
-    'attribute' => 'fecha_rango',
-    'convertFormat' => true,
+    <?= $form->field($model, 'hora_salida')->widget(TimePicker::classname(), [
     'pluginOptions' => [
-        'timePicker' => false, // Oculta la selección de la hora
-        'locale' => [
-            'format' => 'Y-m-d', // Formato para incluir solo la fecha
-            'separator' => ' a ',
-        ],
-        'opens' => 'right',
-        'autoUpdateInput' => true,
-        'autoApply' => true,
-    ],
-    'options' => [
-        'placeholder' => 'Selecciona el rango de fechas...',
-    ],
-])->label('Fecha de Salida y Regreso') ?>
+        'showMeridian' => true, // Habilitar formato de 12 horas con AM/PM
+        'minuteStep' => 1,
+        // Otros ajustes según tus necesidades
+    ]
+    
+])->label('Hora de salida') ?>
+
+
+<?= $form->field($model, 'hora_regreso')->widget(TimePicker::classname(), [
+    'pluginOptions' => [
+        'showMeridian' => true, // Habilitar formato de 12 horas con AM/PM
+        'minuteStep' => 1,
+        // Otros ajustes según tus necesidades
+    ]
+    
+])->label('Hora de regreso') ?>
+
 
 
 
@@ -79,7 +80,9 @@ use kartik\time\TimePicker;
             'placeholder' => 'Selecciona una fecha...',
         ],
     ])->label('Fecha a reponer') ?>
-    <?= $form->field($model, 'horario_fecha_a_reponer')->widget(TimePicker::classname(), [
+   
+   
+   <?= $form->field($model, 'horario_fecha_a_reponer')->widget(TimePicker::classname(), [
     'pluginOptions' => [
         'showMeridian' => true, // Habilitar formato de 12 horas con AM/PM
         'minuteStep' => 1,

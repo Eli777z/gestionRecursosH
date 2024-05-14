@@ -40,25 +40,22 @@ $this->params['breadcrumbs'][] = $this->title;
             },
         ],
         [
-            'attribute' => 'fecha_salida',
+            'attribute' => 'hora_salida',
             'value' => function ($model) {
-                setlocale(LC_TIME, "es_419");
-                $fechaSalida = strtotime($model->fecha_salida);
-                $fechaFormateada = strftime('%A, %B %d, %Y', $fechaSalida);
-                setlocale(LC_TIME, null);
-                return $fechaFormateada;
+                // Obtenemos la hora en formato AM/PM con minutos
+                $hora = date("g:i A", strtotime($model->hora_salida));
+                return $hora;
             },
         ],
         [
-            'attribute' => 'fecha_regreso',
+            'attribute' => 'hora_regreso',
             'value' => function ($model) {
-                setlocale(LC_TIME, "es_419");
-                $fechaRegreso = strtotime($model->fecha_regreso);
-                $fechaFormateada = strftime('%A, %B %d, %Y', $fechaRegreso);
-                setlocale(LC_TIME, null);
-                return $fechaFormateada;
+                // Obtenemos la hora en formato AM/PM con minutos
+                $hora = date("g:i A", strtotime($model->hora_regreso));
+                return $hora;
             },
         ],
+        
         
        // 'fecha_regreso',
         //'fecha_a_reponer',

@@ -56,6 +56,8 @@ class PermisoFueraTrabajoController extends Controller
      */
     public function actionView($id)
     {
+        $this->layout = "main-trabajador";
+
         return $this->render('view', [
             'model' => $this->findModel($id),
         ]);
@@ -90,6 +92,11 @@ class PermisoFueraTrabajoController extends Controller
             try {
                 if ($motivoFechaPermisoModel->save()) {
                     $model->motivo_fecha_permiso_id = $motivoFechaPermisoModel->id;
+                    $model->hora_salida = date('H:i:s', strtotime($model->hora_salida));
+                    $model->hora_regreso = date('H:i:s', strtotime($model->hora_regreso));
+
+                    
+
                     $model->horario_fecha_a_reponer = date('H:i:s', strtotime($model->horario_fecha_a_reponer));
 
                     // Crear registro en la tabla de Solicitud
