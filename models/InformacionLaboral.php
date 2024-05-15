@@ -50,6 +50,8 @@ class InformacionLaboral extends \yii\db\ActiveRecord
             [['cat_departamento_id'], 'exist', 'skipOnError' => true, 'targetClass' => CatDepartamento::class, 'targetAttribute' => ['cat_departamento_id' => 'id']],
             [['cat_direccion_id'], 'exist', 'skipOnError' => true, 'targetClass' => CatDireccion::class, 'targetAttribute' => ['cat_direccion_id' => 'id']],
             [['cat_puesto_id'], 'exist', 'skipOnError' => true, 'targetClass' => CatPuesto::class, 'targetAttribute' => ['cat_puesto_id' => 'id']],
+            [['cat_dpto_cargo_id'], 'exist', 'skipOnError' => true, 'targetClass' => CatDptoCargo::class, 'targetAttribute' => ['cat_dpto_cargo_id' => 'id']],
+
             [['junta_gobierno_id'], 'exist', 'skipOnError' => true, 'targetClass' => JuntaGobierno::class, 'targetAttribute' => ['junta_gobierno_id' => 'id']],
         ];
     }
@@ -62,6 +64,7 @@ class InformacionLaboral extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'cat_tipo_contrato_id' => 'Cat Tipo Contrato ID',
+            'cat_dpto_cargo_id' => 'Cat Dpto Cargo ID',
             'cat_puesto_id' => 'Cat Puesto ID',
             'cat_departamento_id' => 'Cat Departamento ID',
             'vacaciones_id' => 'Vacaciones ID',
@@ -82,6 +85,10 @@ class InformacionLaboral extends \yii\db\ActiveRecord
     public function getCatDepartamento()
     {
         return $this->hasOne(CatDepartamento::class, ['id' => 'cat_departamento_id']);
+    }
+    public function getCatDptoCargo()
+    {
+        return $this->hasOne(CatDptoCargo::class, ['id' => 'cat_dpto_cargo_id']);
     }
 
     /**

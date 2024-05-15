@@ -131,6 +131,7 @@ $config = [
             'prueba/*',
 'documento/*',
 'countries/*',
+'cat-dpto-cargo/*',
 //'debug/*',
 'permiso-fuera-trabajo/*' 
 

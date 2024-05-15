@@ -3,7 +3,7 @@
 use app\models\CatDepartamento;
 
 use app\models\CatDireccion;
-
+use app\models\CatDptoCargo;
 use app\models\CatPuesto;
 use app\models\CatTipoContrato;
 use hail812\adminlte3\yii\grid\ActionColumn;
@@ -122,6 +122,7 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
 
                                 ],
                                 'attributes' => [
+                                    'numero_empleado',
                                     'nombre',
                                     'apellido',
                                     [
@@ -281,6 +282,7 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
 
                             // Definir los atributos
                             $attributes = [
+                                
                                 [
                                     'attribute' => 'cat_departamento_id',
                                     'label' => 'Departamento',
@@ -289,6 +291,16 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
                                     'widgetOptions' => [
                                         'data' => ArrayHelper::map(CatDepartamento::find()->all(), 'id', 'nombre_departamento'), // Obtener los departamentos para el dropdown
                                         'options' => ['prompt' => 'Seleccionar Departamento'],
+                                    ],
+                                ],
+                                [
+                                    'attribute' => 'cat_dpto_cargo_id',
+                                    'label' => 'DPTO',
+                                    'value' => isset($model->informacionLaboral->catDptoCargo) ? $model->informacionLaboral->catDptoCargo->nombre_dpto : null,
+                                    'type' => DetailView::INPUT_SELECT2,
+                                    'widgetOptions' => [
+                                        'data' => ArrayHelper::map(CatDptoCargo::find()->all(), 'id', 'nombre_dpto'), // Obtener los departamentos para el dropdown
+                                        'options' => ['prompt' => 'Selecciona el DPTO'],
                                     ],
                                 ],
                                 [
