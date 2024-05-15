@@ -40,6 +40,8 @@ use yii\helpers\Html;
                     ['label' => 'Inicio', 'icon' => 'home', 'url' => ['site/portalgestionrh']],
 
                     ['label' => 'Empleados', 'icon' => 'user', 'url' => ['empleado/index']],
+                    ['label' => 'Formatos', 'icon' => 'file', 'url' => ['empleado/formatos']],
+
                     ['label' => 'Gii',  'icon' => 'file-code', 'url' => ['/gii'], 'target' => '_blank'],
                     ['label' => 'Administrador', 'icon' => 'user-tie', 'url' => ['/admin']],
                     ['label' => 'MULTI LEVEL EXAMPLE', 'header' => true],

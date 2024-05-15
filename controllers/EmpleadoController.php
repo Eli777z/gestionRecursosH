@@ -17,7 +17,8 @@ use yii\db\Exception;
 use app\models\Documento;
 use app\models\JuntaGobierno;
 use yii\helpers\Json;
-
+use app\models\UploadForm;
+use yii\data\ArrayDataProvider;
 /**
  * EmpleadoController implements the CRUD actions for Empleado model.
  */
@@ -67,13 +68,13 @@ class EmpleadoController extends Controller
     {
         // Encuentra el modelo de empleado
         $modelEmpleado = $this->findModel2($id);
-    
+
         // Encuentra los documentos asociados al empleado
         $documentos = $modelEmpleado->documentos;
-    
+
         // Crea un nuevo modelo de Documento para usar en el formulario
         $documentoModel = new Documento();
-    
+
         // Renderiza la vista 'view' y pasa los datos necesarios
         return $this->render('view', [
             'model' => $modelEmpleado,
@@ -175,7 +176,6 @@ class EmpleadoController extends Controller
             //'departamento' => $departamento,
             // 'departamentosArray' => $departamentosArray,
         ]);
-    
     }
 
     /**
@@ -215,9 +215,9 @@ class EmpleadoController extends Controller
         $usuario_id = $empleado->usuario_id;
         $informacion_laboral_id = $empleado->informacion_laboral_id;
 
-       // $junta_gobierno_id = $empleado->informacionLaboral->junta_gobierno_id;
+        // $junta_gobierno_id = $empleado->informacionLaboral->junta_gobierno_id;
         $transaction = Yii::$app->db->beginTransaction();
-    
+
         try {
             // Eliminar los documentos asociados al empleado y su carpeta
             foreach ($empleado->documentos as $documento) {
@@ -227,10 +227,10 @@ class EmpleadoController extends Controller
                 }
                 $documento->delete();
             }
-    
+
             // Eliminar la información laboral del empleado
-          //  $empleado->informacionLaboral->delete();
-          $empleado->delete();
+            //  $empleado->informacionLaboral->delete();
+            $empleado->delete();
 
             // Eliminar al usuario asociado al empleado si existe
             $usuario = Usuario::findOne($usuario_id);
@@ -238,10 +238,10 @@ class EmpleadoController extends Controller
                 $usuario->delete();
             }
 
-           // $junta_gobierno = JuntaGobierno::findOne($junta_gobierno_id);
+            // $junta_gobierno = JuntaGobierno::findOne($junta_gobierno_id);
             //if ($junta_gobierno) {
-              //  $junta_gobierno->delete();
-           // }
+            //  $junta_gobierno->delete();
+            // }
 
             $informacion_laboral = InformacionLaboral::findOne($informacion_laboral_id);
             if ($informacion_laboral) {
@@ -249,24 +249,24 @@ class EmpleadoController extends Controller
             }
 
 
-    
+
             // Por último, eliminar al empleado
-           
-    
+
+
             $transaction->commit();
-    
+
             Yii::$app->session->setFlash('success', 'Trabajador, expedientes, carpeta asociada y usuario eliminados exitosamente.');
         } catch (Exception $e) {
             $transaction->rollBack();
             Yii::$app->session->setFlash('error', 'Error al eliminar el trabajador, sus expedientes, la carpeta asociada y el usuario.');
         }
-    
+
         return $this->redirect(['index']);
     }
-    
-    
-    
-    
+
+
+
+
 
 
     /**
@@ -296,7 +296,7 @@ class EmpleadoController extends Controller
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 
-    protected function findModel3($id,$usuario_id)
+    protected function findModel3($id, $usuario_id)
     {
         if (($model = Empleado::findOne(['id' => $id, 'usuario_id' => $usuario_id,])) !== null) {
             return $model;
@@ -319,7 +319,7 @@ class EmpleadoController extends Controller
         }
     }
 
-    
+
     public function actionDesactivarUsuario($id)
     {
         $empleado = Empleado::findOne($id);
@@ -432,14 +432,14 @@ class EmpleadoController extends Controller
     public function actionActualizarInformacion($id)
     {
         $model = $this->findModel2($id);
-    
+
         if ($model->load(Yii::$app->request->post())) {
             // Calcula la edad en base a la fecha de nacimiento
             $fechaNacimiento = new \DateTime($model->fecha_nacimiento);
             $hoy = new \DateTime();
             $diferencia = $hoy->diff($fechaNacimiento);
             $model->edad = $diferencia->y; // Asigna la edad al modelo
-    
+
             if ($model->save()) {
                 // Redirige a la vista de detalles o a otra página
                 return $this->redirect(['view', 'id' => $model->id]);
@@ -447,12 +447,12 @@ class EmpleadoController extends Controller
                 Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información del trabajador.');
             }
         }
-    
+
         return $this->render('update', [
             'model' => $model,
         ]);
     }
-    
+
 
     public function actionActualizarInformacionContacto($id)
     {
@@ -504,8 +504,78 @@ class EmpleadoController extends Controller
         // Devolver los datos en formato JSON
         return Json::encode(['results' => $result]);
     }
+
+
+
+
+    public function actionFormatos()
+{
+    $model = new UploadForm();
+
+    if (Yii::$app->request->isPost) {
+        // Obtener el nombre seleccionado antes de cargar los datos del formulario en el modelo
+        $selectedName = Yii::$app->request->post('UploadForm')['selectedName'];
+        // Asignar el nombre seleccionado al modelo
+        $model->selectedName = $selectedName;
+
+        // Cargar los datos del formulario en el modelo
+        $model->load(Yii::$app->request->post());
+        $model->file = UploadedFile::getInstance($model, 'file');
+        if ($model->upload()) {
+            Yii::$app->session->setFlash('uploadSuccess', 'Archivo subido exitosamente.');
+            return $this->redirect(['formatos']);
+        }
+    }
+
+    $files = glob(Yii::getAlias('@app/templates/*'));
+    $fileData = [];
+    foreach ($files as $file) {
+        $fileData[] = [
+            'filename' => basename($file),
+            'path' => $file,
+        ];
+    }
+
+    $dataProvider = new ArrayDataProvider([
+        'allModels' => $fileData,
+        'pagination' => [
+            'pageSize' => 10,
+        ],
+    ]);
+
+    return $this->render('formatos', [
+        'model' => $model,
+        'dataProvider' => $dataProvider,
+    ]);
+}
+
+    
+
+    public function actionDeleteFormato()
+    {
+        $filename = Yii::$app->request->post('filename');
+        $filePath = Yii::getAlias('@app/templates/') . $filename;
+        if (file_exists($filePath)) {
+            unlink($filePath);
+            Yii::$app->session->setFlash('deleteSuccess', 'Archivo eliminado exitosamente.');
+        } else {
+            Yii::$app->session->setFlash('deleteError', 'El archivo no existe.');
+        }
+        return $this->redirect(['formatos']);
+    }
+    public function actionDownloadFormato($filename)
+{
+    $filePath = Yii::getAlias('@app/templates/') . $filename;
+    if (file_exists($filePath)) {
+        Yii::$app->response->sendFile($filePath)->send();
+    } else {
+        Yii::$app->session->setFlash('error', 'El archivo no existe.');
+        return $this->redirect(['formatos']);
+    }
 }
 
 
 
 
+    
+}

@@ -83,6 +83,9 @@ $config = [
             'rules' => [
                 'documento/download/<id:\d+>' => 'documento/download',
                 'obtener-formulario' => 'site/obtener-formulario',
+                'delete-formato' => 'empleado/delete-formato',
+                'download-formato' => 'empleado/download-formato',
+
 
                
             ],

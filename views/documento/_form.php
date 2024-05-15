@@ -81,5 +81,5 @@ $this->registerJs("
 
     <?php ActiveForm::end(); ?>
   
-</script>
+
 </div>
