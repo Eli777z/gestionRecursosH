@@ -286,6 +286,9 @@ $sheet->setCellValue('A33', $nombrePuesto);
 
 
 
+
+
+
         // $sheet->setCellValue('G6', $model->otra_propiedad); // Cambia 'G6' y 'otra_propiedad' según tu plantilla y modelo
     
         // Preparar el archivo para la descarga
