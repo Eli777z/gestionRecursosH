@@ -25,7 +25,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'confirm' => 'Are you sure you want to delete this item?',
                                 'method' => 'post',
                             ],
+                            
                         ]) ?>
+                          <!-- Botón para exportar a Excel -->
+                          <?= Html::a('Exportar Excel', ['export', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
                     </p>
                     <?= DetailView::widget([
     'model' => $model,
@@ -62,7 +65,7 @@ $this->params['breadcrumbs'][] = $this->title;
         [
             'attribute' => 'fecha_a_reponer',
             'value' => function ($model) {
-                setlocale(LC_TIME, "es_419");
+                setlocale(LC_TIME, 'es_419.UTF-8');
                 $fechaAreponer = strtotime($model->fecha_a_reponer);
                 $fechaFormateada = strftime('%A, %B %d, %Y', $fechaAreponer);
                 setlocale(LC_TIME, null);

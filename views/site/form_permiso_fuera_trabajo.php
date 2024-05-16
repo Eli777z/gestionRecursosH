@@ -25,4 +25,4 @@ use yii\widgets\ActiveForm;
         </div>
     <?php ActiveForm::end(); ?>
 
-</div><!-- site-form_permiso_fuera_trabajo -->
+</div>

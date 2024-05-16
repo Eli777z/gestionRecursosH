@@ -101,7 +101,7 @@ class SiteController extends Controller
             elseif (Usuario::isUserAdmin($userId)) {
                 return $this->redirect(["site/portalgestionrh"]);
             } else {
-                return $this->redirect(["site/portaltrabajador"]);
+                return $this->redirect(["site/portalempleado"]);
             }
         }
         $model = new LoginForm();
@@ -116,7 +116,7 @@ class SiteController extends Controller
                     return $this->redirect(['site/portalgestionrh']);
                 }else{
 
-                    return $this->redirect(["site/portaltrabajador"]);
+                    return $this->redirect(["site/portalempleado"]);
                 }
 
                
