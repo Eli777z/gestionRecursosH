@@ -5,7 +5,7 @@ use app\models\Usuario;
 
 use yii\helpers\Html;
 
-
+use yii\bootstrap4\Alert;
 \hail812\adminlte3\assets\FontAwesomeAsset::register($this);
 \hail812\adminlte3\assets\AdminLteAsset::register($this);
 $this->registerCssFile('https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback');
@@ -60,7 +60,8 @@ $this->registerJsFile($publishedRes[1].'/control_sidebar.js', ['depends' => '\ha
   
  <!-- the main fileinput plugin script JS file -->
  <script src="https://cdn.jsdelivr.net/gh/kartik-v/bootstrap-fileinput@5.5.0/js/fileinput.min.js"></script>
-  
+ <script src="https://cdn.jsdelivr.net/gh/kartik-v/bootstrap-fileinput@5.5.0/js/locales/LANG.js"></script>
+
  <!-- following theme script is needed to use the Font Awesome 5.x theme (`fa5`). Uncomment if needed. -->
  <!-- script src="https://cdn.jsdelivr.net/gh/kartik-v/bootstrap-fileinput@5.5.0/themes/fa5/theme.min.js"></script -->
   
@@ -76,7 +77,12 @@ $this->registerJsFile($publishedRes[1].'/control_sidebar.js', ['depends' => '\ha
 </head>
 <body class="hold-transition sidebar-mini">
 <?php $this->beginBody() ?>
-
+<?php //foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
+    //echo Alert::widget([
+      //  'options' => ['class' => 'alert-' . $type],
+        //'body' => $message,
+  //  ]);
+//}?>
 
 
 <div class="wrapper">

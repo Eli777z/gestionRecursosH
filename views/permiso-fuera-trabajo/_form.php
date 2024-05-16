@@ -17,16 +17,12 @@ use kartik\time\TimePicker;
     
 
     
-
     <?= $form->field($motivoFechaPermisoModel, 'fecha_permiso')->widget(DateRangePicker::classname(), [
-        'model' => $model,
-        'attribute' => 'fecha_permiso',
         'convertFormat' => true,
-        'value' => date('Y-m-d'), // Establecer la fecha de hoy como valor inicial
         'pluginOptions' => [
             'singleDatePicker' => true,
             'showDropdowns' => true,
-            'autoUpdateInput' => true, // Mantener el valor actualizado automáticamente
+            'autoUpdateInput' => true,
             'locale' => [
                 'format' => 'Y-m-d',
             ],
@@ -35,6 +31,7 @@ use kartik\time\TimePicker;
         'options' => [
             'placeholder' => 'Selecciona una fecha...',
         ],
+        'value' => date('Y-m-d'), // Establecer la fecha de hoy como valor inicial
     ])->label('Fecha de permiso') ?>
     
     <?= $form->field($motivoFechaPermisoModel, 'motivo')->textarea(['rows' => 4]) ?>
@@ -44,6 +41,7 @@ use kartik\time\TimePicker;
     'pluginOptions' => [
         'showMeridian' => true, // Habilitar formato de 12 horas con AM/PM
         'minuteStep' => 1,
+        'defaultTime' => false,
         // Otros ajustes según tus necesidades
     ]
     
@@ -54,6 +52,7 @@ use kartik\time\TimePicker;
     'pluginOptions' => [
         'showMeridian' => true, // Habilitar formato de 12 horas con AM/PM
         'minuteStep' => 1,
+        'defaultTime' => false,
         // Otros ajustes según tus necesidades
     ]
     
@@ -63,14 +62,11 @@ use kartik\time\TimePicker;
 
 
 <?= $form->field($model, 'fecha_a_reponer')->widget(DateRangePicker::classname(), [
-        'model' => $model,
-        'attribute' => 'fecha_a_reponer',
         'convertFormat' => true,
-        'value' => date('Y-m-d'), // Establecer la fecha de hoy como valor inicial
         'pluginOptions' => [
             'singleDatePicker' => true,
             'showDropdowns' => true,
-            'autoUpdateInput' => true, // Mantener el valor actualizado automáticamente
+            'autoUpdateInput' => true,
             'locale' => [
                 'format' => 'Y-m-d',
             ],
@@ -79,6 +75,7 @@ use kartik\time\TimePicker;
         'options' => [
             'placeholder' => 'Selecciona una fecha...',
         ],
+        'value' => date('Y-m-d'), // Establecer la fecha de hoy como valor inicial
     ])->label('Fecha a reponer') ?>
    
    
@@ -86,6 +83,7 @@ use kartik\time\TimePicker;
     'pluginOptions' => [
         'showMeridian' => true, // Habilitar formato de 12 horas con AM/PM
         'minuteStep' => 1,
+        'defaultTime' => false,
         // Otros ajustes según tus necesidades
     ]
     
@@ -95,7 +93,7 @@ use kartik\time\TimePicker;
    
 
     <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton('Solicitar autorización', ['class' => 'btn btn-success']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

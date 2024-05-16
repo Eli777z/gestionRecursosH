@@ -12,7 +12,7 @@ use app\models\ContactForm;
 //use app\models\User;
 use app\models\PermisoFueraTrabajo;
 use app\models\Usuario;
-
+use app\models\Notificacion;
 class SiteController extends Controller
 {
     /**
@@ -131,7 +131,21 @@ class SiteController extends Controller
 
    
     
+
+    public function actionViewNotificaciones()
+    {
+        $notificaciones = Notificacion::find()
+            ->where(['usuario_id' => Yii::$app->user->identity->id])
+            ->orderBy(['created_at' => SORT_DESC])
+            ->all();
     
+        // Marcar todas las notificaciones como leídas
+        Notificacion::updateAll(['leido' => 1], ['usuario_id' => Yii::$app->user->identity->id]);
+    
+        return $this->render('view-notificaciones', [
+            'notificaciones' => $notificaciones,
+        ]);
+    }
 
     /**
      * Logout action.

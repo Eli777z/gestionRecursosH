@@ -41,6 +41,7 @@ use yii\helpers\Html;
 
                     ['label' => 'Empleados', 'icon' => 'user', 'url' => ['empleado/index']],
                     ['label' => 'Formatos', 'icon' => 'file', 'url' => ['empleado/formatos']],
+                    ['label' => 'Solicitudes', 'icon' => 'thumbs-up', 'url' => ['solicitud/index']],
 
                     ['label' => 'Gii',  'icon' => 'file-code', 'url' => ['/gii'], 'target' => '_blank'],
                     ['label' => 'Administrador', 'icon' => 'user-tie', 'url' => ['/admin']],

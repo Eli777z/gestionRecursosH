@@ -2,7 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
-
+use yii\bootstrap5\Alert;
 /* @var $this yii\web\View */
 /* @var $model app\models\PermisoFueraTrabajo */
 
@@ -28,8 +28,21 @@ $this->params['breadcrumbs'][] = $this->title;
                             
                         ]) ?>
                           <!-- Botón para exportar a Excel -->
-                          <?= Html::a('Exportar Excel', ['export', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
+                          <?php if ($model->solicitud->status === 'Aprobado'): ?>
+                            <?= Html::a('Exportar Excel', ['export', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
+                        <?php endif; ?>
+                          
                     </p>
+
+                    <?php 
+    // Mostrar los flash messages
+    foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
+        echo Alert::widget([
+            'options' => ['class' => 'alert-' . $type],
+            'body' => $message,
+        ]);
+    }
+    ?>
                     <?= DetailView::widget([
     'model' => $model,
     'attributes' => [
@@ -80,7 +93,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 return $hora;
             },
         ],
-        'nota:ntext',
+       // 'nota:ntext',
         [
             'label' => 'Fecha de Permiso',
             'value' => function ($model) {
@@ -94,6 +107,59 @@ $this->params['breadcrumbs'][] = $this->title;
                 setlocale(LC_TIME, null);
                 
                 return $fechaFormateada;
+            },
+        ],
+
+        [
+            'label' => 'Status',
+            'value' => function ($model) {
+               
+    
+                
+                $status = $model->solicitud->status;
+                
+            
+                return $status;
+            },
+        ],
+
+
+        [
+            'label' => 'Aprobó',
+            'value' => function ($model) {
+               
+    
+                
+                $aprobante = $model->solicitud->nombre_aprobante;
+                
+            
+                return $aprobante;
+            },
+        ],
+
+        [
+            'label' => 'Se aprobó',
+            'value' => function ($model) {
+               
+    
+                
+                $aprobante = $model->solicitud->fecha_aprobacion;
+                
+            
+                return $aprobante;
+            },
+        ],
+
+        [
+            'label' => 'Comentario',
+            'value' => function ($model) {
+               
+    
+                
+                $aprobante = $model->solicitud->comentario;
+                
+            
+                return $aprobante;
             },
         ],
         

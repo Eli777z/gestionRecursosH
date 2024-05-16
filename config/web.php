@@ -129,6 +129,7 @@ $config = [
             'expediente/*',
             'some-controller/some-action',
             'prueba/*',
+            'solicitud/*',
 'documento/*',
 'countries/*',
 'cat-dpto-cargo/*',

@@ -45,7 +45,8 @@ class PermisoFueraTrabajo extends \yii\db\ActiveRecord
            
             [['motivo_fecha_permiso_id'], 'exist', 'skipOnError' => true, 'targetClass' => MotivoFechaPermiso::class, 'targetAttribute' => ['motivo_fecha_permiso_id' => 'id']],
             [['empleado_id'], 'exist', 'skipOnError' => true, 'targetClass' => Empleado::class, 'targetAttribute' => ['empleado_id' => 'id']],
-            
+            [['solicitud_id'], 'exist', 'skipOnError' => true, 'targetClass' => Solicitud::class, 'targetAttribute' => ['solicitud_id' => 'id']],
+
             // Otros atributos y reglas...
                 [['fecha_hora_reponer'], 'safe'], // Agrega esta regla
             ];
@@ -78,6 +79,12 @@ class PermisoFueraTrabajo extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Empleado::class, ['id' => 'empleado_id']);
     }
+
+    public function getSolicitud()
+    {
+        return $this->hasOne(Solicitud::class, ['id' => 'solicitud_id']);
+    }
+
 
     /**
      * Gets query for [[MotivoFechaPermiso]].

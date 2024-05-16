@@ -78,6 +78,7 @@ class PermisoFueraTrabajoController extends Controller
      */
     public function actionView($id)
     {
+        
         $this->layout = "main-trabajador";
 
         return $this->render('view', [
@@ -92,66 +93,72 @@ class PermisoFueraTrabajoController extends Controller
      */
    
 
-    public function actionCreate()
-{
-    $model = new PermisoFueraTrabajo();
-    $motivoFechaPermisoModel = new MotivoFechaPermiso();
-    $solicitudModel = new Solicitud();
+ 
 
-    // Obtener el ID del usuario que inició sesión
-    $usuarioId = Yii::$app->user->identity->id;
+     public function actionCreate()
+     {
+         $this->layout = "main-trabajador";
+     
+         $model = new PermisoFueraTrabajo();
+         $motivoFechaPermisoModel = new MotivoFechaPermiso();
+         $solicitudModel = new Solicitud();
+         $motivoFechaPermisoModel->fecha_permiso = date('Y-m-d');
+         $model->fecha_a_reponer = date('Y-m-d');
+         $usuarioId = Yii::$app->user->identity->id;
+     
+         $empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();
+     
+         if ($empleado) {
+             $model->empleado_id = $empleado->id;
+         } else {
+             Yii::$app->session->setFlash('error', 'No se pudo encontrar el empleado asociado al usuario actual.');
+             return $this->redirect(['index']);
+         }
+     
+         if ($model->load(Yii::$app->request->post()) && $motivoFechaPermisoModel->load(Yii::$app->request->post())) {
+             $transaction = Yii::$app->db->beginTransaction();
+             try {
+                 if ($motivoFechaPermisoModel->save()) {
+                     $model->motivo_fecha_permiso_id = $motivoFechaPermisoModel->id;
+                     $model->hora_salida = date('H:i:s', strtotime($model->hora_salida));
+                     $model->hora_regreso = date('H:i:s', strtotime($model->hora_regreso));
+                     $model->horario_fecha_a_reponer = date('H:i:s', strtotime($model->horario_fecha_a_reponer));
+     
+                     // Configurar los atributos de la solicitud
+                     $solicitudModel->empleado_id = $empleado->id;
+                     $solicitudModel->status = 'En Proceso';
+                     $solicitudModel->comentario = ''; // Inicialmente vacío
+                     $solicitudModel->fecha_aprobacion = null; // Inicialmente null
+                     $solicitudModel->fecha_creacion = date('Y-m-d H:i:s'); // Fecha y hora actuales
+                    $solicitudModel->nombre_formato = 'PERMISO FUERA DEL TRABAJO';
+                     if ($solicitudModel->save()) {
+                         $model->solicitud_id = $solicitudModel->id;
+     
+                         if ($model->save()) {
+                             $transaction->commit();
+                             Yii::$app->session->setFlash('success', 'Su solicitud ha sido generada exitosamente.');
 
-    // Buscar el modelo de Empleado asociado al usuario
-    $empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();
-
-    if ($empleado) {
-        // Si se encontró el empleado, establecer su ID en el modelo PermisoFueraTrabajo
-        $model->empleado_id = $empleado->id;
-    } else {
-        // Si no se encuentra el empleado, manejar el escenario apropiado (por ejemplo, redireccionar o mostrar un mensaje de error)
-        Yii::$app->session->setFlash('error', 'No se pudo encontrar el empleado asociado al usuario actual.');
-        return $this->redirect(['index']); // Redirecciona a la página de índice u otra página apropiada
-    }
-
-    if ($model->load(Yii::$app->request->post()) && $motivoFechaPermisoModel->load(Yii::$app->request->post())) {
-        $transaction = Yii::$app->db->beginTransaction();
-        try {
-            if ($motivoFechaPermisoModel->save()) {
-                $model->motivo_fecha_permiso_id = $motivoFechaPermisoModel->id;
-                $model->hora_salida = date('H:i:s', strtotime($model->hora_salida));
-                $model->hora_regreso = date('H:i:s', strtotime($model->hora_regreso));
-
-                $model->horario_fecha_a_reponer = date('H:i:s', strtotime($model->horario_fecha_a_reponer));
-
-                // Crear registro en la tabla de Solicitud
-                $solicitudModel->save(false); // Utiliza save(false) para omitir la validación
-
-                // Asignar el ID de la solicitud recién creada al modelo PermisoFueraTrabajo
-                $model->solicitud_id = $solicitudModel->id;
-
-                if ($model->save()) {
-                    $transaction->commit();
-
-                    // Llama a la acción actionExport para generar el archivo Excel
-                    return $this->actionExport($model->id);
-                }
-            }
-            $transaction->rollBack();
-        } catch (\Exception $e) {
-            $transaction->rollBack();
-            throw $e;
-        } catch (\Throwable $e) {
-            $transaction->rollBack();
-            throw $e;
-        }
-    }
-
-    return $this->render('create', [
-        'model' => $model,
-        'motivoFechaPermisoModel' => $motivoFechaPermisoModel,
-        'solicitudModel' => $solicitudModel,
-    ]);
-}
+                             return $this->redirect(['view', 'id' => $model->id]);
+                         }
+                     }
+                 }
+                 $transaction->rollBack();
+             } catch (\Exception $e) {
+                 $transaction->rollBack();
+                 Yii::$app->session->setFlash('error', 'Hubo un error al crear el registro: ' . $e->getMessage());
+             } catch (\Throwable $e) {
+                 $transaction->rollBack();
+                 Yii::$app->session->setFlash('error', 'Hubo un error al crear el registro: ' . $e->getMessage());
+             }
+         }
+     
+         return $this->render('create', [
+             'model' => $model,
+             'motivoFechaPermisoModel' => $motivoFechaPermisoModel,
+             'solicitudModel' => $solicitudModel,
+         ]);
+     }
+     
 
     
     
