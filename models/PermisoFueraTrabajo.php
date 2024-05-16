@@ -42,7 +42,7 @@ class PermisoFueraTrabajo extends \yii\db\ActiveRecord
         return [
             [['empleado_id', 'solicitud_id', 'motivo_fecha_permiso_id'], 'integer'],
             [['hora_salida', 'hora_regreso', 'fecha_a_reponer', 'horario_fecha_a_reponer'], 'safe'],
-            [['nota'], 'string'],
+           
             [['motivo_fecha_permiso_id'], 'exist', 'skipOnError' => true, 'targetClass' => MotivoFechaPermiso::class, 'targetAttribute' => ['motivo_fecha_permiso_id' => 'id']],
             [['empleado_id'], 'exist', 'skipOnError' => true, 'targetClass' => Empleado::class, 'targetAttribute' => ['empleado_id' => 'id']],
             
@@ -65,7 +65,7 @@ class PermisoFueraTrabajo extends \yii\db\ActiveRecord
             'hora_regreso' => 'Hora Regreso',
             'fecha_a_reponer' => 'Fecha A Reponer',
             'horario_fecha_a_reponer' => 'Horario Fecha A Reponer',
-            'nota' => 'Nota',
+           
         ];
     }
 

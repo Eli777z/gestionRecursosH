@@ -92,7 +92,7 @@ use kartik\time\TimePicker;
 ])->label('Horario de fecha a reponer') ?>
 
 
-    <?= $form->field($model, 'nota')->textarea(['rows' => 4]) ?>
+   
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

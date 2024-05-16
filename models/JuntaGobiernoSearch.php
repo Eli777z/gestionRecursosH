@@ -18,7 +18,7 @@ class JuntaGobiernoSearch extends JuntaGobierno
     {
         return [
             [['id', 'cat_direccion_id', 'cat_departamento_id', 'empleado_id'], 'integer'],
-            [['nivel_jerarquico'], 'safe'],
+            [['nivel_jerarquico', 'profesion'], 'safe'],
         ];
     }
 
@@ -62,6 +62,7 @@ class JuntaGobiernoSearch extends JuntaGobierno
             'cat_direccion_id' => $this->cat_direccion_id,
             'cat_departamento_id' => $this->cat_departamento_id,
             'empleado_id' => $this->empleado_id,
+            
         ]);
 
         $query->andFilterWhere(['like', 'nivel_jerarquico', $this->nivel_jerarquico]);

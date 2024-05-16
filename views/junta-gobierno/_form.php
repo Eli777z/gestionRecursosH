@@ -48,6 +48,18 @@ use app\models\Empleado;
 ], ['prompt' => 'Selecciona el nivel jerárquico...']) ?>
 
 
+<?= $form->field($model, 'profesion')->dropDownList([
+    'ING.' => 'ING.',
+    'LIC.' => 'LIC.',
+    'PROF.' => 'PROF.',
+    'ARQ.' => 'ARQ.',
+    'C.' => 'C.',
+    'DR.' => 'DR.',
+    'DRA.' => 'DRA.',
+    'TEC.' => 'TEC.',
+], ['prompt' => 'Selecciona el nivel académico...']) ?>
+
+
     <div class="form-group">
         <?= Html::submitButton('Guardar', ['class' => 'btn btn-success']) ?>
     </div>

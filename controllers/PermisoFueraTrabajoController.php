@@ -14,7 +14,7 @@ use app\models\Empleado;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use yii\web\Response;
-
+use app\models\JuntaGobierno;
 /**
  * PermisoFueraTrabajoController implements the CRUD actions for PermisoFueraTrabajo model.
  */
@@ -228,6 +228,8 @@ class PermisoFueraTrabajoController extends Controller
         // Modificar la plantilla con los datos del modelo
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setCellValue('F6', $model->empleado->numero_empleado);
+       
+       
         $nombre = mb_strtoupper($model->empleado->nombre, 'UTF-8');
         $apellido = mb_strtoupper($model->empleado->apellido, 'UTF-8');
         $nombreCompleto = $apellido . ' ' . $nombre;
@@ -275,12 +277,72 @@ $sheet->setCellValue('H20', $fecha_a_reponer);
 $sheet->setCellValue('P20', $horaAReponer);
 $sheet->setCellValue('A32', $nombreCompleto);
 
-$nombreJefe = $model->empleado->informacionLaboral->juntaGobierno->empleado->nombre;
-$sheet->setCellValue('H32', $nombreJefe);
+
+
+
+
 
 $sheet->setCellValue('A33', $nombrePuesto);
 
+$jefeUnidad = JuntaGobierno::find()
+->where(['nivel_jerarquico' => 'Jefe de unidad'])
+->andWhere(['cat_direccion_id' => $model->empleado->informacionLaboral->cat_direccion_id])
+->one();
 
+$nombreJefe = mb_strtoupper($jefeUnidad->empleado->nombre, 'UTF-8');
+        $apellidoJefe = mb_strtoupper($jefeUnidad->empleado->apellido , 'UTF-8');
+        $profesionJefe   = mb_strtoupper ($jefeUnidad->profesion, 'UTF-8');
+        $nombreCompletoJefe = $profesionJefe . ' ' .$apellidoJefe . ' ' . $nombreJefe;
+
+
+$sheet->setCellValue('H32',  $jefeUnidad ?   $nombreCompletoJefe : null
+);
+
+
+
+$juntaDirectorDireccion = JuntaGobierno::find()
+->where(['nivel_jerarquico' => 'Director'])
+->andWhere(['cat_direccion_id' => $model->empleado->informacionLaboral->cat_direccion_id])
+->one();
+
+if ($juntaDirectorDireccion) {
+    // Convertir los datos del director a mayúsculas
+    $nombreDirector = mb_strtoupper($juntaDirectorDireccion->empleado->nombre, 'UTF-8');
+    $apellidoDirector = mb_strtoupper($juntaDirectorDireccion->empleado->apellido, 'UTF-8');
+    $profesionDirector = mb_strtoupper($juntaDirectorDireccion->profesion, 'UTF-8');
+    $nombreCompletoDirector = $profesionDirector . ' ' . $apellidoDirector . ' ' . $nombreDirector;
+
+    // Colocar el nombre completo del director en la celda 'N32'
+    $sheet->setCellValue('N32', $nombreCompletoDirector);
+
+    // Obtener el nombre de la dirección y definir el título correspondiente
+    $nombreDireccion = $juntaDirectorDireccion->catDireccion->nombre_direccion;
+    switch ($nombreDireccion) {
+        case 'GENERAL':
+            $tituloDireccion = 'DIRECTOR GENERAL';
+            break;
+        case 'ADMINISTRACIÓN':
+            $tituloDireccion = 'DIRECTOR DE ADMINISTRACIÓN';
+            break;
+        case 'OPERACIONES':
+            $tituloDireccion = 'DIRECTOR DE OPERACIONES';
+            break;
+        case 'COMERCIAL':
+            $tituloDireccion = 'DIRECTOR COMERCIAL';
+            break;
+        case 'PLANEACION':
+            $tituloDireccion = 'DIRECTOR DE PLANEACION';
+            break;
+       
+    }
+
+    // Colocar el título correspondiente en la celda 'N33'
+    $sheet->setCellValue('N33', $tituloDireccion);
+} else {
+    // Si no se encuentra ningún registro, establecer las celdas a null
+    $sheet->setCellValue('N32', null);
+    $sheet->setCellValue('N33', null);
+}
 
 
 

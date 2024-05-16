@@ -51,6 +51,7 @@ $this->params['breadcrumbs'][] = $this->title;
             },
         ],
         'nivel_jerarquico',
+        'profesion',
         ['class' => 'hail812\adminlte3\yii\grid\ActionColumn'],
     ],
     'summaryOptions' => ['class' => 'summary mb-2'],

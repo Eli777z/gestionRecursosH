@@ -169,6 +169,16 @@ $this->params['breadcrumbs'][] = $this->title;
     'Jefe de unidad' => 'Jefe de unidad',
 ], ['prompt' => 'Selecciona el nivel jerárquico...']) ?>
 
+<?= $form->field($juntaGobiernoModel, 'profesion')->dropDownList([
+    'ING.' => 'ING.',
+    'LIC.' => 'LIC.',
+    'PROF.' => 'PROF.',
+    'ARQ.' => 'ARQ.',
+    'C.' => 'C.',
+    'DR.' => 'DR.',
+    'DRA.' => 'DRA.',
+    'TEC.' => 'TEC.',
+], ['prompt' => 'Selecciona el nivel académico...']) ?>
 
     <div class="form-group">
         <?= Html::submitButton('Guardar', ['class' => 'btn btn-success']) ?>
@@ -222,6 +232,7 @@ $this->params['breadcrumbs'][] = $this->title;
             },
         ],
         'nivel_jerarquico',
+        'profesion',
                                         [
                                             'class' => 'hail812\adminlte3\yii\grid\ActionColumn',
                                             'template' => '{view} {delete}',

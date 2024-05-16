@@ -316,7 +316,7 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
                                 // Agregar la fila "Director de dirección"
                                 [
                                     'label' => 'Director de dirección',
-                                    'value' => $juntaDirectorDireccion ? $juntaDirectorDireccion->empleado->nombre . ' ' . $juntaDirectorDireccion->empleado->apellido : null,
+                                    'value' => $juntaDirectorDireccion ? $juntaDirectorDireccion->profesion . ' '.$juntaDirectorDireccion->empleado->nombre . ' ' . $juntaDirectorDireccion->empleado->apellido : null,
                                 ],
 
                                 [
@@ -367,7 +367,7 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
                                 [
                                     'attribute' => 'junta_gobierno_id',
                                     'label' => 'Jefe o director a cargo',
-                                    'value' => isset($model->informacionLaboral->juntaGobierno->empleado) ? $model->informacionLaboral->juntaGobierno->empleado->nombre . ' ' . $model->informacionLaboral->juntaGobierno->empleado->apellido : null,
+                                    'value' => isset($model->informacionLaboral->juntaGobierno->empleado) ? $model->informacionLaboral->juntaGobierno->profesion . ' ' .$model->informacionLaboral->juntaGobierno->empleado->nombre . ' ' . $model->informacionLaboral->juntaGobierno->empleado->apellido : null,
                                     'type' => DetailView::INPUT_SELECT2,
                                     'widgetOptions' => [
                                         'data' => ArrayHelper::map(
@@ -377,7 +377,7 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
                                                 ->all(),
                                             'id',
                                             function ($model) {
-                                                return $model->empleado->nombre . ' ' . $model->empleado->apellido;
+                                                return $model->profesion . ' ' .$model->empleado->nombre . ' ' . $model->empleado->apellido;
                                             }
                                         ),
                                         'options' => ['prompt' => 'Seleccionar Jefe o director a cargo'],

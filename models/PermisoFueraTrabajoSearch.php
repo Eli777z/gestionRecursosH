@@ -18,7 +18,7 @@ class PermisoFueraTrabajoSearch extends PermisoFueraTrabajo
     {
         return [
             [['id', 'empleado_id', 'solicitud_id', 'motivo_fecha_permiso_id'], 'integer'],
-            [['hora_salida', 'hora_regreso', 'fecha_a_reponer', 'horario_fecha_a_reponer', 'nota'], 'safe'],
+            [['hora_salida', 'hora_regreso', 'fecha_a_reponer', 'horario_fecha_a_reponer'], 'safe'],
         ];
     }
 
@@ -68,7 +68,7 @@ class PermisoFueraTrabajoSearch extends PermisoFueraTrabajo
             'horario_fecha_a_reponer' => $this->horario_fecha_a_reponer,
         ]);
 
-        $query->andFilterWhere(['like', 'nota', $this->nota]);
+
 
         return $dataProvider;
     }
