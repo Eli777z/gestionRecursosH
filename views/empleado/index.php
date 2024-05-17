@@ -167,6 +167,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <?= $form->field($juntaGobiernoModel, 'nivel_jerarquico')->dropDownList([
     'Director' => 'Director',
     'Jefe de unidad' => 'Jefe de unidad',
+    'Jefe de departamento' => 'Jefe de departamento',
 ], ['prompt' => 'Selecciona el nivel jerárquico...']) ?>
 
 <?= $form->field($juntaGobiernoModel, 'profesion')->dropDownList([

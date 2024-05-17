@@ -23,6 +23,7 @@ use Yii;
 class PermisoFueraTrabajo extends \yii\db\ActiveRecord
 { 
     public $fecha_hora_reponer; // Este es el atributo temporal para la fecha y hora combinada
+    public $jefe_departamento_id;
 
 
    
@@ -42,10 +43,12 @@ class PermisoFueraTrabajo extends \yii\db\ActiveRecord
         return [
             [['empleado_id', 'solicitud_id', 'motivo_fecha_permiso_id'], 'integer'],
             [['hora_salida', 'hora_regreso', 'fecha_a_reponer', 'horario_fecha_a_reponer'], 'safe'],
-           
+            [['nombre_jefe_departamento'], 'string', 'max' => 90],
+
             [['motivo_fecha_permiso_id'], 'exist', 'skipOnError' => true, 'targetClass' => MotivoFechaPermiso::class, 'targetAttribute' => ['motivo_fecha_permiso_id' => 'id']],
             [['empleado_id'], 'exist', 'skipOnError' => true, 'targetClass' => Empleado::class, 'targetAttribute' => ['empleado_id' => 'id']],
             [['solicitud_id'], 'exist', 'skipOnError' => true, 'targetClass' => Solicitud::class, 'targetAttribute' => ['solicitud_id' => 'id']],
+            [['jefe_departamento_id'], 'safe'], // Añadir jefe_departamento_id como seguro para asignación masiva
 
             // Otros atributos y reglas...
                 [['fecha_hora_reponer'], 'safe'], // Agrega esta regla
@@ -66,6 +69,8 @@ class PermisoFueraTrabajo extends \yii\db\ActiveRecord
             'hora_regreso' => 'Hora Regreso',
             'fecha_a_reponer' => 'Fecha A Reponer',
             'horario_fecha_a_reponer' => 'Horario Fecha A Reponer',
+            'jefe_departamento_id' => 'Jefe de Departamento',
+            'nombre_jefe_departamento' => 'Jefe de Departamento'
            
         ];
     }

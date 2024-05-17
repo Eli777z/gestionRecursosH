@@ -15,6 +15,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use yii\web\Response;
 use app\models\JuntaGobierno;
+use app\models\CatDireccion;
 /**
  * PermisoFueraTrabajoController implements the CRUD actions for PermisoFueraTrabajo model.
  */
@@ -130,14 +131,20 @@ class PermisoFueraTrabajoController extends Controller
                      $solicitudModel->comentario = ''; // Inicialmente vacío
                      $solicitudModel->fecha_aprobacion = null; // Inicialmente null
                      $solicitudModel->fecha_creacion = date('Y-m-d H:i:s'); // Fecha y hora actuales
-                    $solicitudModel->nombre_formato = 'PERMISO FUERA DEL TRABAJO';
+                     $solicitudModel->nombre_formato = 'PERMISO FUERA DEL TRABAJO';
                      if ($solicitudModel->save()) {
                          $model->solicitud_id = $solicitudModel->id;
+     
+                         // Guardar el nombre del jefe de departamento si se seleccionó
+                         if ($model->jefe_departamento_id) {
+                             $jefeDepartamento = JuntaGobierno::findOne($model->jefe_departamento_id);
+                             $model->nombre_jefe_departamento = $jefeDepartamento ? $jefeDepartamento->profesion . ' ' . $jefeDepartamento->empleado->nombre . ' ' . $jefeDepartamento->empleado->apellido : null;
+                         }
      
                          if ($model->save()) {
                              $transaction->commit();
                              Yii::$app->session->setFlash('success', 'Su solicitud ha sido generada exitosamente.');
-
+     
                              return $this->redirect(['view', 'id' => $model->id]);
                          }
                      }
@@ -158,6 +165,9 @@ class PermisoFueraTrabajoController extends Controller
              'solicitudModel' => $solicitudModel,
          ]);
      }
+     
+     
+     
      
 
     
@@ -291,62 +301,60 @@ $sheet->setCellValue('A32', $nombreCompleto);
 
 $sheet->setCellValue('A33', $nombrePuesto);
 
-$jefeUnidad = JuntaGobierno::find()
-->where(['nivel_jerarquico' => 'Jefe de unidad'])
-->andWhere(['cat_direccion_id' => $model->empleado->informacionLaboral->cat_direccion_id])
-->one();
+// Obtener la dirección asociada al empleado
+$direccion = CatDireccion::findOne($model->empleado->informacionLaboral->cat_direccion_id);
 
-$nombreJefe = mb_strtoupper($jefeUnidad->empleado->nombre, 'UTF-8');
-        $apellidoJefe = mb_strtoupper($jefeUnidad->empleado->apellido , 'UTF-8');
-        $profesionJefe   = mb_strtoupper ($jefeUnidad->profesion, 'UTF-8');
-        $nombreCompletoJefe = $profesionJefe . ' ' .$apellidoJefe . ' ' . $nombreJefe;
+// Verificar si la dirección no es '1.- GENERAL' y si se ha ingresado un nombre de Jefe de Departamento
+if ($direccion && $direccion->nombre_direccion !== '1.- GENERAL' && $model->nombre_jefe_departamento) {
+    $nombreCompletoJefe = $model->nombre_jefe_departamento;
+    $sheet->setCellValue('H32', $nombreCompletoJefe);
+} else {
+    $sheet->setCellValue('H32', null);
+}
 
-
-$sheet->setCellValue('H32',  $jefeUnidad ?   $nombreCompletoJefe : null
-);
 
 
 
 $juntaDirectorDireccion = JuntaGobierno::find()
-->where(['nivel_jerarquico' => 'Director'])
-->andWhere(['cat_direccion_id' => $model->empleado->informacionLaboral->cat_direccion_id])
-->one();
+    ->where(['cat_direccion_id' => $model->empleado->informacionLaboral->cat_direccion_id])
+    ->andWhere(['or', ['nivel_jerarquico' => 'Director'], ['nivel_jerarquico' => 'Jefe de unidad']])
+    ->one();
 
 if ($juntaDirectorDireccion) {
-    // Convertir los datos del director a mayúsculas
     $nombreDirector = mb_strtoupper($juntaDirectorDireccion->empleado->nombre, 'UTF-8');
     $apellidoDirector = mb_strtoupper($juntaDirectorDireccion->empleado->apellido, 'UTF-8');
     $profesionDirector = mb_strtoupper($juntaDirectorDireccion->profesion, 'UTF-8');
     $nombreCompletoDirector = $profesionDirector . ' ' . $apellidoDirector . ' ' . $nombreDirector;
 
-    // Colocar el nombre completo del director en la celda 'N32'
     $sheet->setCellValue('N32', $nombreCompletoDirector);
 
-    // Obtener el nombre de la dirección y definir el título correspondiente
     $nombreDireccion = $juntaDirectorDireccion->catDireccion->nombre_direccion;
     switch ($nombreDireccion) {
-        case 'GENERAL':
-            $tituloDireccion = 'DIRECTOR GENERAL';
+        case '1.- GENERAL':
+            if ($juntaDirectorDireccion->nivel_jerarquico == 'Jefe de unidad') {
+                $tituloDireccion = 'JEFE DE ' . $juntaDirectorDireccion->catDepartamento->nombre_departamento;
+            } else {
+                $tituloDireccion = 'DIRECTOR GENERAL';
+            }
             break;
-        case 'ADMINISTRACIÓN':
+        case '2.- ADMINISTRACIÓN':
             $tituloDireccion = 'DIRECTOR DE ADMINISTRACIÓN';
             break;
-        case 'OPERACIONES':
+        case '4.- OPERACIONES':
             $tituloDireccion = 'DIRECTOR DE OPERACIONES';
             break;
-        case 'COMERCIAL':
+        case '3.- COMERCIAL':
             $tituloDireccion = 'DIRECTOR COMERCIAL';
             break;
-        case 'PLANEACION':
+        case '5.- PLANEACION':
             $tituloDireccion = 'DIRECTOR DE PLANEACION';
             break;
-       
+        default:
+            $tituloDireccion = ''; // Otra dirección no especificada
     }
 
-    // Colocar el título correspondiente en la celda 'N33'
     $sheet->setCellValue('N33', $tituloDireccion);
 } else {
-    // Si no se encuentra ningún registro, establecer las celdas a null
     $sheet->setCellValue('N32', null);
     $sheet->setCellValue('N33', null);
 }

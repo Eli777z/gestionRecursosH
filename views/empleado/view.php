@@ -367,31 +367,27 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
                                 [
                                     'attribute' => 'junta_gobierno_id',
                                     'label' => 'Jefe o director a cargo',
-                                    'value' => isset($model->informacionLaboral->juntaGobierno->empleado) ? $model->informacionLaboral->juntaGobierno->profesion . ' ' .$model->informacionLaboral->juntaGobierno->empleado->nombre . ' ' . $model->informacionLaboral->juntaGobierno->empleado->apellido : null,
+                                    'value' => isset($model->informacionLaboral->juntaGobierno->empleado) ? $model->informacionLaboral->juntaGobierno->profesion . ' ' . $model->informacionLaboral->juntaGobierno->empleado->nombre . ' ' . $model->informacionLaboral->juntaGobierno->empleado->apellido : null,
                                     'type' => DetailView::INPUT_SELECT2,
                                     'widgetOptions' => [
                                         'data' => ArrayHelper::map(
                                             JuntaGobierno::find()
-                                                ->where(['nivel_jerarquico' => 'Jefe de unidad']) // Filtrar por rol 'Jefe de unidad'
-                                                ->andWhere(['cat_direccion_id' => $model->informacionLaboral->cat_direccion_id]) // Filtrar por la misma dirección
+                                                ->where(['nivel_jerarquico' => 'Jefe de unidad'])
+                                                ->orWhere(['nivel_jerarquico' => 'Jefe de departamento'])
+                                                ->andWhere(['cat_direccion_id' => $model->informacionLaboral->cat_direccion_id])
                                                 ->all(),
                                             'id',
                                             function ($model) {
-                                                return $model->profesion . ' ' .$model->empleado->nombre . ' ' . $model->empleado->apellido;
+                                                return $model->profesion . ' ' . $model->empleado->nombre . ' ' . $model->empleado->apellido;
                                             }
                                         ),
                                         'options' => ['prompt' => 'Seleccionar Jefe o director a cargo'],
                                         'pluginOptions' => [
-                                            'templateResult' => new JsExpression('function(data) {
-                                                if (!data.id) { return data.text; }
-                                                return "Jefe de dirección ' . ($model->informacionLaboral->catDireccion ? $model->informacionLaboral->catDireccion->nombre_direccion : '') . '\\n" + data.text;
-                                            }'),
-                                            'templateSelection' => new JsExpression('function(data) {
-                                                return data.text;
-                                            }'),
+                                           
                                         ],
                                     ],
                                 ],
+                                
                                 
                                 
                                 

@@ -45,6 +45,7 @@ use app\models\Empleado;
 <?= $form->field($model, 'nivel_jerarquico')->dropDownList([
     'Director' => 'Director',
     'Jefe de unidad' => 'Jefe de unidad',
+    'Jefe de departamento' => 'Jefe de departamento',
 ], ['prompt' => 'Selecciona el nivel jerárquico...']) ?>
 
 
