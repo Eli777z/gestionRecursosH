@@ -16,6 +16,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use yii\web\Response;
 use app\models\JuntaGobierno;
 use app\models\CatDireccion;
+use app\models\Notificacion;
 /**
  * PermisoFueraTrabajoController implements the CRUD actions for PermisoFueraTrabajo model.
  */
@@ -125,28 +126,39 @@ class PermisoFueraTrabajoController extends Controller
                      $model->hora_regreso = date('H:i:s', strtotime($model->hora_regreso));
                      $model->horario_fecha_a_reponer = date('H:i:s', strtotime($model->horario_fecha_a_reponer));
      
-                     // Configurar los atributos de la solicitud
                      $solicitudModel->empleado_id = $empleado->id;
                      $solicitudModel->status = 'En Proceso';
-                     $solicitudModel->comentario = ''; // Inicialmente vacío
-                     $solicitudModel->fecha_aprobacion = null; // Inicialmente null
-                     $solicitudModel->fecha_creacion = date('Y-m-d H:i:s'); // Fecha y hora actuales
+                     $solicitudModel->comentario = ''; 
+                     $solicitudModel->fecha_aprobacion = null; 
+                     $solicitudModel->fecha_creacion = date('Y-m-d H:i:s'); 
                      $solicitudModel->nombre_formato = 'PERMISO FUERA DEL TRABAJO';
                      if ($solicitudModel->save()) {
                          $model->solicitud_id = $solicitudModel->id;
      
-                         // Guardar el nombre del jefe de departamento si se seleccionó
                          if ($model->jefe_departamento_id) {
                              $jefeDepartamento = JuntaGobierno::findOne($model->jefe_departamento_id);
                              $model->nombre_jefe_departamento = $jefeDepartamento ? $jefeDepartamento->profesion . ' ' . $jefeDepartamento->empleado->nombre . ' ' . $jefeDepartamento->empleado->apellido : null;
                          }
      
                          if ($model->save()) {
-                             $transaction->commit();
-                             Yii::$app->session->setFlash('success', 'Su solicitud ha sido generada exitosamente.');
-     
-                             return $this->redirect(['view', 'id' => $model->id]);
-                         }
+                            $transaction->commit();
+                            Yii::$app->session->setFlash('success', 'Su solicitud ha sido generada exitosamente.');
+                        
+                            // Crear notificación
+                            $notificacion = new Notificacion();
+                            $notificacion->usuario_id = $model->empleado->usuario_id;
+                            $notificacion->mensaje = 'Tienes una nueva solicitud pendiente de revisión.';
+                            $notificacion->created_at = date('Y-m-d H:i:s');
+                            $notificacion->leido = 0; 
+                            if ($notificacion->save()) {
+                                return $this->redirect(['view', 'id' => $model->id]);
+                            } else {
+                                Yii::$app->session->setFlash('error', 'Hubo un error al guardar la notificación.');
+                            }
+                        } else {
+                            Yii::$app->session->setFlash('error', 'Hubo un error al guardar la solicitud.');
+                        }
+                        
                      }
                  }
                  $transaction->rollBack();
@@ -182,6 +194,8 @@ class PermisoFueraTrabajoController extends Controller
      */
     public function actionUpdate($id)
     {
+        $this->layout = "main-trabajador";
+
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -359,19 +373,7 @@ if ($juntaDirectorDireccion) {
     $sheet->setCellValue('N33', null);
 }
 
-
-
-
-
-
-
-
-        // $sheet->setCellValue('G6', $model->otra_propiedad); // Cambia 'G6' y 'otra_propiedad' según tu plantilla y modelo
-    
-        // Preparar el archivo para la descarga
-        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-    
-        // Enviar el archivo al navegador para su descarga
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');    
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="permiso_fuera_trabajo.xlsx"');
         header('Cache-Control: max-age=0');

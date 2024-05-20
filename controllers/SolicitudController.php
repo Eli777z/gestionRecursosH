@@ -75,6 +75,7 @@ class SolicitudController extends Controller
             'model' => $model,
         ]);
     }
+    
     public function actionAprobarSolicitud($id)
     {
         $model = $this->findModel($id);

@@ -134,6 +134,8 @@ class SiteController extends Controller
 
     public function actionViewNotificaciones()
     {
+        $this->layout = "main-trabajador";
+
         $notificaciones = Notificacion::find()
             ->where(['usuario_id' => Yii::$app->user->identity->id])
             ->orderBy(['created_at' => SORT_DESC])

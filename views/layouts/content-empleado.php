@@ -1,7 +1,7 @@
 <?php
 /* @var $content string */
 
-use yii\bootstrap5\Breadcrumbs;
+use yii\bootstrap4\Breadcrumbs;
 
 ?>
 <div class="content-wrapper">
@@ -24,13 +24,13 @@ use yii\bootstrap5\Breadcrumbs;
                     <?php
                    echo Breadcrumbs::widget([
 
-                    'homeLink'=> ['url'=>'../site/portalgestionrh','label'=>'Inicio'], 
+                    'homeLink'=> ['url'=>'../site/portalempleado','label'=>'Inicio'], 
     
                     'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
-    
                     'options' => [
                         'class' => 'breadcrumb float-sm-right'
-                    ]                ])
+                    ]
+                ])
                     ?>
                 </div><!-- /.col -->
             </div><!-- /.row -->
