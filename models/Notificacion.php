@@ -39,6 +39,7 @@ class Notificacion extends ActiveRecord
             [['created_at'], 'safe'],
             [['usuario_id'], 'exist', 'skipOnError' => true, 'targetClass' => Usuario::class, 'targetAttribute' => ['usuario_id' => 'id']],
             [['permiso_fuera_trabajo_id'], 'exist', 'skipOnError' => true, 'targetClass' => PermisoFueraTrabajo::class, 'targetAttribute' => ['permiso_fuera_trabajo_id' => 'id']],
+            [['comision_especial_id'], 'exist', 'skipOnError' => true, 'targetClass' =>ComisionEspecial::class, 'targetAttribute' => ['comision_especial_id' => 'id']],
 
         ];
     }
@@ -94,6 +95,12 @@ class Notificacion extends ActiveRecord
     public function getPermisoFueraTrabajo()
 {
     return $this->hasOne(PermisoFueraTrabajo::class, ['id' => 'permiso_fuera_trabajo_id']);
+}
+
+
+public function getComisionEspecial()
+{
+    return $this->hasOne(ComisionEspecial::class, ['id' => 'comision_especial_id']);
 }
 
 }

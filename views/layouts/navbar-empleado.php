@@ -26,10 +26,10 @@ $count = count($notificaciones);
             <?php echo Html::a('PERMISO FUERA DEL TRABAJO', Url::to(['permiso-fuera-trabajo/index']), ['class' => 'dropdown-item']); ?>
                     </li>
                     <li class="list-group-item">
-                        <a href="#" class="dropdown-item">COMISION ESPECIAL</a>
+                    <?php echo Html::a('COMISIÓN ESPECIAL', Url::to(['comision-especial/index']), ['class' => 'dropdown-item']); ?>
                     </li>
                     <li class="list-group-item">
-                        <a href="#" class="dropdown-item">PERMISO ECONÓMICO</a>
+                    <?php echo Html::a('CAMBIO DE DÍA LABORAL', Url::to(['cambio-dia-laboral/index']), ['class' => 'dropdown-item']); ?>
                     </li>
                     <li class="list-group-item">
                         <a href="#" class="dropdown-item">PERMISO SIN GOCE DE SUELDO</a>

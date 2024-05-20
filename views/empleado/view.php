@@ -7,6 +7,7 @@ use app\models\CatDptoCargo;
 use app\models\CatPuesto;
 use app\models\CatTipoContrato;
 use hail812\adminlte3\yii\grid\ActionColumn;
+use hail812\adminlte\widgets\Alert;
 use yii\helpers\Html;
 //use yii\widgets\DetailView;
 use kartik\file\FileInput;
@@ -55,6 +56,15 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
                     <div class="row">
                         <div class="col-md-12">
                             <div class="d-flex align-items-center mb-3">
+                            <?php 
+    // Mostrar los flash messages
+    foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
+        echo Alert::widget([
+            'options' => ['class' => 'alert-' . $type],
+            'body' => $message,
+        ]);
+    }
+    ?>
                                 <?php
                                 // Registro de script
                                 $this->registerJs("
