@@ -174,3 +174,4 @@ if (YII_ENV_DEV) {
   //  private static final String EMAIL_PASSWORD = "vdcj rfzv xpuh aluy";
 
 return $config;
+?>

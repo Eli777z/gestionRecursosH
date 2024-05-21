@@ -17,6 +17,7 @@ use yii\web\Response;
 use app\models\JuntaGobierno;
 use app\models\CatDireccion;
 use app\models\Notificacion;
+use Mpdf\Mpdf;
 /**
  * PermisoFueraTrabajoController implements the CRUD actions for PermisoFueraTrabajo model.
  */
@@ -380,6 +381,160 @@ if ($juntaDirectorDireccion) {
     
         $writer->save('php://output');
         Yii::$app->end();
+    }
+
+
+
+    public function actionExportPdf($id)
+    {
+        $model = PermisoFueraTrabajo::findOne($id);
+    
+        if (!$model) {
+            throw new NotFoundHttpException('El registro no existe.');
+        }
+    
+        $templatePath = Yii::getAlias('@app/templates/permiso_fuera_trabajo.xlsx');
+    
+              
+        $spreadsheet = IOFactory::load($templatePath);
+    
+        // Modificar la plantilla con los datos del modelo
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setCellValue('F6', $model->empleado->numero_empleado);
+       
+       
+        $nombre = mb_strtoupper($model->empleado->nombre, 'UTF-8');
+        $apellido = mb_strtoupper($model->empleado->apellido, 'UTF-8');
+        $nombreCompleto = $apellido . ' ' . $nombre;
+        $sheet->setCellValue('H7', $nombreCompleto);
+
+
+        setlocale(LC_TIME, 'es_419.UTF-8'); 
+        $fechaHOY = strftime('%A, %B %d, %Y'); 
+        $sheet->setCellValue('N6', $fechaHOY);
+        
+        $nombrePuesto = $model->empleado->informacionLaboral->catPuesto->nombre_puesto;
+$sheet->setCellValue('H8', $nombrePuesto);
+
+$nombreCargo = $model->empleado->informacionLaboral->catDptoCargo->nombre_dpto;
+$sheet->setCellValue('H9', $nombreCargo);
+
+$nombreDireccion = $model->empleado->informacionLaboral->catDireccion->nombre_direccion;
+$sheet->setCellValue('H10', $nombreDireccion);
+
+$nombreDepartamento = $model->empleado->informacionLaboral->catDepartamento->nombre_departamento;
+$sheet->setCellValue('H11', $nombreDepartamento);
+
+$nombreTipoContrato = $model->empleado->informacionLaboral->catTipoContrato->nombre_tipo;
+$sheet->setCellValue('H12', $nombreTipoContrato);
+
+
+
+// Convertir la fecha del modelo al formato deseado
+$fecha_permiso = strftime('%A, %B %d, %Y', strtotime($model->motivoFechaPermiso->fecha_permiso));
+$sheet->setCellValue('H14', $fecha_permiso);
+
+
+$horaSalida = date("g:i A", strtotime($model->hora_salida));
+$horaRegreso = date("g:i A", strtotime($model->hora_regreso));
+$horaAReponer = date("g:i A", strtotime($model->horario_fecha_a_reponer));
+
+$sheet->setCellValue('H15', $horaSalida);
+$sheet->setCellValue('H16', $horaRegreso);
+
+
+$sheet->setCellValue('H18', $model->motivoFechaPermiso->motivo);
+$fecha_a_reponer = strftime('%A, %B %d, %Y', strtotime($model->fecha_a_reponer));
+$sheet->setCellValue('H20', $fecha_a_reponer);
+
+$sheet->setCellValue('P20', $horaAReponer);
+$sheet->setCellValue('A32', $nombreCompleto);
+
+
+
+
+
+
+$sheet->setCellValue('A33', $nombrePuesto);
+
+// Obtener la dirección asociada al empleado
+$direccion = CatDireccion::findOne($model->empleado->informacionLaboral->cat_direccion_id);
+
+// Verificar si la dirección no es '1.- GENERAL' y si se ha ingresado un nombre de Jefe de Departamento
+if ($direccion && $direccion->nombre_direccion !== '1.- GENERAL' && $model->nombre_jefe_departamento) {
+    $nombreCompletoJefe = mb_strtoupper($model->nombre_jefe_departamento, 'UTF-8');
+    $sheet->setCellValue('H32', $nombreCompletoJefe);
+} else {
+    $sheet->setCellValue('H32', null);
+}
+
+
+
+
+$juntaDirectorDireccion = JuntaGobierno::find()
+    ->where(['cat_direccion_id' => $model->empleado->informacionLaboral->cat_direccion_id])
+    ->andWhere(['or', ['nivel_jerarquico' => 'Director'], ['nivel_jerarquico' => 'Jefe de unidad']])
+    ->one();
+
+if ($juntaDirectorDireccion) {
+    $nombreDirector = mb_strtoupper($juntaDirectorDireccion->empleado->nombre, 'UTF-8');
+    $apellidoDirector = mb_strtoupper($juntaDirectorDireccion->empleado->apellido, 'UTF-8');
+    $profesionDirector = mb_strtoupper($juntaDirectorDireccion->profesion, 'UTF-8');
+    $nombreCompletoDirector = $profesionDirector . ' ' . $apellidoDirector . ' ' . $nombreDirector;
+
+    $sheet->setCellValue('N32', $nombreCompletoDirector);
+
+    $nombreDireccion = $juntaDirectorDireccion->catDireccion->nombre_direccion;
+    switch ($nombreDireccion) {
+        case '1.- GENERAL':
+            if ($juntaDirectorDireccion->nivel_jerarquico == 'Jefe de unidad') {
+                $tituloDireccion = 'JEFE DE ' . $juntaDirectorDireccion->catDepartamento->nombre_departamento;
+            } else {
+                $tituloDireccion = 'DIRECTOR GENERAL';
+            }
+            break;
+        case '2.- ADMINISTRACIÓN':
+            $tituloDireccion = 'DIRECTOR DE ADMINISTRACIÓN';
+            break;
+        case '4.- OPERACIONES':
+            $tituloDireccion = 'DIRECTOR DE OPERACIONES';
+            break;
+        case '3.- COMERCIAL':
+            $tituloDireccion = 'DIRECTOR COMERCIAL';
+            break;
+        case '5.- PLANEACION':
+            $tituloDireccion = 'DIRECTOR DE PLANEACION';
+            break;
+        default:
+            $tituloDireccion = ''; // Otra dirección no especificada
+    }
+
+    $sheet->setCellValue('N33', $tituloDireccion);
+} else {
+    $sheet->setCellValue('N32', null);
+    $sheet->setCellValue('N33', null);
+}
+        // Código para establecer los valores en la plantilla igual que en actionExport
+    
+        // Crear un objeto Mpdf
+        $mpdf = new Mpdf();
+    
+        // Obtener el contenido HTML del archivo Excel
+        ob_start();
+        $writer = IOFactory::createWriter($spreadsheet, 'Html');
+        $writer->save('php://output');
+        $htmlContent = ob_get_clean();
+    
+        // Escribir el contenido HTML en el objeto Mpdf
+        $mpdf->WriteHTML($htmlContent);
+    
+        // Configurar las cabeceras para descargar el archivo PDF
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: attachment; filename="permiso_fuera_trabajo.pdf"');
+        header('Cache-Control: max-age=0');
+    
+        // Salida del PDF generado
+        $mpdf->Output();
     }
     
     

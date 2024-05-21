@@ -31,11 +31,36 @@ $this->params['breadcrumbs'][] = $this->title;
                         'columns' => [
                             ['class' => 'yii\grid\SerialColumn'],
 
-                            'id',
-                            'empleado_id',
-                            'solicitud_id',
-                            'motivo_fecha_permiso_id',
-                            'nombre_jefe_departamento',
+                            [
+                                'attribute' => 'fecha_creacion',
+                                'label' => 'Fecha de creación',
+                                'value' => function ($model) {
+                                    return $model->solicitud->fecha_creacion;
+                                },
+                            ],
+                        
+                            [
+                                'attribute' => 'status',
+                                'label' => 'Status',
+                                'value' => function ($model) {
+                                    return $model->solicitud->status;
+                                },
+                            ],
+                            [
+                                'attribute' => 'comentario',
+                                'label' => 'Comentarios',
+                                'value' => function ($model) {
+                                    return $model->solicitud->comentario;
+                                },
+                            ],
+                            [
+                                'attribute' => 'nombre_aprobante',
+                                'label' => 'Aprobó',
+                                'value' => function ($model) {
+                                    return $model->solicitud->nombre_aprobante;
+                                },
+                            ],
+
 
                             ['class' => 'hail812\adminlte3\yii\grid\ActionColumn'],
                         ],

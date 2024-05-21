@@ -30,19 +30,13 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <?php if ($model->solicitud->status === 'Aprobado'): ?>
     <?= Html::a('Exportar Excel', ['export', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
-    <?= Html::a('Exportar a PDF', ['export-pdf', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+    <?= Html::a('Exportar PDF', ['export-pdf', 'id' => $model->id], ['class' => 'btn btn-danger']) ?>
 <?php endif; ?>
+
 
                     </p>
 
-                    <?php 
-                    foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
-        echo Alert::widget([
-            'options' => ['class' => 'alert-' . $type],
-            'body' => $message,
-        ]);
-    }
-    ?>
+                  
                     <?= DetailView::widget([
                         'model' => $model,
                         'attributes' => [

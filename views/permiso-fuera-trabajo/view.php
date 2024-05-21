@@ -28,9 +28,11 @@ $this->params['breadcrumbs'][] = $this->title;
                             
                         ]) ?>
                           <!-- Botón para exportar a Excel -->
-                          <?php if ($model->solicitud->status === 'Aprobado'): ?>
-                            <?= Html::a('Exportar Excel', ['export', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
-                        <?php endif; ?>
+                      
+<?php if ($model->solicitud->status === 'Aprobado'): ?>
+    <?= Html::a('Exportar Excel', ['export', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
+    <?= Html::a('Exportar PDF', ['export-pdf', 'id' => $model->id], ['class' => 'btn btn-danger']) ?>
+<?php endif; ?>
                           
                     </p>
 

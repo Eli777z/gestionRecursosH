@@ -20,10 +20,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             <?= Html::a('Create Permiso Fuera Trabajo', ['create'], ['class' => 'btn btn-success']) ?>
                         </div>
                     </div>
-
-
-                    <?php Pjax::begin(); ?>
-                    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+<?php Pjax::begin();?>
 
                     <?= GridView::widget([
                         'dataProvider' => $dataProvider,
@@ -31,15 +28,36 @@ $this->params['breadcrumbs'][] = $this->title;
                         'columns' => [
                             ['class' => 'yii\grid\SerialColumn'],
 
-                            'id',
-                            'empleado_id',
-                            'solicitud_id',
-                            'motivo_fecha_permiso_id',
-                            'fecha_salida',
-                            //'fecha_regreso',
-                            //'fecha_a_reponer',
-                            //'horario_fecha_a_reponer',
-                            //'nota:ntext',
+                            [
+                                'attribute' => 'fecha_creacion',
+                                'label' => 'Fecha de creación',
+                                'value' => function ($model) {
+                                    return $model->solicitud->fecha_creacion;
+                                },
+                            ],
+                        
+                            [
+                                'attribute' => 'status',
+                                'label' => 'Status',
+                                'value' => function ($model) {
+                                    return $model->solicitud->status;
+                                },
+                            ],
+                            [
+                                'attribute' => 'comentario',
+                                'label' => 'Comentarios',
+                                'value' => function ($model) {
+                                    return $model->solicitud->comentario;
+                                },
+                            ],
+                            [
+                                'attribute' => 'nombre_aprobante',
+                                'label' => 'Aprobó',
+                                'value' => function ($model) {
+                                    return $model->solicitud->nombre_aprobante;
+                                },
+                            ],
+
 
                             ['class' => 'hail812\adminlte3\yii\grid\ActionColumn'],
                         ],
