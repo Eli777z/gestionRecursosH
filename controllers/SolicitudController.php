@@ -43,7 +43,8 @@ class SolicitudController extends Controller
     {
         $searchModel = new SolicitudSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
+        $dataProvider->pagination->pageSize=80;
+        $dataProvider->sort = ['defaultOrder' => ['id' => 'DESC']];
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,

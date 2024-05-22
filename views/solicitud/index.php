@@ -23,45 +23,61 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
                     <?php Pjax::begin(); ?>
-                    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+<?= GridView::widget([
+    'dataProvider' => $dataProvider,
+    'filterModel' => $searchModel,
+    
+    'columns' => [
+        ['class' => 'yii\grid\SerialColumn'],
+        [
+            'attribute' => 'empleado_id',
+            'label' => 'Empleado',
+            'value' => function ($model) {
+                return $model->empleado ? $model->empleado->nombre . ' ' . $model->empleado->apellido : 'N/A';
+            },
+        ],
+        [
+            'attribute' => 'fecha_creacion',
+            'format' => 'raw',
+            'value' => function ($model) {
+                setlocale(LC_TIME, "es_419");
+                return strftime('%A, %d de %B de %Y', strtotime($model->fecha_creacion));
+            },
+        ],
+        [
+            'attribute' => 'status',
+            'format' => 'raw',
+            'value' => function ($model) {
+                $status = '';
+                switch ($model->status) {
+                    case 'Aprobado':
+                        $status = '<span class="badge badge-success">' . $model->status . '</span>';
+                        break;
+                    case 'En Proceso':
+                        $status = '<span class="badge badge-warning">' . $model->status . '</span>';
+                        break;
+                    case 'Rechazado':
+                        $status = '<span class="badge badge-danger">' . $model->status . '</span>';
+                        break;
+                    default:
+                        $status = '<span class="badge badge-secondary">' . $model->status . '</span>';
+                        break;
+                }
+                return $status;
+            },
+            'filter' => Html::activeDropDownList($searchModel, 'status', ['Aprobado' => 'Aprobado', 'En Proceso' => 'En Proceso', 'Rechazado' => 'Rechazado'], ['class' => 'form-control', 'prompt' => 'Todos']),
+        ],
+        'comentario:ntext',
+        'nombre_formato',
+        ['class' => 'hail812\adminlte3\yii\grid\ActionColumn'],
+    ],
+    'summaryOptions' => ['class' => 'summary mb-2'],
+    'pager' => [
+        'class' => 'yii\bootstrap4\LinkPager',
+    ]
+]); ?>
+<?php Pjax::end(); ?>
 
-                    <?= GridView::widget([
-                        'dataProvider' => $dataProvider,
-                        'filterModel' => $searchModel,
-                        'columns' => [
-                            ['class' => 'yii\grid\SerialColumn'],
-
-                            'id',
-                            [
-                                'attribute' => 'empleado_id',
-                                'label' => 'Empleado',
-                                'value' => function ($model) {
-                                    return $model->empleado ? $model->empleado->nombre . ' ' . $model->empleado->apellido : 'N/A';
-                                },
-                            ],
-                            [
-                                'attribute' => 'fecha_creacion',
-                                'format' => 'raw',
-                                'value' => function ($model) {
-                                    setlocale(LC_TIME, "es_419");
-                                    return strftime('%A, %d de %B de %Y', strtotime($model->fecha_creacion));
-                                },
-                            ],
-                            'status',
-                            'comentario:ntext',
-                            //'fecha_aprobacion',
-                            //'nombre_aprobante',
-                            //'nombre_formato',
-
-                            ['class' => 'hail812\adminlte3\yii\grid\ActionColumn'],
-                        ],
-                        'summaryOptions' => ['class' => 'summary mb-2'],
-                        'pager' => [
-                            'class' => 'yii\bootstrap4\LinkPager',
-                        ]
-                    ]); ?>
-
-                    <?php Pjax::end(); ?>
 
                 </div>
                 <!--.card-body-->

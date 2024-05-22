@@ -315,7 +315,7 @@ class ComisionEspecialController extends Controller
             $sheet->setCellValue('N24', null);
         }
 
-        $tempFileName = Yii::getAlias('@app/runtime/comision_especial.xlsx');
+        $tempFileName = Yii::getAlias('@app/runtime/archivos_temporales/comision_especial.xlsx');
         $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
         $writer->save($tempFileName);
     
@@ -327,13 +327,126 @@ class ComisionEspecialController extends Controller
 
     public function actionDownload($filename)
     {
-        $filePath = Yii::getAlias("@app/runtime/$filename");
+        $filePath = Yii::getAlias("@app/runtime/archivos_temporales/$filename");
         if (file_exists($filePath)) {
             return Yii::$app->response->sendFile($filePath);
         } else {
             throw new NotFoundHttpException('El archivo solicitado no existe.');
         }
     }
+
+
+    public function actionExportSegundoCaso($id)
+    {
+
+        $model = ComisionEspecial::findOne($id);
+
+        if (!$model) {
+            throw new NotFoundHttpException('El registro no existe.');
+        }
+
+        $templatePath = Yii::getAlias('@app/templates/comision_especial.xlsx');
+
+
+        $spreadsheet = IOFactory::load($templatePath);
+
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setCellValue('F6', $model->empleado->numero_empleado);
+
+
+        $nombre = mb_strtoupper($model->empleado->nombre, 'UTF-8');
+        $apellido = mb_strtoupper($model->empleado->apellido, 'UTF-8');
+        $nombreCompleto = $apellido . ' ' . $nombre;
+        $sheet->setCellValue('H7', $nombreCompleto);
+
+
+        setlocale(LC_TIME, 'es_419.UTF-8');
+        $fechaHOY = strftime('%A, %B %d, %Y');
+        $sheet->setCellValue('N6', $fechaHOY);
+
+        $nombrePuesto = $model->empleado->informacionLaboral->catPuesto->nombre_puesto;
+        $sheet->setCellValue('H8', $nombrePuesto);
+
+        $nombreCargo = $model->empleado->informacionLaboral->catDptoCargo->nombre_dpto;
+        $sheet->setCellValue('H9', $nombreCargo);
+
+        $nombreDireccion = $model->empleado->informacionLaboral->catDireccion->nombre_direccion;
+        $sheet->setCellValue('H10', $nombreDireccion);
+
+        $nombreDepartamento = $model->empleado->informacionLaboral->catDepartamento->nombre_departamento;
+        $sheet->setCellValue('H11', $nombreDepartamento);
+
+        $nombreTipoContrato = $model->empleado->informacionLaboral->catTipoContrato->nombre_tipo;
+        $sheet->setCellValue('H12', $nombreTipoContrato);
+
+        $fecha_permiso = strftime('%A, %B %d, %Y', strtotime($model->motivoFechaPermiso->fecha_permiso));
+        $sheet->setCellValue('H14', $fecha_permiso);
+        $sheet->setCellValue('H15', $model->motivoFechaPermiso->motivo);
+        $sheet->setCellValue('A23', $nombreCompleto);
+        $sheet->setCellValue('A24', $nombrePuesto);
+
+
+        
+//        $direccion = CatDireccion::findOne($model->empleado->informacionLaboral->cat_direccion_id);
+
+       // if ($direccion && $direccion->nombre_direccion !== '1.- GENERAL' && $model->nombre_jefe_departamento) {
+         //   $nombreCompletoJefe = mb_strtoupper($model->nombre_jefe_departamento, 'UTF-8');
+           // $sheet->setCellValue('H23', $nombreCompletoJefe);
+        //} else {
+          //  $sheet->setCellValue('H23', null);
+        //}
+       
+        
+        
+        // Buscar el registro en junta_gobierno que corresponde a un Director
+        $juntaGobierno = JuntaGobierno::find()
+            ->where(['nivel_jerarquico' => 'Director'])
+            ->all();
+        
+        $directorGeneral = null;
+        
+        // Recorrer todos los registros de junta_gobierno encontrados
+        foreach ($juntaGobierno as $junta) {
+            $empleado = Empleado::findOne($junta->empleado_id);
+        
+            if ($empleado && $empleado->informacionLaboral->catPuesto->nombre_puesto === 'DIRECTOR GENERAL') {
+                $directorGeneral = $empleado;
+                break;
+            }
+        }
+        
+        // Establecer el valor en la celda N23 si se encontró un Director General
+        if ($directorGeneral) {
+            $nombre = mb_strtoupper($directorGeneral->nombre, 'UTF-8');
+            $apellido = mb_strtoupper($directorGeneral->apellido, 'UTF-8');
+            $nombreCompleto = $apellido . ' ' . $nombre;
+            $sheet->setCellValue('N23', $nombreCompleto);
+        } else {
+          
+        }
+        
+        $sheet->setCellValue('N24', 'DIRECTOR GENERAL');
+        
+        
+
+        $tempFileName = Yii::getAlias('@app/runtime/archivos_temporales/comision_especial.xlsx');
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save($tempFileName);
+    
+        // Luego, proporciona un enlace para que el usuario descargue el archivo
+        // Puedes redirigir a una acción que presente el enlace o generar directamente el enlace aquí mismo
+        return $this->redirect(['download', 'filename' => basename($tempFileName)]);
+    }
+   
+
+
+
+
+
+
+
+
+
 
 
 
@@ -442,24 +555,23 @@ class ComisionEspecialController extends Controller
         // Código para establecer los valores en la plantilla igual que en actionExport
 
         // Crear un objeto Mpdf
-        $mpdf = new Mpdf();
+        $mpdf = new Mpdf(['mode' => 'utf-8','format' => [215.9, 279.4]]);
 
-        // Obtener el contenido HTML del archivo Excel
+        // Obtener el contenido HTML del archivo Excel (como lo estás haciendo actualmente)
         ob_start();
         $writer = IOFactory::createWriter($spreadsheet, 'Html');
         $writer->save('php://output');
         $htmlContent = ob_get_clean();
-    
+        
         // Escribir el contenido HTML en el objeto Mpdf
         $mpdf->WriteHTML($htmlContent);
-    
-        // Configurar las cabeceras para descargar el archivo PDF
-        header('Content-Type: application/pdf');
-        header('Content-Disposition: attachment; filename="comision_especial.pdf"');
-        header('Cache-Control: max-age=0');
-    
-        // Salida del PDF generado
-        $mpdf->Output();
+        
+        // Guardar el PDF en una ruta temporal
+        $tempPdfFileName = Yii::getAlias('@app/runtime/archivos_temporales/comision_especial.pdf');
+        $mpdf->Output($tempPdfFileName, 'F'); // Guardar el PDF en un archivo
+        
+        // Redirigir al método de descarga con el nombre del archivo PDF generado
+        return $this->redirect(['download', 'filename' => basename($tempPdfFileName)]);
  
  
  

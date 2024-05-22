@@ -45,6 +45,7 @@ class CambioDiaLaboralController extends Controller
      */
     public function actionIndex()
     {
+        
         // Obtener el ID del usuario que ha iniciado sesión
     $usuarioId = Yii::$app->user->identity->id;
 
@@ -81,6 +82,8 @@ class CambioDiaLaboralController extends Controller
      */
     public function actionView($id)
     {
+        $this->layout = "main-trabajador";
+
         return $this->render('view', [
             'model' => $this->findModel($id),
         ]);
@@ -347,13 +350,146 @@ if ($juntaDirectorDireccion) {
     $sheet->setCellValue('N25', null);
 }
 
-        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');    
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="cambio_dia_laboral.xlsx"');
-        header('Cache-Control: max-age=0');
+$tempFileName = Yii::getAlias('@app/runtime/archivos_temporales/cambio_dia_laboral.xlsx');
+$writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+$writer->save($tempFileName);
+
+// Luego, proporciona un enlace para que el usuario descargue el archivo
+// Puedes redirigir a una acción que presente el enlace o generar directamente el enlace aquí mismo
+return $this->redirect(['download', 'filename' => basename($tempFileName)]);
+    }
+
+
+
+    public function actionExportSegundoCaso($id)
+    {
+        // Encuentra el modelo PermisoFueraTrabajo según el ID pasado como parámetro
+        $model = CambioDiaLaboral::findOne($id);
     
-        $writer->save('php://output');
-        Yii::$app->end();
+        if (!$model) {
+            throw new NotFoundHttpException('El registro no existe.');
+        }
+    
+        // Ruta a tu plantilla de Excel
+        $templatePath = Yii::getAlias('@app/templates/cambio_dia_laboral.xlsx');
+    
+        // Cargar la plantilla de Excel
+        $spreadsheet = IOFactory::load($templatePath);
+    
+        // Modificar la plantilla con los datos del modelo
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setCellValue('F5', $model->empleado->numero_empleado);
+       
+       
+        $nombre = mb_strtoupper($model->empleado->nombre, 'UTF-8');
+        $apellido = mb_strtoupper($model->empleado->apellido, 'UTF-8');
+        $nombreCompleto = $apellido . ' ' . $nombre;
+        $sheet->setCellValue('H6', $nombreCompleto);
+
+
+        setlocale(LC_TIME, 'es_419.UTF-8'); 
+        $fechaHOY = strftime('%A, %B %d, %Y'); 
+        $sheet->setCellValue('N5', $fechaHOY);
+        
+        $nombrePuesto = $model->empleado->informacionLaboral->catPuesto->nombre_puesto;
+$sheet->setCellValue('H7', $nombrePuesto);
+
+$nombreCargo = $model->empleado->informacionLaboral->catDptoCargo->nombre_dpto;
+$sheet->setCellValue('H8', $nombreCargo);
+
+$nombreDireccion = $model->empleado->informacionLaboral->catDireccion->nombre_direccion;
+$sheet->setCellValue('H9', $nombreDireccion);
+
+$nombreDepartamento = $model->empleado->informacionLaboral->catDepartamento->nombre_departamento;
+$sheet->setCellValue('H10', $nombreDepartamento);
+
+$nombreTipoContrato = $model->empleado->informacionLaboral->catTipoContrato->nombre_tipo;
+$sheet->setCellValue('H11', $nombreTipoContrato);
+
+
+
+// Convertir la fecha del modelo al formato deseado
+$fecha_permiso = strftime('%A, %B %d, %Y', strtotime($model->motivoFechaPermiso->fecha_permiso));
+$sheet->setCellValue('H13', $fecha_permiso);
+
+
+
+$sheet->setCellValue('H15', $model->motivoFechaPermiso->motivo);
+$fecha_a_laborar = strftime('%A, %B %d, %Y', strtotime($model->fecha_a_laborar));
+$sheet->setCellValue('H14', $fecha_a_laborar);
+
+
+
+
+$sheet->setCellValue('B24', $nombreCompleto);
+
+
+$sheet->setCellValue('B25', $nombrePuesto);
+
+// Obtener la dirección asociada al empleado
+//$direccion = CatDireccion::findOne($model->empleado->informacionLaboral->cat_direccion_id);
+
+// Verificar si la dirección no es '1.- GENERAL' y si se ha ingresado un nombre de Jefe de Departamento
+//if ($direccion && $direccion->nombre_direccion !== '1.- GENERAL' && $model->nombre_jefe_departamento) {
+    //$nombreCompletoJefe = mb_strtoupper($model->nombre_jefe_departamento, 'UTF-8');
+  //  $sheet->setCellValue('H24', $nombreCompletoJefe);
+//} else {
+    //$sheet->setCellValue('H24', null);
+////}
+
+
+
+
+  // Buscar el registro en junta_gobierno que corresponde a un Director
+  $juntaGobierno = JuntaGobierno::find()
+  ->where(['nivel_jerarquico' => 'Director'])
+  ->all();
+
+$directorGeneral = null;
+
+// Recorrer todos los registros de junta_gobierno encontrados
+foreach ($juntaGobierno as $junta) {
+  $empleado = Empleado::findOne($junta->empleado_id);
+
+  if ($empleado && $empleado->informacionLaboral->catPuesto->nombre_puesto === 'DIRECTOR GENERAL') {
+      $directorGeneral = $empleado;
+      break;
+  }
+}
+
+// Establecer el valor en la celda N23 si se encontró un Director General
+if ($directorGeneral) {
+  $nombre = mb_strtoupper($directorGeneral->nombre, 'UTF-8');
+  $apellido = mb_strtoupper($directorGeneral->apellido, 'UTF-8');
+  $nombreCompleto = $apellido . ' ' . $nombre;
+  $sheet->setCellValue('N24', $nombreCompleto);
+} else {
+
+}
+
+$sheet->setCellValue('N25', 'DIRECTOR GENERAL');
+
+$tempFileName = Yii::getAlias('@app/runtime/archivos_temporales/cambio_dia_laboral.xlsx');
+$writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+$writer->save($tempFileName);
+
+// Luego, proporciona un enlace para que el usuario descargue el archivo
+// Puedes redirigir a una acción que presente el enlace o generar directamente el enlace aquí mismo
+return $this->redirect(['download', 'filename' => basename($tempFileName)]);
+    }
+
+
+
+
+
+    public function actionDownload($filename)
+    {
+        $filePath = Yii::getAlias("@app/runtime/archivos_temporales/$filename");
+        if (file_exists($filePath)) {
+            return Yii::$app->response->sendFile($filePath);
+        } else {
+            throw new NotFoundHttpException('El archivo solicitado no existe.');
+        }
     }
 
 }

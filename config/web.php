@@ -25,7 +25,10 @@ $config = [
     ],
     'components' => [
         
-       
+        'mpdf' => [
+            'class' => 'Mpdf\Mpdf',
+            'tempDir' => '@runtime/mpdf', // Ruta al directorio temporal deseado
+        ],
         'view' => [
             'theme' => [
                 'pathMap' => [

@@ -3,7 +3,8 @@
 use hail812\adminlte\widgets\Alert;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
-
+use app\models\Empleado;
+use app\models\JuntaGobierno;
 /* @var $this yii\web\View */
 /* @var $model app\models\CambioDiaLaboral */
 
@@ -27,9 +28,35 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'method' => 'post',
                             ],
                         ]) ?>
-                                            <?php if ($model->solicitud->status === 'Aprobado'): ?>
-                            <?= Html::a('Exportar Excel', ['export', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
-                        <?php endif; ?>
+                                      <?php
+
+
+// Obtener el ID del usuario que tiene la sesión iniciada
+$usuarioId = Yii::$app->user->identity->id;
+
+// Buscar el empleado relacionado con el usuario
+$empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();
+
+if ($empleado) {
+    $model->empleado_id = $empleado->id;
+
+    // Buscar el registro en junta_gobierno que corresponde al empleado
+    $juntaGobierno = JuntaGobierno::find()->where(['empleado_id' => $empleado->id])->one();
+
+    if ($model->solicitud->status === 'Aprobado') {
+        if ($juntaGobierno && ($juntaGobierno->nivel_jerarquico === 'Jefe de unidad' || $juntaGobierno->nivel_jerarquico === 'Director')){
+            echo Html::a('Exportar Excel', ['export-segundo-caso', 'id' => $model->id], ['class' => 'btn btn-success']);
+            echo Html::a('Exportar PDF', ['export-pdf', 'id' => $model->id], ['class' => 'btn btn-danger']);
+        } else {
+            echo Html::a('Exportar Excel', ['export', 'id' => $model->id], ['class' => 'btn btn-primary']);
+            echo Html::a('Exportar PDF', ['export-pdf', 'id' => $model->id], ['class' => 'btn btn-danger']);
+        }
+    }
+} else {
+    Yii::$app->session->setFlash('error', 'No se pudo encontrar el empleado asociado al usuario actual.');
+    return $this->redirect(['index']);
+}
+?>
                           
                     </p>
 

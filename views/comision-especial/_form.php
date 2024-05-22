@@ -6,6 +6,8 @@ use kartik\daterange\DateRangePicker;
 use yii\helpers\ArrayHelper;
 use app\models\JuntaGobierno; 
 use kartik\select2\Select2;
+use app\models\Empleado;
+
 /* @var $this yii\web\View */
 /* @var $model app\models\ComisionEspecial */
 /* @var $form yii\bootstrap4\ActiveForm */
@@ -40,11 +42,35 @@ use kartik\select2\Select2;
 
 <?= $form->field($motivoFechaPermisoModel, 'motivo')->textarea(['rows' => 4]) ?>
 
+<?php
 
-<?php 
+
+
+// Obtener el ID del usuario que tiene la sesión iniciada
+$usuarioId = Yii::$app->user->identity->id;
+
+// Buscar el empleado relacionado con el usuario
+$empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();
+
+$mostrarCampo = true;
+
+if ($empleado) {
+    // Buscar el registro en junta_gobierno que corresponde al empleado
+    $juntaGobierno = JuntaGobierno::find()
+        ->where(['empleado_id' => $empleado->id])
+        ->andWhere(['nivel_jerarquico' => ['Director', 'Jefe de unidad']])
+        ->one();
+
+    if ($juntaGobierno) {
+        // Si se encuentra un registro con nivel jerárquico "Director" o "Jefe de unidad", no mostrar el campo
+        $mostrarCampo = false;
+    }
+}
+
 $direccion = $model->empleado->informacionLaboral->catDireccion;
 
-if ($direccion && in_array($direccion->nombre_direccion, ['2.- ADMINISTRACIÓN', '3.- COMERCIAL', '4.- OPERACIONES', '5.- PLANEACION'])) : ?>
+if ($mostrarCampo && $direccion && in_array($direccion->nombre_direccion, ['2.- ADMINISTRACIÓN', '3.- COMERCIAL', '4.- OPERACIONES', '5.- PLANEACION'])) :
+    ?>
     <?= $form->field($model, 'jefe_departamento_id')->widget(Select2::classname(), [
         'data' => ArrayHelper::map(
             JuntaGobierno::find()
@@ -64,6 +90,7 @@ if ($direccion && in_array($direccion->nombre_direccion, ['2.- ADMINISTRACIÓN',
 
     <?= $form->field($model, 'nombre_jefe_departamento')->hiddenInput()->label(false) ?>
 <?php endif; ?>
+
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

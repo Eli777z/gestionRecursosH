@@ -17,8 +17,8 @@ class SolicitudSearch extends Solicitud
     public function rules()
     {
         return [
-            [['id', 'empleado_id', 'status'], 'integer'],
-            [['fecha_creacion', 'comentario', 'fecha_aprobacion', 'nombre_aprobante', 'nombre_formato'], 'safe'],
+            [['id', 'empleado_id'], 'integer'],
+            [['fecha_creacion', 'comentario', 'fecha_aprobacion', 'nombre_aprobante', 'nombre_formato', 'status'], 'safe'],
         ];
     }
 
@@ -67,7 +67,9 @@ class SolicitudSearch extends Solicitud
 
         $query->andFilterWhere(['like', 'comentario', $this->comentario])
             ->andFilterWhere(['like', 'nombre_aprobante', $this->nombre_aprobante])
-            ->andFilterWhere(['like', 'nombre_formato', $this->nombre_formato]);
+            ->andFilterWhere(['like', 'nombre_formato', $this->nombre_formato])
+
+            ->andFilterWhere(['like', 'status', $this->status]);
 
         return $dataProvider;
     }
