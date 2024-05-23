@@ -68,7 +68,18 @@ $this->params['breadcrumbs'][] = $this->title;
             'filter' => Html::activeDropDownList($searchModel, 'status', ['Aprobado' => 'Aprobado', 'En Proceso' => 'En Proceso', 'Rechazado' => 'Rechazado'], ['class' => 'form-control', 'prompt' => 'Todos']),
         ],
         'comentario:ntext',
-        'nombre_formato',
+       
+
+[
+'attribute' => 'nombre_formato',
+'label' => 'Tipo de solicitud',
+'value' => function ($model){
+return $model->nombre_formato;
+
+}
+    
+],
+
         ['class' => 'hail812\adminlte3\yii\grid\ActionColumn'],
     ],
     'summaryOptions' => ['class' => 'summary mb-2'],
