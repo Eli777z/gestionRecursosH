@@ -32,10 +32,11 @@ $count = count($notificaciones);
                     <?php echo Html::a('CAMBIO DE DÍA LABORAL', Url::to(['cambio-dia-laboral/index']), ['class' => 'dropdown-item']); ?>
                     </li>
                     <li class="list-group-item">
-                        <a href="#" class="dropdown-item">PERMISO SIN GOCE DE SUELDO</a>
+                    <?php echo Html::a('CAMBIO DE HORARIO DE TRABAJO', Url::to(['cambio-horario-trabajo/index']), ['class' => 'dropdown-item']); ?>
                     </li>
                     <li class="list-group-item">
-                        <a href="#" class="dropdown-item">CAMBIO DE DÍA LABORAL</a>
+                    <?php echo Html::a('PERMISO ECONÓMICO', Url::to(['permiso-economico/index']), ['class' => 'dropdown-item']); ?>
+
                     </li>
                     <li class="list-group-item">
                         <a href="#" class="dropdown-item">CAMBIO DE HORARIO DE TRABAJO</a>
