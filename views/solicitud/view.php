@@ -19,10 +19,11 @@ $this->params['breadcrumbs'][] = $this->title;
                     <div class="d-flex justify-content-between"> 
                         
                         <div class="form-group mr-2">
+                        <?= Html::beginForm(['aprobar-solicitud', 'id' => $model->id], 'post', ['class' => 'form-inline']) ?>
                             <?= Html::label('Añadir Comentarios:', null, ['class' => 'control-label']) ?>
                             <?= Html::textInput('comentario', $model->comentario, ['class' => 'form-control']) ?>
                         </div>
-                        <?= Html::beginForm(['aprobar-solicitud', 'id' => $model->id], 'post', ['class' => 'form-inline']) ?>
+                        
                         <div class="form-group mr-2 mb-2">
                             <?= Html::submitButton(Html::tag('i', '  Aprobar', ['class' => 'fas fa-check']), ['name' => 'status', 'value' => 'Aprobado', 'class' => 'btn btn-success', 'title' => 'Aceptar']) ?>
                         </div>

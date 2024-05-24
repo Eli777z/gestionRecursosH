@@ -36,10 +36,10 @@ $count = count($notificaciones);
                     </li>
                     <li class="list-group-item">
                     <?php echo Html::a('PERMISO ECONÓMICO', Url::to(['permiso-economico/index']), ['class' => 'dropdown-item']); ?>
-
+             
                     </li>
                     <li class="list-group-item">
-                        <a href="#" class="dropdown-item">CAMBIO DE HORARIO DE TRABAJO</a>
+                    <?php echo Html::a('PERMISO SIN GOCE DE SUELDO', Url::to(['permiso-sin-sueldo/index']), ['class' => 'dropdown-item']); ?>
                     </li>
                     <li class="list-group-item">
                         <a href="#" class="dropdown-item">CAMBIO DE PERIODO VACACIONAL</a>

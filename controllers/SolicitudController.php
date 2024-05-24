@@ -90,26 +90,23 @@ class SolicitudController extends Controller
             $status = Yii::$app->request->post('status');
             $comentario = Yii::$app->request->post('comentario');
     
-            // Actualizar el estado y el comentario
             $model->status = $status;
             $model->comentario = $comentario;
     
-            // Obtener el empleado que inició sesión
             $usuarioId = Yii::$app->user->identity->id;
             $empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();
     
             if ($empleado) {
-                // Actualizar la fecha de aprobación y el nombre del aprobante
                 $model->fecha_aprobacion = date('Y-m-d H:i:s');
                 $model->nombre_aprobante = $empleado->nombre . ' ' . $empleado->apellido;
     
                 if ($model->save()) {
                     $notificacion = new Notificacion();
                     $notificacion->usuario_id = $model->empleado->usuario_id;
-                    
                     $notificacion->mensaje = 'Su solicitud ha sido ' . ($status == 'Aprobado' ? 'aprobada' : 'rechazada') . '.';
                     $notificacion->created_at = date('Y-m-d H:i:s');
-                    $notificacion->leido = 0; // Marcar la notificación como no leída
+                    $notificacion->leido = 0;
+    
                     if ($notificacion->save()) {
                         Yii::$app->session->setFlash('success', 'Solicitud modificada correctamente.');
                     } else {

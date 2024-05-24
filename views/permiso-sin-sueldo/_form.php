@@ -8,10 +8,9 @@ use app\models\JuntaGobierno;
 use kartik\select2\Select2;
 use app\models\Empleado;
 /* @var $this yii\web\View */
-/* @var $model app\models\PermisoEconomico */
+/* @var $model app\models\PermisoSinSueldo */
 /* @var $form yii\bootstrap4\ActiveForm */
 ?>
-
 <div class="permiso-economico-form">
 <div class="form-group">
     <label class="control-label">No Permiso Anterior</label>
