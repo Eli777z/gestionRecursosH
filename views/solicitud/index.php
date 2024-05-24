@@ -1,29 +1,31 @@
 <?php
 
 use yii\helpers\Html;
-use yii\grid\GridView;
+
 use yii\widgets\Pjax;
+use kartik\select2\Select2;
+use yii\grid\GridView;
+use kartik\daterange\DateRangePicker;
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\SolicitudSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Solicituds';
+$this->title = 'Solicitudes';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-12">
             <div class="card">
+            <div class="card-header bg-primary text-white"> <!-- Agregando las clases bg-primary y text-white -->
+                    <h3><?= Html::encode($this->title) ?></h3>
+                </div>
                 <div class="card-body">
-                    <div class="row mb-2">
-                        <div class="col-md-12">
-                            <?= Html::a('Create Solicitud', ['create'], ['class' => 'btn btn-success']) ?>
-                        </div>
-                    </div>
+         
+                    <?php
 
-
-                    <?php Pjax::begin(); ?>
-<?= GridView::widget([
+                    Pjax::begin(['id' => 'pjax-container']);
+                    echo GridView::widget([
     'dataProvider' => $dataProvider,
     'filterModel' => $searchModel,
     
@@ -35,6 +37,24 @@ $this->params['breadcrumbs'][] = $this->title;
             'value' => function ($model) {
                 return $model->empleado ? $model->empleado->nombre . ' ' . $model->empleado->apellido : 'N/A';
             },
+            'filter' => Select2::widget([
+                'model' => $searchModel,
+                'attribute' => 'empleado_id',
+                'data' => \yii\helpers\ArrayHelper::map(\app\models\Empleado::find()->all(), 'id', function($model) {
+                    return $model->nombre . ' ' . $model->apellido;
+                }), 
+                'options' => ['placeholder' => 'Seleccione un empleado'],
+                'pluginOptions' => [
+                    'allowClear' => true
+                ],
+                'theme' => Select2::THEME_BOOTSTRAP, // Esto aplicará el estilo de Bootstrap al Select2
+                'pluginEvents' => [
+                    'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }", // Aquí se personaliza el icono de borrar
+                ],
+                'pluginEvents' => [
+                    'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }", // Agregar un margen izquierdo
+                ],
+            ]),
         ],
         [
             'attribute' => 'fecha_creacion',
@@ -43,10 +63,32 @@ $this->params['breadcrumbs'][] = $this->title;
                 setlocale(LC_TIME, "es_419");
                 return strftime('%A, %d de %B de %Y', strtotime($model->fecha_creacion));
             },
+            'filter' => DateRangePicker::widget([
+                'model' => $searchModel,
+                'attribute' => 'fecha_creacion',
+                'pluginOptions' => [
+                    'singleDatePicker' => true,
+                    'showDropdowns' => true,
+                    'autoUpdateInput' => true,
+                    'locale' => [
+                        'format' => 'Y-m-d',
+                    ],
+                    'opens' => 'right',
+                ],
+                'options' => [
+                    'placeholder' => 'Selecciona una fecha',
+                    'autocomplete' => 'off', // Desactivar las sugerencias del navegador
+
+                ],
+            ]),
         ],
+        
+        
+        
         [
             'attribute' => 'status',
             'format' => 'raw',
+            'label' => 'Estatus',
             'value' => function ($model) {
                 $status = '';
                 switch ($model->status) {
@@ -67,27 +109,62 @@ $this->params['breadcrumbs'][] = $this->title;
             },
             'filter' => Html::activeDropDownList($searchModel, 'status', ['Aprobado' => 'Aprobado', 'En Proceso' => 'En Proceso', 'Rechazado' => 'Rechazado'], ['class' => 'form-control', 'prompt' => 'Todos']),
         ],
-        'comentario:ntext',
+        [
+            'attribute' => 'comentario',
+            'format' => 'ntext',
+            // Aquí se deshabilita el filtro
+            'filter' => false,
+        ],
        
 
-[
-'attribute' => 'nombre_formato',
-'label' => 'Tipo de solicitud',
-'value' => function ($model){
-return $model->nombre_formato;
+        [
+            'attribute' => 'nombre_formato',
+            'label' => 'Tipo de solicitud',
+            'value' => function ($model) {
+                return $model->nombre_formato;
+            },
+            'filter' => Select2::widget([
+                'model' => $searchModel,
+                'attribute' => 'nombre_formato',
+                'data' => \yii\helpers\ArrayHelper::map(\app\models\Solicitud::find()->select(['nombre_formato'])->distinct()->all(), 'nombre_formato', 'nombre_formato'), // Asegúrate de que 'nombre_formato' sea el nombre correcto del campo en tu tabla Solicitud
+                'options' => ['placeholder' => 'Seleccione un tipo de solicitud'],
+                'pluginOptions' => [
+                    'allowClear' => true
 
-}
-    
-],
+                    
+                ],
+                'theme' => Select2::THEME_BOOTSTRAP, // Esto aplicará el estilo de Bootstrap al Select2
+                'pluginEvents' => [
+                    'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }", // Aquí se personaliza el icono de borrar
+                ],
+                'pluginEvents' => [
+                    'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }", // Agregar un margen izquierdo
+                ],
+            ]),
+        ],
 
         ['class' => 'hail812\adminlte3\yii\grid\ActionColumn'],
     ],
     'summaryOptions' => ['class' => 'summary mb-2'],
     'pager' => [
         'class' => 'yii\bootstrap4\LinkPager',
-    ]
-]); ?>
-<?php Pjax::end(); ?>
+    ],
+    // Agregar el botón de reinicio fuera del GridView
+   
+    
+]); 
+Pjax::end();
+
+// Script para actualizar el contenedor Pjax cada 30 segundos
+$script = <<< JS
+    setInterval(function(){
+        $.pjax.reload({container:'#pjax-container'});
+    }, 20000);
+JS;
+
+// Registrar el script en la vista
+$this->registerJs($script);
+ ?>
 
 
                 </div>

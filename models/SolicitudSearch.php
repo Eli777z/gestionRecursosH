@@ -65,8 +65,8 @@ class SolicitudSearch extends Solicitud
             'fecha_aprobacion' => $this->fecha_aprobacion,
         ]);
 
-        $query->andFilterWhere(['like', 'comentario', $this->comentario])
-            ->andFilterWhere(['like', 'nombre_aprobante', $this->nombre_aprobante])
+        $query->
+andFilterWhere(['like', 'nombre_aprobante', $this->nombre_aprobante])
             ->andFilterWhere(['like', 'nombre_formato', $this->nombre_formato])
 
             ->andFilterWhere(['like', 'status', $this->status]);
