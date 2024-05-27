@@ -62,7 +62,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                         'attribute' => 'fecha_creacion',
                                         'format' => 'raw',
                                         'value' => function ($model) {
-                                            setlocale(LC_TIME, "es_419");
+                                            setlocale(LC_TIME, "es_419.UTF-8");
                                             return strftime('%A, %d de %B de %Y', strtotime($model->fecha_creacion));
                                         },
                                     ],

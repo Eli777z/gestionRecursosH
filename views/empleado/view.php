@@ -23,6 +23,7 @@ use kartik\detail\DetailView;
 use app\models\ExpedienteSearch;
 //use yii\bootstrap4\ActiveForm;
 use kartik\form\ActiveForm;
+use yii\jui\DatePicker;
 use kartik\daterange\DateRangePicker;
 use yii\helpers\ArrayHelper;
 use app\models\Departamento;
@@ -46,6 +47,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Empleados', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 $activeTab = Yii::$app->request->get('tab', 'info_p');
+$currentDate = date('Y-m-d');
 
 ?>
 <div class="container-fluid">
@@ -56,15 +58,9 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
                     <div class="row">
                         <div class="col-md-12">
                             <div class="d-flex align-items-center mb-3">
-                            <?php 
-    // Mostrar los flash messages
-    foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
-        echo Alert::widget([
-            'options' => ['class' => 'alert-' . $type],
-            'body' => $message,
-        ]);
-    }
-    ?>
+
+
+
                                 <?php
                                 // Registro de script
                                 $this->registerJs("
@@ -99,6 +95,28 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
                                 <?php ActiveForm::end(); ?>
 
                                 <h2 class="mb-0"> Empleado: <?= $model->nombre ?> <?= $model->apellido ?></h2>
+                                <?php
+                                // Mostrar los flash messages
+
+
+
+                                // En tu vista donde deseas mostrar los mensajes de flash:
+                                foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
+                                    if ($type === 'error') {
+                                        // Muestra los mensajes de error en rojo
+                                        echo Alert::widget([
+                                            'options' => ['class' => 'alert-danger'],
+                                            'body' => $message,
+                                        ]);
+                                    } else {
+                                        // Muestra los demás mensajes de flash con estilos predeterminados
+                                        echo Alert::widget([
+                                            'options' => ['class' => 'alert-' . $type],
+                                            'body' => $message,
+                                        ]);
+                                    }
+                                }
+                                ?>
                             </div>
                             <?php $this->beginBlock('datos'); ?>
 
@@ -120,81 +138,64 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
                                 'options' => ['pushState' => false], // Deshabilita el uso de la API pushState para navegadores que la soportan
                             ]); ?>
 
-                            <?= DetailView::widget([
-                                'model' => $model,
-                                'condensed' => true,
-                                'hover' => true,
-                                'buttons1' => '{update}',
-                                'mode' => DetailView::MODE_VIEW,
-                                'panel' => [
-                                    'heading' => 'Información Personal',
-                                    'type' =>  DetailView::TYPE_PRIMARY
+<div class="card">
+                                        <div class="card-header bg-primary text-white"> <!-- Agregando las clases bg-primary y text-white -->
+                                            <h3>Información personal</h3>
 
-                                ],
-                                'attributes' => [
-                                    'numero_empleado',
-                                    'nombre',
-                                    'apellido',
-                                    [
-                                        'attribute' => 'fecha_nacimiento',
-                                        'type' => DetailView::INPUT_DATE,
-                                        'format' => ['date', 'php:Y-m-d'], // Formato de fecha
-                                        'displayFormat' => 'php:Y-m-d',
-                                        'widgetOptions' => [
-                                            'pluginOptions' => [
-                                                'format' => 'yyyy-mm-dd', // Formato deseado para la fecha
-                                                'autoclose' => true,
-                                            ]
-                                        ],
-                                    ],
-                                    [
-                                        'attribute' => 'edad',
-                                        // 'type' => d, // Establece el campo como de solo lectura
-                                        'displayOnly' => 'true',
-                                    ],
+                                        </div>
+                                        <div class="card-body">
 
-                                    [
-                                        'attribute' => 'sexo',
-                                        'type' => DetailView::INPUT_SELECT2,
-                                        'widgetOptions' => [
-                                            'data' => ['Masculino' => 'Masculino', 'Femenino' => 'Femenino'],
-                                            'options' => ['prompt' => 'Seleccionar Sexo'],
-                                        ],
-                                    ],
+<?php $form = ActiveForm::begin([
+    'action' => ['actualizar-informacion', 'id' => $model->id]
+]); ?>
 
-                                    [
-                                        'attribute' => 'estado_civil',
-                                        'type' => DetailView::INPUT_SELECT2,
-                                        'widgetOptions' => [
-                                            'data' => [
-                                                'Masculino' => [
-                                                    'Soltero' => 'Soltero',
-                                                    'Casado' => 'Casado',
-                                                    'Separado' => 'Separado',
-                                                    'Viudo' => 'Viudo',
-                                                ],
-                                                'Femenino' => [
-                                                    'Soltero' => 'Soltera',
-                                                    'Casado' => 'Casada',
-                                                    'Separado' => 'Separada',
-                                                    'Viudo' => 'Viuda',
-                                                ],
-                                            ],
-                                            'options' => ['prompt' => 'Seleccionar Estado Civil'],
-                                        ],
-                                    ],
+<?= $form->field($model, 'numero_empleado')->textInput(['readonly' => true]); ?>
+<?= $form->field($model, 'nombre')->textInput(); ?>
+<?= $form->field($model, 'apellido')->textInput(); ?>
+<?= $form->field($model, 'fecha_nacimiento')->widget(DatePicker::class, [
+    'language' => 'es',
+    'dateFormat' => 'yyyy-MM-dd',
+    'options' => [
+        'class' => 'form-control',
+        'autocomplete' => 'off'
+    ],
+    'clientOptions' => [
+        'changeYear' => true,
+        'changeMonth' => true,
+        'yearRange' => '-100:+0',
+    ],
+]); ?>
 
+<?= $form->field($model, 'edad')->textInput(['readonly' => true]); ?>
+<?= $form->field($model, 'sexo')->dropDownList(['Masculino' => 'Masculino', 'Femenino' => 'Femenino'], ['prompt' => 'Seleccionar Sexo']); ?>
+<?= $form->field($model, 'estado_civil')->widget(Select2::className(), [
+    'data' => [
+        'Masculino' => [
+            'Soltero' => 'Soltero',
+            'Casado' => 'Casado',
+            'Separado' => 'Separado',
+            'Viudo' => 'Viudo',
+        ],
+        'Femenino' => [
+            'Soltero' => 'Soltera',
+            'Casado' => 'Casada',
+            'Separado' => 'Separada',
+            'Viudo' => 'Viuda',
+        ],
+    ],
+    'options' => ['prompt' => 'Seleccionar Estado Civil'],
+    'pluginOptions' => [
+        'allowClear' => true
+    ],
+]); ?>
 
+<div class="form-group">
+    <?= Html::submitButton('Guardar', ['class' => 'btn btn-primary']) ?>
+</div>
 
-                                    ///   'codigo_postal',
-                                    //  'calle',
-                                    //'numero_casa',
-                                    //'colonia',
-                                ],
-                                'formOptions' => [
-                                    'action' => ['actualizar-informacion', 'id' => $model->id],
-                                ],
-                            ]); ?>
+<?php ActiveForm::end(); ?>
+</div>
+                                    </div>
                             <?php Pjax::end(); ?>
                             <?php $this->endBlock(); ?>
 
@@ -203,77 +204,62 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
                             <br>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <?= DetailView::widget([
-                                        'model' => $model,
-                                        'condensed' => true,
-                                        'hover' => true,
-                                        'buttons1' => '{update}',
-                                        'mode' => DetailView::MODE_VIEW,
-                                        'panel' => [
-                                            'heading' => 'Información de Contacto',
-                                            'type' => DetailView::TYPE_PRIMARY,
-                                            //'before' => '<h3>Información de contacto de emergencia</h3>',
-                                        ],
-                                        'attributes' => [
-                                            'email:email',
-                                            'telefono',
-                                            'colonia',
-                                            'calle',
-                                            'numero_casa',
-                                            'codigo_postal',
+                                    <div class="card">
+                                        <div class="card-header bg-primary text-white"> <!-- Agregando las clases bg-primary y text-white -->
+                                            <h3>Información de contacto</h3>
+
+                                        </div>
+                                        <div class="card-body">
+                                            <?php $form = ActiveForm::begin([
+                                                'action' => ['actualizar-informacion-contacto', 'id' => $model->id]
+                                            ]); ?>
+
+                                            <?= $form->field($model, 'email')->textInput(['maxlength' => true]); ?>
+                                            <?= $form->field($model, 'telefono')->textInput(['maxlength' => true]); ?>
+                                            <?= $form->field($model, 'colonia')->textInput(['maxlength' => true]); ?>
+                                            <?= $form->field($model, 'calle')->textInput(['maxlength' => true]); ?>
+                                            <?= $form->field($model, 'numero_casa')->textInput(['maxlength' => true]); ?>
+                                            <?= $form->field($model, 'codigo_postal')->textInput(['maxlength' => true]); ?>
 
 
-                                        ],
-                                        'formOptions' => [
-                                            'action' => ['actualizar-informacion-contacto', 'id' => $model->id],
-                                        ],
-                                    ]) ?>
-
+                                            <div class="form-group">
+                                                <?= Html::submitButton('Guardar', ['class' => 'btn btn-primary']) ?>
+                                            </div>
+                                            <?php ActiveForm::end(); ?>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <?= DetailView::widget([
-                                        'model' => $model,
-                                        'condensed' => true,
-                                        'hover' => true,
-                                        'buttons1' => '{update}',
+                                <div class="card">
+                                        <div class="card-header bg-primary text-white"> <!-- Agregando las clases bg-primary y text-white -->
+                                            <h3>Información de contacto de emergencia</h3>
 
-                                        'mode' => DetailView::MODE_VIEW,
-                                        'panel' => [
-                                            'heading' => 'Información de Contacto de emergencia',
-                                            'type' => DetailView::TYPE_PRIMARY,
-                                            //'before' => '<h3>Información de contacto de emergencia</h3>',
-                                        ],
-                                        'attributes' => [
+                                        </div>
+                                        <div class="card-body">
+        <?php $form = ActiveForm::begin([
+            'action' => ['actualizar-informacion-contacto', 'id' => $model->id]
+        ]); ?>
 
-                                            'nombre_contacto_emergencia',
+        <?= $form->field($model, 'nombre_contacto_emergencia')->textInput(['maxlength' => true]); ?>
 
-                                            [
-                                                'attribute' =>  'relacion_contacto_emergencia',
-                                                'type' => DetailView::INPUT_SELECT2,
-                                                'widgetOptions' => [
-                                                    'data' => [
-                                                        'Padre' => 'Padre',
-                                                        'Madre' => 'Madre',
-                                                        'Esposo/a' => 'Esposo/a',
-                                                        'Hijo/a' => 'Hijo/a',
-                                                        'Hermano/a' => 'Hermano/a',
-                                                        'Compañero/a de trabajo' =>  'Compañero/a de trabajo',
-                                                        'Tio/a' => 'Tio/a'
+        <?= $form->field($model, 'relacion_contacto_emergencia')->dropDownList([
+            'Padre' => 'Padre',
+            'Madre' => 'Madre',
+            'Esposo/a' => 'Esposo/a',
+            'Hijo/a' => 'Hijo/a',
+            'Hermano/a' => 'Hermano/a',
+            'Compañero/a de trabajo' => 'Compañero/a de trabajo',
+            'Tio/a' => 'Tio/a'
+        ], ['prompt' => 'Seleccionar parentesco']); ?>
 
+        <?= $form->field($model, 'telefono_contacto_emergencia')->textInput(['maxlength' => true]); ?>
 
-
-                                                    ],
-                                                    'options' => ['prompt' => 'Seleccionar parentesco'],
-                                                ],
-                                            ],
-                                            'telefono_contacto_emergencia',
-                                        ],
-                                        'formOptions' => [
-                                            'action' => ['actualizar-informacion-contacto', 'id' => $model->id],
-                                            'enableAjaxValidation' => true,
-
-                                        ],
-                                    ]) ?>
+        <div class="form-group">
+            <?= Html::submitButton('Guardar', ['class' => 'btn btn-primary']) ?>
+        </div>
+        <?php ActiveForm::end(); ?>
+    </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -292,7 +278,7 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
 
                             // Definir los atributos
                             $attributes = [
-                                
+
                                 [
                                     'attribute' => 'cat_departamento_id',
                                     'label' => 'Departamento',
@@ -326,7 +312,7 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
                                 // Agregar la fila "Director de dirección"
                                 [
                                     'label' => 'Director de dirección',
-                                    'value' => $juntaDirectorDireccion ? $juntaDirectorDireccion->profesion . ' '.$juntaDirectorDireccion->empleado->nombre . ' ' . $juntaDirectorDireccion->empleado->apellido : null,
+                                    'value' => $juntaDirectorDireccion ? $juntaDirectorDireccion->profesion . ' ' . $juntaDirectorDireccion->empleado->nombre . ' ' . $juntaDirectorDireccion->empleado->apellido : null,
                                 ],
 
                                 [
@@ -343,7 +329,7 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
 
 
 
-                               
+
                                 [
                                     'attribute' => 'cat_puesto_id',
                                     'label' => 'Puesto',
@@ -392,15 +378,13 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
                                             }
                                         ),
                                         'options' => ['prompt' => 'Seleccionar Jefe o director a cargo'],
-                                        'pluginOptions' => [
-                                           
-                                        ],
+                                        'pluginOptions' => [],
                                     ],
                                 ],
-                                
-                                
-                                
-                                
+
+
+
+
 
 
 
@@ -450,6 +434,110 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
                             ]); ?>
 
                             <?php $this->endBlock(); ?>
+                            <?php $this->beginBlock('info_vacacional'); ?>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header bg-primary text-white"> <!-- Agregando las clases bg-primary y text-white -->
+                                            <h3>PRIMER PERIODO</h3>
+                                            <?php setlocale(LC_TIME, "es_419.UTF-8"); ?>
+                                            <label class="control-label">
+                                                <?= mb_strtoupper(strftime('%A, %d de %B de %Y', strtotime($model->informacionLaboral->vacaciones->periodoVacacional->fecha_inicio))) ?>
+                                                ---
+                                                <?= mb_strtoupper(strftime('%A, %d de %B de %Y', strtotime($model->informacionLaboral->vacaciones->periodoVacacional->fecha_final))) ?>
+                                            </label>
+                                        </div>
+                                        <div class="card-body">
+                                            <?php $form = ActiveForm::begin(['action' => ['actualizar-primer-periodo', 'id' => $model->id]]); ?>
+
+                                            <?= $form->field($model->informacionLaboral->vacaciones->periodoVacacional, 'año')->textInput(['type' => 'number']) ?>
+
+                                            <?= $form->field($model->informacionLaboral->vacaciones->periodoVacacional, 'dateRange')->widget(DateRangePicker::class, [
+                                                'convertFormat' => true,
+                                                'pluginOptions' => [
+                                                    'locale' => [
+                                                        'format' => 'Y-m-d',
+                                                        'separator' => ' a ',
+                                                    ],
+                                                    'opens' => 'left',
+                                                    'singleDatePicker' => false,
+                                                    'showDropdowns' => true,
+                                                    'alwaysShowCalendars' => true,
+                                                    'minDate' => '2000-01-01',  // Ajusta según tu necesidad
+                                                    'maxDate' => '2100-12-31',  // Ajusta según tu necesidad
+                                                    'startDate' => $currentDate, // Fecha de inicio predeterminada
+                                                    'endDate' => $currentDate, // Fecha de fin predeterminada
+                                                    'autoApply' => true,
+                                                ]
+                                            ])->label('Seleccionar ango de fechas del primer periodo:') ?>
+                                            <label class="control-label">
+
+
+
+
+                                                <?= $form->field($model->informacionLaboral->vacaciones->periodoVacacional, 'original')->dropDownList(['Si' => 'Si', 'No' => 'No'], ['prompt' => 'Selecciona una opción...']) ?>
+
+                                                <div class="form-group">
+                                                    <?= Html::submitButton('Guardar', ['class' => 'btn btn-primary']) ?>
+                                                </div>
+
+                                                <?php ActiveForm::end(); ?>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header bg-primary text-white"> <!-- Agregando las clases bg-primary y text-white -->
+                                            <h3>SEGUNDO PERIODO</h3>
+                                            <?php setlocale(LC_TIME, "es_419.UTF-8"); ?>
+                                            <label class="control-label">
+                                                <?= mb_strtoupper(strftime('%A, %d de %B de %Y', strtotime($model->informacionLaboral->vacaciones->segundoPeriodoVacacional->fecha_inicio))) ?>
+                                                ---
+                                                <?= mb_strtoupper(strftime('%A, %d de %B de %Y', strtotime($model->informacionLaboral->vacaciones->segundoPeriodoVacacional->fecha_final))) ?>
+                                            </label>
+                                        </div>
+                                        <div class="card-body">
+                                            <?php $form = ActiveForm::begin(['action' => ['actualizar-segundo-periodo', 'id' => $model->id]]); ?>
+
+                                            <?= $form->field($model->informacionLaboral->vacaciones->segundoPeriodoVacacional, 'año')->textInput(['type' => 'number']) ?>
+
+                                            <?= $form->field($model->informacionLaboral->vacaciones->segundoPeriodoVacacional, 'dateRange')->widget(DateRangePicker::class, [
+                                                'convertFormat' => true,
+                                                'pluginOptions' => [
+                                                    'locale' => [
+                                                        'format' => 'Y-m-d',
+                                                        'separator' => ' a ',
+                                                    ],
+                                                    'opens' => 'left',
+                                                    'singleDatePicker' => false,
+                                                    'showDropdowns' => true,
+                                                    'alwaysShowCalendars' => true,
+                                                    'minDate' => '2000-01-01',  // Ajusta según tu necesidad
+                                                    'maxDate' => '2100-12-31',  // Ajusta según tu necesidad
+                                                    'startDate' => $currentDate, // Fecha de inicio predeterminada
+                                                    'endDate' => $currentDate, // Fecha de fin predeterminada
+                                                    'autoApply' => true,
+                                                ]
+                                            ])->label('Seleccionar ango de fechas del segundo periodo:') ?>
+                                            <label class="control-label">
+
+
+
+
+                                                <?= $form->field($model->informacionLaboral->vacaciones->segundoPeriodoVacacional, 'original')->dropDownList(['Si' => 'Si', 'No' => 'No'], ['prompt' => 'Selecciona una opción...']) ?>
+
+                                                <div class="form-group">
+                                                    <?= Html::submitButton('Guardar', ['class' => 'btn btn-primary']) ?>
+                                                </div>
+
+                                                <?php ActiveForm::end(); ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php $this->endBlock(); ?>
+
+
 
 
                             <?php
@@ -472,6 +560,11 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
                                         'label' => 'Información laboral',
                                         'content' => $this->blocks['info_l'],
                                         'active' => $activeTab === 'info_l',
+                                    ],
+                                    [
+                                        'label' => 'Vacaciones',
+                                        'content' => $this->blocks['info_vacacional'],
+                                        'active' => $activeTab === 'info_vacacional',
                                     ],
                                 ],
                                 'position' => TabsX::POS_ABOVE,

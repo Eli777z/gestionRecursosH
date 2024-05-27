@@ -25,6 +25,7 @@ use Yii;
  * @property CatTipoContrato $catTipoContrato
  * @property Empleado[] $empleados
  * @property JuntaGobierno $juntaGobierno
+ *  @property Vacaciones $vacaciones
  */
 class InformacionLaboral extends \yii\db\ActiveRecord
 {
@@ -53,6 +54,9 @@ class InformacionLaboral extends \yii\db\ActiveRecord
             [['cat_dpto_cargo_id'], 'exist', 'skipOnError' => true, 'targetClass' => CatDptoCargo::class, 'targetAttribute' => ['cat_dpto_cargo_id' => 'id']],
 
             [['junta_gobierno_id'], 'exist', 'skipOnError' => true, 'targetClass' => JuntaGobierno::class, 'targetAttribute' => ['junta_gobierno_id' => 'id']],
+
+            [['vacaciones_id'], 'exist', 'skipOnError' => true, 'targetClass' => Vacaciones::class, 'targetAttribute' => ['vacaciones_id' => 'id']],
+
         ];
     }
 
@@ -131,6 +135,8 @@ class InformacionLaboral extends \yii\db\ActiveRecord
         return $this->hasMany(Empleado::class, ['informacion_laboral_id' => 'id']);
     }
 
+  
+
     /**
      * Gets query for [[JuntaGobierno]].
      *
@@ -140,4 +146,15 @@ class InformacionLaboral extends \yii\db\ActiveRecord
     {
         return $this->hasOne(JuntaGobierno::class, ['id' => 'junta_gobierno_id']);
     }
+
+/**
+     * Gets query for [[Vacaciones]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getVacaciones()
+    {
+        return $this->hasOne(Vacaciones::class, ['id' => 'vacaciones_id']);
+    }
+
 }

@@ -5,6 +5,7 @@ use yii\helpers\Html;
 use yii\widgets\Pjax;
 use kartik\select2\Select2;
 use yii\grid\GridView;
+use yii\jui\DatePicker;
 use kartik\daterange\DateRangePicker;
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\SolicitudSearch */
@@ -60,26 +61,23 @@ $this->params['breadcrumbs'][] = $this->title;
             'attribute' => 'fecha_creacion',
             'format' => 'raw',
             'value' => function ($model) {
-                setlocale(LC_TIME, "es_419");
+                setlocale(LC_TIME, "es_419.UTF-8");
                 return strftime('%A, %d de %B de %Y', strtotime($model->fecha_creacion));
             },
-            'filter' => DateRangePicker::widget([
+            'filter' => DatePicker::widget([
                 'model' => $searchModel,
                 'attribute' => 'fecha_creacion',
-                'pluginOptions' => [
-                    'singleDatePicker' => true,
-                    'showDropdowns' => true,
-                    'autoUpdateInput' => true,
-                    'locale' => [
-                        'format' => 'Y-m-d',
-                    ],
-                    'opens' => 'right',
-                ],
-                'options' => [
-                    'placeholder' => 'Selecciona una fecha',
-                    'autocomplete' => 'off', // Desactivar las sugerencias del navegador
+                'language' => 'es',
+    'dateFormat' => 'php:Y-m-d',
+    'options' => ['class' => 'form-control',
+                'autocomplete' => 'off',
 
-                ],
+],
+    'clientOptions' => [
+        'changeYear' => true,
+        'changeMonth' => true,
+        'yearRange' => '-100:+0',
+    ],
             ]),
         ],
         
