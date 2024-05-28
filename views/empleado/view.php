@@ -725,7 +725,13 @@ document.getElementById('cancel-button-period').addEventListener('click', functi
 
 
                             <?php $this->beginBlock('expediente'); ?>
-
+                            <div class="card">
+                                
+                                <div class="card-header bg-secondary text-white">
+                                    <h3>Expediente del empleado</h3>
+                                    
+                                </div>
+                                <div class="card-body">
                             <div class="documento-form">
 
                                 <?php $form = ActiveForm::begin(['action' => ['documento/create', 'empleado_id' => $model->id], 'options' => ['enctype' => 'multipart/form-data', 'class' => 'narrow-form']]); ?>
@@ -778,11 +784,13 @@ document.getElementById('cancel-button-period').addEventListener('click', functi
                                     ],
                                     'pluginOptions' => [
                                         'showUpload' => false,
+                                        
+        'showCancel' => false, // Oculta el botón de cancelar
                                     ],
                                 ])->label('Archivo') ?>
 
                                 <div class="form-group">
-                                    <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+                                <?= Html::submitButton('Subir archivo <i class="fa fa-upload"></i>', ['class' => 'btn btn-warning float-right', 'id' => 'save-button-personal']) ?>
                                 </div>
 
                                 <?php ActiveForm::end(); ?>
@@ -797,12 +805,13 @@ document.getElementById('cancel-button-period').addEventListener('click', functi
                             ?>
 
                             <?php Pjax::begin(); ?>
+                                <br> <br>
                             <div class="card-container">
+
                                 <?= GridView::widget([
                                     'dataProvider' => $dataProvider,
                                     'filterModel' => $searchModel,
-                                    'options' => ['class' => 'grid-view'],
-                                    'tableOptions' => ['class' => 'table table-simple table-striped table-bordered table-condensed borderless'], // Aquí agregamos la clase "table-simple"
+                                    
                                     'columns' => [
                                         ['class' => 'yii\grid\SerialColumn'],
                                         [
@@ -852,7 +861,10 @@ document.getElementById('cancel-button-period').addEventListener('click', functi
                                     ],
                                 ]); ?>
                             </div>
+                            </div>
+                                
 
+                            </div>
 
                             <?php Pjax::end(); ?>
                             <?php $this->endBlock(); ?>
