@@ -22,6 +22,7 @@ use app\models\Vacaciones;
 use yii\data\ArrayDataProvider;
 use app\models\PeriodoVacacional;
 use app\models\SegundoPeriodoVacacional;
+use yii\helpers\Url;
 
 /**
  * EmpleadoController implements the CRUD actions for Empleado model.
@@ -471,9 +472,14 @@ class EmpleadoController extends Controller
 
             if ($model->save()) {
                 // Redirige a la vista de detalles o a otra página
-                return $this->redirect(['view', 'id' => $model->id]);
+                Yii::$app->session->setFlash('success', 'Los cambios de la información personal han sido actualizados correctamente.');
+
+                $url = Url::to(['view', 'id' => $model->id,]) . '#informacion_personal';
+                return $this->redirect($url);
             } else {
                 Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información del trabajador.');
+                $url = Url::to(['view', 'id' => $model->id,]) . '#informacion_personal';
+                return $this->redirect($url);
             }
         }
 
@@ -489,29 +495,39 @@ class EmpleadoController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             // Yii::$app->session->setFlash('success', 'La información del trabajador ha sido actualizada correctamente.');
-            return $this->redirect(['view', 'id' => $model->id]);
+            Yii::$app->session->setFlash('success', 'Los cambios de la información de contacto han sido actualizados correctamente.');
+
+            $url = Url::to(['view', 'id' => $model->id,]) . '#informacion_contacto';
+            return $this->redirect($url);
         } else {
             Yii::$app->session->setFlash('error', 'Hubo un error al actualizar la información del trabajador.');
-            return $this->redirect(['view', 'id' => $model->id]);
+            $url = Url::to(['view', 'id' => $model->id,]) . '#informacion_contacto';
+            return $this->redirect($url);
         }
     }
+
+    
 
     public function actionActualizarInformacionLaboral($id)
     {
         $model = $this->findModel2($id);
         $informacion_laboral = InformacionLaboral::findOne($model->informacion_laboral_id);
-
-
+    
         if ($model->informacionLaboral->load(Yii::$app->request->post()) && $model->informacionLaboral->save()) {
-            // Yii::$app->session->setFlash('success', 'La información laboral del trabajador ha sido actualizada correctamente.');
             $informacion_laboral->cat_departamento_id = Yii::$app->request->post('InformacionLaboral')['cat_departamento_id'];
+            // Generar la URL manualmente para evitar el URL encode del símbolo #
+            Yii::$app->session->setFlash('success', 'Los cambios de la información laboral han sido actualizados correctamente.');
 
-            return $this->redirect(['view', 'id' => $model->id]);
+            $url = Url::to(['view', 'id' => $model->id,]) . '#informacion_laboral';
+            return $this->redirect($url);
         } else {
             Yii::$app->session->setFlash('error', 'Hubo un error al actualizar la información laboral del trabajador.');
-            return $this->redirect(['view', 'id' => $model->id]);
+            // Generar la URL manualmente para evitar el URL encode del símbolo #
+            $url = Url::to(['view', 'id' => $model->id]) . '#informacion_laboral';
+            return $this->redirect($url);
         }
     }
+    
 
 
 
@@ -521,11 +537,13 @@ public function actionActualizarPrimerPeriodo($id)
     $periodoVacacional = $model->informacionLaboral->vacaciones->periodoVacacional;
 
     if ($periodoVacacional->load(Yii::$app->request->post()) && $periodoVacacional->save()) {
-        Yii::$app->session->setFlash('success', 'La información de vacaciones ha sido actualizada correctamente.');
-        return $this->redirect(['view', 'id' => $model->id]);
+        Yii::$app->session->setFlash('success', 'El primer periodo ha sido actualizado correctamente.');
+        $url = Url::to(['view', 'id' => $model->id,]) . '#informacion_vacaciones';
+            return $this->redirect($url);
     } else {
         Yii::$app->session->setFlash('error', 'Hubo un error al actualizar la información de vacaciones.');
-        return $this->redirect(['view', 'id' => $model->id]);
+        $url = Url::to(['view', 'id' => $model->id,]) . '#informacion_vacaciones';
+        return $this->redirect($url);
     }
 }
 
@@ -536,11 +554,13 @@ public function actionActualizarSegundoPeriodo($id)
     $segundoPeriodoVacacional = $model->informacionLaboral->vacaciones->segundoPeriodoVacacional;
 
     if ($segundoPeriodoVacacional->load(Yii::$app->request->post()) && $segundoPeriodoVacacional->save()) {
-        Yii::$app->session->setFlash('success', 'La información de vacaciones ha sido actualizada correctamente.');
-        return $this->redirect(['view', 'id' => $model->id]);
+        Yii::$app->session->setFlash('success', 'El segundo periodo ha sido actualizado correctamente.');
+        $url = Url::to(['view', 'id' => $model->id,]) . '#informacion_vacaciones';
+        return $this->redirect($url);
     } else {
         Yii::$app->session->setFlash('error', 'Hubo un error al actualizar la información de vacaciones.');
-        return $this->redirect(['view', 'id' => $model->id]);
+        $url = Url::to(['view', 'id' => $model->id,]) . '#informacion_vacaciones';
+        return $this->redirect($url);
     }
 }
     

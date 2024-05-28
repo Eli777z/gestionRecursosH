@@ -11,6 +11,7 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\UploadedFile;
 use app\models\Empleado;
+use yii\helpers\Url;
 /**
  * DocumentoController implements the CRUD actions for Documento model.
  */
@@ -100,7 +101,11 @@ class DocumentoController extends Controller
             $model->fecha_subida = date('Y-m-d H:i:s'); 
         
             if ($model->save()) {
-                return $this->redirect(['empleado/view', 'id' => $empleado->id]);
+                //return $this->redirect(['empleado/view', 'id' => $empleado->id]);
+               
+                Yii::$app->session->setFlash('success', 'El documento se ha subido exitosamente.');
+        $url = Url::to(['empleado/view', 'id' => $empleado->id,]) . '#expediente';
+            return $this->redirect($url);
             }
         }
     }

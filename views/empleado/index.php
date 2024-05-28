@@ -13,7 +13,7 @@ use kartik\select2\Select2;
 use app\models\CatDepartamento;
 use app\models\Empleado;
 use app\models\JuntaGobiernoSearch;
-
+use hail812\adminlte\widgets\Alert;
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\EmpleadoSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -27,26 +27,62 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="row">
         <div class="col-md-12">
             <div class="card">
+            <div class="card-header bg-primary text-white"> <!-- Agregando las clases bg-primary y text-white -->
+                    <h3><?= Html::encode($this->title) ?></h3>
+                </div>
                 <div class="card-body">
-                    <?php $this->beginBlock('block-empleados');?>
-                    <div class="row mb-2">
+                    <div class="row">
                         <div class="col-md-12">
-                            <?= Html::a('Create Empleado', ['create'], ['class' => 'btn btn-success']) ?>
-                        </div>
-                    </div>
+                            <div class="d-flex align-items-center mb-3">
 
 
+
+
+                                <?php
+                                // Mostrar los flash messages
+
+
+
+                                // En tu vista donde deseas mostrar los mensajes de flash:
+                                foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
+                                    if ($type === 'error') {
+                                        // Muestra los mensajes de error en rojo
+                                        echo Alert::widget([
+                                            'options' => ['class' => 'alert-danger'],
+                                            'body' => $message,
+                                        ]);
+                                    } else {
+                                        // Muestra los demás mensajes de flash con estilos predeterminados
+                                        echo Alert::widget([
+                                            'options' => ['class' => 'alert-' . $type],
+                                            'body' => $message,
+                                        ]);
+                                    }
+                                }
+                                ?>
+                            </div>
+
+
+                    <?php $this->beginBlock('block-empleados');?>
+                    <div class="card">
+                     <div class="card-header bg-secondary text-white">
+                     <h3>LISTA DE EMPLEADOS</h3>       
+                     <?= Html::a('Añadir nuevo   <i class="fa fa-plus"></i>', ['create'], ['class' => 'btn btn-secondary float-right mr-3']) ?>
+
+                            </div>
+                   
+
+                            <div class="card-body">
                     <?php Pjax::begin(); ?>
                     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
                     <?= GridView::widget([
                         'dataProvider' => $dataProvider,
                         'filterModel' => $searchModel,
-                        'options' => ['class' => 'grid-view', 'style' => 'width: 80%; margin: auto;'],
-                        'tableOptions' => ['class' => 'table table-striped table-bordered table-condensed'],
+                        
                         
                         'columns' => [
-                            
+                            ['class' => 'yii\grid\SerialColumn'],
                             [
                                 'attribute' => 'foto',
                                 'format' => 'html',
@@ -59,14 +95,118 @@ $this->params['breadcrumbs'][] = $this->title;
                                     return null; 
                                 },
                             ],
-                            'id',
-                            'numero_empleado',
+                            [
+                                'attribute' => 'id',
+                                'label' => 'Empleado',
+                                'value' => function ($model) {
+                                    return $model ? $model->apellido . ' ' . $model->nombre : 'N/A';
+                                },
+                                'filter' => Select2::widget([
+                                    'model' => $searchModel,
+                                    'attribute' => 'id',
+                                    'data' => \yii\helpers\ArrayHelper::map(\app\models\Empleado::find()->all(), 'id', function($model) {
+                                        return $model->apellido . ' ' . $model->nombre;
+                                    }), 
+                                    'options' => ['placeholder' => 'Empleado'],
+                                    'pluginOptions' => [
+                                        'allowClear' => true
+                                    ],
+                                    'theme' => Select2::THEME_BOOTSTRAP, // Esto aplicará el estilo de Bootstrap al Select2
+                                    'pluginEvents' => [
+                                        'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }", // Aquí se personaliza el icono de borrar
+                                    ],
+                                    'pluginEvents' => [
+                                        'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }", // Agregar un margen izquierdo
+                                    ],
+                                ]),
+                                'contentOptions' => ['class' => 'small-font'], // Aplica la clase CSS personalizada
+
+                            ],
+                            [
+                                'attribute' => 'numero_empleado',
+                                'label' => 'Número de empleado',
+                                'value' => function ($model) {
+                                    return $model->numero_empleado;
+                                },
+                                'filter' => Select2::widget([
+                                    'model' => $searchModel,
+                                    'attribute' => 'numero_empleado',
+                                    'data' => \yii\helpers\ArrayHelper::map(\app\models\Empleado::find()->select(['numero_empleado'])->distinct()->all(), 'numero_empleado', 'numero_empleado'), // Asegúrate de que 'nombre_formato' sea el nombre correcto del campo en tu tabla Solicitud
+                                    'options' => ['placeholder' => 'Número Empleado'],
+                                    'pluginOptions' => [
+                                        'allowClear' => true
+                    
+                                        
+                                    ],
+                                    'theme' => Select2::THEME_BOOTSTRAP, // Esto aplicará el estilo de Bootstrap al Select2
+                                    'pluginEvents' => [
+                                        'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }", // Aquí se personaliza el icono de borrar
+                                    ],
+                                    'pluginEvents' => [
+                                        'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }", // Agregar un margen izquierdo
+                                    ],
+                                ]),
+                                'contentOptions' => ['class' => 'small-font'], // Aplica la clase CSS personalizada
+
+                            ],
+
+                            [
+                                'attribute' => 'cat_departamento_id',
+                                'label' => 'Departamento',
+                                'value' => function ($model) {
+                                    return $model->informacionLaboral && $model->informacionLaboral->catDepartamento 
+                                        ? $model->informacionLaboral->catDepartamento->nombre_departamento 
+                                        : 'N/A';
+                                },
+                                'filter' => Select2::widget([
+                                    'model' => $searchModel,
+                                    'attribute' => 'cat_departamento_id',
+                                    'data' => ArrayHelper::map(CatDepartamento::find()->all(), 'id', 'nombre_departamento'),
+                                    'options' => ['placeholder' => 'Departamento', 'class' => 'small-font'],
+                                    'pluginOptions' => [
+                                        'allowClear' => true,
+                                    ],
+                                    'theme' => Select2::THEME_BOOTSTRAP,
+                                    'pluginEvents' => [
+                                        'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
+                                        'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
+                                    ],
+                                ]),
+                                'contentOptions' => ['class' => 'small-font'], // Aplica la clase CSS personalizada
+
+                            ],
+                            [
+                                'attribute' => 'cat_direccion_id',
+                                'label' => 'Dirección',
+                                'value' => function ($model) {
+                                    return $model->informacionLaboral && $model->informacionLaboral->catDireccion 
+                                        ? $model->informacionLaboral->catDireccion->nombre_direccion
+                                        : 'N/A';
+                                },
+                                'filter' => Select2::widget([
+                                    'model' => $searchModel,
+                                    'attribute' => 'cat_direccion_id',
+                                    'data' => ArrayHelper::map(CatDireccion::find()->all(), 'id', 'nombre_direccion'),
+                                    'options' => ['placeholder' => 'Dirección'],
+                                    'pluginOptions' => [
+                                        'allowClear' => true,
+                                    ],
+                                    'theme' => Select2::THEME_BOOTSTRAP,
+                                    'pluginEvents' => [
+                                        'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
+                                        'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '0x',); }",
+                                    ],
+                                ]),
+                                'contentOptions' => ['class' => 'small-font'], // Aplica la clase CSS personalizada
+
+                            ],
+
                             //'usuario_id',
                             //'informacion_laboral_id',
                            // 'cat_nivel_estudio_id',
                             //'parametro_formato_id',
-                            'nombre',
-                            'apellido',
+                            //'nombre',
+                           // 'apellido',
                             //'fecha_nacimiento',
                             //'edad',
                             //'sexo',
@@ -121,28 +261,47 @@ $this->params['breadcrumbs'][] = $this->title;
               
                 
             ],
-            'options' => ['style' => 'width: 15%;'], 
+           
         ],
+       
     ],
     'summaryOptions' => ['class' => 'summary mb-2'],
     'pager' => [
         'class' => 'yii\bootstrap4\LinkPager',
-    ]
+    ],
 ]); ?>
-
+</div>
                     <?php Pjax::end(); ?>
+                    
+                    </div>
+
                     <?php $this->endBlock();?>
                     <?php $this->beginBlock('block-junta-gobierno');?>
                     <?php $this->beginBlock('block-crear-junta-gobierno');?>
-                    <div class="junta-gobierno-form">
-    <?php $form = ActiveForm::begin(['action' => ['junta-gobierno/create'], 'options' => ['enctype' => 'multipart/form-data', 'class' => 'narrow-form']]); ?>
 
+                    <div class="card">
+                   
+    <?php $form = ActiveForm::begin(['action' => ['junta-gobierno/create'], 'options' => ['enctype' => 'multipart/form-data']]); ?>
+
+    <div class="card-header bg-secondary text-white">
+                                    <h3>Añadir empleado a la junta de gobierno</h3>
+                                    
+                                    <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-secondary float-right mr-3', 'id' => 'save-button-personal']) ?>
+                                </div>
+                                <div class="card-body">
     <?= $form->field($juntaGobiernoModel, 'cat_direccion_id')->widget(Select2::classname(), [
         'data' => ArrayHelper::map(CatDireccion::find()->all(), 'id', 'nombre_direccion'), // Suponiendo que 'nombre' es el atributo que deseas mostrar en la lista desplegable
         'options' => ['placeholder' => 'Selecciona una dirección...'],
         'pluginOptions' => [
             'allowClear' => true
         ],
+        'theme' => Select2::THEME_BOOTSTRAP, // Esto aplicará el estilo de Bootstrap al Select2
+                                        'pluginEvents' => [
+                                            'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }", // Aquí se personaliza el icono de borrar
+                                        ],
+                                        'pluginEvents' => [
+                                            'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }", // Agregar un margen izquierdo
+                                        ],
     ]); ?>
 
     <?= $form->field($juntaGobiernoModel, 'cat_departamento_id')->widget(Select2::classname(), [
@@ -151,6 +310,13 @@ $this->params['breadcrumbs'][] = $this->title;
         'pluginOptions' => [
             'allowClear' => true
         ],
+        'theme' => Select2::THEME_BOOTSTRAP, // Esto aplicará el estilo de Bootstrap al Select2
+                                        'pluginEvents' => [
+                                            'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }", // Aquí se personaliza el icono de borrar
+                                        ],
+                                        'pluginEvents' => [
+                                            'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }", // Agregar un margen izquierdo
+                                        ],
     ]); ?>
 
 <?= $form->field($juntaGobiernoModel, 'empleado_id')->widget(Select2::classname(), [
@@ -161,6 +327,13 @@ $this->params['breadcrumbs'][] = $this->title;
     'pluginOptions' => [
         'allowClear' => true
     ],
+    'theme' => Select2::THEME_BOOTSTRAP, // Esto aplicará el estilo de Bootstrap al Select2
+                                        'pluginEvents' => [
+                                            'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }", // Aquí se personaliza el icono de borrar
+                                        ],
+                                        'pluginEvents' => [
+                                            'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }", // Agregar un margen izquierdo
+                                        ],
 ]); ?>
 
 
@@ -181,10 +354,7 @@ $this->params['breadcrumbs'][] = $this->title;
     'TEC.' => 'TEC.',
 ], ['prompt' => 'Selecciona el nivel académico...']) ?>
 
-    <div class="form-group">
-        <?= Html::submitButton('Guardar', ['class' => 'btn btn-success']) ?>
-    </div>
-
+</div>
     <?php ActiveForm::end(); ?>
 
 </div>
@@ -195,7 +365,14 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <?php $this->beginBlock('block-view-junta-gobierno');?>
 
-
+<div class="card">
+                   
+               
+                   <div class="card-header bg-secondary text-white">
+                                                   <h3>Lista de empleados que pertenecen a la junta de gobierno</h3>
+                                                   
+                                               </div>
+                                               <div class="card-body">
 <?php
                             $searchModel = new JuntaGobiernoSearch();
                             $params = Yii::$app->request->queryParams;
@@ -204,7 +381,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             ?>
 
                             <?php Pjax::begin(); ?>
-                            <div class="card-container">
+                            
                                 <?= GridView::widget([
                                     'dataProvider' => $dataProvider,
                                     'filterModel' => $searchModel,
@@ -264,14 +441,18 @@ $this->params['breadcrumbs'][] = $this->title;
                                         'class' => 'yii\bootstrap4\LinkPager',
                                     ],
                                 ]); ?>
-                            </div>
+                         
 
 
                             <?php Pjax::end(); ?>
                           
+                            </div>
+ 
 
+</div>
                             <?php $this->endBlock();?>
 <?php echo TabsX::widget([
+    'enableStickyTabs' => true,
                     'options' => ['class' => 'custom-tabs-2'],
                     'items' => [
                        
@@ -279,12 +460,14 @@ $this->params['breadcrumbs'][] = $this->title;
                             'label' => 'Junta De Gobierno',
                            'content' => $this->blocks['block-view-junta-gobierno'],
                            'active' => true,
+                        
 
                         ],
                         [
                             'label' => 'Añadir',
                             'content' => $this->blocks['block-crear-junta-gobierno'],
-                           
+                          
+                            
 
 
                         ],
@@ -306,24 +489,31 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
                 </div>
-                <!--.card-body-->
-
+              <!--.col-md-12-->
 
 
                 <?php echo TabsX::widget([
+                     'enableStickyTabs' => true,
                     'options' => ['class' => 'custom-tabs-2'],
                     'items' => [
                         [
                             'label' => 'Empleados',
                             'content' => $this->blocks['block-empleados'],
                             'active' => true,
+                            'options' =>[
+                                'id' => 'empleados',
+                            ],
+                            
 
 
                         ],
                         [
                             'label' => 'Junta De Gobierno',
                            'content' => $this->blocks['block-junta-gobierno'],
-
+                           'options' =>[
+                            'id' => 'junta_gobierno',
+                        ],
+                        
 
                         ],
 
@@ -338,10 +528,23 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 ?>
 
+</div>
+                    <!--.row-->
+
+
+
+                </div>
+                <!--.card-body-->
+
+
             </div>
             <!--.card-->
+
+
         </div>
-        <!--.col-md-12-->
+        <!--.col-md-10-->
+
     </div>
     <!--.row-->
 </div>
+<!--.container-fluid-->

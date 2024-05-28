@@ -8,7 +8,7 @@ use app\models\JuntaGobiernoSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-
+use yii\helpers\Url;
 /**
  * JuntaGobiernoController implements the CRUD actions for JuntaGobierno model.
  */
@@ -70,7 +70,8 @@ class JuntaGobiernoController extends Controller
         $model = new JuntaGobierno();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['empleado/index']);
+            $url = Url::to(['empleado/index',]) . '#junta_gobierno';
+            return $this->redirect($url);
         }
 
         return $this->render('create', [
@@ -114,8 +115,11 @@ class JuntaGobiernoController extends Controller
     public function actionDelete($id, $cat_direccion_id, $cat_departamento_id, $empleado_id)
     {
         $this->findModel($id, $cat_direccion_id, $cat_departamento_id, $empleado_id)->delete();
+        Yii::$app->session->setFlash('success', 'El primer periodo ha sido actualizado correctamente.');
+        $url = Url::to(['empleado/index',]) . '#junta_gobierno';
+            return $this->redirect($url);
 
-        return $this->redirect(['empleado/index']);
+       // return $this->redirect(['empleado/index']);
     }
 
     /**

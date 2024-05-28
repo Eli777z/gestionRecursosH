@@ -11,6 +11,8 @@ use app\models\Empleado;
  */
 class EmpleadoSearch extends Empleado
 {
+    public $cat_departamento_id;
+    public $cat_direccion_id;
     /**
      * {@inheritdoc}
      */
@@ -19,6 +21,7 @@ class EmpleadoSearch extends Empleado
         return [
             [['id', 'numero_empleado', 'usuario_id', 'informacion_laboral_id', 'cat_nivel_estudio_id', 'parametro_formato_id', 'edad', 'sexo', 'estado_civil', 'numero_casa', 'codigo_postal', 'relacion_contacto_emergencia'], 'integer'],
             [['nombre', 'apellido', 'fecha_nacimiento', 'foto', 'telefono', 'email', 'colonia', 'calle', 'nombre_contacto_emergencia', 'telefono_contacto_emergencia', 'institucion_educativa', 'titulo_grado'], 'safe'],
+            [['cat_departamento_id', 'cat_direccion_id'], 'integer'],
         ];
     }
 
@@ -41,6 +44,8 @@ class EmpleadoSearch extends Empleado
     public function search($params)
     {
         $query = Empleado::find();
+        $query->joinWith(['informacionLaboral.catDepartamento']); // Agregar las relaciones necesarias
+        $query->joinWith(['informacionLaboral.catDireccion']); // Agregar las relaciones necesarias
 
         // add conditions that should always apply here
 
@@ -71,6 +76,9 @@ class EmpleadoSearch extends Empleado
             'numero_casa' => $this->numero_casa,
             'codigo_postal' => $this->codigo_postal,
             'relacion_contacto_emergencia' => $this->relacion_contacto_emergencia,
+            'informacion_laboral.cat_departamento_id' => $this->cat_departamento_id,
+            'informacion_laboral.cat_direccion_id' => $this->cat_direccion_id,
+
         ]);
 
         $query->andFilterWhere(['like', 'nombre', $this->nombre])
