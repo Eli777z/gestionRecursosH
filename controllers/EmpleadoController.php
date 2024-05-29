@@ -23,6 +23,7 @@ use yii\data\ArrayDataProvider;
 use app\models\PeriodoVacacional;
 use app\models\SegundoPeriodoVacacional;
 use yii\helpers\Url;
+use app\models\CatTipoContrato;
 
 /**
  * EmpleadoController implements the CRUD actions for Empleado model.
@@ -94,120 +95,190 @@ class EmpleadoController extends Controller
      * @return mixed
      */
     public function actionCreate()
+{
+    $model = new Empleado();
+    $usuario = new Usuario();
+    $informacion_laboral = new InformacionLaboral();
+    $vacaciones = new Vacaciones();
+    $periodoVacacional = new PeriodoVacacional();
+    $segundoPeriodoVacacional = new SegundoPeriodoVacacional();
+
+    $usuario->scenario = Usuario::SCENARIO_CREATE;
+
+    if ($model->load(Yii::$app->request->post()) && $usuario->load(Yii::$app->request->post()) && $informacion_laboral->load(Yii::$app->request->post())) {
+        $transaction = Yii::$app->db->beginTransaction();
+        $usuario->username = $model->nombre . $model->apellido;
+        $nombres = explode(" ", $model->nombre);
+        $apellidos = explode(" ", $model->apellido);
+        $usernameBase = strtolower($nombres[0][0] . $apellidos[0] . (isset($apellidos[1]) ? $apellidos[1][0] : ''));
+        $usuario->username = $usernameBase;
+        $counter = 1;
+        while (Usuario::find()->where(['username' => $usuario->username])->exists()) {
+            $usuario->username = $usernameBase . $counter;
+            $counter++;
+        }
+        $usuario->password = 'contrasena';
+        $usuario->status = 10;
+        $usuario->nuevo = 4;
+        $hash = Yii::$app->security->generatePasswordHash($usuario->password);
+        $usuario->password = $hash;
+
+        try {
+            // Calcular días de vacaciones
+            $totalDiasVacaciones = $this->calcularDiasVacaciones($informacion_laboral->fecha_ingreso, $informacion_laboral->cat_tipo_contrato_id);
+            $diasPorPeriodo = ceil($totalDiasVacaciones / 2); // Dividir en dos y redondear hacia arriba
+
+            // Asignar días a los periodos vacacionales
+            $periodoVacacional->dias_vacaciones_periodo = $diasPorPeriodo;
+            if (!$periodoVacacional->save()) {
+                throw new \yii\db\Exception('Error al guardar PeriodoVacacional');
+            }
+
+            $segundoPeriodoVacacional->dias_vacaciones_periodo = $totalDiasVacaciones - $diasPorPeriodo; // Asegurarse de que la suma es correcta
+            if (!$segundoPeriodoVacacional->save()) {
+                throw new \yii\db\Exception('Error al guardar SegundoPeriodoVacacional');
+            }
+
+            $vacaciones->periodo_vacacional_id = $periodoVacacional->id;
+            $vacaciones->segundo_periodo_vacacional_id = $segundoPeriodoVacacional->id;
+            $vacaciones->total_dias_vacaciones = $totalDiasVacaciones;
+            if (!$vacaciones->save()) {
+                throw new \yii\db\Exception('Error al guardar Vacaciones');
+            }
+
+            $informacion_laboral->vacaciones_id = $vacaciones->id;
+            if (!$informacion_laboral->save()) {
+                throw new \yii\db\Exception('Error al guardar InformacionLaboral');
+            }
+
+            $model->informacion_laboral_id = $informacion_laboral->id;
+            if ($usuario->save()) {
+                $model->usuario_id = $usuario->id;
+                $rol = ($usuario->rol == 1) ? 'empleado' : 'administrador';
+
+                $auth = Yii::$app->authManager;
+                $authorRole = $auth->getRole($rol);
+                $auth->assign($authorRole, $usuario->id);
+
+                $upload = UploadedFile::getInstance($model, 'foto');
+                if (is_object($upload)) {
+                    $nombreCarpetaTrabajador = Yii::getAlias('@runtime') . '/empleados/' . $model->nombre . '_' . $model->apellido;
+                    if (!is_dir($nombreCarpetaTrabajador)) {
+                        mkdir($nombreCarpetaTrabajador, 0775, true);
+                    }
+                    $nombreCarpetaUsuarioProfile = $nombreCarpetaTrabajador . '/foto_empleado';
+                    if (!is_dir($nombreCarpetaUsuarioProfile)) {
+                        mkdir($nombreCarpetaUsuarioProfile, 0775, true);
+                    }
+                    $upload_filename = $nombreCarpetaUsuarioProfile . '/' . $upload->baseName . '.' . $upload->extension;
+                    $upload->saveAs($upload_filename);
+                    $model->foto = $upload_filename;
+                }
+
+                if ($model->save()) {
+                    Yii::$app->mailer->compose()
+                        ->setFrom('elitaev7@gmail.com')
+                        ->setTo($model->email)
+                        ->setSubject('Datos de acceso al sistema')
+                        ->setTextBody("Nos comunicamos con usted, {$model->nombre}.\nAquí están tus datos de acceso:\nNombre de Usuario: {$usuario->username}\nContraseña: contrasena") // Reemplaza 'contrasena' con la contraseña generada si es diferente
+                        ->send();
+
+                    $transaction->commit();
+                    Yii::$app->session->setFlash('success', "Trabajador y usuario creados con éxito.");
+                    return $this->redirect(['view', 'id' => $model->id]);
+                } else {
+                    $transaction->rollBack();
+                }
+            }
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            throw $e;
+        }
+    }
+
+    return $this->render('create', [
+        'model' => $model,
+        'usuario' => $usuario,
+        'informacion_laboral' => $informacion_laboral,
+    ]);
+}
+
+    
+    private function calcularDiasVacaciones($fechaIngreso, $tipoContratoId)
     {
-        $model = new Empleado();
-        $usuario = new Usuario();
-        $informacion_laboral = new InformacionLaboral();
-        $vacaciones = new Vacaciones();
-        $periodoVacacional = new PeriodoVacacional();
-        $segundoPeriodoVacacional = new SegundoPeriodoVacacional();
-
-        $usuario->scenario = Usuario::SCENARIO_CREATE;
+        $fechaIngreso = new \DateTime($fechaIngreso);
+        $fechaActual = new \DateTime();
+        $intervalo = $fechaIngreso->diff($fechaActual);
+        $aniosTrabajados = $intervalo->y;
     
-        if ($model->load(Yii::$app->request->post()) && $usuario->load(Yii::$app->request->post()) && $informacion_laboral->load(Yii::$app->request->post())) {
-            $transaction = Yii::$app->db->beginTransaction();
-            $usuario->username = $model->nombre . $model->apellido;
-            $nombres = explode(" ", $model->nombre);
-            $apellidos = explode(" ", $model->apellido);
-            $usernameBase = strtolower($nombres[0][0] . $apellidos[0] . (isset($apellidos[1]) ? $apellidos[1][0] : ''));
-            $usuario->username = $usernameBase;
-            $counter = 1;
-            while (Usuario::find()->where(['username' => $usuario->username])->exists()) {
-                $usuario->username = $usernameBase . $counter;
-                $counter++;
-            }
-            $usuario->password = 'contrasena';
-            $usuario->status = 10;
-            $usuario->nuevo = 4;
-            $hash = Yii::$app->security->generatePasswordHash($usuario->password);
-            $usuario->password = $hash;
+        // Obtener el nombre del tipo de contrato
+        $tipoContrato = CatTipoContrato::findOne($tipoContratoId);
     
-            try {
-                // Crear y guardar PeriodoVacacional
-                if (!$periodoVacacional->save()) {
-                    throw new \yii\db\Exception('Error al guardar PeriodoVacacional');
-                }
-    
-                // Crear y guardar Vacaciones
-                $vacaciones->periodo_vacacional_id = $periodoVacacional->id;
-                if (!$vacaciones->save()) {
-                    throw new \yii\db\Exception('Error al guardar Vacaciones');
-                }
-    
-                // Asociar Vacaciones a InformacionLaboral
-                $informacion_laboral->vacaciones_id = $vacaciones->id;
-                if (!$informacion_laboral->save()) {
-                    throw new \yii\db\Exception('Error al guardar Informacion_laboral');
-                }
-
-
-                if (!$segundoPeriodoVacacional->save()) {
-                    throw new \yii\db\Exception('Error al guardar PeriodoVacacional');
-                }
-    
-                // Crear y guardar Vacaciones
-                $vacaciones->segundo_periodo_vacacional_id = $segundoPeriodoVacacional->id;
-                if (!$vacaciones->save()) {
-                    throw new \yii\db\Exception('Error al guardar Vacaciones');
-                }
-    
-               
-    
-                $model->informacion_laboral_id = $informacion_laboral->id;
-                if ($usuario->save()) {
-                    $model->usuario_id = $usuario->id;
-                    $rol = ($usuario->rol == 1) ? 'empleado' : 'administrador';
-    
-                    // Obtener el objeto de autorización
-                    $auth = Yii::$app->authManager;
-                    // Obtener el rol correspondiente según el valor de $rol
-                    $authorRole = $auth->getRole($rol);
-                    // Asignar el rol al usuario
-                    $auth->assign($authorRole, $usuario->id);
-    
-                    $upload = UploadedFile::getInstance($model, 'foto');
-                    if (is_object($upload)) {
-                        $nombreCarpetaTrabajador = Yii::getAlias('@runtime') . '/empleados/' . $model->nombre . '_' . $model->apellido;
-                        if (!is_dir($nombreCarpetaTrabajador)) {
-                            mkdir($nombreCarpetaTrabajador, 0775, true);
-                        }
-                        $nombreCarpetaUsuarioProfile = $nombreCarpetaTrabajador . '/foto_empleado';
-                        if (!is_dir($nombreCarpetaUsuarioProfile)) {
-                            mkdir($nombreCarpetaUsuarioProfile, 0775, true);
-                        }
-                        $upload_filename = $nombreCarpetaUsuarioProfile . '/' . $upload->baseName . '.' . $upload->extension;
-                        $upload->saveAs($upload_filename);
-                        $model->foto = $upload_filename;
-                    }
-    
-                    if ($model->save()) {
-                        Yii::$app->mailer->compose()
-                            ->setFrom('elitaev7@gmail.com')
-                            ->setTo($model->email)
-                            ->setSubject('Datos de acceso al sistema')
-                            ->setTextBody("Nos comunicamos con usted, {$model->nombre}.\nAquí están tus datos de acceso:\nNombre de Usuario: {$usuario->username}\nContraseña: contrasena") // Reemplaza 'contrasena' con la contraseña generada si es diferente
-                            ->send();
-    
-                        $transaction->commit();
-                        Yii::$app->session->setFlash('success', "Trabajador y usuario creados con éxito.");
-                        return $this->redirect(['view', 'id' => $model->id]);
-                    } else {
-                        $transaction->rollBack();
-                    }
-                }
-            } catch (\Exception $e) {
-                $transaction->rollBack();
-                throw $e;
-            }
+        if (!$tipoContrato) {
+            return 0; // Si no se encuentra el tipo de contrato, retornar 0
         }
     
-        return $this->render('create', [
-            'model' => $model,
-            'usuario' => $usuario,
-            'informacion_laboral' => $informacion_laboral,
-        ]);
+        switch ($tipoContrato->nombre_tipo) {
+            case 'Eventual':
+                return $this->calcularVacacionesEventual($aniosTrabajados);
+            case 'Confianza':
+                return $this->calcularVacacionesConfianza($aniosTrabajados);
+            case 'Sindicalizado':
+                return $this->calcularVacacionesSindicalizado($aniosTrabajados);
+            default:
+                return 0;
+        }
     }
     
+    private function calcularVacacionesEventual($anios)
+{
+    if ($anios < 1) {
+        return 0;
+    } elseif ($anios == 1) {
+        return 12;
+    } elseif ($anios == 2) {
+        return 14;
+    } elseif ($anios == 3) {
+        return 16;
+    } elseif ($anios == 4) {
+        return 18;
+    } elseif ($anios == 5) {
+        return 20;
+    } elseif ($anios <= 10) {
+        return 22;
+    } elseif ($anios <= 15) {
+        return 24;
+    } else {
+        return 24 + floor(($anios - 15) / 5) * 2;
+    }
+}
+
+private function calcularVacacionesConfianza($anios)
+{
+    if ($anios < 1) {
+        return 0;
+    } elseif ($anios <= 10) {
+        return 20;
+    } elseif ($anios <= 15) {
+        return 22;
+    } else {
+        return 22 + floor(($anios - 10) / 5) * 2;
+    }
+}
+
+private function calcularVacacionesSindicalizado($anios)
+{
+    if ($anios < 1) {
+        return 0;
+    } elseif ($anios <= 10) {
+        return 22;
+    } elseif ($anios <= 15) {
+        return 24;
+    } else {
+        return 24 + floor(($anios - 10) / 5) * 2;
+    }
+}
+
     /**
      * Updates an existing Empleado model.
      * If update is successful, the browser will be redirected to the 'view' page.
@@ -513,12 +584,20 @@ class EmpleadoController extends Controller
         $model = $this->findModel2($id);
         $informacion_laboral = InformacionLaboral::findOne($model->informacion_laboral_id);
     
-        if ($model->informacionLaboral->load(Yii::$app->request->post()) && $model->informacionLaboral->save()) {
-            $informacion_laboral->cat_departamento_id = Yii::$app->request->post('InformacionLaboral')['cat_departamento_id'];
+        if ($informacion_laboral->load(Yii::$app->request->post()) && $informacion_laboral->save()) {
+            // Recalcular los días de vacaciones
+            $vacaciones = Vacaciones::findOne($informacion_laboral->vacaciones_id);
+            $totalDiasVacaciones = $this->calcularDiasVacaciones($informacion_laboral->fecha_ingreso, $informacion_laboral->cat_tipo_contrato_id);
+            $vacaciones->total_dias_vacaciones = $totalDiasVacaciones;
+    
+            if ($vacaciones->save()) {
+                Yii::$app->session->setFlash('success', 'Los cambios de la información laboral y las vacaciones han sido actualizados correctamente.');
+            } else {
+                Yii::$app->session->setFlash('error', 'Hubo un error al actualizar los días de vacaciones.');
+            }
+    
             // Generar la URL manualmente para evitar el URL encode del símbolo #
-            Yii::$app->session->setFlash('success', 'Los cambios de la información laboral han sido actualizados correctamente.');
-
-            $url = Url::to(['view', 'id' => $model->id,]) . '#informacion_laboral';
+            $url = Url::to(['view', 'id' => $model->id]) . '#informacion_laboral';
             return $this->redirect($url);
         } else {
             Yii::$app->session->setFlash('error', 'Hubo un error al actualizar la información laboral del trabajador.');
@@ -527,6 +606,7 @@ class EmpleadoController extends Controller
             return $this->redirect($url);
         }
     }
+    
     
 
 

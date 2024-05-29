@@ -38,7 +38,8 @@
         "dompdf/dompdf": "^3.0",
         "phpoffice/phpspreadsheet": "^2.1",
         "tecnickcom/tcpdf": "^6.7",
-        "mpdf/mpdf": "^8.2"
+        "mpdf/mpdf": "^8.2",
+        "edofre/yii2-fullcalendar": "^1.0"
        
         
       

@@ -146,11 +146,11 @@ $currentDate = date('Y-m-d');
                                     'action' => ['actualizar-informacion', 'id' => $model->id],
                                     'options' => ['id' => 'personal-info-form'] // Asegúrate de que el formulario tenga un ID único
                                 ]); ?>
-                                <div class="card-header bg-secondary text-white">
+                                <div class="card-header bg-info text-white">
                                     <h3>Información personal</h3>
-                                    <button type="button" id="edit-button-personal" class="btn btn-secondary float-right"><i class="fa fa-edit"></i></button>
-                                    <button type="button" id="cancel-button-personal" class="btn btn-secondary float-right" style="display:none;"><i class="fa fa-times"></i></button>
-                                    <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-secondary float-right mr-3', 'id' => 'save-button-personal', 'style' => 'display:none;']) ?>
+                                    <button type="button" id="edit-button-personal" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
+                                    <button type="button" id="cancel-button-personal" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
+                                    <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right mr-3', 'id' => 'save-button-personal', 'style' => 'display:none;']) ?>
                                 </div>
                                 <div class="card-body">
                                     <?= $form->field($model, 'numero_empleado')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
@@ -237,12 +237,12 @@ $currentDate = date('Y-m-d');
                                             'action' => ['actualizar-informacion-contacto', 'id' => $model->id],
                                             'options' => ['id' => 'contact-info-form'] // Asegúrate de que el formulario tenga un ID único
                                         ]); ?>
-                                        <div class="card-header bg-secondary text-white">
+                                        <div class="card-header bg-info text-white">
                                             <h3>Información de contacto</h3>
-                                            <button type="button" id="edit-button" class="btn btn-secondary float-right"><i class="fa fa-edit"></i></button>
-                                            <button type="button" id="cancel-button" class="btn btn-secondary float-right" style="display:none;"><i class="fa fa-times"></i></button>
+                                            <button type="button" id="edit-button" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
+                                            <button type="button" id="cancel-button" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
 
-                                            <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-secondary float-right mr-3', 'id' => 'save-button', 'style' => 'display:none;']) ?>
+                                            <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right mr-3', 'id' => 'save-button', 'style' => 'display:none;']) ?>
                                         </div>
                                         <div class="card-body">
                                             <?= $form->field($model, 'email')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
@@ -293,9 +293,9 @@ $currentDate = date('Y-m-d');
                                         ]); ?>
                                         <div class="card-header bg-secondary text-white">
                                             <h3>Información de contacto de emergencia</h3>
-                                            <button type="button" id="edit-button-emergency" class="btn btn-secondary float-right"><i class="fa fa-edit"></i></button>
-                                            <button type="button" id="cancel-button-emergency" class="btn btn-secondary float-right" style="display:none;"><i class="fa fa-times"></i></button>
-                                            <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-secondary float-right  mr-3', 'id' => 'save-button-emergency', 'style' => 'display:none;']) ?>
+                                            <button type="button" id="edit-button-emergency" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
+                                            <button type="button" id="cancel-button-emergency" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
+                                            <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-info float-right  mr-3', 'id' => 'save-button-emergency', 'style' => 'display:none;']) ?>
                                         </div>
                                         <div class="card-body">
                                             <?= $form->field($model, 'nombre_contacto_emergencia')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
@@ -376,14 +376,28 @@ $currentDate = date('Y-m-d');
                                     'action' => ['actualizar-informacion-laboral', 'id' => $model->id],
                                     'options' => ['id' => 'laboral-info-form']
                                 ]); ?>
-                                <div class="card-header bg-secondary text-white">
+                                <div class="card-header bg-info text-white">
                                     <h3>Información Laboral</h3>
-                                    <button type="button" id="edit-button-laboral" class="btn btn-secondary float-right"><i class="fa fa-edit"></i></button>
-                                    <button type="button" id="cancel-button-laboral" class="btn btn-secondary float-right" style="display:none;"><i class="fa fa-times"></i></button>
-                                    <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-secondary float-right  mr-3', 'id' => 'save-button-laboral', 'style' => 'display:none;']) ?>
+                                    <button type="button" id="edit-button-laboral" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
+                                    <button type="button" id="cancel-button-laboral" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
+                                    <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right  mr-3', 'id' => 'save-button-laboral', 'style' => 'display:none;']) ?>
                                 </div>
                                 <div class="card-body">
-
+                                    <?= $form->field($model->informacionLaboral, 'cat_tipo_contrato_id')->widget(Select2::classname(), [
+                                        'data' => ArrayHelper::map(CatTipoContrato::find()->all(), 'id', 'nombre_tipo'),
+                                        'options' => ['placeholder' => 'Seleccionar Tipo de Contrato', 'disabled' => true],
+                                        'pluginOptions' => [
+                                            'allowClear' => true
+                                        ],
+                                        'theme' => Select2::THEME_BOOTSTRAP, // Esto aplicará el estilo de Bootstrap al Select2
+                                        'pluginEvents' => [
+                                            'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }", // Aquí se personaliza el icono de borrar
+                                        ],
+                                        'pluginEvents' => [
+                                            'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }", // Agregar un margen izquierdo
+                                        ],
+                                    ]) ?>
+                                    <?= $form->field($model->informacionLaboral, 'fecha_ingreso')->input('date', ['disabled' => true]) ?>
 
                                     <?= $form->field($model->informacionLaboral, 'cat_departamento_id')->widget(Select2::classname(), [
                                         'data' => ArrayHelper::map(CatDepartamento::find()->all(), 'id', 'nombre_departamento'),
@@ -434,20 +448,7 @@ $currentDate = date('Y-m-d');
                                             'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }", // Agregar un margen izquierdo
                                         ],
                                     ]) ?>
-                                    <?= $form->field($model->informacionLaboral, 'cat_tipo_contrato_id')->widget(Select2::classname(), [
-                                        'data' => ArrayHelper::map(CatTipoContrato::find()->all(), 'id', 'nombre_tipo'),
-                                        'options' => ['placeholder' => 'Seleccionar Tipo de Contrato', 'disabled' => true],
-                                        'pluginOptions' => [
-                                            'allowClear' => true
-                                        ],
-                                        'theme' => Select2::THEME_BOOTSTRAP, // Esto aplicará el estilo de Bootstrap al Select2
-                                        'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }", // Aquí se personaliza el icono de borrar
-                                        ],
-                                        'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }", // Agregar un margen izquierdo
-                                        ],
-                                    ]) ?>
+
 
 
                                     <?= $form->field($model->informacionLaboral, 'cat_direccion_id')->widget(Select2::classname(), [
@@ -465,7 +466,6 @@ $currentDate = date('Y-m-d');
                                         ],
                                     ]) ?>
 
-                                    <?= $form->field($model->informacionLaboral, 'fecha_ingreso')->input('date', ['disabled' => true]) ?>
                                     <?= $form->field($model->informacionLaboral, 'junta_gobierno_id')->widget(Select2::classname(), [
                                         'data' => $jefesDirectores,
                                         'options' => ['placeholder' => 'Seleccionar Jefe o director a cargo', 'disabled' => true],
@@ -521,155 +521,189 @@ $currentDate = date('Y-m-d');
                             </script>
 
                             <?php $this->endBlock(); ?>
+
+
                             <?php $this->beginBlock('info_vacacional'); ?>
-                            <div class="row">
-                                <div class="col-md-6">
-                                <div class="card">
-    <?php $form = ActiveForm::begin([
-        'action' => ['actualizar-primer-periodo', 'id' => $model->id],
-        'options' => ['id' => 'first-period-form']
-    ]); ?>
-    <div class="card-header bg-secondary text-white">
-        <h3>PRIMER PERIODO</h3>
-        <?php setlocale(LC_TIME, "es_419.UTF-8"); ?>
-        <label class="control-label">
-            <?= mb_strtoupper(strftime('%A, %d de %B de %Y', strtotime($model->informacionLaboral->vacaciones->periodoVacacional->fecha_inicio))) ?>
-            ---
-            <?= mb_strtoupper(strftime('%A, %d de %B de %Y', strtotime($model->informacionLaboral->vacaciones->periodoVacacional->fecha_final))) ?>
-        </label>
-        <br>
-        <button type="button" id="edit-button-first-period" class="btn btn-secondary float-right"><i class="fa fa-edit"></i></button>
-        <button type="button" id="cancel-button-first-period" class="btn btn-secondary float-right" style="display:none;"><i class="fa fa-times"></i></button>
-        <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-secondary float-right  mr-3', 'id' => 'save-button-first-period', 'style' => 'display:none;']) ?>
-    </div>
-    <div class="card-body">
-        <?= $form->field($model->informacionLaboral->vacaciones->periodoVacacional, 'año')->textInput(['type' => 'number', 'disabled' => true]) ?>
-        <?= $form->field($model->informacionLaboral->vacaciones->periodoVacacional, 'dateRange')->widget(DateRangePicker::class, [
-            'convertFormat' => true,
-            'pluginOptions' => [
-                'locale' => [
-                    'format' => 'Y-m-d',
-                    'separator' => ' a ',
-                ],
-                'opens' => 'left',
-                'singleDatePicker' => false,
-                'showDropdowns' => true,
-                'alwaysShowCalendars' => true,
-                'minDate' => '2000-01-01',
-                'maxDate' => '2100-12-31',
-                'startDate' => $currentDate,
-                'endDate' => $currentDate,
-                'autoApply' => true,
-            ],
-            'options' => ['disabled' => true], // Deshabilitar el widget
-        ])->label('Seleccionar rango de fechas del primer periodo:') ?>
-        <?= $form->field($model->informacionLaboral->vacaciones->periodoVacacional, 'original')->dropDownList(['Si' => 'Si', 'No' => 'No'], ['prompt' => 'Selecciona una opción...', 'disabled' => true]) ?>
-    </div>
-    <?php ActiveForm::end(); ?>
-</div>
-<script>
-document.getElementById('edit-button-first-period').addEventListener('click', function() {
-    var fields = document.querySelectorAll('#first-period-form input, #first-period-form select');
-    fields.forEach(function(field) {
-        field.disabled = false; // Habilitar campos
-    });
-    $('.select2-hidden-accessible').select2('enable'); // Habilitar todos los Select2
-    document.getElementById('edit-button-first-period').style.display = 'none';
-    document.getElementById('save-button-first-period').style.display = 'block';
-    document.getElementById('cancel-button-first-period').style.display = 'block';
-});
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="card-header bg-success text-dark text-center">
+                                        <h3>Total de dias vacacionales: <?= $model->informacionLaboral->vacaciones->total_dias_vacaciones ?></h3>
+                                    </div>
 
-document.getElementById('cancel-button-first-period').addEventListener('click', function() {
-    var fields = document.querySelectorAll('#first-period-form input, #first-period-form select');
-    fields.forEach(function(field) {
-        field.disabled = true; // Deshabilitar campos
-        if (field.tagName !== 'SELECT') { // No restablecer los valores de los campos select
-            field.value = field.defaultValue; // Restablecer los valores originales
-        }
-    });
-    $('.select2-hidden-accessible').select2('enable', false); // Deshabilitar Select2
-    document.getElementById('edit-button-first-period').style.display = 'block';
-    document.getElementById('save-button-first-period').style.display = 'none';
-    document.getElementById('cancel-button-first-period').style.display = 'none';
-});
-</script>
+                                    <li class="dropdown-divider"></li>
 
-                                    
-                                </div>
-                                <div class="col-md-6">
-                                <div class="card">
-    <?php $form = ActiveForm::begin([
-        'action' => ['actualizar-segundo-periodo', 'id' => $model->id],
-        'options' => ['id' => 'second-period-form']
-    ]); ?>
-    <div class="card-header bg-secondary text-white">
-        <h3>SEGUNDO PERIODO</h3>
-        <?php setlocale(LC_TIME, "es_419.UTF-8"); ?>
-        <label class="control-label">
-            <?= mb_strtoupper(strftime('%A, %d de %B de %Y', strtotime($model->informacionLaboral->vacaciones->segundoPeriodoVacacional->fecha_inicio))) ?>
-            ---
-            <?= mb_strtoupper(strftime('%A, %d de %B de %Y', strtotime($model->informacionLaboral->vacaciones->segundoPeriodoVacacional->fecha_final))) ?>
-        </label>
-        <br>
-        <button type="button" id="edit-button-period" class="btn btn-secondary float-right"><i class="fa fa-edit"></i></button>
-        <button type="button" id="cancel-button-period" class="btn btn-secondary float-right" style="display:none;"><i class="fa fa-times"></i></button>
-        <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-secondary float-right  mr-3', 'id' => 'save-button-period', 'style' => 'display:none;']) ?>
-    </div>
-    <div class="card-body">
-        <?= $form->field($model->informacionLaboral->vacaciones->segundoPeriodoVacacional, 'año')->textInput(['type' => 'number', 'disabled' => true]) ?>
-        <?= $form->field($model->informacionLaboral->vacaciones->segundoPeriodoVacacional, 'dateRange')->widget(DateRangePicker::class, [
-            'convertFormat' => true,
-            'pluginOptions' => [
-                'locale' => [
-                    'format' => 'Y-m-d',
-                    'separator' => ' a ',
-                ],
-                'opens' => 'left',
-                'singleDatePicker' => false,
-                'showDropdowns' => true,
-                'alwaysShowCalendars' => true,
-                'minDate' => '2000-01-01',
-                'maxDate' => '2100-12-31',
-                'startDate' => $currentDate,
-                'endDate' => $currentDate,
-                'autoApply' => true,
-            ],
-            'options' => ['disabled' => true], // Deshabilitar el widget
-        ])->label('Seleccionar rango de fechas del segundo periodo:') ?>
-        <?= $form->field($model->informacionLaboral->vacaciones->segundoPeriodoVacacional, 'original')->dropDownList(['Si' => 'Si', 'No' => 'No'], ['prompt' => 'Selecciona una opción...', 'disabled' => true]) ?>
-    </div>
-    <?php ActiveForm::end(); ?>
-</div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="card">
+                                                <?php $form = ActiveForm::begin([
+                                                    'action' => ['actualizar-primer-periodo', 'id' => $model->id],
+                                                    'options' => ['id' => 'first-period-form']
+                                                ]); ?>
+                                                <div class="card-header bg-info text-white">
+                                                    <h3>PRIMER PERIODO</h3>
+                                                    <?php setlocale(LC_TIME, "es_419.UTF-8"); ?>
+                                                    <div class="alert alert-warning text-center" role="alert">
+                                                        <label class="control-label small ">
+                                                            <?php if ($model->informacionLaboral->vacaciones->periodoVacacional && $model->informacionLaboral->vacaciones->periodoVacacional->fecha_inicio && $model->informacionLaboral->vacaciones->periodoVacacional->fecha_final) : ?>
+                                                                <?= mb_strtoupper(strftime('%A, %d de %B de %Y', strtotime($model->informacionLaboral->vacaciones->periodoVacacional->fecha_inicio))) ?>
+                                                                ---
+                                                                <?= mb_strtoupper(strftime('%A, %d de %B de %Y', strtotime($model->informacionLaboral->vacaciones->periodoVacacional->fecha_final))) ?>
+                                                            <?php else : ?>
+                                                                Aún no se ha definido el periodo
+                                                            <?php endif; ?>
 
+                                                        </label>
+                                                    </div>
+
+                                                    <label> Dias de vacaciones disponibles: <?= $model->informacionLaboral->vacaciones->periodoVacacional->dias_vacaciones_periodo ?>
+                                                    </label>
+
+                                                    <br>
+                                                    <button type="button" id="edit-button-first-period" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
+                                                    <button type="button" id="cancel-button-first-period" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
+                                                    <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right  mr-3', 'id' => 'save-button-first-period', 'style' => 'display:none;']) ?>
+                                                </div>
+                                                <div class="card-body">
+                                                    <?= $form->field($model->informacionLaboral->vacaciones->periodoVacacional, 'año')->textInput(['type' => 'number', 'disabled' => true]) ?>
+                                                    <?= $form->field($model->informacionLaboral->vacaciones->periodoVacacional, 'dateRange')->widget(DateRangePicker::class, [
+                                                        'convertFormat' => true,
+                                                        'pluginOptions' => [
+                                                            'locale' => [
+                                                                'format' => 'Y-m-d',
+                                                                'separator' => ' a ',
+                                                            ],
+                                                            'opens' => 'left',
+                                                            'singleDatePicker' => false,
+                                                            'showDropdowns' => true,
+                                                            'alwaysShowCalendars' => true,
+                                                            'minDate' => '2000-01-01',
+                                                            'maxDate' => '2100-12-31',
+                                                            'startDate' => $currentDate,
+                                                            'endDate' => $currentDate,
+                                                            'autoApply' => true,
+                                                        ],
+                                                        'options' => ['disabled' => true],
+                                                    ])->label('Seleccionar rango de fechas del primer periodo:') ?>
+                                                    <?= $form->field($model->informacionLaboral->vacaciones->periodoVacacional, 'original')->dropDownList(['Si' => 'Si', 'No' => 'No'], ['prompt' => 'Selecciona una opción...', 'disabled' => true]) ?>
+                                                </div>
+                                                <?php ActiveForm::end(); ?>
+                                            </div>
+                                            <script>
+                                                document.getElementById('edit-button-first-period').addEventListener('click', function() {
+                                                    var fields = document.querySelectorAll('#first-period-form input, #first-period-form select');
+                                                    fields.forEach(function(field) {
+                                                        field.disabled = false;
+                                                    });
+                                                    $('.select2-hidden-accessible').select2('enable');
+                                                    document.getElementById('edit-button-first-period').style.display = 'none';
+                                                    document.getElementById('save-button-first-period').style.display = 'block';
+                                                    document.getElementById('cancel-button-first-period').style.display = 'block';
+                                                });
+
+                                                document.getElementById('cancel-button-first-period').addEventListener('click', function() {
+                                                    var fields = document.querySelectorAll('#first-period-form input, #first-period-form select');
+                                                    fields.forEach(function(field) {
+                                                        field.disabled = true;
+                                                        if (field.tagName !== 'SELECT') {
+                                                            field.value = field.defaultValue;
+                                                        }
+                                                    });
+                                                    $('.select2-hidden-accessible').select2('enable', false); // Deshabilitar Select2
+                                                    document.getElementById('edit-button-first-period').style.display = 'block';
+                                                    document.getElementById('save-button-first-period').style.display = 'none';
+                                                    document.getElementById('cancel-button-first-period').style.display = 'none';
+                                                });
+                                            </script>
+
+
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="card">
+                                                <?php $form = ActiveForm::begin([
+                                                    'action' => ['actualizar-segundo-periodo', 'id' => $model->id],
+                                                    'options' => ['id' => 'second-period-form']
+                                                ]); ?>
+                                                <div class="card-header bg-secondary text-white">
+                                                    <h3>SEGUNDO PERIODO</h3>
+                                                    <?php setlocale(LC_TIME, "es_419.UTF-8"); ?>
+                                                    <div class="alert alert-warning text-center" role="alert">
+                                                        <label class="control-label small">
+                                                            <?php if ($model->informacionLaboral->vacaciones->segundoPeriodoVacacional && $model->informacionLaboral->vacaciones->segundoPeriodoVacacional->fecha_inicio && $model->informacionLaboral->vacaciones->segundoPeriodoVacacional->fecha_final) : ?>
+                                                                <?= mb_strtoupper(strftime('%A, %d de %B de %Y', strtotime($model->informacionLaboral->vacaciones->segundoPeriodoVacacional->fecha_inicio))) ?>
+                                                                ---
+                                                                <?= mb_strtoupper(strftime('%A, %d de %B de %Y', strtotime($model->informacionLaboral->vacaciones->segundoPeriodoVacacional->fecha_final))) ?>
+                                                            <?php else : ?>
+                                                                Aún no se ha definido el periodo
+                                                            <?php endif; ?>
+                                                        </label>
+                                                    </div>
+
+
+                                                    <label> Dias de vacaciones disponibles: <?= $model->informacionLaboral->vacaciones->segundoPeriodoVacacional->dias_vacaciones_periodo ?>
+                                                    </label>
+
+                                                    <br>
+                                                    <button type="button" id="edit-button-period" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
+                                                    <button type="button" id="cancel-button-period" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
+                                                    <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-info float-right  mr-3', 'id' => 'save-button-period', 'style' => 'display:none;']) ?>
+                                                </div>
+                                                <div class="card-body">
+                                                    <?= $form->field($model->informacionLaboral->vacaciones->segundoPeriodoVacacional, 'año')->textInput(['type' => 'number', 'disabled' => true]) ?>
+                                                    <?= $form->field($model->informacionLaboral->vacaciones->segundoPeriodoVacacional, 'dateRange')->widget(DateRangePicker::class, [
+                                                        'convertFormat' => true,
+                                                        'pluginOptions' => [
+                                                            'locale' => [
+                                                                'format' => 'Y-m-d',
+                                                                'separator' => ' a ',
+                                                            ],
+                                                            'opens' => 'left',
+                                                            'singleDatePicker' => false,
+                                                            'showDropdowns' => true,
+                                                            'alwaysShowCalendars' => true,
+                                                            'minDate' => '2000-01-01',
+                                                            'maxDate' => '2100-12-31',
+                                                            'startDate' => $currentDate,
+                                                            'endDate' => $currentDate,
+                                                            'autoApply' => true,
+                                                        ],
+                                                        'options' => ['disabled' => true], // Deshabilitar el widget
+                                                    ])->label('Seleccionar rango de fechas del segundo periodo:') ?>
+                                                    <?= $form->field($model->informacionLaboral->vacaciones->segundoPeriodoVacacional, 'original')->dropDownList(['Si' => 'Si', 'No' => 'No'], ['prompt' => 'Selecciona una opción...', 'disabled' => true]) ?>
+                                                </div>
+                                                <?php ActiveForm::end(); ?>
+                                            </div>
+
+
+                                        </div>
+                                        <script>
+                                            document.getElementById('edit-button-period').addEventListener('click', function() {
+                                                var fields = document.querySelectorAll('#second-period-form input, #second-period-form select');
+                                                fields.forEach(function(field) {
+                                                    field.disabled = false; // Habilitar campos
+                                                });
+                                                document.getElementById('edit-button-period').style.display = 'none';
+                                                document.getElementById('save-button-period').style.display = 'block';
+                                                document.getElementById('cancel-button-period').style.display = 'block';
+                                            });
+
+                                            document.getElementById('cancel-button-period').addEventListener('click', function() {
+                                                var fields = document.querySelectorAll('#second-period-form input, #second-period-form select');
+                                                fields.forEach(function(field) {
+                                                    field.disabled = true; // Deshabilitar campos
+                                                    if (!field.type === 'select-one') { // No restablecer los valores de los campos select
+                                                        field.value = field.defaultValue; // Restablecer los valores originales
+                                                    }
+                                                });
+                                                document.getElementById('edit-button-period').style.display = 'block';
+                                                document.getElementById('save-button-period').style.display = 'none';
+                                                document.getElementById('cancel-button-period').style.display = 'none';
+                                            });
+                                        </script>
 
                                     </div>
-                                    <script>
-document.getElementById('edit-button-period').addEventListener('click', function() {
-    var fields = document.querySelectorAll('#second-period-form input, #second-period-form select');
-    fields.forEach(function(field) {
-        field.disabled = false; // Habilitar campos
-    });
-    document.getElementById('edit-button-period').style.display = 'none';
-    document.getElementById('save-button-period').style.display = 'block';
-    document.getElementById('cancel-button-period').style.display = 'block';
-});
-
-document.getElementById('cancel-button-period').addEventListener('click', function() {
-    var fields = document.querySelectorAll('#second-period-form input, #second-period-form select');
-    fields.forEach(function(field) {
-        field.disabled = true; // Deshabilitar campos
-        if (!field.type === 'select-one') { // No restablecer los valores de los campos select
-            field.value = field.defaultValue; // Restablecer los valores originales
-        }
-    });
-    document.getElementById('edit-button-period').style.display = 'block';
-    document.getElementById('save-button-period').style.display = 'none';
-    document.getElementById('cancel-button-period').style.display = 'none';
-});
-</script>
 
                                 </div>
-                            
+                            </div>
                             <?php $this->endBlock(); ?>
 
 
@@ -686,35 +720,35 @@ document.getElementById('cancel-button-period').addEventListener('click', functi
                                         'label' => 'Información personal',
                                         'content' => $this->blocks['info_p'],
                                         'active' => true,
-                                        'options' =>[
+                                        'options' => [
                                             'id' => 'informacion_personal',
                                         ],
-                                        
+
                                     ],
                                     [
                                         'label' => 'Información de contacto',
                                         'content' => $this->blocks['info_c'],
-                                        'options' =>[
+                                        'options' => [
                                             'id' => 'informacion_contacto',
                                         ],
-                                        
+
                                     ],
                                     [
                                         'label' => 'Información laboral',
                                         'content' => $this->blocks['info_l'],
-                                      
-                                        'options' =>[
+
+                                        'options' => [
                                             'id' => 'informacion_laboral',
                                         ],
-                                       
+
                                     ],
                                     [
                                         'label' => 'Vacaciones',
                                         'content' => $this->blocks['info_vacacional'],
-                                        'options' =>[
+                                        'options' => [
                                             'id' => 'informacion_vacaciones',
                                         ],
-                                        
+
                                     ],
                                 ],
                                 'position' => TabsX::POS_ABOVE,
@@ -726,35 +760,40 @@ document.getElementById('cancel-button-period').addEventListener('click', functi
 
                             <?php $this->beginBlock('expediente'); ?>
                             <div class="card">
-                                
-                                <div class="card-header bg-secondary text-white">
+
+                                <div class="card-header bg-info text-white">
                                     <h3>Expediente del empleado</h3>
-                                    
+
                                 </div>
                                 <div class="card-body">
-                            <div class="documento-form">
+                                    <div class="documento-form">
 
-                                <?php $form = ActiveForm::begin(['action' => ['documento/create', 'empleado_id' => $model->id], 'options' => ['enctype' => 'multipart/form-data', 'class' => 'narrow-form']]); ?>
+                                        <?php $form = ActiveForm::begin(['action' => ['documento/create', 'empleado_id' => $model->id], 'options' => ['enctype' => 'multipart/form-data', 'class' => 'narrow-form']]); ?>
 
-                                <?= $form->field($documentoModel, 'cat_tipo_documento_id')->widget(Select2::classname(), [
-                                    'data' => ArrayHelper::map(CatTipoDocumento::find()->all(), 'id', 'nombre_tipo'),
-                                    'language' => 'es',
-                                    'options' => ['placeholder' => 'Seleccione el tipo de documento', 'id' => 'tipo-documento'],
-                                    'pluginOptions' => [
-                                        'allowClear' => true
-                                    ],
-                                ])->label('Tipo de Documento') ?>
+                                        <?= $form->field($documentoModel, 'cat_tipo_documento_id')->widget(Select2::classname(), [
+                                            'data' => ArrayHelper::map(CatTipoDocumento::find()->all(), 'id', 'nombre_tipo'),
+                                            'language' => 'es',
+                                            'options' => ['placeholder' => 'Seleccione el tipo de documento', 'id' => 'tipo-documento'],
+                                            'pluginOptions' => [
+                                                'allowClear' => true
+                                            ],
+                                            'theme' => Select2::THEME_BOOTSTRAP,
+                                            'pluginEvents' => [
+                                                'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
+                                                'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '0x',); }",
+                                            ],
+                                        ])->label('Tipo de Documento') ?>
 
 
-                                <?= $form->field($documentoModel, 'nombre')->textInput([
-                                    'maxlength' => true,
-                                    'id' => 'nombre-archivo',
-                                    'style' => 'display:none',
-                                    'placeholder' => 'Ingrese el nombre del documento'
-                                ])->label(false) ?>
+                                        <?= $form->field($documentoModel, 'nombre')->textInput([
+                                            'maxlength' => true,
+                                            'id' => 'nombre-archivo',
+                                            'style' => 'display:none',
+                                            'placeholder' => 'Ingrese el nombre del documento'
+                                        ])->label(false) ?>
 
-                                <?php
-                                $this->registerJs("
+                                        <?php
+                                        $this->registerJs("
                                         $('#tipo-documento').change(function(){
                                             var tipoDocumentoId = $(this).val();
                                             var nombreArchivoInput = $('#nombre-archivo');
@@ -772,97 +811,100 @@ document.getElementById('cancel-button-period').addEventListener('click', functi
                                             }
                                         });
                                     ");
-                                ?>
+                                        ?>
 
-                                <?= $form->field($documentoModel, 'ruta')->widget(FileInput::classname(), [
-                                    'options' => ['accept' => 'file/*'],
-                                    'pluginEvents' => [
-                                        'fileclear' => "function() {
+                                        <?= $form->field($documentoModel, 'ruta')->widget(FileInput::classname(), [
+                                            'options' => ['accept' => 'file/*'],
+                                            'pluginEvents' => [
+                                                'fileclear' => "function() {
                                         $('#nombre-archivo').val('');
                                         $('#tipo-archivo').val('');
                                     }",
-                                    ],
-                                    'pluginOptions' => [
-                                        'showUpload' => false,
-                                        
-        'showCancel' => false, // Oculta el botón de cancelar
-                                    ],
-                                ])->label('Archivo') ?>
+                                            ],
+                                            'pluginOptions' => [
+                                                'showUpload' => false,
 
-                                <div class="form-group">
-                                <?= Html::submitButton('Subir archivo <i class="fa fa-upload"></i>', ['class' => 'btn btn-warning float-right', 'id' => 'save-button-personal']) ?>
+                                                'showCancel' => false, // Oculta el botón de cancelar
+                                            ],
+                                        ])->label('Archivo') ?>
+
+                                        <div class="form-group">
+                                            <?= Html::submitButton('Subir archivo <i class="fa fa-upload"></i>', ['class' => 'btn btn-warning float-right', 'id' => 'save-button-personal']) ?>
+                                        </div>
+
+                                        <?php ActiveForm::end(); ?>
+
+                                    </div>
+
+                                    <?php
+                                    $searchModel = new DocumentoSearch();
+                                    $params = Yii::$app->request->queryParams;
+                                    $params[$searchModel->formName()]['empleado_id'] = $model->id;
+                                    $dataProvider = $searchModel->search($params);
+                                    ?>
+
+                                    <?php Pjax::begin(); ?>
+                                    <br>
+                                    <br>
+                                    <li class="dropdown-divider"></li>
+
+
+
+                                    <?= GridView::widget([
+                                        'dataProvider' => $dataProvider,
+                                        'filterModel' => $searchModel,
+
+                                        'columns' => [
+                                            ['class' => 'yii\grid\SerialColumn'],
+                                            [
+                                                'attribute' => 'nombre',
+                                                'value' => 'nombre',
+                                                'options' => ['style' => 'width: 30%;'],
+                                            ],
+                                            [
+                                                'attribute' => 'fecha_subida',
+                                                'filter' => false,
+                                                'options' => ['style' => 'width: 30%;'],
+                                            ],
+                                            [
+                                                'class' => 'hail812\adminlte3\yii\grid\ActionColumn',
+                                                'template' => '{view} {delete} {download}',
+                                                'buttons' => [
+                                                    'view' => function ($url, $model) {
+                                                        return Html::a('<i class="far fa-eye"></i>', ['documento/open', 'id' => $model->id], [
+                                                            'target' => '_blank',
+                                                            'title' => 'Ver archivo',
+                                                            'class' => 'btn btn-info btn-xs',
+                                                            'data-pjax' => "0"
+                                                        ]);
+                                                    },
+                                                    'delete' => function ($url, $model) {
+                                                        return Html::a('<i class="fas fa-trash"></i>', ['documento/delete', 'id' => $model->id, 'empleado_id' => $model->empleado_id], [
+                                                            'title' => Yii::t('yii', 'Eliminar'),
+                                                            'data-confirm' => Yii::t('yii', '¿Estás seguro de que deseas eliminar este elemento?'),
+                                                            'data-method' => 'post',
+                                                            'class' => 'btn btn-danger btn-xs',
+                                                        ]);
+                                                    },
+                                                    'download' => function ($url, $model) {
+                                                        return Html::a('<i class="fas fa-download"></i>', ['documento/download', 'id' => $model->id], [
+                                                            'title' => 'Descargar archivo',
+                                                            'class' => 'btn btn-success btn-xs',
+                                                            'data-pjax' => "0"
+                                                        ]);
+                                                    },
+                                                ],
+                                                // 'options' => ['style' => 'width: 15%;'], //ancho de la columna
+                                            ],
+                                        ],
+                                        'summaryOptions' => ['class' => 'summary mb-2'],
+                                        'pager' => [
+                                            'class' => 'yii\bootstrap4\LinkPager',
+                                        ],
+                                    ]); ?>
+
                                 </div>
 
-                                <?php ActiveForm::end(); ?>
-
-                            </div>
-
-                            <?php
-                            $searchModel = new DocumentoSearch();
-                            $params = Yii::$app->request->queryParams;
-                            $params[$searchModel->formName()]['empleado_id'] = $model->id;
-                            $dataProvider = $searchModel->search($params);
-                            ?>
-
-                            <?php Pjax::begin(); ?>
-                                <br> <br>
-                            <div class="card-container">
-
-                                <?= GridView::widget([
-                                    'dataProvider' => $dataProvider,
-                                    'filterModel' => $searchModel,
-                                    
-                                    'columns' => [
-                                        ['class' => 'yii\grid\SerialColumn'],
-                                        [
-                                            'attribute' => 'nombre',
-                                            'value' => 'nombre',
-                                            'options' => ['style' => 'width: 30%;'],
-                                        ],
-                                        [
-                                            'attribute' => 'fecha_subida',
-                                            'filter' => false,
-                                            'options' => ['style' => 'width: 30%;'],
-                                        ],
-                                        [
-                                            'class' => 'hail812\adminlte3\yii\grid\ActionColumn',
-                                            'template' => '{view} {delete} {download}',
-                                            'buttons' => [
-                                                'view' => function ($url, $model) {
-                                                    return Html::a('<i class="far fa-eye"></i>', ['documento/open', 'id' => $model->id], [
-                                                        'target' => '_blank',
-                                                        'title' => 'Ver archivo',
-                                                        'class' => 'btn btn-info btn-xs',
-                                                        'data-pjax' => "0"
-                                                    ]);
-                                                },
-                                                'delete' => function ($url, $model) {
-                                                    return Html::a('<i class="fas fa-trash"></i>', ['documento/delete', 'id' => $model->id, 'empleado_id' => $model->empleado_id], [
-                                                        'title' => Yii::t('yii', 'Eliminar'),
-                                                        'data-confirm' => Yii::t('yii', '¿Estás seguro de que deseas eliminar este elemento?'),
-                                                        'data-method' => 'post',
-                                                        'class' => 'btn btn-danger btn-xs',
-                                                    ]);
-                                                },
-                                                'download' => function ($url, $model) {
-                                                    return Html::a('<i class="fas fa-download"></i>', ['documento/download', 'id' => $model->id], [
-                                                        'title' => 'Descargar archivo',
-                                                        'class' => 'btn btn-success btn-xs',
-                                                        'data-pjax' => "0"
-                                                    ]);
-                                                },
-                                            ],
-                                            'options' => ['style' => 'width: 15%;'], //ancho de la columna
-                                        ],
-                                    ],
-                                    'summaryOptions' => ['class' => 'summary mb-2'],
-                                    'pager' => [
-                                        'class' => 'yii\bootstrap4\LinkPager',
-                                    ],
-                                ]); ?>
-                            </div>
-                            </div>
-                                
 
                             </div>
 
@@ -888,7 +930,7 @@ document.getElementById('cancel-button-period').addEventListener('click', functi
                                     'label' => 'Información',
                                     'content' => $this->blocks['datos'],
                                     'active' => true,
-                                    'options' =>[
+                                    'options' => [
                                         'id' => 'datos',
                                     ],
 
@@ -897,7 +939,7 @@ document.getElementById('cancel-button-period').addEventListener('click', functi
                                 [
                                     'label' => 'Expediente',
                                     'content' => $this->blocks['expediente'],
-                                    'options' =>[
+                                    'options' => [
                                         'id' => 'expediente',
                                     ],
 
@@ -909,7 +951,7 @@ document.getElementById('cancel-button-period').addEventListener('click', functi
                             'align' => TabsX::ALIGN_CENTER,
                             // 'bordered'=>true,
                             'encodeLabels' => false
-                            
+
 
                         ]);
 

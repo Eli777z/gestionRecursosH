@@ -12,7 +12,7 @@ use Yii;
  * @property string|null $fecha_inicio
  * @property string|null $fecha_final
  * @property string|null $original
- *
+ * @property int|null $dias_vacaciones_periodo
  * @property Vacaciones[] $vacaciones
  */
 class PeriodoVacacional extends \yii\db\ActiveRecord
@@ -40,6 +40,8 @@ class PeriodoVacacional extends \yii\db\ActiveRecord
             [['fecha_inicio', 'fecha_final'], 'safe'],
             [['año'], 'string', 'max' => 8],
             [['original'], 'string', 'max' => 3],
+            [['dias_vacaciones_periodo'], 'integer'],
+
         ];
     }
 
@@ -54,6 +56,8 @@ class PeriodoVacacional extends \yii\db\ActiveRecord
             'fecha_inicio' => 'Fecha Inicio',
             'fecha_final' => 'Fecha Final',
             'original' => 'Original',
+            'dias_vacaciones_periodo' => 'Dias Vacaciones Periodo',
+
         ];
     }
 

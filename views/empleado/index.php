@@ -66,9 +66,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
                             <?php $this->beginBlock('block-empleados'); ?>
                             <div class="card">
-                                <div class="card-header bg-secondary text-white">
+                                <div class="card-header bg-info text-white">
                                     <h3>LISTA DE EMPLEADOS</h3>
-                                    <?= Html::a('Añadir nuevo   <i class="fa fa-plus"></i>', ['create'], ['class' => 'btn btn-secondary float-right mr-3']) ?>
+                                    <?= Html::a('AÑADIR NUEVO EMPLEADO  <i class="fa fa-user-plus fa-lg"></i>', ['create'], ['class' => 'btn btn-warning float-right fa-lg']) ?>
 
                                 </div>
 
