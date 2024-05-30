@@ -84,7 +84,7 @@ if ($empleado) {
                                 'label' => 'Fecha de Permiso',
                                 'value' => function ($model) {
                                    
-                                    setlocale(LC_TIME, "es_419");
+                                    setlocale(LC_TIME, "es_419.UTF-8");
                                     
                                     $fechaPermiso = strtotime($model->motivoFechaPermiso->fecha_permiso);
                                     

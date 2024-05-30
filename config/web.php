@@ -133,6 +133,7 @@ $config = [
             'some-controller/some-action',
             'prueba/*',
             'solicitud/*',
+            'cambio-periodo-vacacional/*',
 'documento/*',
 'countries/*',
 'cat-dpto-cargo/*',

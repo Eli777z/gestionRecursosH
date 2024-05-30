@@ -10,11 +10,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Permiso Economicos', 'url' => ['in
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-<div class="container-fluid">
-    <div class="card">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-12">
+
                     <?=$this->render('_form', [
                        'model' => $model,
                        'motivoFechaPermisoModel' => $motivoFechaPermisoModel,
@@ -22,10 +18,4 @@ $this->params['breadcrumbs'][] = $this->title;
                        'noPermisoAnterior' => $noPermisoAnterior, // Asegúrate de pasar $noPermisoAnterior a la vista
                        'fechaPermisoAnterior' => $fechaPermisoAnterior, // Asegúrate de pasar $fechaPermisoAnterior a la vista
                     ]) ?>
-                </div>
-            </div>
-        </div>
-        <!--.card-body-->
-    </div>
-    <!--.card-->
-</div>
+         

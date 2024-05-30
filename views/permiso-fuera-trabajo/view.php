@@ -107,7 +107,7 @@ if ($empleado) {
         [
             'attribute' => 'fecha_a_reponer',
             'value' => function ($model) {
-                setlocale(LC_TIME, 'es_419.UTF-8');
+                setlocale(LC_TIME, "es_419.UTF-8");
                 $fechaAreponer = strtotime($model->fecha_a_reponer);
                 $fechaFormateada = strftime('%A, %B %d, %Y', $fechaAreponer);
                 setlocale(LC_TIME, null);
@@ -127,7 +127,7 @@ if ($empleado) {
             'label' => 'Fecha de Permiso',
             'value' => function ($model) {
                
-                setlocale(LC_TIME, "es_419");
+                setlocale(LC_TIME, "es_419.UTF-8");
                 
                 $fechaPermiso = strtotime($model->motivoFechaPermiso->fecha_permiso);
                 

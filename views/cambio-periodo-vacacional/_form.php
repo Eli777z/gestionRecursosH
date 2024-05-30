@@ -3,7 +3,6 @@
 use yii\helpers\Html;
 use yii\bootstrap4\ActiveForm;
 use kartik\daterange\DateRangePicker;
-use kartik\time\TimePicker;
 use yii\helpers\ArrayHelper;
 use app\models\JuntaGobierno; 
 use kartik\select2\Select2;
@@ -11,8 +10,10 @@ use app\models\Empleado;
 use hail812\adminlte\widgets\Alert;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\CambioDiaLaboral */
+/* @var $model app\models\CambioPeriodoVacacional */
 /* @var $form yii\bootstrap4\ActiveForm */
+$currentDate = date('Y-m-d');
+
 ?>
 <div class="container-fluid">
     <div class="row justify-content-center">
@@ -20,7 +21,7 @@ use hail812\adminlte\widgets\Alert;
             <div class="card">
             <?php $form = ActiveForm::begin(); ?>
                 <div class="card-header bg-primary text-white">
-                    <h2>CREAR NUEVA SOLICITUD DE CAMBIO DE DIA LABORAL</h2>
+                    <h2>CREAR NUEVA SOLICITUD DE CAMBIO DE PERIODO VACANIONAL</h2>
                    
                 </div>
 
@@ -47,8 +48,7 @@ use hail812\adminlte\widgets\Alert;
                                 }
                                 ?>
                             </div>
-
-<div class="cambio-dia-laboral-form">
+<div class="cambio-periodo-vacacional-form">
 
 <div class="card">
                                             <div class="card-header bg-info text-white">Ingrese los siguientes datos</div>
@@ -56,41 +56,47 @@ use hail812\adminlte\widgets\Alert;
 
 
 
-    <?= $form->field($motivoFechaPermisoModel, 'fecha_permiso')->widget(DateRangePicker::classname(), [
-    'convertFormat' => true,
-    'pluginOptions' => [
-        'singleDatePicker' => true,
-        'showDropdowns' => true,
-        'autoUpdateInput' => true,
-        'locale' => [
-            'format' => 'Y-m-d',
-        ],
-        'opens' => 'right',
-    ],
-    'options' => [
-        'placeholder' => 'Selecciona una fecha...',
-    ],
-    'value' => date('Y-m-d'), // Establecer la fecha de hoy como valor inicial
-])->label('Fecha de permiso') ?>
-<?= $form->field($motivoFechaPermisoModel, 'motivo')->textarea(['rows' => 4]) ?>
 
+    
+
+    <?= $form->field($model, 'motivo')->textarea(['rows' => 6]) ?>
+
+    <?= $form->field($model, 'primera_vez')->dropDownList(
+        ['Sí' => 'Sí', 'No' => 'No'],
+        ['prompt' => 'Seleccionar opción']
+    ) ?>
+    <?= $form->field($model, 'año')->dropDownList(
+    array_combine(range(date('Y'), 2000), range(date('Y'), 2000)), // Genera una lista de años desde el actual hasta 2000
+    ['prompt' => 'Seleccionar Año']
+) ?>
+
+
+
+<?= $form->field($model, 'numero_periodo')->dropDownList(
+        ['1ero' => '1ero', '2do' => '2do'],
+        ['prompt' => 'Seleccionar opción']
+    ) ?>
   
-<?= $form->field($model, 'fecha_a_laborar')->widget(DateRangePicker::classname(), [
-    'convertFormat' => true,
-    'pluginOptions' => [
-        'singleDatePicker' => true,
-        'showDropdowns' => true,
-        'autoUpdateInput' => true,
-        'locale' => [
-            'format' => 'Y-m-d',
-        ],
-        'opens' => 'right',
-    ],
-    'options' => [
-        'placeholder' => 'Selecciona una fecha...',
-    ],
-    'value' => date('Y-m-d'), // Establecer la fecha de hoy como valor inicial
-])->label('Fecha a laborar') ?>
+<?= $form->field($model, 'dateRange', [
+        'options' => ['class' => 'form-group col-md-6'],
+    ])->widget(DateRangePicker::classname(), [
+        'convertFormat' => true,
+        'pluginOptions' => [
+            'locale' => [
+                'format' => 'Y-m-d',
+                'separator' => ' a ',
+            ],
+            'opens' => 'left',
+            'singleDatePicker' => false,
+            'showDropdowns' => true,
+            'alwaysShowCalendars' => true,
+            'minDate' => '2000-01-01',  // Ajusta según tu necesidad
+            'maxDate' => '2100-12-31',  // Ajusta según tu necesidad
+            'startDate' => $currentDate, // Fecha de inicio predeterminada
+            'endDate' => $currentDate, // Fecha de fin predeterminada
+            'autoApply' => true,
+        ]
+    ])->label('Rango de Fechas') ?>
 
 <?php
 
@@ -140,6 +146,7 @@ if ($mostrarCampo && $direccion && in_array($direccion->nombre_direccion, ['2.- 
 
     <?= $form->field($model, 'nombre_jefe_departamento')->hiddenInput()->label(false) ?>
 <?php endif; ?>
+
 
 <?= Html::submitButton('Solicitar  autorización <i class="fa fa-paper-plane fa-md"></i>', [
                         'class' => 'btn btn-success btn-lg float-right', 

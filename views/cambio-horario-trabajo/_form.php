@@ -8,15 +8,53 @@ use yii\helpers\ArrayHelper;
 use app\models\JuntaGobierno; 
 use kartik\select2\Select2;
 use app\models\Empleado;
+use hail812\adminlte\widgets\Alert;
+
 /* @var $this yii\web\View */
 /* @var $model app\models\CambioHorarioTrabajo */
 /* @var $form yii\bootstrap4\ActiveForm */
 $currentDate = date('Y-m-d');
 ?>
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+            <?php $form = ActiveForm::begin(); ?>
+                <div class="card-header bg-primary text-white">
+                    <h2>CREAR NUEVA SOLICITUD DE HORARIO DE TRABAJO</h2>
+                   
+                </div>
 
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="d-flex align-items-center mb-3">
+                                <?php
+                                // Mostrar los flash messages
+                                foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
+                                    if ($type === 'error') {
+                                        // Muestra los mensajes de error en rojo
+                                        echo Alert::widget([
+                                            'options' => ['class' => 'alert-danger'],
+                                            'body' => $message,
+                                        ]);
+                                    } else {
+                                        // Muestra los demás mensajes de flash con estilos predeterminados
+                                        echo Alert::widget([
+                                            'options' => ['class' => 'alert-' . $type],
+                                            'body' => $message,
+                                        ]);
+                                    }
+                                }
+                                ?>
+                            </div>
 <div class="cambio-horario-trabajo-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+<div class="card">
+                                            <div class="card-header bg-info text-white">Ingrese los siguientes datos</div>
+                                            <div class="card-body">
+
+
 
     <?= $form->field($motivoFechaPermisoModel, 'fecha_permiso')->widget(DateRangePicker::classname(), [
     'convertFormat' => true,
@@ -129,11 +167,25 @@ if ($mostrarCampo && $direccion && in_array($direccion->nombre_direccion, ['2.- 
 
     <?= $form->field($model, 'nombre_jefe_departamento')->hiddenInput()->label(false) ?>
 <?php endif; ?>
+<?= Html::submitButton('Solicitar  autorización <i class="fa fa-paper-plane fa-md"></i>', [
+                        'class' => 'btn btn-success btn-lg float-right', 
+                        'id' => 'save-button-personal'
+                    ]) ?>
+</div>
+                                        </div>
+                                   
 
-    <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+
+<?php ActiveForm::end(); ?>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+             
+            </div>
+        </div>
     </div>
-
-    <?php ActiveForm::end(); ?>
-
 </div>

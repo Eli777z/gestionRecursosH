@@ -18,15 +18,27 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="card-header bg-primary text-white">
                     <div class="d-flex justify-content-between"> 
                         
-                        <div class="form-group mr-2">
-                        <?= Html::beginForm(['aprobar-solicitud', 'id' => $model->id], 'post', ['class' => 'form-inline']) ?>
-                            <?= Html::label('Añadir Comentarios:', null, ['class' => 'control-label']) ?>
-                            <?= Html::textInput('comentario', $model->comentario, ['class' => 'form-control']) ?>
-                        </div>
-                        
-                        <div class="form-group mr-2 mb-2">
-                            <?= Html::submitButton(Html::tag('i', '  Aprobar', ['class' => 'fas fa-check']), ['name' => 'status', 'value' => 'Aprobado', 'class' => 'btn btn-success', 'title' => 'Aceptar']) ?>
-                        </div>
+                    <div class="form-group mr-2">
+    <?= Html::beginForm(['aprobar-solicitud', 'id' => $model->id], 'post', ['class' => 'form-inline']) ?>
+        <?= Html::label('Añadir Comentarios:', null, ['class' => 'control-label']) ?>
+        <?= Html::textInput('comentario', $model->comentario, ['class' => 'form-control']) ?>
+    <?= Html::endForm() ?>
+</div>
+
+<div class="form-group mr-2 mb-2">
+    <?php if ($model->nombre_formato == 'CAMBIO PERIODO VACACIONAL'): ?>
+        <?= Html::beginForm(['aprobar-cambio-periodo-vacacional', 'id' => $model->id], 'post', ['class' => 'form-inline']) ?>
+        <?= Html::submitButton(Html::tag('i', '  Aprobar', ['class' => 'fas fa-check']), ['name' => 'status', 'value' => 'Aprobado', 'class' => 'btn btn-primary', 'title' => 'Aceptar']) ?>
+        <?= Html::endForm() ?>
+    <?php else: ?>
+        <?= Html::beginForm(['aprobar-solicitud', 'id' => $model->id], 'post', ['class' => 'form-inline']) ?>
+        <?= Html::submitButton(Html::tag('i', '  Aprobar', ['class' => 'fas fa-check']), ['name' => 'status', 'value' => 'Aprobado', 'class' => 'btn btn-success', 'title' => 'Aceptar']) ?>
+        <?= Html::endForm() ?>
+    <?php endif; ?>
+</div>
+
+
+
                         <div class="form-group mr-2 mb-2">
                             <?= Html::submitButton(Html::tag('i', '  Rechazar', ['class' => 'fas fa-times']), ['name' => 'status', 'value' => 'Rechazado', 'class' => 'btn btn-danger', 'title' => 'Rechazar']) ?>
                         </div>

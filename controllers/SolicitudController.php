@@ -14,7 +14,7 @@ use app\models\CatDireccion;
 use app\models\ComisionEspecial;
 use app\models\Notificacion;
 use PhpOffice\PhpSpreadsheet\IOFactory;
-
+use app\models\CambioPeriodoVacacional;
 /**
  * SolicitudController implements the CRUD actions for Solicitud model.
  */
@@ -124,11 +124,85 @@ class SolicitudController extends Controller
     
         return $this->redirect(['index']);
     }
-    
-    
 
-
-    /**
+    public function actionAprobarCambioPeriodoVacacional($id)
+    {
+        $model = $this->findModel($id);
+        $cambioPeriodo = CambioPeriodoVacacional::findOne(['solicitud_id' => $model->id]);
+    
+        if (Yii::$app->request->isPost) {
+            $status = Yii::$app->request->post('status');
+            $comentario = Yii::$app->request->post('comentario');
+    
+            $model->status = $status;
+            $model->comentario = $comentario;
+    
+            $usuarioId = Yii::$app->user->identity->id;
+            $empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();
+    
+            if ($empleado) {
+                $model->fecha_aprobacion = date('Y-m-d H:i:s');
+                $model->nombre_aprobante = $empleado->nombre . ' ' . $empleado->apellido;
+    
+                if ($model->save()) {
+                    if ($status == 'Aprobado' && $cambioPeriodo) {
+                        $vacaciones = $model->empleado->informacionLaboral->vacaciones;
+                        if ($cambioPeriodo->numero_periodo == '1ero') {
+                            $periodoVacacional = $vacaciones->periodoVacacional;
+                        } else {
+                            $periodoVacacional = $vacaciones->segundoPeriodoVacacional;
+                        }
+    
+                        if ($periodoVacacional) {
+                            // Calcular el número de días seleccionados en el rango
+                            $fechaInicio = new \DateTime($cambioPeriodo->fecha_inicio_periodo);
+                            $fechaFin = new \DateTime($cambioPeriodo->fecha_fin_periodo);
+                            $diasSeleccionados = $fechaInicio->diff($fechaFin)->days + 1;
+    
+                            // Calcular el nuevo valor de dias_disponibles
+                            $diasDisponibles = $periodoVacacional->dias_vacaciones_periodo - $diasSeleccionados;
+    
+                            // Actualizar el campo dias_disponibles
+                            $periodoVacacional->dias_disponibles = $diasDisponibles+1;
+    
+                            // Actualizar el periodo vacacional
+                            $periodoVacacional->fecha_inicio = $cambioPeriodo->fecha_inicio_periodo;
+                            $periodoVacacional->fecha_final = $cambioPeriodo->fecha_fin_periodo;
+                            $periodoVacacional->año = $cambioPeriodo->año;
+                            $periodoVacacional->original = 'No';
+    
+                            if ($periodoVacacional->save()) {
+                                Yii::$app->session->setFlash('success', 'El periodo vacacional ha sido actualizado correctamente.');
+                            } else {
+                                Yii::$app->session->setFlash('error', 'Hubo un error al actualizar el periodo vacacional.');
+                            }
+                        }
+                    }
+    
+                    $notificacion = new Notificacion();
+                    $notificacion->usuario_id = $model->empleado->usuario_id;
+                    $notificacion->mensaje = 'Su solicitud de cambio de periodo vacacional ha sido ' . ($status == 'Aprobado' ? 'aprobada' : 'rechazada') . '.';
+                    $notificacion->created_at = date('Y-m-d H:i:s');
+                    $notificacion->leido = 0;
+    
+                    if ($notificacion->save()) {
+                        Yii::$app->session->setFlash('success', 'Solicitud modificada correctamente.');
+                    } else {
+                        Yii::$app->session->setFlash('error', 'Hubo un error al guardar la notificación.');
+                    }
+                } else {
+                    Yii::$app->session->setFlash('error', 'Hubo un error al modificar la solicitud.');
+                }
+            } else {
+                Yii::$app->session->setFlash('error', 'No se pudo encontrar el empleado asociado al usuario actual.');
+            }
+    
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
+    
+        return $this->redirect(['index']);
+    }
+     /**
      * Updates an existing Solicitud model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param int $id ID

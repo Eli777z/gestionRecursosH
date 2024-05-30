@@ -7,11 +7,52 @@ use yii\helpers\ArrayHelper;
 use app\models\JuntaGobierno;
 use kartik\select2\Select2;
 use app\models\Empleado;
+use hail812\adminlte\widgets\Alert;
+
 /* @var $this yii\web\View */
 /* @var $model app\models\PermisoSinSueldo */
 /* @var $form yii\bootstrap4\ActiveForm */
 ?>
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+            <?php $form = ActiveForm::begin(); ?>
+                <div class="card-header bg-primary text-white">
+                    <h2>CREAR NUEVA SOLICITUD DE PERMISO SIN GOCE DE SUELDO</h2>
+                   
+                </div>
+
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="d-flex align-items-center mb-3">
+                                <?php
+                                // Mostrar los flash messages
+                                foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
+                                    if ($type === 'error') {
+                                        // Muestra los mensajes de error en rojo
+                                        echo Alert::widget([
+                                            'options' => ['class' => 'alert-danger'],
+                                            'body' => $message,
+                                        ]);
+                                    } else {
+                                        // Muestra los demás mensajes de flash con estilos predeterminados
+                                        echo Alert::widget([
+                                            'options' => ['class' => 'alert-' . $type],
+                                            'body' => $message,
+                                        ]);
+                                    }
+                                }
+                                ?>
+                            </div>
 <div class="permiso-economico-form">
+<div class="card">
+                                            <div class="card-header bg-info text-white">Ingrese los siguientes datos</div>
+                                            <div class="card-body">
+
+
+
 <div class="form-group">
     <label class="control-label">No Permiso Anterior</label>
     <?php if ($noPermisoAnterior === null): ?>
@@ -31,7 +72,7 @@ use app\models\Empleado;
 </div>
 
 
-    <?php $form = ActiveForm::begin(); ?>
+   
 
 
 
@@ -107,11 +148,25 @@ use app\models\Empleado;
         <?= $form->field($model, 'nombre_jefe_departamento')->hiddenInput()->label(false) ?>
     <?php endif; ?>
 
+    <?= Html::submitButton('Solicitar  autorización <i class="fa fa-paper-plane fa-md"></i>', [
+                        'class' => 'btn btn-success btn-lg float-right', 
+                        'id' => 'save-button-personal'
+                    ]) ?>
+</div>
+                                        </div>
+                                   
 
-    <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+
+<?php ActiveForm::end(); ?>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+             
+            </div>
+        </div>
     </div>
-
-    <?php ActiveForm::end(); ?>
-
 </div>

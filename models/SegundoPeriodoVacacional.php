@@ -39,7 +39,7 @@ class SegundoPeriodoVacacional extends \yii\db\ActiveRecord
             [['fecha_inicio', 'fecha_final'], 'safe'],
             [['año'], 'string', 'max' => 8],
             [['original'], 'string', 'max' => 3],
-            [['dias_vacaciones_periodo'], 'integer'],
+            [['dias_vacaciones_periodo', 'dias_disponibles'], 'integer'],
             
 
 
@@ -58,6 +58,7 @@ class SegundoPeriodoVacacional extends \yii\db\ActiveRecord
             'fecha_final' => 'Fecha Final',
             'original' => 'Original',
             'dias_vacaciones_periodo' => 'Dias Vacaciones Periodo',
+            'dias_disponibles' => 'Dias disponibles',
 
         ];
     }

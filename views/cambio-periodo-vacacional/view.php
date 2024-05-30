@@ -1,15 +1,13 @@
 <?php
 
-use hail812\adminlte\widgets\Alert;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
-use app\models\Empleado;
-use app\models\JuntaGobierno;
+
 /* @var $this yii\web\View */
-/* @var $model app\models\CambioDiaLaboral */
+/* @var $model app\models\CambioPeriodoVacacional */
 
 $this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Cambio Dia Laborals', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Cambio Periodo Vacacionals', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
@@ -28,84 +26,50 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'method' => 'post',
                             ],
                         ]) ?>
-                                      <?php
-
-
-// Obtener el ID del usuario que tiene la sesión iniciada
-$usuarioId = Yii::$app->user->identity->id;
-
-// Buscar el empleado relacionado con el usuario
-$empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();
-
-if ($empleado) {
-    $model->empleado_id = $empleado->id;
-
-    // Buscar el registro en junta_gobierno que corresponde al empleado
-    $juntaGobierno = JuntaGobierno::find()->where(['empleado_id' => $empleado->id])->one();
-
-    if ($model->solicitud->status === 'Aprobado') {
-        if ($juntaGobierno && ($juntaGobierno->nivel_jerarquico === 'Jefe de unidad' || $juntaGobierno->nivel_jerarquico === 'Director')){
-            echo Html::a('Exportar Excel', ['export-segundo-caso', 'id' => $model->id], ['class' => 'btn btn-success']);
-            echo Html::a('Exportar PDF', ['export-pdf', 'id' => $model->id], ['class' => 'btn btn-danger']);
-        } else {
-            echo Html::a('Exportar Excel', ['export', 'id' => $model->id], ['class' => 'btn btn-primary']);
-            echo Html::a('Exportar PDF', ['export-pdf', 'id' => $model->id], ['class' => 'btn btn-danger']);
-        }
-    }
-} else {
-    Yii::$app->session->setFlash('error', 'No se pudo encontrar el empleado asociado al usuario actual.');
-    return $this->redirect(['index']);
-}
-?>
-                          
                     </p>
-
-                    <?php 
-    // Mostrar los flash messages
-    foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
-        echo Alert::widget([
-            'options' => ['class' => 'alert-' . $type],
-            'body' => $message,
-        ]);
-    }
-    ?>
                     <?= DetailView::widget([
                         'model' => $model,
                         'attributes' => [
-                            'id',
-                            'empleado_id',
-                            'solicitud_id',
+                           // 'id',
+                            //'empleado_id',
+                            //'solicitud_id',
+                            'motivo:ntext',
+                            'año',
+                            'primera_vez',
+                           // 'nombre_jefe_departamento',
+                            'numero_periodo',
+                          //  'fecha_inicio_periodo',
                             [
-                                'label' => 'Motivo',
-                                'value' => function ($model) {
-                                    return $model->motivoFechaPermiso->motivo; // Reemplaza "nombre_del_atributo_del_motivo" con el nombre del atributo que deseas mostrar
-                                },
-                            ],
-                            [
-                                'attribute' => 'fecha_a_laborar',
-                                'value' => function ($model) {
-                                    setlocale(LC_TIME, "es_419.UTF-8");
-                                    $fechaAlaborar = strtotime($model->fecha_a_laborar);
-                                    $fechaFormateada = strftime('%A, %B %d, %Y', $fechaAlaborar);
-                                    setlocale(LC_TIME, null);
-                                    return $fechaFormateada;
-                                },
-                            ],
-                            [
-                                'label' => 'Fecha de Permiso',
+                                'label' => 'Fecha de Inicio',
                                 'value' => function ($model) {
                                    
                                     setlocale(LC_TIME, "es_419.UTF-8");
                                     
-                                    $fechaPermiso = strtotime($model->motivoFechaPermiso->fecha_permiso);
+                                    $fechaInicio= strtotime($model->fecha_inicio_periodo);
                                     
-                                    $fechaFormateada = strftime('%A, %B %d, %Y', $fechaPermiso);
+                                    $fechaFormateada = strftime('%A, %B %d, %Y', $fechaInicio);
                                     
                                     setlocale(LC_TIME, null);
                                     
                                     return $fechaFormateada;
                                 },
                             ],
+                            [
+                                'label' => 'Fecha de Fin',
+                                'value' => function ($model) {
+                                   
+                                    setlocale(LC_TIME, "es_419.UTF-8");
+                                    
+                                    $fechaInicio= strtotime($model->fecha_fin_periodo);
+                                    
+                                    $fechaFormateada = strftime('%A, %B %d, %Y', $fechaInicio);
+                                    
+                                    setlocale(LC_TIME, null);
+                                    
+                                    return $fechaFormateada;
+                                },
+                            ],
+                            //'fecha_fin_periodo',
                             [
                                 'label' => 'Status',
                                 'value' => function ($model) {
@@ -158,6 +122,7 @@ if ($empleado) {
                                     return $aprobante;
                                 },
                             ],
+                           
                         ],
                     ]) ?>
                 </div>

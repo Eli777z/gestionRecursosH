@@ -265,7 +265,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                 <?php $form = ActiveForm::begin(['action' => ['junta-gobierno/create'], 'options' => ['enctype' => 'multipart/form-data']]); ?>
 
-                                <div class="card-header bg-secondary text-white">
+                                <div class="card-header bg-info text-white">
                                     <h3>Añadir empleado a la junta de gobierno</h3>
 
                                     <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-secondary float-right mr-3', 'id' => 'save-button-personal']) ?>
