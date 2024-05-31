@@ -9,6 +9,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\helpers\Url;
+use app\models\InformacionLaboral;
 /**
  * JuntaGobiernoController implements the CRUD actions for JuntaGobierno model.
  */
@@ -114,14 +115,21 @@ class JuntaGobiernoController extends Controller
      */
     public function actionDelete($id, $cat_direccion_id, $cat_departamento_id, $empleado_id)
     {
-        $this->findModel($id, $cat_direccion_id, $cat_departamento_id, $empleado_id)->delete();
-        Yii::$app->session->setFlash('success', 'El primer periodo ha sido actualizado correctamente.');
-        $url = Url::to(['empleado/index',]) . '#junta_gobierno';
-            return $this->redirect($url);
-
-       // return $this->redirect(['empleado/index']);
+        $model = $this->findModel($id, $cat_direccion_id, $cat_departamento_id, $empleado_id);
+    
+        // Establecer a NULL el campo `junta_gobierno_id` en la tabla `informacion_laboral`
+        InformacionLaboral::updateAll(['junta_gobierno_id' => null], ['junta_gobierno_id' => $id]);
+    
+        if ($model->delete()) {
+            Yii::$app->session->setFlash('success', 'Empleado eliminado de junta gobierno.');
+        } else {
+            Yii::$app->session->setFlash('error', 'Hubo un error al eliminar el registro.');
+        }
+    
+        $url = Url::to(['empleado/index']) . '#junta_gobierno';
+        return $this->redirect($url);
     }
-
+    
     /**
      * Finds the JuntaGobierno model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.

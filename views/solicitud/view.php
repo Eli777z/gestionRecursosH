@@ -3,19 +3,29 @@
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\bootstrap5\Alert;
+use yii\web\View;
 /* @var $this yii\web\View */
 /* @var $model app\models\Solicitud */
+$this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
 
 $this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Solicituds', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+
+
+$this->params['breadcrumbs'][] = ['label' => 'Solicitudes', 'url' => ['solicitud/index']];
+
+if ($empleadoId !== null) {
+   
+    $this->params['breadcrumbs'][] = ['label' => 'Empleado ' . $empleadoId, 'url' => ['empleado/view', 'id' => $empleadoId]];
+}
+$this->params['breadcrumbs'][] = ['label' => 'Solicitud ' . $model->id];
+
 \yii\web\YiiAsset::register($this);
 ?>
 <div class="container-fluid">
     <div class="row justify-content-center"> <!-- Centra el contenido horizontalmente -->
         <div class="col-md-8"> <!-- Div principal con ancho personalizado -->
             <div class="card">
-                <div class="card-header bg-primary text-white">
+            <div class="card-header gradient-info text-white"><!-- Agregando las clases bg-primary y text-white -->
                     <div class="d-flex justify-content-between"> 
                         
                     <div class="form-group mr-2">

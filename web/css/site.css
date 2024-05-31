@@ -164,5 +164,18 @@ a.desc:after {
     text-decoration: none; /* Opcional: eliminar el subrayado al pasar el cursor */
 }
 .small-font {
-    font-size: 13px; /* Ajusta este valor según tus necesidades */
+    font-size: 15px; /* Ajusta este valor según tus necesidades */
+}
+
+.gradient-yellow {
+    background: rgb(32,120,224);
+    background: linear-gradient(90deg, rgba(32,120,224,1) 0%, rgba(12,168,222,1) 35%, rgba(0,219,255,1) 100%);
+
+}
+
+
+.gradient-info {
+    background: rgb(63,203,251);
+    background: radial-gradient(circle, rgba(63,203,251,1) 0%, rgba(70,113,252,1) 100%);
+
 }

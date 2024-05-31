@@ -20,8 +20,7 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
     <div class="row justify-content-center">
         <div class="col-md-10">
             <div class="card">
-            <div class="card-header bg-primary text-white"> <!-- Agregando las clases bg-primary y text-white -->
-                    <h3><?= Html::encode($this->title) ?></h3>
+            <div class="card-header gradient-info text-white"><!-- Agregando las clases bg-primary y text-white -->                    <h3><?= Html::encode($this->title) ?></h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -44,7 +43,7 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
                                         'permiso_sin_goce_de_sueldo' => 'Permiso Sin Goce de Sueldo',
                                         'cambio_dia_laboral' => 'Cambio de Día Laboral',
                                         'cambio_horario_trabajo' => 'Cambio de Horario de Trabajo',
-                                        'cambio_vacacional' => 'Cambio de Período Vacacional',
+                                        'cambio_periodo_vacacional' => 'Cambio de Período Vacacional',
                                         'reporte_tiempo_extra' => 'Reporte de Tiempo Extra',
                                         'reporte_general_tiempo_extra' => 'Reporte General de Tiempo Extra',
                                     ],
@@ -55,6 +54,10 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
                                     'pluginOptions' => [
                                         'allowClear' => true,
                                     ],
+
+                             
+                                'theme' => Select2::THEME_KRAJEE_BS4, // Esto aplicará el estilo de Bootstrap al Select2
+                              
                                 ])->label('Selecciona el nombre para el archivo'); ?>
 
 <?= $form->field($model, 'file')->widget(FileInput::classname(), [
@@ -69,7 +72,7 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
 
 
                                 <div class="form-group">
-                                    <?= Html::submitButton('Subir', ['class' => 'btn btn-primary', 'name' => 'upload-button']) ?>
+                                    <?= Html::submitButton('Subir', ['class' => 'btn btn-dark ', 'name' => 'upload-button']) ?>
                                 </div>
 
                                 <?php ActiveForm::end(); ?>
@@ -91,7 +94,7 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
                                         <?= Yii::$app->session->getFlash('deleteError') ?>
                                     </div>
                                 <?php endif; ?>
-                                <div class="card-header bg-primary text-white"> <!-- Agregando las clases bg-primary y text-white -->
+                                <div class="card-header bg-info text-white"> <!-- Agregando las clases bg-primary y text-white -->
                                 <h4>Plantillas</h4>
                 </div>
                                 

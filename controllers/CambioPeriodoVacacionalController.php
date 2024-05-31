@@ -14,6 +14,9 @@ use app\models\Solicitud;
 use app\models\JuntaGobierno;
 use app\models\Notificacion;
 use app\models\CatDireccion;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use DateTime;
+use app\models\PeriodoVacacionalHistorial;
 /**
  * CambioPeriodoVacacionalController implements the CRUD actions for CambioPeriodoVacacional model.
  */
@@ -205,4 +208,430 @@ class CambioPeriodoVacacionalController extends Controller
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+
+
+    public function actionExport($id)
+    {
+        // Encuentra el modelo PermisoFueraTrabajo según el ID pasado como parámetro
+        $model = CambioPeriodoVacacional::findOne($id);
+
+        if (!$model) {
+            throw new NotFoundHttpException('El registro no existe.');
+        }
+
+        // Ruta a tu plantilla de Excel
+        $templatePath = Yii::getAlias('@app/templates/cambio_periodo_vacacional.xlsx');
+
+        // Cargar la plantilla de Excel
+        $spreadsheet = IOFactory::load($templatePath);
+
+        // Modificar la plantilla con los datos del modelo
+        $sheet = $spreadsheet->getActiveSheet();
+
+        setlocale(LC_TIME, 'es_419.UTF-8');
+
+        if ($model->numero_periodo === '1ero') {
+            $sheet->setCellValue('G14', 'X');
+            $sheet->setCellValue('P14', '');
+            $sheet->setCellValue('I14', $model->año);
+    
+            // Buscar el periodo original en el historial
+            $periodoOriginal = PeriodoVacacionalHistorial::find()
+                ->where(['empleado_id' => $model->empleado_id, 'periodo' => 'primer periodo', 'original' => 'Si'])
+                ->orderBy(['created_at' => SORT_DESC])
+                ->one();
+    
+            $periodoVacacional = $model->empleado->informacionLaboral->vacaciones->periodoVacacional;
+    
+            $fechaInicioOriginal = strftime('%d de %B del %Y', strtotime($periodoOriginal->fecha_inicio));
+            $fechaFinOriginal = strftime('%d de %B del %Y', strtotime($periodoOriginal->fecha_final));
+            $fechaInicioNuevo = strftime('%d de %B del %Y', strtotime($model->fecha_inicio_periodo));
+            $fechaFinNuevo = strftime('%d de %B del %Y', strtotime($model->fecha_fin_periodo));
+    
+            // Colocar las fechas en las celdas correspondientes
+            $sheet->setCellValue('G16', "$fechaInicioOriginal al $fechaFinOriginal");
+            $sheet->setCellValue('G17', "$fechaInicioNuevo al $fechaFinNuevo");
+            $sheet->setCellValue('G18', $periodoVacacional->dias_vacaciones_periodo);
+            $sheet->setCellValue('G19', $periodoVacacional->dias_disponibles);
+    
+            if ($model->primera_vez === 'Sí') {
+                $sheet->setCellValue('P23', 'X');
+                $sheet->setCellValue('S23', '');
+            } elseif ($model->primera_vez === 'No') {
+                $sheet->setCellValue('P23', '');
+                $sheet->setCellValue('S23', 'X');
+            }
+    
+        } elseif ($model->numero_periodo === '2do') {
+            $sheet->setCellValue('G14', '');
+            $sheet->setCellValue('P14', 'X');
+            $sheet->setCellValue('S14', $model->año);
+    
+            // Buscar el periodo original en el historial
+            $periodoOriginal = PeriodoVacacionalHistorial::find()
+                ->where(['empleado_id' => $model->empleado_id, 'periodo' => 'segundo periodo', 'original' => 'Si'])
+                ->orderBy(['created_at' => SORT_DESC])
+                ->one();
+    
+            $periodoVacacional = $model->empleado->informacionLaboral->vacaciones->segundoPeriodoVacacional;
+    
+            $fechaInicioOriginal = strftime('%d de %B del %Y', strtotime($periodoOriginal->fecha_inicio));
+            $fechaFinOriginal = strftime('%d de %B del %Y', strtotime($periodoOriginal->fecha_final));
+            $fechaInicioNuevo = strftime('%d de %B del %Y', strtotime($model->fecha_inicio_periodo));
+            $fechaFinNuevo = strftime('%d de %B del %Y', strtotime($model->fecha_fin_periodo));
+    
+            // Colocar las fechas en las celdas correspondientes
+            $sheet->setCellValue('G16', "$fechaInicioOriginal al $fechaFinOriginal");
+            $sheet->setCellValue('G17', "$fechaInicioNuevo al $fechaFinNuevo");
+            $sheet->setCellValue('G18', $periodoVacacional->dias_vacaciones_periodo);
+            $sheet->setCellValue('G19', $periodoVacacional->dias_disponibles);
+    
+            if ($model->primera_vez === 'Sí') {
+                $sheet->setCellValue('P23', 'X');
+                $sheet->setCellValue('S23', '');
+            } elseif ($model->primera_vez === 'No') {
+                $sheet->setCellValue('P23', '');
+                $sheet->setCellValue('S23', 'X');
+            }
+        }
+
+
+
+
+
+        $sheet->setCellValue('F6', $model->empleado->numero_empleado);
+
+
+        $nombre = mb_strtoupper($model->empleado->nombre, 'UTF-8');
+        $apellido = mb_strtoupper($model->empleado->apellido, 'UTF-8');
+        $nombreCompleto = $apellido . ' ' . $nombre;
+        $sheet->setCellValue('H7', $nombreCompleto);
+
+
+        setlocale(LC_TIME, 'es_419.UTF-8');
+        $fechaHOY = strftime('%A, %B %d, %Y');
+        $sheet->setCellValue('N6', $fechaHOY);
+
+        $nombrePuesto = $model->empleado->informacionLaboral->catPuesto->nombre_puesto;
+        $sheet->setCellValue('H8', $nombrePuesto);
+
+        $nombreCargo = $model->empleado->informacionLaboral->catDptoCargo->nombre_dpto;
+        $sheet->setCellValue('H9', $nombreCargo);
+
+        $nombreDireccion = $model->empleado->informacionLaboral->catDireccion->nombre_direccion;
+        $sheet->setCellValue('H10', $nombreDireccion);
+
+        $nombreDepartamento = $model->empleado->informacionLaboral->catDepartamento->nombre_departamento;
+        $sheet->setCellValue('H11', $nombreDepartamento);
+
+        $nombreTipoContrato = $model->empleado->informacionLaboral->catTipoContrato->nombre_tipo;
+        $sheet->setCellValue('H12', $nombreTipoContrato);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        $sheet->setCellValue('G20', $model->motivo);
+
+
+
+
+
+
+        $sheet->setCellValue('B28', $nombreCompleto);
+
+
+        $sheet->setCellValue('B29', $nombrePuesto);
+
+        // Obtener la dirección asociada al empleado
+        $direccion = CatDireccion::findOne($model->empleado->informacionLaboral->cat_direccion_id);
+
+        // Verificar si la dirección no es '1.- GENERAL' y si se ha ingresado un nombre de Jefe de Departamento
+        if ($direccion && $direccion->nombre_direccion !== '1.- GENERAL' && $model->nombre_jefe_departamento) {
+            $nombreCompletoJefe = mb_strtoupper($model->nombre_jefe_departamento, 'UTF-8');
+            $sheet->setCellValue('I28', $nombreCompletoJefe);
+        } else {
+            $sheet->setCellValue('I28', null);
+        }
+
+
+
+
+        $juntaDirectorDireccion = JuntaGobierno::find()
+            ->where(['cat_direccion_id' => $model->empleado->informacionLaboral->cat_direccion_id])
+            ->andWhere(['or', ['nivel_jerarquico' => 'Director'], ['nivel_jerarquico' => 'Jefe de unidad']])
+            ->one();
+
+        if ($juntaDirectorDireccion) {
+            $nombreDirector = mb_strtoupper($juntaDirectorDireccion->empleado->nombre, 'UTF-8');
+            $apellidoDirector = mb_strtoupper($juntaDirectorDireccion->empleado->apellido, 'UTF-8');
+            $profesionDirector = mb_strtoupper($juntaDirectorDireccion->profesion, 'UTF-8');
+            $nombreCompletoDirector = $profesionDirector . ' ' . $apellidoDirector . ' ' . $nombreDirector;
+
+            $sheet->setCellValue('O28', $nombreCompletoDirector);
+
+            $nombreDireccion = $juntaDirectorDireccion->catDireccion->nombre_direccion;
+            switch ($nombreDireccion) {
+                case '1.- GENERAL':
+                    if ($juntaDirectorDireccion->nivel_jerarquico == 'Jefe de unidad') {
+                        $tituloDireccion = 'JEFE DE ' . $juntaDirectorDireccion->catDepartamento->nombre_departamento;
+                    } else {
+                        $tituloDireccion = 'DIRECTOR GENERAL';
+                    }
+                    break;
+                case '2.- ADMINISTRACIÓN':
+                    $tituloDireccion = 'DIRECTOR DE ADMINISTRACIÓN';
+                    break;
+                case '4.- OPERACIONES':
+                    $tituloDireccion = 'DIRECTOR DE OPERACIONES';
+                    break;
+                case '3.- COMERCIAL':
+                    $tituloDireccion = 'DIRECTOR COMERCIAL';
+                    break;
+                case '5.- PLANEACION':
+                    $tituloDireccion = 'DIRECTOR DE PLANEACION';
+                    break;
+                default:
+                    $tituloDireccion = ''; // Otra dirección no especificada
+            }
+
+            $sheet->setCellValue('O29', $tituloDireccion);
+        } else {
+            $sheet->setCellValue('O28', null);
+            $sheet->setCellValue('O29', null);
+        }
+
+        $tempFileName = Yii::getAlias('@app/runtime/archivos_temporales/cambio_periodo_vacacional.xlsx');
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save($tempFileName);
+
+        // Luego, proporciona un enlace para que el usuario descargue el archivo
+        // Puedes redirigir a una acción que presente el enlace o generar directamente el enlace aquí mismo
+        return $this->redirect(['download', 'filename' => basename($tempFileName)]);
+    }
+
+
+    public function actionDownload($filename)
+    {
+        $filePath = Yii::getAlias("@app/runtime/archivos_temporales/$filename");
+        if (file_exists($filePath)) {
+            return Yii::$app->response->sendFile($filePath);
+        } else {
+            throw new NotFoundHttpException('El archivo solicitado no existe.');
+        }
+    }
+
+
+    public function actionExportSegundoCaso($id)
+    {
+        // Encuentra el modelo PermisoFueraTrabajo según el ID pasado como parámetro
+        $model = CambioPeriodoVacacional::findOne($id);
+
+        if (!$model) {
+            throw new NotFoundHttpException('El registro no existe.');
+        }
+
+        // Ruta a tu plantilla de Excel
+        $templatePath = Yii::getAlias('@app/templates/cambio_periodo_vacacional.xlsx');
+
+        // Cargar la plantilla de Excel
+        $spreadsheet = IOFactory::load($templatePath);
+
+        // Modificar la plantilla con los datos del modelo
+        $sheet = $spreadsheet->getActiveSheet();
+
+        setlocale(LC_TIME, 'es_419.UTF-8');
+
+        if ($model->numero_periodo === '1ero') {
+            $sheet->setCellValue('G14', 'X');
+            $sheet->setCellValue('P14', '');
+            $sheet->setCellValue('I14', $model->año);
+    
+            // Buscar el periodo original en el historial
+            $periodoOriginal = PeriodoVacacionalHistorial::find()
+                ->where(['empleado_id' => $model->empleado_id, 'periodo' => 'primer periodo', 'original' => 'Si'])
+                ->orderBy(['created_at' => SORT_DESC])
+                ->one();
+    
+            $periodoVacacional = $model->empleado->informacionLaboral->vacaciones->periodoVacacional;
+    
+            $fechaInicioOriginal = strftime('%d de %B del %Y', strtotime($periodoOriginal->fecha_inicio));
+            $fechaFinOriginal = strftime('%d de %B del %Y', strtotime($periodoOriginal->fecha_final));
+            $fechaInicioNuevo = strftime('%d de %B del %Y', strtotime($model->fecha_inicio_periodo));
+            $fechaFinNuevo = strftime('%d de %B del %Y', strtotime($model->fecha_fin_periodo));
+    
+            // Colocar las fechas en las celdas correspondientes
+            $sheet->setCellValue('G16', "$fechaInicioOriginal al $fechaFinOriginal");
+            $sheet->setCellValue('G17', "$fechaInicioNuevo al $fechaFinNuevo");
+            $sheet->setCellValue('G18', $periodoVacacional->dias_vacaciones_periodo);
+            $sheet->setCellValue('G19', $periodoVacacional->dias_disponibles);
+    
+            if ($model->primera_vez === 'Sí') {
+                $sheet->setCellValue('P23', 'X');
+                $sheet->setCellValue('S23', '');
+            } elseif ($model->primera_vez === 'No') {
+                $sheet->setCellValue('P23', '');
+                $sheet->setCellValue('S23', 'X');
+            }
+    
+        } elseif ($model->numero_periodo === '2do') {
+            $sheet->setCellValue('G14', '');
+            $sheet->setCellValue('P14', 'X');
+            $sheet->setCellValue('S14', $model->año);
+    
+            // Buscar el periodo original en el historial
+            $periodoOriginal = PeriodoVacacionalHistorial::find()
+                ->where(['empleado_id' => $model->empleado_id, 'periodo' => 'segundo periodo', 'original' => 'Si'])
+                ->orderBy(['created_at' => SORT_DESC])
+                ->one();
+    
+            $periodoVacacional = $model->empleado->informacionLaboral->vacaciones->segundoPeriodoVacacional;
+    
+            $fechaInicioOriginal = strftime('%d de %B del %Y', strtotime($periodoOriginal->fecha_inicio));
+            $fechaFinOriginal = strftime('%d de %B del %Y', strtotime($periodoOriginal->fecha_final));
+            $fechaInicioNuevo = strftime('%d de %B del %Y', strtotime($model->fecha_inicio_periodo));
+            $fechaFinNuevo = strftime('%d de %B del %Y', strtotime($model->fecha_fin_periodo));
+    
+            // Colocar las fechas en las celdas correspondientes
+            $sheet->setCellValue('G16', "$fechaInicioOriginal al $fechaFinOriginal");
+            $sheet->setCellValue('G17', "$fechaInicioNuevo al $fechaFinNuevo");
+            $sheet->setCellValue('G18', $periodoVacacional->dias_vacaciones_periodo);
+            $sheet->setCellValue('G19', $periodoVacacional->dias_disponibles);
+    
+            if ($model->primera_vez === 'Sí') {
+                $sheet->setCellValue('P23', 'X');
+                $sheet->setCellValue('S23', '');
+            } elseif ($model->primera_vez === 'No') {
+                $sheet->setCellValue('P23', '');
+                $sheet->setCellValue('S23', 'X');
+            }
+        }
+
+
+
+
+
+        $sheet->setCellValue('F6', $model->empleado->numero_empleado);
+
+
+        $nombre = mb_strtoupper($model->empleado->nombre, 'UTF-8');
+        $apellido = mb_strtoupper($model->empleado->apellido, 'UTF-8');
+        $nombreCompleto = $apellido . ' ' . $nombre;
+        $sheet->setCellValue('H7', $nombreCompleto);
+
+
+        setlocale(LC_TIME, 'es_419.UTF-8');
+        $fechaHOY = strftime('%A, %B %d, %Y');
+        $sheet->setCellValue('N6', $fechaHOY);
+
+        $nombrePuesto = $model->empleado->informacionLaboral->catPuesto->nombre_puesto;
+        $sheet->setCellValue('H8', $nombrePuesto);
+
+        $nombreCargo = $model->empleado->informacionLaboral->catDptoCargo->nombre_dpto;
+        $sheet->setCellValue('H9', $nombreCargo);
+
+        $nombreDireccion = $model->empleado->informacionLaboral->catDireccion->nombre_direccion;
+        $sheet->setCellValue('H10', $nombreDireccion);
+
+        $nombreDepartamento = $model->empleado->informacionLaboral->catDepartamento->nombre_departamento;
+        $sheet->setCellValue('H11', $nombreDepartamento);
+
+        $nombreTipoContrato = $model->empleado->informacionLaboral->catTipoContrato->nombre_tipo;
+        $sheet->setCellValue('H12', $nombreTipoContrato);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        $sheet->setCellValue('G20', $model->motivo);
+
+
+
+
+
+
+        $sheet->setCellValue('B28', $nombreCompleto);
+
+
+        $sheet->setCellValue('B29', $nombrePuesto);
+
+        // Obtener la dirección asociada al empleado
+//        $direccion = CatDireccion::findOne($model->empleado->informacionLaboral->cat_direccion_id);
+//
+  ///      // Verificar si la dirección no es '1.- GENERAL' y si se ha ingresado un nombre de Jefe de Departamento
+     //   if ($direccion && $direccion->nombre_direccion !== '1.- GENERAL' && $model->nombre_jefe_departamento) {
+       //     $nombreCompletoJefe = mb_strtoupper($model->nombre_jefe_departamento, 'UTF-8');
+        //    $sheet->setCellValue('I28', $nombreCompletoJefe);
+       // } else {
+         //   $sheet->setCellValue('I28', null);
+       // }
+
+
+
+       $juntaGobierno = JuntaGobierno::find()
+       ->where(['nivel_jerarquico' => 'Director'])
+       ->all();
+       
+       $directorGeneral = null;
+       
+       // Recorrer todos los registros de junta_gobierno encontrados
+       foreach ($juntaGobierno as $junta) {
+       $empleado = Empleado::findOne($junta->empleado_id);
+       
+       if ($empleado && $empleado->informacionLaboral->catPuesto->nombre_puesto === 'DIRECTOR GENERAL') {
+           $directorGeneral = $empleado;
+           break;
+       }
+       }
+       
+       // Establecer el valor en la celda N23 si se encontró un Director General
+       if ($directorGeneral) {
+       $nombre = mb_strtoupper($directorGeneral->nombre, 'UTF-8');
+       $apellido = mb_strtoupper($directorGeneral->apellido, 'UTF-8');
+       $nombreCompleto = $apellido . ' ' . $nombre;
+       $sheet->setCellValue('O28', $nombreCompleto);
+       } else {
+       
+       }
+       
+       $sheet->setCellValue('O29', 'DIRECTOR GENERAL');
+       
+       
+        $tempFileName = Yii::getAlias('@app/runtime/archivos_temporales/cambio_periodo_vacacional.xlsx');
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save($tempFileName);
+
+        // Luego, proporciona un enlace para que el usuario descargue el archivo
+        // Puedes redirigir a una acción que presente el enlace o generar directamente el enlace aquí mismo
+        return $this->redirect(['download', 'filename' => basename($tempFileName)]);
+    }
+
+
+
 }

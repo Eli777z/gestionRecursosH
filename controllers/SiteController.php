@@ -190,8 +190,17 @@ class SiteController extends Controller
     }
     public function actionPortalgestionrh()
     {
-        return $this->render('portalgestionrh');
+        // Obtener las solicitudes más recientes (puedes ajustar el límite según tus necesidades)
+        $solicitudesRecientes = \app\models\Solicitud::find()
+            ->orderBy(['fecha_creacion' => SORT_DESC])
+            ->limit(10) // Ajusta el número de solicitudes que quieres mostrar
+            ->all();
+    
+        return $this->render('portalgestionrh', [
+            'solicitudesRecientes' => $solicitudesRecientes,
+        ]);
     }
+    
 
     public function actionPortalempleado()
     {

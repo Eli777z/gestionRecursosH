@@ -28,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="row">
         <div class="col-md-12">
             <div class="card">
-                <div class="card-header bg-primary text-white"> <!-- Agregando las clases bg-primary y text-white -->
+            <div class="card-header gradient-info text-white"><!-- Agregando las clases bg-primary y text-white -->
                     <h3><?= Html::encode($this->title) ?></h3>
                 </div>
                 <div class="card-body">
@@ -68,7 +68,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             <div class="card">
                                 <div class="card-header bg-info text-white">
                                     <h3>LISTA DE EMPLEADOS</h3>
-                                    <?= Html::a('AÑADIR NUEVO EMPLEADO  <i class="fa fa-user-plus fa-lg"></i>', ['create'], ['class' => 'btn btn-warning float-right fa-lg']) ?>
+                                    <?= Html::a('AÑADIR NUEVO EMPLEADO  <i class="fa fa-user-plus fa-lg"></i>', ['create'], ['class' => 'btn btn-warning float-right fa-lg btn-dark']) ?>
 
                                 </div>
 
@@ -113,13 +113,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                                     'pluginOptions' => [
                                                         'allowClear' => true
                                                     ],
-                                                    'theme' => Select2::THEME_BOOTSTRAP, // Esto aplicará el estilo de Bootstrap al Select2
-                                                    'pluginEvents' => [
-                                                        'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }", // Aquí se personaliza el icono de borrar
-                                                    ],
-                                                    'pluginEvents' => [
-                                                        'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }", // Agregar un margen izquierdo
-                                                    ],
+                                                    'theme' => Select2::THEME_KRAJEE_BS3, // Esto aplicará el estilo de Bootstrap al Select2
+                                                    
                                                 ]),
                                                 'contentOptions' => ['class' => 'small-font'], // Aplica la clase CSS personalizada
 
@@ -140,13 +135,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
                                                     ],
-                                                    'theme' => Select2::THEME_BOOTSTRAP, // Esto aplicará el estilo de Bootstrap al Select2
-                                                    'pluginEvents' => [
-                                                        'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }", // Aquí se personaliza el icono de borrar
-                                                    ],
-                                                    'pluginEvents' => [
-                                                        'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }", // Agregar un margen izquierdo
-                                                    ],
+                                                    'theme' => Select2::THEME_KRAJEE_BS3, // Esto aplicará el estilo de Bootstrap al Select2
                                                 ]),
                                                 'contentOptions' => ['class' => 'small-font'], // Aplica la clase CSS personalizada
 
@@ -168,11 +157,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                                     'pluginOptions' => [
                                                         'allowClear' => true,
                                                     ],
-                                                    'theme' => Select2::THEME_BOOTSTRAP,
-                                                    'pluginEvents' => [
-                                                        'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
-                                                        'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
-                                                    ],
+                                                    'theme' => Select2::THEME_KRAJEE_BS3, // Esto aplicará el estilo de Bootstrap al Select2
                                                 ]),
                                                 'contentOptions' => ['class' => 'small-font'], // Aplica la clase CSS personalizada
                                                 'headerOptions' => ['class' => 'small-font'],  // Aplica la clase CSS personalizada al encabezado
@@ -194,11 +179,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                                     'pluginOptions' => [
                                                         'allowClear' => true,
                                                     ],
-                                                    'theme' => Select2::THEME_BOOTSTRAP,
-                                                    'pluginEvents' => [
-                                                        'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
-                                                        'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '0x',); }",
-                                                    ],
+                                                    'theme' => Select2::THEME_KRAJEE_BS3, // Esto aplicará el estilo de Bootstrap al Select2
                                                 ]),
                                                 'contentOptions' => ['class' => 'small-font'], // Aplica la clase CSS personalizada
 
@@ -268,7 +249,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <div class="card-header bg-info text-white">
                                     <h3>Añadir empleado a la junta de gobierno</h3>
 
-                                    <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-secondary float-right mr-3', 'id' => 'save-button-personal']) ?>
+                                    <?= Html::submitButton('AÑADIR <i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right mr-3 btn-dark', 'id' => 'save-button-personal']) ?>
                                 </div>
                                 <div class="card-body">
                                     <?= $form->field($juntaGobiernoModel, 'cat_direccion_id')->widget(Select2::classname(), [
@@ -277,14 +258,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                         'pluginOptions' => [
                                             'allowClear' => true
                                         ],
-                                        'theme' => Select2::THEME_BOOTSTRAP, // Esto aplicará el estilo de Bootstrap al Select2
-                                        'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }", // Aquí se personaliza el icono de borrar
-                                        ],
-                                        'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }", // Agregar un margen izquierdo
-                                        ],
-                                    ]); ?>
+                                        'theme' => Select2::THEME_KRAJEE_BS3, // Esto aplicará el estilo de Bootstrap al Select2
+                                    ])->label('Dirección:'); ?>
 
                                     <?= $form->field($juntaGobiernoModel, 'cat_departamento_id')->widget(Select2::classname(), [
                                         'data' => ArrayHelper::map(CatDepartamento::find()->all(), 'id', 'nombre_departamento'), // Suponiendo que 'nombre' es el atributo que deseas mostrar en la lista desplegable
@@ -292,14 +267,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                         'pluginOptions' => [
                                             'allowClear' => true
                                         ],
-                                        'theme' => Select2::THEME_BOOTSTRAP, // Esto aplicará el estilo de Bootstrap al Select2
-                                        'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }", // Aquí se personaliza el icono de borrar
-                                        ],
-                                        'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }", // Agregar un margen izquierdo
-                                        ],
-                                    ]); ?>
+                                        'theme' => Select2::THEME_KRAJEE_BS3, // Esto aplicará el estilo de Bootstrap al Select2
+                                    ])->label('Departamento:'); ?>
 
                                     <?= $form->field($juntaGobiernoModel, 'empleado_id')->widget(Select2::classname(), [
                                         'data' => ArrayHelper::map(Empleado::find()->all(), 'id', function ($model) {
@@ -309,21 +278,15 @@ $this->params['breadcrumbs'][] = $this->title;
                                         'pluginOptions' => [
                                             'allowClear' => true
                                         ],
-                                        'theme' => Select2::THEME_BOOTSTRAP, // Esto aplicará el estilo de Bootstrap al Select2
-                                        'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }", // Aquí se personaliza el icono de borrar
-                                        ],
-                                        'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }", // Agregar un margen izquierdo
-                                        ],
-                                    ]); ?>
+                                        'theme' => Select2::THEME_KRAJEE_BS3, // Esto aplicará el estilo de Bootstrap al Select2
+                                    ])->label('Empleado:'); ?>
 
 
                                     <?= $form->field($juntaGobiernoModel, 'nivel_jerarquico')->dropDownList([
                                         'Director' => 'Director',
                                         'Jefe de unidad' => 'Jefe de unidad',
                                         'Jefe de departamento' => 'Jefe de departamento',
-                                    ], ['prompt' => 'Selecciona el nivel jerárquico...']) ?>
+                                    ], ['prompt' => 'Selecciona el nivel jerárquico...'])->label('Tipo de empleado:') ?>
 
                                     <?= $form->field($juntaGobiernoModel, 'profesion')->dropDownList([
                                         'ING.' => 'ING.',
@@ -334,7 +297,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                         'DR.' => 'DR.',
                                         'DRA.' => 'DRA.',
                                         'TEC.' => 'TEC.',
-                                    ], ['prompt' => 'Selecciona el nivel académico...']) ?>
+                                    ], ['prompt' => 'Selecciona el nivel académico...'])->label('Profesión:') ?>
 
                                 </div>
                                 <?php ActiveForm::end(); ?>
@@ -350,7 +313,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             <div class="card">
 
 
-                                <div class="card-header bg-secondary text-white">
+                                <div class="card-header bg-info text-white">
                                     <h3>Lista de empleados que pertenecen a la junta de gobierno</h3>
 
                                 </div>

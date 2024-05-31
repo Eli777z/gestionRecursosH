@@ -15,6 +15,7 @@ use app\models\ComisionEspecial;
 use app\models\Notificacion;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use app\models\CambioPeriodoVacacional;
+use app\models\PeriodoVacacionalHistorial;
 /**
  * SolicitudController implements the CRUD actions for Solicitud model.
  */
@@ -59,8 +60,13 @@ class SolicitudController extends Controller
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
+
+        $empleadoId = $model->empleado_id;
         return $this->render('view', [
             'model' => $this->findModel($id),
+            'empleadoId' => $empleadoId,
+
         ]);
     }
 
@@ -149,11 +155,24 @@ class SolicitudController extends Controller
                         $vacaciones = $model->empleado->informacionLaboral->vacaciones;
                         if ($cambioPeriodo->numero_periodo == '1ero') {
                             $periodoVacacional = $vacaciones->periodoVacacional;
+                            $periodo = 'primer periodo';
                         } else {
                             $periodoVacacional = $vacaciones->segundoPeriodoVacacional;
+                            $periodo = 'segundo periodo';
                         }
     
                         if ($periodoVacacional) {
+                            // Guardar el periodo original en el historial
+                            $historial = new PeriodoVacacionalHistorial();
+                            $historial->empleado_id = $model->empleado_id;
+                            $historial->periodo = $periodo;
+                            $historial->fecha_inicio = $periodoVacacional->fecha_inicio;
+                            $historial->fecha_final = $periodoVacacional->fecha_final;
+                            $historial->año = $periodoVacacional->año;
+                            $historial->dias_disponibles = $periodoVacacional->dias_disponibles;
+                            $historial->original = $periodoVacacional->original;
+                            $historial->save();
+    
                             // Calcular el número de días seleccionados en el rango
                             $fechaInicio = new \DateTime($cambioPeriodo->fecha_inicio_periodo);
                             $fechaFin = new \DateTime($cambioPeriodo->fecha_fin_periodo);
@@ -163,7 +182,7 @@ class SolicitudController extends Controller
                             $diasDisponibles = $periodoVacacional->dias_vacaciones_periodo - $diasSeleccionados;
     
                             // Actualizar el campo dias_disponibles
-                            $periodoVacacional->dias_disponibles = $diasDisponibles+1;
+                            $periodoVacacional->dias_disponibles = $diasDisponibles;
     
                             // Actualizar el periodo vacacional
                             $periodoVacacional->fecha_inicio = $cambioPeriodo->fecha_inicio_periodo;
@@ -202,6 +221,7 @@ class SolicitudController extends Controller
     
         return $this->redirect(['index']);
     }
+    
      /**
      * Updates an existing Solicitud model.
      * If update is successful, the browser will be redirected to the 'view' page.

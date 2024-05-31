@@ -24,6 +24,7 @@ use app\models\PeriodoVacacional;
 use app\models\SegundoPeriodoVacacional;
 use yii\helpers\Url;
 use app\models\CatTipoContrato;
+use app\models\PeriodoVacacionalHistorial;
 
 /**
  * EmpleadoController implements the CRUD actions for Empleado model.
@@ -80,12 +81,19 @@ class EmpleadoController extends Controller
 
         // Crea un nuevo modelo de Documento para usar en el formulario
         $documentoModel = new Documento();
+        $historial = PeriodoVacacionalHistorial::find()->where(['empleado_id' => $modelEmpleado->id])->all();
 
+        $searchModel = new \app\models\SolicitudSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider->query->andWhere(['empleado_id' => $id]);
         // Renderiza la vista 'view' y pasa los datos necesarios
         return $this->render('view', [
             'model' => $modelEmpleado,
             'documentos' => $documentos,
             'documentoModel' => $documentoModel,
+            'historial' => $historial,
+            'searchModel' => $searchModel,
+        'dataProvider' => $dataProvider,
         ]);
     }
 
@@ -591,7 +599,7 @@ class EmpleadoController extends Controller
             $vacaciones->total_dias_vacaciones = $totalDiasVacaciones;
 
             if ($vacaciones->save()) {
-                Yii::$app->session->setFlash('success', 'Los cambios de la información laboral y las vacaciones han sido actualizados correctamente.');
+                Yii::$app->session->setFlash('success', 'Los cambios de la información laboral han sido actualizados correctamente.');
             } else {
                 Yii::$app->session->setFlash('error', 'Hubo un error al actualizar los días de vacaciones.');
             }

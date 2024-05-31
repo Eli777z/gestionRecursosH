@@ -6,6 +6,7 @@ use yii\widgets\Pjax;
 use kartik\select2\Select2;
 use yii\grid\GridView;
 use yii\jui\DatePicker;
+use yii\web\View;
 use kartik\daterange\DateRangePicker;
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\SolicitudSearch */
@@ -13,12 +14,14 @@ use kartik\daterange\DateRangePicker;
 
 $this->title = 'Solicitudes';
 $this->params['breadcrumbs'][] = $this->title;
+$this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
+
 ?>
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-12">
             <div class="card">
-            <div class="card-header bg-primary text-white"> <!-- Agregando las clases bg-primary y text-white -->
+            <div class="card-header gradient-info text-white"><!-- Agregando las clases bg-primary y text-white -->
                     <h3><?= Html::encode($this->title) ?></h3>
                 </div>
                 <div class="card-body">
@@ -48,13 +51,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'pluginOptions' => [
                     'allowClear' => true
                 ],
-                'theme' => Select2::THEME_BOOTSTRAP, // Esto aplicará el estilo de Bootstrap al Select2
-                'pluginEvents' => [
-                    'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }", // Aquí se personaliza el icono de borrar
-                ],
-                'pluginEvents' => [
-                    'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }", // Agregar un margen izquierdo
-                ],
+                'theme' => Select2::THEME_KRAJEE_BS3, // Esto aplicará el estilo de Bootstrap al Select2
             ]),
         ],
         [
@@ -131,13 +128,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     
                 ],
-                'theme' => Select2::THEME_BOOTSTRAP, // Esto aplicará el estilo de Bootstrap al Select2
-                'pluginEvents' => [
-                    'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }", // Aquí se personaliza el icono de borrar
-                ],
-                'pluginEvents' => [
-                    'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }", // Agregar un margen izquierdo
-                ],
+                'theme' => Select2::THEME_KRAJEE_BS3, // Esto aplicará el estilo de Bootstrap al Select2
             ]),
         ],
 

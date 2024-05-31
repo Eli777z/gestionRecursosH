@@ -16,49 +16,31 @@ $count = count($notificaciones);
             <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
-            <a href="<?=\yii\helpers\Url::home()?>" class="nav-link">Inicio</a>
+            <a href="../site/portalempleado" class="nav-link">Inicio</a>
         </li>
         
-        <li class="nav-item dropdown">
-    <a id="dropdownSubMenu1" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Formatos de Incidencias</a>
-    <ul aria-labelledby="dropdownSubMenu1" class="dropdown-menu border-0 shadow">
-        <li class="list-group-item">
-            <?php echo Html::a('PERMISO FUERA DEL TRABAJO', Url::to(['permiso-fuera-trabajo/index']), ['class' => 'dropdown-item']); ?>
-                    </li>
-                    <li class="list-group-item">
-                    <?php echo Html::a('COMISIÓN ESPECIAL', Url::to(['comision-especial/index']), ['class' => 'dropdown-item']); ?>
-                    </li>
-                    <li class="list-group-item">
-                    <?php echo Html::a('CAMBIO DE DÍA LABORAL', Url::to(['cambio-dia-laboral/index']), ['class' => 'dropdown-item']); ?>
-                    </li>
-                    <li class="list-group-item">
-                    <?php echo Html::a('CAMBIO DE HORARIO DE TRABAJO', Url::to(['cambio-horario-trabajo/index']), ['class' => 'dropdown-item']); ?>
-                    </li>
-                    <li class="list-group-item">
-                    <?php echo Html::a('PERMISO ECONÓMICO', Url::to(['permiso-economico/index']), ['class' => 'dropdown-item']); ?>
-             
-                    </li>
-                    <li class="list-group-item">
-                    <?php echo Html::a('PERMISO SIN GOCE DE SUELDO', Url::to(['permiso-sin-sueldo/index']), ['class' => 'dropdown-item']); ?>
-                    </li>
-                    <li class="list-group-item">
-                    <?php echo Html::a('CAMBIO PERIODO VACACIONAL', Url::to(['cambio-periodo-vacacional/index']), ['class' => 'dropdown-item']); ?>
-                    </li>
-                    <li class="list-group-item">
-                        <a href="#" class="dropdown-item">REPORTE DE TIEMPO EXTRA</a>
-                    </li>
-                    <li class="list-group-item">
-                        <a href="#" class="dropdown-item">REPORTE GENERAL DE TIEMPO EXTRA</a>
-                    </li>
-             
+        <div class="btn-group">
+    <button type="button" class="btn btn-info">Formatos de Incidencias</button>
+    <button type="button" class="btn btn-info dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-expanded="false">
+        <span class="sr-only">Toggle Dropdown</span>
+    </button>
+    <div class="dropdown-menu">
+        <?= Html::a('PERMISO FUERA DEL TRABAJO', Url::to(['permiso-fuera-trabajo/index']), ['class' => 'dropdown-item']) ?>
+        <?= Html::a('COMISIÓN ESPECIAL', Url::to(['comision-especial/index']), ['class' => 'dropdown-item']) ?>
+        <?= Html::a('CAMBIO DE DÍA LABORAL', Url::to(['cambio-dia-laboral/index']), ['class' => 'dropdown-item']) ?>
+        <?= Html::a('CAMBIO DE HORARIO DE TRABAJO', Url::to(['cambio-horario-trabajo/index']), ['class' => 'dropdown-item']) ?>
+        <?= Html::a('PERMISO ECONÓMICO', Url::to(['permiso-economico/index']), ['class' => 'dropdown-item']) ?>
+        <?= Html::a('PERMISO SIN GOCE DE SUELDO', Url::to(['permiso-sin-sueldo/index']), ['class' => 'dropdown-item']) ?>
+        <?= Html::a('CAMBIO PERIODO VACACIONAL', Url::to(['cambio-periodo-vacacional/index']), ['class' => 'dropdown-item']) ?>
+        <a class="dropdown-item" href="#">REPORTE DE TIEMPO EXTRA</a>
+        <a class="dropdown-item" href="#">REPORTE GENERAL DE TIEMPO EXTRA</a>
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item" href="#">Separated link</a>
+    </div>
+</div>
 
-                <li class="dropdown-divider"></li>
 
-                <!-- Level two dropdown-->
-                
-                <!-- End Level two -->
-            </ul>
-        </li>
+
     </ul>
 
     <!-- SEARCH FORM -->
