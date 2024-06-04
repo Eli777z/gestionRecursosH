@@ -132,7 +132,7 @@ class PermisoFueraTrabajoController extends Controller
      
                          if ($model->jefe_departamento_id) {
                              $jefeDepartamento = JuntaGobierno::findOne($model->jefe_departamento_id);
-                             $model->nombre_jefe_departamento = $jefeDepartamento ? $jefeDepartamento->profesion . ' ' . $jefeDepartamento->empleado->nombre . ' ' . $jefeDepartamento->empleado->apellido : null;
+                             $model->nombre_jefe_departamento = $jefeDepartamento ? $jefeDepartamento->empleado->profesion . ' ' . $jefeDepartamento->empleado->nombre . ' ' . $jefeDepartamento->empleado->apellido : null;
                          }
      
                          if ($model->save()) {
@@ -324,7 +324,7 @@ $juntaDirectorDireccion = JuntaGobierno::find()
 if ($juntaDirectorDireccion) {
     $nombreDirector = mb_strtoupper($juntaDirectorDireccion->empleado->nombre, 'UTF-8');
     $apellidoDirector = mb_strtoupper($juntaDirectorDireccion->empleado->apellido, 'UTF-8');
-    $profesionDirector = mb_strtoupper($juntaDirectorDireccion->profesion, 'UTF-8');
+    $profesionDirector = mb_strtoupper($juntaDirectorDireccion->empleado->profesion, 'UTF-8');
     $nombreCompletoDirector = $profesionDirector . ' ' . $apellidoDirector . ' ' . $nombreDirector;
 
     $sheet->setCellValue('N32', $nombreCompletoDirector);
@@ -502,16 +502,13 @@ return $this->redirect(['download', 'filename' => basename($tempFileName)]);
     public function actionExportPdf($id)
     {
         $model = PermisoFueraTrabajo::findOne($id);
-    
+
         if (!$model) {
             throw new NotFoundHttpException('El registro no existe.');
         }
     
         $templatePath = Yii::getAlias('@app/templates/permiso_fuera_trabajo.xlsx');
-    
-              
         $spreadsheet = IOFactory::load($templatePath);
-    
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setCellValue('F6', $model->empleado->numero_empleado);
        
@@ -589,7 +586,7 @@ $juntaDirectorDireccion = JuntaGobierno::find()
 if ($juntaDirectorDireccion) {
     $nombreDirector = mb_strtoupper($juntaDirectorDireccion->empleado->nombre, 'UTF-8');
     $apellidoDirector = mb_strtoupper($juntaDirectorDireccion->empleado->apellido, 'UTF-8');
-    $profesionDirector = mb_strtoupper($juntaDirectorDireccion->profesion, 'UTF-8');
+    $profesionDirector = mb_strtoupper($juntaDirectorDireccion->empleado->profesion, 'UTF-8');
     $nombreCompletoDirector = $profesionDirector . ' ' . $apellidoDirector . ' ' . $nombreDirector;
 
     $sheet->setCellValue('N32', $nombreCompletoDirector);
@@ -624,26 +621,46 @@ if ($juntaDirectorDireccion) {
     $sheet->setCellValue('N32', null);
     $sheet->setCellValue('N33', null);
 }
-       
-        $mpdf = new Mpdf();
-    
-        
-        ob_start();
-        $writer = IOFactory::createWriter($spreadsheet, 'Html');
-        $writer->save('php://output');
-        $htmlContent = ob_get_clean();
-    
-      
-        $mpdf->WriteHTML($htmlContent);
-    
-     
-        header('Content-Type: application/pdf');
-        header('Content-Disposition: attachment; filename="permiso_fuera_trabajo.pdf"');
-        header('Cache-Control: max-age=0');
-    
-    
-        $mpdf->Output();
+$tempFileName = Yii::getAlias('@app/runtime/archivos_temporales/permiso_fuera_trabajo.xlsx');
+    $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+    $writer->save($tempFileName);
+
+    // **Convertir a PDF** (Elimina el redirect)
+    $reader = IOFactory::createReader('Xlsx');
+    $spreadsheet = $reader->load($tempFileName);
+
+    // Convertir a HTML temporalmente
+    $htmlWriter = IOFactory::createWriter($spreadsheet, 'Html');
+    $htmlWriter->save('html_temp_file.html');
+
+    // Leer el contenido HTML
+    $html = file_get_contents('html_temp_file.html');
+
+    // Configurar mPDF
+    $mpdf = new \Mpdf\Mpdf([
+        'mode' => 'utf-8',
+        'format' => 'A4',
+        'margin_left' => 15,
+        'margin_right' => 15,
+        'margin_top' => 16,
+        'margin_bottom' => 16,
+        'margin_header' => 9,
+        'margin_footer' => 9,
+    ]);
+
+    // Dividir el HTML en fragmentos
+    $chunkSize = 100000; 
+    $chunks = str_split($html, $chunkSize);
+
+    // Escribir los fragmentos de HTML en el PDF
+    foreach ($chunks as $chunk) {
+        $mpdf->WriteHTML($chunk);
     }
-    
-    
+
+    // Guardar el PDF en un archivo temporal
+    $mpdf->Output('pdf_temp_file.pdf', 'F');
+
+    // Enviar el PDF al navegador y eliminarlo después de enviarlo
+    return Yii::$app->response->sendFile('pdf_temp_file.pdf')->deleteAfterSend(true);
+}
 }

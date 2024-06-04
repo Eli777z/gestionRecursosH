@@ -61,6 +61,7 @@ class Empleado extends \yii\db\ActiveRecord
             [['foto', 'email'], 'string', 'max' => 100],
             [['telefono', 'telefono_contacto_emergencia'], 'string', 'max' => 15],
             [['colonia'], 'string', 'max' => 50],
+            [['profesion'], 'string', 'max' => 15],
             [['calle'], 'string', 'max' => 85],
             [['nombre_contacto_emergencia'], 'string', 'max' => 90],
             [['relacion_contacto_emergencia'], 'string', 'max' => 25],
@@ -103,6 +104,7 @@ class Empleado extends \yii\db\ActiveRecord
             'telefono_contacto_emergencia' => 'Telefono',
             'institucion_educativa' => 'Institucion Educativa',
             'titulo_grado' => 'Titulo Grado',
+            'profesion' => 'Profesion'
         ];
     }
 

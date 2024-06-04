@@ -56,36 +56,31 @@ $currentDate = date('Y-m-d');
             <div class="card-header gradient-info text-white">
                     <h3><?= Html::encode($this->title) ?></h3>
                     <?php
-                    $this->registerJs("
-                               // Función para abrir el cuadro de diálogo de carga de archivos cuando se hace clic en la imagen
-                               $('#foto').click(function() {
-                                   $('#foto-input').trigger('click');
-                               });
-                               
-                               // Función para enviar el formulario cuando se selecciona una nueva imagen
-                               $('#foto-input').change(function() {
-                                   $('#foto-form').submit();
-                               });
-                               ", View::POS_READY);
-                    ?>
+$this->registerJs("
+    $('#foto, .fas.fa-edit').click(function() { // También detecta clics en el icono de edición
+        $('#foto-input').trigger('click');
+    });
 
-                    <div id="foto" title="Cambiar foto de perfil" style="position: relative;">
-                        <?php if ($model->foto) : ?>
-                            <?= Html::img(['empleado/foto-empleado', 'id' => $model->id], ['class' => 'mr-3', 'style' => 'width: 100px; height: 100px;']) ?>
-                        <?php else : ?>
-                            <?= Html::tag('div', 'No hay foto disponible', ['class' => 'mr-3']) ?>
-                        <?php endif; ?>
-                        <i class="fas fa-edit" style="position: absolute; bottom: 5px; right: 5px; cursor: pointer;"></i>
-                    </div>
+    $('#foto-input').change(function() {
+        $('#foto-form').submit();
+    });
+", View::POS_READY);
+?>
 
+<div id="foto" title="Cambiar foto de perfil" style="position: relative;">
+    <?php if ($model->foto) : ?>
+        <?= Html::img(['empleado/foto-empleado', 'id' => $model->id], ['class' => 'mr-3', 'style' => 'width: 100px; height: 100px;']) ?>
+    <?php else : ?>
+        <?= Html::tag('div', 'No hay foto disponible', ['class' => 'mr-3']) ?>
+    <?php endif; ?>
+    <i class="fas fa-edit" style="position: absolute; bottom: 5px; right: 5px; cursor: pointer;"></i>
+</div>
 
+<?php $form = ActiveForm::begin(['id' => 'foto-form', 'options' => ['enctype' => 'multipart/form-data', 'action' => ['cambio', 'id' => $model->id]]]); ?>
+    <?= $form->field($model, 'foto')->fileInput(['id' => 'foto-input', 'style' => 'display:none'])->label(false) ?>
+    <button type="submit" id="submit-button" hidden></button> 
+<?php ActiveForm::end(); ?>
 
-                    <?php $form = ActiveForm::begin(['id' => 'foto-form', 'options' => ['enctype' => 'multipart/form-data', 'action' => ['cambio', 'id' => $model->id]]]); ?>
-
-                    <?= $form->field($model, 'foto')->fileInput(['id' => 'foto-input', 'style' => 'display:none'])->label(false) ?>
-
-
-                    <?php ActiveForm::end(); ?>
 
                     <h3 class="mb-0"> Empleado: <?= $model->nombre ?> <?= $model->apellido ?></h3>
                 </div>
@@ -165,9 +160,43 @@ $currentDate = date('Y-m-d');
                                             'yearRange' => '-100:+0',
                                         ],
                                     ]); ?>
+<?= $form->field($model, 'profesion')->widget(Select2::className(), [
+   'data'=>[ 'No tiene' => 'No tiene',
+    'ING.' => 'ING.',
+    'LIC.' => 'LIC.',
+    'PROF.' => 'PROF.',
+    'ARQ.' => 'ARQ.',
+    'C.' => 'C.',
+    'DR.' => 'DR.',
+    'DRA.' => 'DRA.',
+    'TEC.' => 'TEC.',
+],
+'options' => ['prompt' => 'Seleccionar Profesión', 'disabled' => true],
+'pluginOptions' => [
+    'allowClear' => true
+],
+'theme' => Select2::THEME_BOOTSTRAP,
+]); ?>
+
                                     <?= $form->field($model, 'edad')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
-                                    <?= $form->field($model, 'sexo')->dropDownList(['Masculino' => 'Masculino', 'Femenino' => 'Femenino'], ['prompt' => 'Seleccionar Sexo', 'disabled' => true]); ?>
-                                    <?= $form->field($model, 'estado_civil')->widget(Select2::className(), [
+                                   
+                                    <?= $form->field($model, 'sexo')->widget(Select2::className(), [
+                                        'data' => [
+                                          
+                                                'Masculino' => 'Masculino',
+                                                'Femenino' => 'Femenino',
+
+                                         
+                                        ],
+                                        'options' => ['prompt' => 'Seleccionar Sexo', 'disabled' => true],
+                                        'pluginOptions' => [
+                                            'allowClear' => true
+                                        ],
+                                        'theme' => Select2::THEME_BOOTSTRAP,
+                                    ]); ?>
+                                 
+                                 
+                                 <?= $form->field($model, 'estado_civil')->widget(Select2::className(), [
                                         'data' => [
                                             'Masculino' => [
                                                 'Soltero' => 'Soltero',
@@ -286,7 +315,7 @@ $currentDate = date('Y-m-d');
                                             'action' => ['actualizar-informacion-contacto', 'id' => $model->id],
                                             'options' => ['id' => 'emergency-contact-form']
                                         ]); ?>
-                                        <div class="card-header bg-secondary text-white">
+                                        <div class="card-header bg-success text-white">
                                             <h3>Información de contacto de emergencia</h3>
                                             <button type="button" id="edit-button-emergency" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
                                             <button type="button" id="cancel-button-emergency" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
@@ -294,15 +323,21 @@ $currentDate = date('Y-m-d');
                                         </div>
                                         <div class="card-body">
                                             <?= $form->field($model, 'nombre_contacto_emergencia')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
-                                            <?= $form->field($model, 'relacion_contacto_emergencia')->dropDownList([
-                                                'Padre' => 'Padre',
+                                            <?= $form->field($model, 'relacion_contacto_emergencia')->widget(Select2::className(), [
+                                               'data' => [ 'Padre' => 'Padre',
                                                 'Madre' => 'Madre',
                                                 'Esposo/a' => 'Esposo/a',
                                                 'Hijo/a' => 'Hijo/a',
                                                 'Hermano/a' => 'Hermano/a',
                                                 'Compañero/a de trabajo' => 'Compañero/a de trabajo',
                                                 'Tio/a' => 'Tio/a'
-                                            ], ['prompt' => 'Seleccionar parentesco', 'disabled' => true]); ?>
+                                            ],
+                                            'options' => ['prompt' => 'Seleccionar Parentesco', 'disabled' => true],
+                                            'pluginOptions' => [
+                                                'allowClear' => true
+                                            ],
+                                            'theme' => Select2::THEME_BOOTSTRAP,
+                                        ]); ?>
                                             <?= $form->field($model, 'telefono_contacto_emergencia')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
                                         </div>
                                         <?php ActiveForm::end(); ?>
@@ -355,7 +390,7 @@ $currentDate = date('Y-m-d');
                                     ->all(),
                                 'id',
                                 function ($model) {
-                                    return $model->profesion . ' ' . $model->empleado->nombre . ' ' . $model->empleado->apellido;
+                                    return $model->empleado->nombre . ' ' . $model->empleado->apellido;
                                 }
                             );
 
@@ -476,7 +511,7 @@ $currentDate = date('Y-m-d');
 
                                     <div class="form-group">
                                         <label class="control-label">Director de dirección</label>
-                                        <input type="text" class="form-control" readonly value="<?= $juntaDirectorDireccion ? $juntaDirectorDireccion->profesion . ' ' . $juntaDirectorDireccion->empleado->nombre . ' ' . $juntaDirectorDireccion->empleado->apellido : 'No Asignado' ?>">
+                                        <input type="text" class="form-control" readonly value="<?= $juntaDirectorDireccion ?  $juntaDirectorDireccion->empleado->nombre . ' ' . $juntaDirectorDireccion->empleado->apellido : 'No Asignado' ?>">
                                     </div>
 
 

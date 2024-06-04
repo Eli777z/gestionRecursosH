@@ -1,7 +1,10 @@
 <?php
 
+use app\models\CatDireccion;
 use yii\helpers\Html;
 use yii\bootstrap4\ActiveForm;
+use kartik\select2\Select2;
+use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\CatDepartamento */
@@ -14,7 +17,14 @@ use yii\bootstrap4\ActiveForm;
 
     <?= $form->field($model, 'nombre_departamento')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'cat_direccion_id')->textInput() ?>
+  
+    <?= $form->field($model, 'cat_direccion_id')->widget(Select2::classname(), [
+                                        'data' => ArrayHelper::map(CatDireccion::find()->all(), 'id', 'nombre_direccion'), 
+                                        'pluginOptions' => [
+                                            'allowClear' => true
+                                        ],
+                                        'theme' => Select2::THEME_KRAJEE_BS3, 
+                                    ])->label('Dirección:'); ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

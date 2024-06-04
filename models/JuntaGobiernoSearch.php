@@ -18,7 +18,7 @@ class JuntaGobiernoSearch extends JuntaGobierno
     {
         return [
             [['id', 'cat_direccion_id', 'cat_departamento_id', 'empleado_id'], 'integer'],
-            [['nivel_jerarquico', 'profesion'], 'safe'],
+            [['nivel_jerarquico'], 'safe'],
         ];
     }
 

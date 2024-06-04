@@ -72,6 +72,8 @@ use yii\helpers\ArrayHelper;
                                                     'options' => ['accept' => 'file/*'],
                                                     'pluginOptions' => [
                                                         'showUpload' => false,
+                                                        'showCancel' => false, 
+
                                                     ],
                                                 ])->label('Foto del empleado:') ?>
                                             </div>
@@ -91,15 +93,7 @@ use yii\helpers\ArrayHelper;
                                                     'theme' => Select2::THEME_BOOTSTRAP,
                                                 ])->label('Departamento al que pertenece:') ?>
 
-                                                <?= $form->field($informacion_laboral, 'cat_direccion_id')->widget(Select2::classname(), [
-                                                    'data' => ArrayHelper::map(CatDireccion::find()->all(), 'id', 'nombre_direccion'),
-                                                    'language' => 'es',
-                                                    'options' => ['placeholder' => 'Seleccione la dirección'],
-                                                    'pluginOptions' => [
-                                                        'allowClear' => true
-                                                    ],
-                                                    'theme' => Select2::THEME_BOOTSTRAP,
-                                                ])->label('Dirección a la que pertenece') ?>
+                                              
 
                                                 <?= $form->field($informacion_laboral, 'cat_tipo_contrato_id')->widget(Select2::classname(), [
                                                     'data' => ArrayHelper::map(CatTipoContrato::find()->all(), 'id', 'nombre_tipo'),
@@ -111,6 +105,27 @@ use yii\helpers\ArrayHelper;
                                                     'theme' => Select2::THEME_BOOTSTRAP,
                                                 ])->label('Tipo de contrato del empleado:') ?>
 
+
+     <?= $form->field($juntaGobiernoModel, 'nivel_jerarquico')->dropDownList([
+        'Comun' => 'Comun',
+                                        'Director' => 'Director',
+                                        'Jefe de unidad' => 'Jefe de unidad',
+                                        'Jefe de departamento' => 'Jefe de departamento',
+                                    ], ['prompt' => 'Selecciona el nivel jerárquico...'])->label('Tipo de empleado:') ?>
+  <?= $form->field($model, 'profesion')->dropDownList([
+                                        'No tiene' => 'No tiene',
+                                        'ING.' => 'ING.',
+                                        'LIC.' => 'LIC.',
+                                        'PROF.' => 'PROF.',
+                                        'ARQ.' => 'ARQ.',
+                                        'C.' => 'C.',
+                                        'DR.' => 'DR.',
+                                        'DRA.' => 'DRA.',
+                                        'TEC.' => 'TEC.',
+
+                                    ], ['prompt' => 'Selecciona el nivel académico...'])->label('Profesión:') ?>
+
+                               
                                                 <?= $form->field($informacion_laboral, 'fecha_ingreso')->input('date')->label('Fecha de contratación del empleado:') ?>
                                             </div>
                                         </div>

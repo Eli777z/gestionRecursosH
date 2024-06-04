@@ -106,10 +106,11 @@ class EmpleadoController extends Controller
         $vacaciones = new Vacaciones();
         $periodoVacacional = new PeriodoVacacional();
         $segundoPeriodoVacacional = new SegundoPeriodoVacacional();
+        $juntaGobiernoModel = new JuntaGobierno();
 
         $usuario->scenario = Usuario::SCENARIO_CREATE;
 
-        if ($model->load(Yii::$app->request->post()) && $usuario->load(Yii::$app->request->post()) && $informacion_laboral->load(Yii::$app->request->post())) {
+        if ($model->load(Yii::$app->request->post()) && $usuario->load(Yii::$app->request->post()) && $informacion_laboral->load(Yii::$app->request->post()) && $juntaGobiernoModel->load(Yii::$app->request->post())) { 
             $transaction = Yii::$app->db->beginTransaction();
             $usuario->username = $model->nombre . $model->apellido;
             $nombres = explode(" ", $model->nombre);
@@ -156,6 +157,7 @@ class EmpleadoController extends Controller
 
                 $model->informacion_laboral_id = $informacion_laboral->id;
                 if ($usuario->save()) {
+                    
                     $model->usuario_id = $usuario->id;
                     $rol = ($usuario->rol == 1) ? 'empleado' : 'administrador';
 
@@ -179,6 +181,28 @@ class EmpleadoController extends Controller
                     }
 
                     if ($model->save()) {
+                       
+                        $departamento = CatDepartamento::findOne($informacion_laboral->cat_departamento_id);
+                        if ($departamento) {
+                            $informacion_laboral->cat_direccion_id = $departamento->cat_direccion_id;
+                        
+                            if (!empty($juntaGobiernoModel->nivel_jerarquico) && $juntaGobiernoModel->nivel_jerarquico !== 'Comun') { // Validación adicional
+                                $juntaGobiernoModel->empleado_id = $model->id;
+                                $juntaGobiernoModel->cat_departamento_id = $informacion_laboral->cat_departamento_id;
+                                $juntaGobiernoModel->cat_direccion_id = $informacion_laboral->cat_direccion_id;
+                        
+                                if (!$juntaGobiernoModel->save()) {
+                                    $transaction->rollBack();
+                                    throw new \yii\db\Exception('Error al guardar JuntaGobierno: ' . json_encode($juntaGobiernoModel->errors));
+                                }
+                            }
+                        
+                            if (!$informacion_laboral->save()) {
+                                $transaction->rollBack();
+                                throw new \yii\db\Exception('Error al guardar InformacionLaboral: ' . json_encode($informacion_laboral->errors));
+                            }
+                        }
+                
                         Yii::$app->mailer->compose()
                             ->setFrom('elitaev7@gmail.com')
                             ->setTo($model->email)
@@ -203,6 +227,8 @@ class EmpleadoController extends Controller
             'model' => $model,
             'usuario' => $usuario,
             'informacion_laboral' => $informacion_laboral,
+            'juntaGobiernoModel' => $juntaGobiernoModel
+
         ]);
     }
 
@@ -410,17 +436,8 @@ class EmpleadoController extends Controller
 
 
 
-    public function actionFotoEmpleado($id)
-    {
-        $model = $this->findModel2($id);
-
-        if (file_exists($model->foto) && @getimagesize($model->foto)) {
-            return Yii::$app->response->sendFile($model->foto);
-        } else {
-            throw new \yii\web\NotFoundHttpException('La imagen no existe.');
-        }
-    }
-
+ 
+    
 
     public function actionDesactivarUsuario($id)
     {
@@ -485,49 +502,64 @@ class EmpleadoController extends Controller
         }
     }
 
+    public function actionFotoEmpleado($id)
+{
+    $model = $this->findModel2($id);
 
-    public function actionCambio($id)
-    {
-        Yii::info('Entrando en actionCambioFoto');
+    if (file_exists($model->foto) && @getimagesize($model->foto)) {
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mimeType = finfo_file($finfo, $model->foto);
+        finfo_close($finfo);
 
-        $model = $this->findModel2($id);
-        $previous_photo = $model->foto;
+        Yii::$app->response->headers->set('Content-Type', $mimeType);
+        return Yii::$app->response->sendFile($model->foto);
+    } else {
+        throw new \yii\web\NotFoundHttpException('La imagen no existe.');
+    }
+}
 
-        if (Yii::$app->request->isPost) {
-            Yii::info('Solicitud POST recibida');
-            $upload = UploadedFile::getInstance($model, 'foto');
-            Yii::info('Archivo de imagen recibido: ' . print_r($upload, true));
+public function actionCambio($id)
+{
+    $model = $this->findModel2($id);
 
-            if (is_object($upload)) {
-                $nombreCarpetaTrabajador = Yii::getAlias('@runtime') . '/empleados/' . $model->nombre . '_' . $model->apellido;
-                if (!is_dir($nombreCarpetaTrabajador)) {
-                    mkdir($nombreCarpetaTrabajador, 0775, true);
-                }
-                $nombreCarpetaUserProfile = $nombreCarpetaTrabajador . '/foto_Trabajador';
-                if (!is_dir($nombreCarpetaUserProfile)) {
-                    mkdir($nombreCarpetaUserProfile, 0775, true);
-                }
-                $upload_filename = $nombreCarpetaUserProfile . '/' . $upload->baseName . '.' . $upload->extension;
-                if ($upload->saveAs($upload_filename)) {
-                    if ($previous_photo && $previous_photo !== $upload_filename && file_exists($previous_photo)) {
-                        @unlink($previous_photo);
-                    }
-                    $model->foto = $upload_filename;
-                    if ($model->save()) {
-                        Yii::$app->session->setFlash('success', 'La foto del trabajador se actualizó correctamente.');
-                    } else {
-                        Yii::$app->session->setFlash('error', 'Hubo un error al guardar la nueva foto del trabajador.');
-                    }
+    if (Yii::$app->request->isPost) {
+        $uploadedFile = UploadedFile::getInstance($model, 'foto');
+
+        if ($uploadedFile && $model->validate(['foto'])) {
+            $nombreCarpetaTrabajador = Yii::getAlias('@runtime') . '/empleados/' . $model->nombre . '_' . $model->apellido;
+            if (!is_dir($nombreCarpetaTrabajador)) {
+                mkdir($nombreCarpetaTrabajador, 0775, true);
+            }
+
+            $nombreCarpetaUsuarioProfile = $nombreCarpetaTrabajador . '/foto_empleado';
+            if (!is_dir($nombreCarpetaUsuarioProfile)) {
+                mkdir($nombreCarpetaUsuarioProfile, 0775, true);
+            }
+
+            if ($model->foto && file_exists(Yii::getAlias('@runtime') . $model->foto)) {
+                unlink(Yii::getAlias('@runtime') . $model->foto);
+            }
+
+            $rutaFoto = $nombreCarpetaUsuarioProfile . '/' . $uploadedFile->baseName . '.' . $uploadedFile->extension;
+            if ($uploadedFile->saveAs($rutaFoto)) {
+                $model->foto = $rutaFoto; 
+                if ($model->save(false)) {
+                    Yii::$app->session->setFlash('success', 'La foto del trabajador se actualizó correctamente.');
                 } else {
-                    Yii::$app->session->setFlash('error', 'Hubo un error al guardar la nueva foto del trabajador.');
+                    Yii::$app->session->setFlash('error', 'Error al guardar la foto: ' . json_encode($model->errors));
                 }
             } else {
-                Yii::$app->session->setFlash('error', 'No se ha proporcionado ninguna imagen para subir.');
+                Yii::$app->session->setFlash('error', 'Error al guardar la imagen.');
             }
+        } else {
+            Yii::$app->session->setFlash('error', 'Error al validar la imagen: ' . json_encode($model->errors));
         }
-
-        return $this->redirect(['view', 'id' => $id]);
     }
+
+    return $this->redirect(['view', 'id' => $id]);
+}
+
+    
 
     public function actionActualizarInformacion($id)
     {

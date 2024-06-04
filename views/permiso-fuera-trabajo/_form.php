@@ -144,7 +144,7 @@ if ($mostrarCampo && $direccion && in_array($direccion->nombre_direccion, ['2.- 
                 ->all(),
             'id',
             function ($model) {
-                return $model->profesion . ' ' . $model->empleado->nombre . ' ' . $model->empleado->apellido;
+                return $model->empleado->profesion . ' ' . $model->empleado->nombre . ' ' . $model->empleado->apellido;
             }
         ),
         'options' => ['placeholder' => 'Seleccionar Jefe de Departamento'],

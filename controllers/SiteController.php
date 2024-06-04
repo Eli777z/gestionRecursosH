@@ -259,7 +259,7 @@ class SiteController extends Controller
                 ->all(),
             'id',
             function ($model) {
-                return $model->profesion . ' ' . $model->empleado->nombre . ' ' . $model->empleado->apellido;
+                return $model->empleado->nombre . ' ' . $model->empleado->apellido;
             }
         );
     

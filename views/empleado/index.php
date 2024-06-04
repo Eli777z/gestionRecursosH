@@ -283,16 +283,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                         'Jefe de departamento' => 'Jefe de departamento',
                                     ], ['prompt' => 'Selecciona el nivel jerárquico...'])->label('Tipo de empleado:') ?>
 
-                                    <?= $form->field($juntaGobiernoModel, 'profesion')->dropDownList([
-                                        'ING.' => 'ING.',
-                                        'LIC.' => 'LIC.',
-                                        'PROF.' => 'PROF.',
-                                        'ARQ.' => 'ARQ.',
-                                        'C.' => 'C.',
-                                        'DR.' => 'DR.',
-                                        'DRA.' => 'DRA.',
-                                        'TEC.' => 'TEC.',
-                                    ], ['prompt' => 'Selecciona el nivel académico...'])->label('Profesión:') ?>
+                                   
 
                                 </div>
                                 <?php ActiveForm::end(); ?>
@@ -309,7 +300,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
                                 <div class="card-header bg-info text-white">
-                                    <h3>Lista de empleados que pertenecen a la junta de gobierno</h3>
+                                    <h3>Lista de directores, jefes de unidad y jefes de departamento</h3>
 
                                 </div>
                                 <div class="card-body">
@@ -348,7 +339,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                                 },
                                             ],
                                             'nivel_jerarquico',
-                                            'profesion',
+                                            [
+                                                'attribute' => 'profesion',
+                                                'value' => function ($juntaGobiernoModel) {
+                                                    return $juntaGobiernoModel->empleado->profesion; 
+
+                                                },
+                                            ],
                                             [
                                                 'class' => 'hail812\adminlte3\yii\grid\ActionColumn',
                                                 'template' => '{view} {delete}',
@@ -393,21 +390,21 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'options' => ['class' => 'custom-tabs-2'],
                                 'items' => [
 
-                                    [
-                                        'label' => 'Junta De Gobierno',
-                                        'content' => $this->blocks['block-view-junta-gobierno'],
-                                        'active' => true,
+                                  ///  [
+                                     //   'label' => 'Junta De Gobierno',
+                                       // 'content' => $this->blocks['block-view-junta-gobierno'],
+                                       // 'active' => true,
 
 
-                                    ],
-                                    [
-                                        'label' => 'Añadir',
-                                        'content' => $this->blocks['block-crear-junta-gobierno'],
+                                    //],
+                                   // [
+                                     //   'label' => 'Añadir',
+                                       // 'content' => $this->blocks['block-crear-junta-gobierno'],
 
 
 
 
-                                    ],
+                                    //],
 
 
                                 ],
@@ -445,8 +442,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                 ],
                                 [
-                                    'label' => 'Junta De Gobierno',
-                                    'content' => $this->blocks['block-junta-gobierno'],
+                                    'label' => 'Directores y Jefes',
+                                    'content' => $this->blocks['block-view-junta-gobierno'],
                                     'options' => [
                                         'id' => 'junta_gobierno',
                                     ],
