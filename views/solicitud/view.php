@@ -22,10 +22,10 @@ $this->params['breadcrumbs'][] = ['label' => 'Solicitud ' . $model->id];
 \yii\web\YiiAsset::register($this);
 ?>
 <div class="container-fluid">
-    <div class="row justify-content-center"> <!-- Centra el contenido horizontalmente -->
-        <div class="col-md-8"> <!-- Div principal con ancho personalizado -->
+    <div class="row justify-content-center"> 
+        <div class="col-md-8">
             <div class="card">
-            <div class="card-header gradient-info text-white"><!-- Agregando las clases bg-primary y text-white -->
+            <div class="card-header gradient-info text-white">
                     <div class="d-flex justify-content-between"> 
                         
                     <div class="form-group mr-2">

@@ -77,11 +77,9 @@ class DocumentoController extends Controller
         $model->load(Yii::$app->request->post());
         $file = UploadedFile::getInstance($model, 'ruta');
         
-        // Obtener el ID del tipo de documento seleccionado del formulario
         $tipoDocumentoIdSeleccionado = Yii::$app->request->post('Documento')['cat_tipo_documento_id'];
 
         if ($file && $tipoDocumentoIdSeleccionado !== null) {
-            // Asignar el ID del tipo de documento seleccionado al modelo Documento
             $model->cat_tipo_documento_id = $tipoDocumentoIdSeleccionado;
 
             $empleado = Empleado::findOne($model->empleado_id);
@@ -203,9 +201,8 @@ class DocumentoController extends Controller
             return Yii::$app->response->sendFile($rutaArchivo, $model->nombre, ['inline' => true]);
         }
     }
-    // Si el archivo no se encuentra, puedes redirigir o mostrar un mensaje de error
     Yii::$app->session->setFlash('error', 'El archivo solicitado no se encuentra disponible.');
-    return $this->redirect(['empleado/index']); // Cambia esto por la acción o la vista que desees
+    return $this->redirect(['empleado/index']); 
 }
 
 public function actionDownload($id)
@@ -214,14 +211,13 @@ public function actionDownload($id)
     if ($model) {
         $rutaArchivo = $model->ruta;
         if (file_exists($rutaArchivo)) {
-            $nombreArchivo = $model->nombre; // Nombre del archivo sin la extensión
-            $extension = pathinfo($rutaArchivo, PATHINFO_EXTENSION); // Obtener la extensión del archivo
-            $nombreCompleto = $nombreArchivo . '.' . $extension; // Nombre completo con la extensión
+            $nombreArchivo = $model->nombre; 
+            $extension = pathinfo($rutaArchivo, PATHINFO_EXTENSION); 
+            $nombreCompleto = $nombreArchivo . '.' . $extension; 
             return Yii::$app->response->sendFile($rutaArchivo, $nombreCompleto);
         }
     }
-    // Si el archivo no se encuentra, puedes redirigir o mostrar un mensaje de error
     Yii::$app->session->setFlash('error', 'El archivo solicitado no se encuentra disponible.');
-    return $this->redirect(['documento/index']); // Cambia esto por la acción o la vista que desees
+    return $this->redirect(['documento/index']); 
 }
 }

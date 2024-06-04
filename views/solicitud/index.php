@@ -21,7 +21,7 @@ $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
     <div class="row">
         <div class="col-md-12">
             <div class="card">
-            <div class="card-header gradient-info text-white"><!-- Agregando las clases bg-primary y text-white -->
+            <div class="card-header gradient-info text-white">
                     <h3><?= Html::encode($this->title) ?></h3>
                 </div>
                 <div class="card-body">
@@ -51,7 +51,7 @@ $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
                 'pluginOptions' => [
                     'allowClear' => true
                 ],
-                'theme' => Select2::THEME_KRAJEE_BS3, // Esto aplicará el estilo de Bootstrap al Select2
+                'theme' => Select2::THEME_KRAJEE_BS3,
             ]),
         ],
         [
@@ -107,7 +107,6 @@ $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
         [
             'attribute' => 'comentario',
             'format' => 'ntext',
-            // Aquí se deshabilita el filtro
             'filter' => false,
         ],
        
@@ -121,14 +120,14 @@ $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
             'filter' => Select2::widget([
                 'model' => $searchModel,
                 'attribute' => 'nombre_formato',
-                'data' => \yii\helpers\ArrayHelper::map(\app\models\Solicitud::find()->select(['nombre_formato'])->distinct()->all(), 'nombre_formato', 'nombre_formato'), // Asegúrate de que 'nombre_formato' sea el nombre correcto del campo en tu tabla Solicitud
+                'data' => \yii\helpers\ArrayHelper::map(\app\models\Solicitud::find()->select(['nombre_formato'])->distinct()->all(), 'nombre_formato', 'nombre_formato'), 
                 'options' => ['placeholder' => 'Seleccione un tipo de solicitud'],
                 'pluginOptions' => [
                     'allowClear' => true
 
                     
                 ],
-                'theme' => Select2::THEME_KRAJEE_BS3, // Esto aplicará el estilo de Bootstrap al Select2
+                'theme' => Select2::THEME_KRAJEE_BS3,
             ]),
         ],
 
@@ -138,20 +137,17 @@ $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
     'pager' => [
         'class' => 'yii\bootstrap4\LinkPager',
     ],
-    // Agregar el botón de reinicio fuera del GridView
    
     
 ]); 
 Pjax::end();
 
-// Script para actualizar el contenedor Pjax cada 30 segundos
 $script = <<< JS
     setInterval(function(){
         $.pjax.reload({container:'#pjax-container'});
     }, 20000);
 JS;
 
-// Registrar el script en la vista
 $this->registerJs($script);
  ?>
 

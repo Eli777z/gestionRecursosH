@@ -27,7 +27,7 @@ $config = [
         
         'mpdf' => [
             'class' => 'Mpdf\Mpdf',
-            'tempDir' => '@runtime/mpdf', // Ruta al directorio temporal deseado
+            'tempDir' => '@runtime/mpdf', 
         ],
         'view' => [
             'theme' => [
@@ -177,8 +177,7 @@ if (YII_ENV_DEV) {
 }
 
 
-//private static final String EMAIL_USERNAME = "elitaev7@gmail.com"; 
-  //  private static final String EMAIL_PASSWORD = "vdcj rfzv xpuh aluy";
+
 
 return $config;
 ?>

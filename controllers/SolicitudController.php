@@ -162,7 +162,6 @@ class SolicitudController extends Controller
                         }
     
                         if ($periodoVacacional) {
-                            // Guardar el periodo original en el historial
                             $historial = new PeriodoVacacionalHistorial();
                             $historial->empleado_id = $model->empleado_id;
                             $historial->periodo = $periodo;
@@ -173,18 +172,14 @@ class SolicitudController extends Controller
                             $historial->original = $periodoVacacional->original;
                             $historial->save();
     
-                            // Calcular el número de días seleccionados en el rango
                             $fechaInicio = new \DateTime($cambioPeriodo->fecha_inicio_periodo);
                             $fechaFin = new \DateTime($cambioPeriodo->fecha_fin_periodo);
                             $diasSeleccionados = $fechaInicio->diff($fechaFin)->days + 1;
     
-                            // Calcular el nuevo valor de dias_disponibles
                             $diasDisponibles = $periodoVacacional->dias_vacaciones_periodo - $diasSeleccionados;
     
-                            // Actualizar el campo dias_disponibles
                             $periodoVacacional->dias_disponibles = $diasDisponibles;
     
-                            // Actualizar el periodo vacacional
                             $periodoVacacional->fecha_inicio = $cambioPeriodo->fecha_inicio_periodo;
                             $periodoVacacional->fecha_final = $cambioPeriodo->fecha_fin_periodo;
                             $periodoVacacional->año = $cambioPeriodo->año;

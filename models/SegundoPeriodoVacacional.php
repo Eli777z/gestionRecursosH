@@ -34,7 +34,7 @@ class SegundoPeriodoVacacional extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['dateRange'], 'safe'], // Añadir dateRange como seguro para asignación masiva
+            [['dateRange'], 'safe'], 
 
             [['fecha_inicio', 'fecha_final'], 'safe'],
             [['año'], 'string', 'max' => 8],

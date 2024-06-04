@@ -45,16 +45,12 @@ class CambioPeriodoVacacionalController extends Controller
     {
         $usuarioId = Yii::$app->user->identity->id;
 
-        // Buscar el modelo de Empleado asociado al usuario actual
         $empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();
 
-        // Verificar si se encontró el empleado
         if ($empleado !== null) {
-            // Si se encontró el empleado, utilizar su ID para filtrar los registros
             $searchModel = new CambioPeriodoVacacionalSearch();
             $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-            // Filtrar los registros por el ID del empleado
             $dataProvider->query->andFilterWhere(['empleado_id' => $empleado->id]);
 
             $this->layout = "main-trabajador";
@@ -64,7 +60,6 @@ class CambioPeriodoVacacionalController extends Controller
                 'dataProvider' => $dataProvider,
             ]);
         } else {
-            // Si no se encontró el empleado, mostrar un mensaje de error o redireccionar
             Yii::$app->session->setFlash('error', 'No se pudo encontrar el empleado asociado al usuario actual.');
             return $this->redirect(['index']); // Redirecciona a la página de índice u otra página apropiada
         }
@@ -127,7 +122,6 @@ class CambioPeriodoVacacionalController extends Controller
                         $transaction->commit();
                         Yii::$app->session->setFlash('success', 'Su solicitud ha sido generada exitosamente.');
     
-                        // Crear notificación
                         $notificacion = new Notificacion();
                         $notificacion->usuario_id = $model->empleado->usuario_id;
                         $notificacion->mensaje = 'Tienes una nueva solicitud pendiente de revisión.';
@@ -212,20 +206,16 @@ class CambioPeriodoVacacionalController extends Controller
 
     public function actionExport($id)
     {
-        // Encuentra el modelo PermisoFueraTrabajo según el ID pasado como parámetro
         $model = CambioPeriodoVacacional::findOne($id);
 
         if (!$model) {
             throw new NotFoundHttpException('El registro no existe.');
         }
 
-        // Ruta a tu plantilla de Excel
         $templatePath = Yii::getAlias('@app/templates/cambio_periodo_vacacional.xlsx');
 
-        // Cargar la plantilla de Excel
         $spreadsheet = IOFactory::load($templatePath);
 
-        // Modificar la plantilla con los datos del modelo
         $sheet = $spreadsheet->getActiveSheet();
 
         setlocale(LC_TIME, 'es_419.UTF-8');
@@ -235,7 +225,6 @@ class CambioPeriodoVacacionalController extends Controller
             $sheet->setCellValue('P14', '');
             $sheet->setCellValue('I14', $model->año);
     
-            // Buscar el periodo original en el historial
             $periodoOriginal = PeriodoVacacionalHistorial::find()
                 ->where(['empleado_id' => $model->empleado_id, 'periodo' => 'primer periodo', 'original' => 'Si'])
                 ->orderBy(['created_at' => SORT_DESC])
@@ -248,7 +237,6 @@ class CambioPeriodoVacacionalController extends Controller
             $fechaInicioNuevo = strftime('%d de %B del %Y', strtotime($model->fecha_inicio_periodo));
             $fechaFinNuevo = strftime('%d de %B del %Y', strtotime($model->fecha_fin_periodo));
     
-            // Colocar las fechas en las celdas correspondientes
             $sheet->setCellValue('G16', "$fechaInicioOriginal al $fechaFinOriginal");
             $sheet->setCellValue('G17', "$fechaInicioNuevo al $fechaFinNuevo");
             $sheet->setCellValue('G18', $periodoVacacional->dias_vacaciones_periodo);
@@ -267,7 +255,6 @@ class CambioPeriodoVacacionalController extends Controller
             $sheet->setCellValue('P14', 'X');
             $sheet->setCellValue('S14', $model->año);
     
-            // Buscar el periodo original en el historial
             $periodoOriginal = PeriodoVacacionalHistorial::find()
                 ->where(['empleado_id' => $model->empleado_id, 'periodo' => 'segundo periodo', 'original' => 'Si'])
                 ->orderBy(['created_at' => SORT_DESC])
@@ -280,7 +267,6 @@ class CambioPeriodoVacacionalController extends Controller
             $fechaInicioNuevo = strftime('%d de %B del %Y', strtotime($model->fecha_inicio_periodo));
             $fechaFinNuevo = strftime('%d de %B del %Y', strtotime($model->fecha_fin_periodo));
     
-            // Colocar las fechas en las celdas correspondientes
             $sheet->setCellValue('G16', "$fechaInicioOriginal al $fechaFinOriginal");
             $sheet->setCellValue('G17', "$fechaInicioNuevo al $fechaFinNuevo");
             $sheet->setCellValue('G18', $periodoVacacional->dias_vacaciones_periodo);
@@ -356,10 +342,8 @@ class CambioPeriodoVacacionalController extends Controller
 
         $sheet->setCellValue('B29', $nombrePuesto);
 
-        // Obtener la dirección asociada al empleado
         $direccion = CatDireccion::findOne($model->empleado->informacionLaboral->cat_direccion_id);
 
-        // Verificar si la dirección no es '1.- GENERAL' y si se ha ingresado un nombre de Jefe de Departamento
         if ($direccion && $direccion->nombre_direccion !== '1.- GENERAL' && $model->nombre_jefe_departamento) {
             $nombreCompletoJefe = mb_strtoupper($model->nombre_jefe_departamento, 'UTF-8');
             $sheet->setCellValue('I28', $nombreCompletoJefe);
@@ -405,7 +389,7 @@ class CambioPeriodoVacacionalController extends Controller
                     $tituloDireccion = 'DIRECTOR DE PLANEACION';
                     break;
                 default:
-                    $tituloDireccion = ''; // Otra dirección no especificada
+                    $tituloDireccion = ''; 
             }
 
             $sheet->setCellValue('O29', $tituloDireccion);
@@ -418,8 +402,7 @@ class CambioPeriodoVacacionalController extends Controller
         $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
         $writer->save($tempFileName);
 
-        // Luego, proporciona un enlace para que el usuario descargue el archivo
-        // Puedes redirigir a una acción que presente el enlace o generar directamente el enlace aquí mismo
+    
         return $this->redirect(['download', 'filename' => basename($tempFileName)]);
     }
 
@@ -437,20 +420,16 @@ class CambioPeriodoVacacionalController extends Controller
 
     public function actionExportSegundoCaso($id)
     {
-        // Encuentra el modelo PermisoFueraTrabajo según el ID pasado como parámetro
         $model = CambioPeriodoVacacional::findOne($id);
 
         if (!$model) {
             throw new NotFoundHttpException('El registro no existe.');
         }
 
-        // Ruta a tu plantilla de Excel
         $templatePath = Yii::getAlias('@app/templates/cambio_periodo_vacacional.xlsx');
 
-        // Cargar la plantilla de Excel
         $spreadsheet = IOFactory::load($templatePath);
 
-        // Modificar la plantilla con los datos del modelo
         $sheet = $spreadsheet->getActiveSheet();
 
         setlocale(LC_TIME, 'es_419.UTF-8');
@@ -460,7 +439,6 @@ class CambioPeriodoVacacionalController extends Controller
             $sheet->setCellValue('P14', '');
             $sheet->setCellValue('I14', $model->año);
     
-            // Buscar el periodo original en el historial
             $periodoOriginal = PeriodoVacacionalHistorial::find()
                 ->where(['empleado_id' => $model->empleado_id, 'periodo' => 'primer periodo', 'original' => 'Si'])
                 ->orderBy(['created_at' => SORT_DESC])
@@ -473,7 +451,6 @@ class CambioPeriodoVacacionalController extends Controller
             $fechaInicioNuevo = strftime('%d de %B del %Y', strtotime($model->fecha_inicio_periodo));
             $fechaFinNuevo = strftime('%d de %B del %Y', strtotime($model->fecha_fin_periodo));
     
-            // Colocar las fechas en las celdas correspondientes
             $sheet->setCellValue('G16', "$fechaInicioOriginal al $fechaFinOriginal");
             $sheet->setCellValue('G17', "$fechaInicioNuevo al $fechaFinNuevo");
             $sheet->setCellValue('G18', $periodoVacacional->dias_vacaciones_periodo);
@@ -492,7 +469,6 @@ class CambioPeriodoVacacionalController extends Controller
             $sheet->setCellValue('P14', 'X');
             $sheet->setCellValue('S14', $model->año);
     
-            // Buscar el periodo original en el historial
             $periodoOriginal = PeriodoVacacionalHistorial::find()
                 ->where(['empleado_id' => $model->empleado_id, 'periodo' => 'segundo periodo', 'original' => 'Si'])
                 ->orderBy(['created_at' => SORT_DESC])
@@ -505,7 +481,6 @@ class CambioPeriodoVacacionalController extends Controller
             $fechaInicioNuevo = strftime('%d de %B del %Y', strtotime($model->fecha_inicio_periodo));
             $fechaFinNuevo = strftime('%d de %B del %Y', strtotime($model->fecha_fin_periodo));
     
-            // Colocar las fechas en las celdas correspondientes
             $sheet->setCellValue('G16', "$fechaInicioOriginal al $fechaFinOriginal");
             $sheet->setCellValue('G17', "$fechaInicioNuevo al $fechaFinNuevo");
             $sheet->setCellValue('G18', $periodoVacacional->dias_vacaciones_periodo);
@@ -581,10 +556,8 @@ class CambioPeriodoVacacionalController extends Controller
 
         $sheet->setCellValue('B29', $nombrePuesto);
 
-        // Obtener la dirección asociada al empleado
 //        $direccion = CatDireccion::findOne($model->empleado->informacionLaboral->cat_direccion_id);
 //
-  ///      // Verificar si la dirección no es '1.- GENERAL' y si se ha ingresado un nombre de Jefe de Departamento
      //   if ($direccion && $direccion->nombre_direccion !== '1.- GENERAL' && $model->nombre_jefe_departamento) {
        //     $nombreCompletoJefe = mb_strtoupper($model->nombre_jefe_departamento, 'UTF-8');
         //    $sheet->setCellValue('I28', $nombreCompletoJefe);
@@ -600,7 +573,6 @@ class CambioPeriodoVacacionalController extends Controller
        
        $directorGeneral = null;
        
-       // Recorrer todos los registros de junta_gobierno encontrados
        foreach ($juntaGobierno as $junta) {
        $empleado = Empleado::findOne($junta->empleado_id);
        
@@ -610,7 +582,6 @@ class CambioPeriodoVacacionalController extends Controller
        }
        }
        
-       // Establecer el valor en la celda N23 si se encontró un Director General
        if ($directorGeneral) {
        $nombre = mb_strtoupper($directorGeneral->nombre, 'UTF-8');
        $apellido = mb_strtoupper($directorGeneral->apellido, 'UTF-8');
@@ -627,8 +598,7 @@ class CambioPeriodoVacacionalController extends Controller
         $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
         $writer->save($tempFileName);
 
-        // Luego, proporciona un enlace para que el usuario descargue el archivo
-        // Puedes redirigir a una acción que presente el enlace o generar directamente el enlace aquí mismo
+      
         return $this->redirect(['download', 'filename' => basename($tempFileName)]);
     }
 

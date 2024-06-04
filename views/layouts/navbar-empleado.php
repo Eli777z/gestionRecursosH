@@ -19,25 +19,26 @@ $count = count($notificaciones);
             <a href="../site/portalempleado" class="nav-link">Inicio</a>
         </li>
         
-        <div class="btn-group">
-    <button type="button" class="btn btn-info">Formatos de Incidencias</button>
-    <button type="button" class="btn btn-info dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-expanded="false">
-        <span class="sr-only">Toggle Dropdown</span>
-    </button>
-    <div class="dropdown-menu">
-        <?= Html::a('PERMISO FUERA DEL TRABAJO', Url::to(['permiso-fuera-trabajo/index']), ['class' => 'dropdown-item']) ?>
-        <?= Html::a('COMISIÓN ESPECIAL', Url::to(['comision-especial/index']), ['class' => 'dropdown-item']) ?>
-        <?= Html::a('CAMBIO DE DÍA LABORAL', Url::to(['cambio-dia-laboral/index']), ['class' => 'dropdown-item']) ?>
-        <?= Html::a('CAMBIO DE HORARIO DE TRABAJO', Url::to(['cambio-horario-trabajo/index']), ['class' => 'dropdown-item']) ?>
-        <?= Html::a('PERMISO ECONÓMICO', Url::to(['permiso-economico/index']), ['class' => 'dropdown-item']) ?>
-        <?= Html::a('PERMISO SIN GOCE DE SUELDO', Url::to(['permiso-sin-sueldo/index']), ['class' => 'dropdown-item']) ?>
-        <?= Html::a('CAMBIO PERIODO VACACIONAL', Url::to(['cambio-periodo-vacacional/index']), ['class' => 'dropdown-item']) ?>
-        <a class="dropdown-item" href="#">REPORTE DE TIEMPO EXTRA</a>
-        <a class="dropdown-item" href="#">REPORTE GENERAL DE TIEMPO EXTRA</a>
-        <div class="dropdown-divider"></div>
-        <a class="dropdown-item" href="#">Separated link</a>
-    </div>
+       <div class="dropdown">
+  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+    FORMATOS DE INCIDENCIAS
+  </button>
+  <div class="dropdown-menu">
+    <?= Html::a('PERMISO FUERA DEL TRABAJO', Url::to(['permiso-fuera-trabajo/index']), ['class' => 'dropdown-item']) ?>
+    <div class="dropdown-divider"></div>
+
+    <?= Html::a('COMISIÓN ESPECIAL', Url::to(['comision-especial/index']), ['class' => 'dropdown-item']) ?>
+    
+    <?= Html::a('CAMBIO DE DÍA LABORAL', Url::to(['cambio-dia-laboral/index']), ['class' => 'dropdown-item']) ?>
+    <?= Html::a('CAMBIO DE HORARIO DE TRABAJO', Url::to(['cambio-horario-trabajo/index']), ['class' => 'dropdown-item']) ?>
+    <?= Html::a('PERMISO ECONÓMICO', Url::to(['permiso-economico/index']), ['class' => 'dropdown-item']) ?>
+    <?= Html::a('PERMISO SIN GOCE DE SUELDO', Url::to(['permiso-sin-sueldo/index']), ['class' => 'dropdown-item']) ?>
+    <?= Html::a('CAMBIO PERIODO VACACIONAL', Url::to(['cambio-periodo-vacacional/index']), ['class' => 'dropdown-item']) ?>
+    <a class="dropdown-item" href="#">REPORTE DE TIEMPO EXTRA</a>
+    <a class="dropdown-item" href="#">REPORTE GENERAL DE TIEMPO EXTRA</a>
+  </div>
 </div>
+
 
 
 

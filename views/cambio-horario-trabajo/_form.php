@@ -30,16 +30,13 @@ $currentDate = date('Y-m-d');
                         <div class="col-md-12">
                             <div class="d-flex align-items-center mb-3">
                                 <?php
-                                // Mostrar los flash messages
                                 foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
                                     if ($type === 'error') {
-                                        // Muestra los mensajes de error en rojo
                                         echo Alert::widget([
                                             'options' => ['class' => 'alert-danger'],
                                             'body' => $message,
                                         ]);
                                     } else {
-                                        // Muestra los demás mensajes de flash con estilos predeterminados
                                         echo Alert::widget([
                                             'options' => ['class' => 'alert-' . $type],
                                             'body' => $message,
@@ -70,7 +67,7 @@ $currentDate = date('Y-m-d');
     'options' => [
         'placeholder' => 'Selecciona una fecha...',
     ],
-    'value' => date('Y-m-d'), // Establecer la fecha de hoy como valor inicial
+    'value' => date('Y-m-d'), 
 ])->label('Fecha de permiso') ?>
    
 
@@ -81,7 +78,7 @@ $currentDate = date('Y-m-d');
 
     <?= $form->field($model, 'horario_inicio')->widget(TimePicker::classname(), [
     'pluginOptions' => [
-        'showMeridian' => true, // Habilitar formato de 12 horas con AM/PM
+        'showMeridian' => true, 
         'minuteStep' => 1,
         'defaultTime' => false,
     ]
@@ -89,7 +86,7 @@ $currentDate = date('Y-m-d');
 
 <?= $form->field($model, 'horario_fin')->widget(TimePicker::classname(), [
     'pluginOptions' => [
-        'showMeridian' => true, // Habilitar formato de 12 horas con AM/PM
+        'showMeridian' => true, 
         'minuteStep' => 1,
         'defaultTime' => false,
     ]
@@ -109,10 +106,10 @@ $currentDate = date('Y-m-d');
             'singleDatePicker' => false,
             'showDropdowns' => true,
             'alwaysShowCalendars' => true,
-            'minDate' => '2000-01-01',  // Ajusta según tu necesidad
-            'maxDate' => '2100-12-31',  // Ajusta según tu necesidad
-            'startDate' => $currentDate, // Fecha de inicio predeterminada
-            'endDate' => $currentDate, // Fecha de fin predeterminada
+            'minDate' => '2000-01-01',  
+            'maxDate' => '2100-12-31',  
+            'startDate' => $currentDate, 
+            'endDate' => $currentDate,
             'autoApply' => true,
         ]
     ])->label('Rango de Fechas') ?>
@@ -123,23 +120,19 @@ $currentDate = date('Y-m-d');
 
 
 
-// Obtener el ID del usuario que tiene la sesión iniciada
 $usuarioId = Yii::$app->user->identity->id;
 
-// Buscar el empleado relacionado con el usuario
 $empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();
 
 $mostrarCampo = true;
 
 if ($empleado) {
-    // Buscar el registro en junta_gobierno que corresponde al empleado
     $juntaGobierno = JuntaGobierno::find()
         ->where(['empleado_id' => $empleado->id])
         ->andWhere(['nivel_jerarquico' => ['Director', 'Jefe de unidad']])
         ->one();
 
     if ($juntaGobierno) {
-        // Si se encuentra un registro con nivel jerárquico "Director" o "Jefe de unidad", no mostrar el campo
         $mostrarCampo = false;
     }
 }

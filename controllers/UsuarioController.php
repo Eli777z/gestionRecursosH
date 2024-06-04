@@ -150,16 +150,14 @@ class UsuarioController extends Controller
         $userId = Yii::$app->user->identity->id;
         $user = Usuario::findOne($userId);
 
-        // Verifica si el usuario es un administrador
         if (Usuario::isUserAdmin($userId)) {
             $redirectUrl = ['site/portalgestionrh'];
         } else {
-            $redirectUrl = ['site/portaltrabajador'];
+            $redirectUrl = ['site/portalempleado'];
         }
 
-        // Si el usuario no es nuevo y no es administrador, redirígelo a portaltrabajador
         if ($user->nuevo != 4 && !Usuario::isUserAdmin($userId)) {
-            return $this->redirect(['site/portaltrabajador']);
+            return $this->redirect(['site/portalempleado']);
         }
 
         $model = new CambiarContrasenaForm();

@@ -33,6 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                             'id',
                             'nombre_departamento',
+                            'cat_direccion_id',
 
                             ['class' => 'hail812\adminlte3\yii\grid\ActionColumn'],
                         ],

@@ -73,20 +73,16 @@ class EmpleadoController extends Controller
      */
     public function actionView($id)
     {
-        // Encuentra el modelo de empleado
         $modelEmpleado = $this->findModel2($id);
 
-        // Encuentra los documentos asociados al empleado
         $documentos = $modelEmpleado->documentos;
 
-        // Crea un nuevo modelo de Documento para usar en el formulario
         $documentoModel = new Documento();
         $historial = PeriodoVacacionalHistorial::find()->where(['empleado_id' => $modelEmpleado->id])->all();
 
         $searchModel = new \app\models\SolicitudSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->query->andWhere(['empleado_id' => $id]);
-        // Renderiza la vista 'view' y pasa los datos necesarios
         return $this->render('view', [
             'model' => $modelEmpleado,
             'documentos' => $documentos,
@@ -132,17 +128,16 @@ class EmpleadoController extends Controller
             $usuario->password = $hash;
 
             try {
-                // Calcular días de vacaciones
                 $totalDiasVacaciones = $this->calcularDiasVacaciones($informacion_laboral->fecha_ingreso, $informacion_laboral->cat_tipo_contrato_id);
-                $diasPorPeriodo = ceil($totalDiasVacaciones / 2); // Dividir en dos y redondear hacia arriba
+                $diasPorPeriodo = ceil($totalDiasVacaciones / 2);
 
-                // Asignar días a los periodos vacacionales
+              
                 $periodoVacacional->dias_vacaciones_periodo = $diasPorPeriodo;
                 if (!$periodoVacacional->save()) {
                     throw new \yii\db\Exception('Error al guardar PeriodoVacacional');
                 }
 
-                $segundoPeriodoVacacional->dias_vacaciones_periodo = $totalDiasVacaciones - $diasPorPeriodo; // Asegurarse de que la suma es correcta
+                $segundoPeriodoVacacional->dias_vacaciones_periodo = $totalDiasVacaciones - $diasPorPeriodo; 
                 if (!$segundoPeriodoVacacional->save()) {
                     throw new \yii\db\Exception('Error al guardar SegundoPeriodoVacacional');
                 }
@@ -219,11 +214,10 @@ class EmpleadoController extends Controller
         $intervalo = $fechaIngreso->diff($fechaActual);
         $aniosTrabajados = $intervalo->y;
 
-        // Obtener el nombre del tipo de contrato
         $tipoContrato = CatTipoContrato::findOne($tipoContratoId);
 
         if (!$tipoContrato) {
-            return 0; // Si no se encuentra el tipo de contrato, retornar 0
+            return 0; 
         }
 
         switch ($tipoContrato->nombre_tipo) {
@@ -328,7 +322,6 @@ class EmpleadoController extends Controller
         $transaction = Yii::$app->db->beginTransaction();
 
         try {
-            // Eliminar los documentos asociados al empleado y su carpeta
             foreach ($empleado->documentos as $documento) {
                 $nombreCarpetaTrabajador = Yii::getAlias('@runtime') . '/empleados/' . $empleado->nombre . '_' . $empleado->apellido;
                 if (is_dir($nombreCarpetaTrabajador)) {
@@ -337,11 +330,11 @@ class EmpleadoController extends Controller
                 $documento->delete();
             }
 
-            // Eliminar la información laboral del empleado
+          
             //  $empleado->informacionLaboral->delete();
             $empleado->delete();
 
-            // Eliminar al usuario asociado al empleado si existe
+       
             $usuario = Usuario::findOne($usuario_id);
             if ($usuario) {
                 $usuario->delete();
@@ -359,7 +352,7 @@ class EmpleadoController extends Controller
 
 
 
-            // Por último, eliminar al empleado
+          
 
 
             $transaction->commit();
@@ -460,7 +453,6 @@ class EmpleadoController extends Controller
     {
         $model = $this->findModel2($id);
 
-        // Cambia el estado del usuario
         if ($model->usuario->status == 10) {
             $model->usuario->status = 0; // Inactiva el usuario
         } else {
@@ -517,7 +509,6 @@ class EmpleadoController extends Controller
                 }
                 $upload_filename = $nombreCarpetaUserProfile . '/' . $upload->baseName . '.' . $upload->extension;
                 if ($upload->saveAs($upload_filename)) {
-                    // Eliminar la foto anterior solo si se proporciona una nueva imagen
                     if ($previous_photo && $previous_photo !== $upload_filename && file_exists($previous_photo)) {
                         @unlink($previous_photo);
                     }
@@ -543,14 +534,12 @@ class EmpleadoController extends Controller
         $model = $this->findModel2($id);
 
         if ($model->load(Yii::$app->request->post())) {
-            // Calcula la edad en base a la fecha de nacimiento
             $fechaNacimiento = new \DateTime($model->fecha_nacimiento);
             $hoy = new \DateTime();
             $diferencia = $hoy->diff($fechaNacimiento);
-            $model->edad = $diferencia->y; // Asigna la edad al modelo
+            $model->edad = $diferencia->y; 
 
             if ($model->save()) {
-                // Redirige a la vista de detalles o a otra página
                 Yii::$app->session->setFlash('success', 'Los cambios de la información personal han sido actualizados correctamente.');
 
                 $url = Url::to(['view', 'id' => $model->id,]) . '#informacion_personal';
@@ -593,7 +582,6 @@ class EmpleadoController extends Controller
         $informacion_laboral = InformacionLaboral::findOne($model->informacion_laboral_id);
 
         if ($informacion_laboral->load(Yii::$app->request->post()) && $informacion_laboral->save()) {
-            // Recalcular los días de vacaciones
             $vacaciones = Vacaciones::findOne($informacion_laboral->vacaciones_id);
             $totalDiasVacaciones = $this->calcularDiasVacaciones($informacion_laboral->fecha_ingreso, $informacion_laboral->cat_tipo_contrato_id);
             $vacaciones->total_dias_vacaciones = $totalDiasVacaciones;
@@ -604,12 +592,10 @@ class EmpleadoController extends Controller
                 Yii::$app->session->setFlash('error', 'Hubo un error al actualizar los días de vacaciones.');
             }
 
-            // Generar la URL manualmente para evitar el URL encode del símbolo #
             $url = Url::to(['view', 'id' => $model->id]) . '#informacion_laboral';
             return $this->redirect($url);
         } else {
             Yii::$app->session->setFlash('error', 'Hubo un error al actualizar la información laboral del trabajador.');
-            // Generar la URL manualmente para evitar el URL encode del símbolo #
             $url = Url::to(['view', 'id' => $model->id]) . '#informacion_laboral';
             return $this->redirect($url);
         }
@@ -625,14 +611,12 @@ class EmpleadoController extends Controller
         $periodoVacacional = $model->informacionLaboral->vacaciones->periodoVacacional;
 
         if ($periodoVacacional->load(Yii::$app->request->post())) {
-            // Calcular el número de días seleccionados en el rango
             if ($periodoVacacional->dateRange) {
                 list($fechaInicio, $fechaFin) = explode(' a ', $periodoVacacional->dateRange);
                 $fechaInicio = new \DateTime($fechaInicio);
                 $fechaFin = new \DateTime($fechaFin);
                 $diasSeleccionados = $fechaInicio->diff($fechaFin)->days + 1;
 
-                // Calcular el nuevo valor de dias_disponibles
                 $diasDisponibles = $periodoVacacional->dias_vacaciones_periodo - $diasSeleccionados;
                 $periodoVacacional->dias_disponibles = $diasDisponibles;
             }
@@ -659,14 +643,12 @@ class EmpleadoController extends Controller
         $periodoVacacional = $model->informacionLaboral->vacaciones->segundoPeriodoVacacional;
 
         if ($periodoVacacional->load(Yii::$app->request->post())) {
-            // Calcular el número de días seleccionados en el rango
             if ($periodoVacacional->dateRange) {
                 list($fechaInicio, $fechaFin) = explode(' a ', $periodoVacacional->dateRange);
                 $fechaInicio = new \DateTime($fechaInicio);
                 $fechaFin = new \DateTime($fechaFin);
                 $diasSeleccionados = $fechaInicio->diff($fechaFin)->days + 1;
 
-                // Calcular el nuevo valor de dias_disponibles
                 $diasDisponibles = $periodoVacacional->dias_vacaciones_periodo - $diasSeleccionados;
                 $periodoVacacional->dias_disponibles = $diasDisponibles;
             }
@@ -690,13 +672,11 @@ class EmpleadoController extends Controller
 
     public function actionDatosJuntaGobierno($direccion_id)
     {
-        // Obtener los datos de JuntaGobierno basados en la dirección seleccionada
         $datosJuntaGobierno = JuntaGobierno::find()
             ->where(['nivel_jerarquico' => 'Jefe de unidad'])
             ->andWhere(['cat_direccion_id' => $direccion_id])
             ->all();
 
-        // Formatear los datos en el formato necesario para Select2
         $result = [];
         foreach ($datosJuntaGobierno as $juntaGobierno) {
             $result[] = [
@@ -705,7 +685,6 @@ class EmpleadoController extends Controller
             ];
         }
 
-        // Devolver los datos en formato JSON
         return Json::encode(['results' => $result]);
     }
 
@@ -717,12 +696,9 @@ class EmpleadoController extends Controller
         $model = new UploadForm();
 
         if (Yii::$app->request->isPost) {
-            // Obtener el nombre seleccionado antes de cargar los datos del formulario en el modelo
             $selectedName = Yii::$app->request->post('UploadForm')['selectedName'];
-            // Asignar el nombre seleccionado al modelo
             $model->selectedName = $selectedName;
 
-            // Cargar los datos del formulario en el modelo
             $model->load(Yii::$app->request->post());
             $model->file = UploadedFile::getInstance($model, 'file');
             if ($model->upload()) {

@@ -32,16 +32,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?php
 
 
-// Obtener el ID del usuario que tiene la sesión iniciada
 $usuarioId = Yii::$app->user->identity->id;
 
-// Buscar el empleado relacionado con el usuario
 $empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();
 
 if ($empleado) {
     $model->empleado_id = $empleado->id;
 
-    // Buscar el registro en junta_gobierno que corresponde al empleado
     $juntaGobierno = JuntaGobierno::find()->where(['empleado_id' => $empleado->id])->one();
 
     if ($model->solicitud->status === 'Aprobado') {
@@ -60,7 +57,6 @@ if ($empleado) {
 ?>
                     </p>
                     <?php 
-    // Mostrar los flash messages
     foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
         echo Alert::widget([
             'options' => ['class' => 'alert-' . $type],

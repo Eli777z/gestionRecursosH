@@ -2,7 +2,6 @@
 
 use yii\helpers\Html;
 use app\models\Notificacion;
-// Obtener la cantidad de notificaciones no leídas
 $notificaciones = Notificacion::find()->where(['usuario_id' => Yii::$app->user->identity->id, 'leido' => 0])->orderBy(['created_at' => SORT_DESC])->all();
 $count = count($notificaciones);
 ?>

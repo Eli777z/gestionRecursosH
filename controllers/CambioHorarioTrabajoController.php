@@ -46,16 +46,12 @@ class CambioHorarioTrabajoController extends Controller
     {
         $usuarioId = Yii::$app->user->identity->id;
 
-        // Buscar el modelo de Empleado asociado al usuario actual
         $empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();
 
-        // Verificar si se encontró el empleado
         if ($empleado !== null) {
-            // Si se encontró el empleado, utilizar su ID para filtrar los registros
             $searchModel = new CambioHorarioTrabajoSearch();
             $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-            // Filtrar los registros por el ID del empleado
             $dataProvider->query->andFilterWhere(['empleado_id' => $empleado->id]);
 
             $this->layout = "main-trabajador";
@@ -65,9 +61,8 @@ class CambioHorarioTrabajoController extends Controller
                 'dataProvider' => $dataProvider,
             ]);
         } else {
-            // Si no se encontró el empleado, mostrar un mensaje de error o redireccionar
             Yii::$app->session->setFlash('error', 'No se pudo encontrar el empleado asociado al usuario actual.');
-            return $this->redirect(['index']); // Redirecciona a la página de índice u otra página apropiada
+            return $this->redirect(['index']);
         }
     }
 
@@ -139,7 +134,6 @@ class CambioHorarioTrabajoController extends Controller
                             $transaction->commit();
                             Yii::$app->session->setFlash('success', 'Su solicitud ha sido generada exitosamente.');
 
-                            // Crear notificación
                             $notificacion = new Notificacion();
                             $notificacion->usuario_id = $model->empleado->usuario_id;
                             $notificacion->mensaje = 'Tienes una nueva solicitud pendiente de revisión.';
@@ -226,20 +220,16 @@ class CambioHorarioTrabajoController extends Controller
 
     public function actionExport($id)
     {
-        // Encuentra el modelo PermisoFueraTrabajo según el ID pasado como parámetro
         $model = CambioHorarioTrabajo::findOne($id);
 
         if (!$model) {
             throw new NotFoundHttpException('El registro no existe.');
         }
 
-        // Ruta a tu plantilla de Excel
         $templatePath = Yii::getAlias('@app/templates/cambio_horario_trabajo.xlsx');
 
-        // Cargar la plantilla de Excel
         $spreadsheet = IOFactory::load($templatePath);
 
-        // Modificar la plantilla con los datos del modelo
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setCellValue('F6', $model->empleado->numero_empleado);
 
@@ -282,38 +272,29 @@ if ($model->turno === 'MATUTINO') {
 $horarioInicio = DateTime::createFromFormat('H:i:s', $model->horario_inicio)->format('g:i A');
 $horarioFin = DateTime::createFromFormat('H:i:s', $model->horario_fin)->format('g:i A');
 
-// Concatenar el formato deseado
 $horarioCompleto = "DE $horarioInicio A $horarioFin";
 
-// Asignar el valor a la celda M17
 $sheet->setCellValue('M17', $horarioCompleto);
 
 setlocale(LC_TIME, 'es_419.UTF-8');
 
-// Ejemplo de cómo podrías obtener el modelo
-// $model = YourModel::findOne($id); // Asegúrate de cargar tu modelo
 
-// Convertir fecha_inicio y fecha_termino a objetos DateTime
 $fechaInicio = DateTime::createFromFormat('Y-m-d', $model->fecha_inicio);
 $fechaTermino = DateTime::createFromFormat('Y-m-d', $model->fecha_termino);
 
-// Formatear las fechas usando strftime para el formato en español
-$formatoFecha = '%A, %B %d, %Y'; // Formato PHP para día de la semana, día del mes, mes, año
+$formatoFecha = '%A, %B %d, %Y'; 
 $fechaInicioFormateada = strftime($formatoFecha, $fechaInicio->getTimestamp());
 $fechaTerminoFormateada = strftime($formatoFecha, $fechaTermino->getTimestamp());
 
-// Comparar las fechas y determinar el mensaje
 if ($fechaInicio == $fechaTermino) {
     $mensaje = "SOLAMENTE ESE DÍA";
 } else {
     $mensaje = "Del $fechaInicioFormateada al $fechaTerminoFormateada";
 }
 
-// Asignar el valor a la celda M18
 $sheet->setCellValue('M18', $mensaje);
 
 
-        // Convertir la fecha del modelo al formato deseado
         $fecha_permiso = strftime('%A, %B %d, %Y', strtotime($model->motivoFechaPermiso->fecha_permiso));
         $sheet->setCellValue('M16', $fecha_permiso);
 
@@ -333,10 +314,8 @@ $sheet->setCellValue('M18', $mensaje);
 
         $sheet->setCellValue('B26', $nombrePuesto);
 
-        // Obtener la dirección asociada al empleado
         $direccion = CatDireccion::findOne($model->empleado->informacionLaboral->cat_direccion_id);
 
-        // Verificar si la dirección no es '1.- GENERAL' y si se ha ingresado un nombre de Jefe de Departamento
         if ($direccion && $direccion->nombre_direccion !== '1.- GENERAL' && $model->nombre_jefe_departamento) {
             $nombreCompletoJefe = mb_strtoupper($model->nombre_jefe_departamento, 'UTF-8');
             $sheet->setCellValue('I25', $nombreCompletoJefe);
@@ -382,7 +361,7 @@ $sheet->setCellValue('M18', $mensaje);
                     $tituloDireccion = 'DIRECTOR DE PLANEACION';
                     break;
                 default:
-                    $tituloDireccion = ''; // Otra dirección no especificada
+                    $tituloDireccion = ''; 
             }
 
             $sheet->setCellValue('P26', $tituloDireccion);
@@ -395,8 +374,6 @@ $sheet->setCellValue('M18', $mensaje);
         $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
         $writer->save($tempFileName);
 
-        // Luego, proporciona un enlace para que el usuario descargue el archivo
-        // Puedes redirigir a una acción que presente el enlace o generar directamente el enlace aquí mismo
         return $this->redirect(['download', 'filename' => basename($tempFileName)]);
     }
 
@@ -415,20 +392,16 @@ $sheet->setCellValue('M18', $mensaje);
 
     public function actionExportSegundoCaso($id)
     {
-        // Encuentra el modelo PermisoFueraTrabajo según el ID pasado como parámetro
         $model = CambioHorarioTrabajo::findOne($id);
 
         if (!$model) {
             throw new NotFoundHttpException('El registro no existe.');
         }
 
-        // Ruta a tu plantilla de Excel
         $templatePath = Yii::getAlias('@app/templates/cambio_horario_trabajo.xlsx');
 
-        // Cargar la plantilla de Excel
         $spreadsheet = IOFactory::load($templatePath);
 
-        // Modificar la plantilla con los datos del modelo
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setCellValue('F6', $model->empleado->numero_empleado);
 
@@ -460,7 +433,6 @@ $sheet->setCellValue('M18', $mensaje);
 
 
 
-        // Convertir la fecha del modelo al formato deseado
         $fecha_permiso = strftime('%A, %B %d, %Y', strtotime($model->motivoFechaPermiso->fecha_permiso));
         $sheet->setCellValue('M16', $fecha_permiso);
 
@@ -479,34 +451,26 @@ $sheet->setCellValue('M18', $mensaje);
         $horarioInicio = DateTime::createFromFormat('H:i:s', $model->horario_inicio)->format('g:i A');
         $horarioFin = DateTime::createFromFormat('H:i:s', $model->horario_fin)->format('g:i A');
         
-        // Concatenar el formato deseado
         $horarioCompleto = "DE $horarioInicio A $horarioFin";
         
-        // Asignar el valor a la celda M17
         $sheet->setCellValue('M17', $horarioCompleto);
 
         setlocale(LC_TIME, 'es_419.UTF-8');
 
-        // Ejemplo de cómo podrías obtener el modelo
-        // $model = YourModel::findOne($id); // Asegúrate de cargar tu modelo
-        
-        // Convertir fecha_inicio y fecha_termino a objetos DateTime
+      
         $fechaInicio = DateTime::createFromFormat('Y-m-d', $model->fecha_inicio);
         $fechaTermino = DateTime::createFromFormat('Y-m-d', $model->fecha_termino);
         
-        // Formatear las fechas usando strftime para el formato en español
-        $formatoFecha = '%A, %B %d, %Y'; // Formato PHP para día de la semana, día del mes, mes, año
-        $fechaInicioFormateada = strftime($formatoFecha, $fechaInicio->getTimestamp());
+        $formatoFecha = '%A, %B %d, %Y';        $fechaInicioFormateada = strftime($formatoFecha, $fechaInicio->getTimestamp());
         $fechaTerminoFormateada = strftime($formatoFecha, $fechaTermino->getTimestamp());
         
-        // Comparar las fechas y determinar el mensaje
+ 
         if ($fechaInicio == $fechaTermino) {
             $mensaje = "SOLAMENTE ESE DÍA";
         } else {
             $mensaje = "Del $fechaInicioFormateada al $fechaTerminoFormateada";
         }
         
-        // Asignar el valor a la celda M18
         $sheet->setCellValue('M18', $mensaje);
 
 
@@ -518,10 +482,10 @@ $sheet->setCellValue('M18', $mensaje);
 
 
 
-        // Obtener la dirección asociada al empleado
+    
 //        $direccion = CatDireccion::findOne($model->empleado->informacionLaboral->cat_direccion_id);
 
-        // Verificar si la dirección no es '1.- GENERAL' y si se ha ingresado un nombre de Jefe de Departamento
+       
   //      if ($direccion && $direccion->nombre_direccion !== '1.- GENERAL' && $model->nombre_jefe_departamento) {
     //        $nombreCompletoJefe = mb_strtoupper($model->nombre_jefe_departamento, 'UTF-8');
       //      $sheet->setCellValue('I25', $nombreCompletoJefe);
@@ -538,7 +502,6 @@ $sheet->setCellValue('M18', $mensaje);
 
 $directorGeneral = null;
 
-// Recorrer todos los registros de junta_gobierno encontrados
 foreach ($juntaGobierno as $junta) {
 $empleado = Empleado::findOne($junta->empleado_id);
 
@@ -548,7 +511,6 @@ if ($empleado && $empleado->informacionLaboral->catPuesto->nombre_puesto === 'DI
 }
 }
 
-// Establecer el valor en la celda N23 si se encontró un Director General
 if ($directorGeneral) {
 $nombre = mb_strtoupper($directorGeneral->nombre, 'UTF-8');
 $apellido = mb_strtoupper($directorGeneral->apellido, 'UTF-8');
@@ -564,8 +526,7 @@ $sheet->setCellValue('P26', 'DIRECTOR GENERAL');
         $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
         $writer->save($tempFileName);
 
-        // Luego, proporciona un enlace para que el usuario descargue el archivo
-        // Puedes redirigir a una acción que presente el enlace o generar directamente el enlace aquí mismo
+       
         return $this->redirect(['download', 'filename' => basename($tempFileName)]);
     }
 }

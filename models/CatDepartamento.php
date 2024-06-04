@@ -9,8 +9,11 @@ use Yii;
  *
  * @property int $id
  * @property string $nombre_departamento
+ * @property int|null $cat_direccion_id
  *
+ * @property CatDireccion $catDireccion
  * @property InformacionLaboral[] $informacionLaborals
+ * @property JuntaGobierno[] $juntaGobiernos
  */
 class CatDepartamento extends \yii\db\ActiveRecord
 {
@@ -29,7 +32,10 @@ class CatDepartamento extends \yii\db\ActiveRecord
     {
         return [
             [['nombre_departamento'], 'required'],
+            [['cat_direccion_id'], 'integer'],
             [['nombre_departamento'], 'string', 'max' => 100],
+            [['nombre_departamento'], 'unique'],
+            [['cat_direccion_id'], 'exist', 'skipOnError' => true, 'targetClass' => CatDireccion::class, 'targetAttribute' => ['cat_direccion_id' => 'id']],
         ];
     }
 
@@ -41,7 +47,18 @@ class CatDepartamento extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'nombre_departamento' => 'Nombre Departamento',
+            'cat_direccion_id' => 'Cat Direccion ID',
         ];
+    }
+
+    /**
+     * Gets query for [[CatDireccion]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCatDireccion()
+    {
+        return $this->hasOne(CatDireccion::class, ['id' => 'cat_direccion_id']);
     }
 
     /**
@@ -52,5 +69,15 @@ class CatDepartamento extends \yii\db\ActiveRecord
     public function getInformacionLaborals()
     {
         return $this->hasMany(InformacionLaboral::class, ['cat_departamento_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[JuntaGobiernos]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getJuntaGobiernos()
+    {
+        return $this->hasMany(JuntaGobierno::class, ['cat_departamento_id' => 'id']);
     }
 }

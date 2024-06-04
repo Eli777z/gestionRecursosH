@@ -32,16 +32,13 @@ $this->params['breadcrumbs'][] = $this->title;
 <?php
 
 
-// Obtener el ID del usuario que tiene la sesión iniciada
 $usuarioId = Yii::$app->user->identity->id;
 
-// Buscar el empleado relacionado con el usuario
 $empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();
 
 if ($empleado) {
     $model->empleado_id = $empleado->id;
 
-    // Buscar el registro en junta_gobierno que corresponde al empleado
     $juntaGobierno = JuntaGobierno::find()->where(['empleado_id' => $empleado->id])->one();
 
     if ($model->solicitud->status === 'Aprobado') {
@@ -77,7 +74,7 @@ if ($empleado) {
                             [
                                 'label' => 'Motivo',
                                 'value' => function ($model) {
-                                    return $model->motivoFechaPermiso->motivo; // Reemplaza "nombre_del_atributo_del_motivo" con el nombre del atributo que deseas mostrar
+                                    return $model->motivoFechaPermiso->motivo; 
                                 },
                             ],
                             [
@@ -151,7 +148,6 @@ if ($empleado) {
                             [
                                 'attribute' => 'horario_inicio',
                                 'value' => function ($model) {
-                                    // Obtenemos la hora en formato AM/PM con minutos
                                     $hora = date("g:i A", strtotime($model->horario_inicio));
                                     return $hora;
                                 },
@@ -159,7 +155,6 @@ if ($empleado) {
                             [
                                 'attribute' => 'horario_fin',
                                 'value' => function ($model) {
-                                    // Obtenemos la hora en formato AM/PM con minutos
                                     $hora = date("g:i A", strtotime($model->horario_fin));
                                     return $hora;
                                 },

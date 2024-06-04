@@ -22,7 +22,7 @@ use Yii;
  */
 class PermisoFueraTrabajo extends \yii\db\ActiveRecord
 { 
-    public $fecha_hora_reponer; // Este es el atributo temporal para la fecha y hora combinada
+    public $fecha_hora_reponer; 
     public $jefe_departamento_id;
 
 
@@ -48,10 +48,9 @@ class PermisoFueraTrabajo extends \yii\db\ActiveRecord
             [['motivo_fecha_permiso_id'], 'exist', 'skipOnError' => true, 'targetClass' => MotivoFechaPermiso::class, 'targetAttribute' => ['motivo_fecha_permiso_id' => 'id']],
             [['empleado_id'], 'exist', 'skipOnError' => true, 'targetClass' => Empleado::class, 'targetAttribute' => ['empleado_id' => 'id']],
             [['solicitud_id'], 'exist', 'skipOnError' => true, 'targetClass' => Solicitud::class, 'targetAttribute' => ['solicitud_id' => 'id']],
-            [['jefe_departamento_id'], 'safe'], // Añadir jefe_departamento_id como seguro para asignación masiva
+            [['jefe_departamento_id'], 'safe'], 
 
-            // Otros atributos y reglas...
-                [['fecha_hora_reponer'], 'safe'], // Agrega esta regla
+                [['fecha_hora_reponer'], 'safe'], 
             ];
     }
 

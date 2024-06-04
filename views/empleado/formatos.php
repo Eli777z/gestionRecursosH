@@ -56,7 +56,7 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
                                     ],
 
                              
-                                'theme' => Select2::THEME_KRAJEE_BS4, // Esto aplicará el estilo de Bootstrap al Select2
+                                'theme' => Select2::THEME_KRAJEE_BS4, 
                               
                                 ])->label('Selecciona el nombre para el archivo'); ?>
 
@@ -66,7 +66,7 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
         'showPreview' => true,
         'showUpload' => false,
         'allowedFileExtensions' => ['xls', 'xlsx'],
-        'showCancel' => false, // Agregar esta opción para ocultar el botón de cancelar
+        'showCancel' => false, 
     ]
 ])->label('Sube la plantilla del formato'); ?>
 
@@ -94,7 +94,7 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
                                         <?= Yii::$app->session->getFlash('deleteError') ?>
                                     </div>
                                 <?php endif; ?>
-                                <div class="card-header bg-info text-white"> <!-- Agregando las clases bg-primary y text-white -->
+                                <div class="card-header bg-info text-white"> 
                                 <h4>Plantillas</h4>
                 </div>
                                 

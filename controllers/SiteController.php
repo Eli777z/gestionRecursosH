@@ -13,6 +13,9 @@ use app\models\ContactForm;
 use app\models\PermisoFueraTrabajo;
 use app\models\Usuario;
 use app\models\Notificacion;
+use app\models\Empleado;
+use yii\helpers\ArrayHelper;
+use app\models\JuntaGobierno;
 class SiteController extends Controller
 {
     /**
@@ -141,7 +144,6 @@ class SiteController extends Controller
             ->orderBy(['created_at' => SORT_DESC])
             ->all();
     
-        // Marcar todas las notificaciones como leídas
         Notificacion::updateAll(['leido' => 1], ['usuario_id' => Yii::$app->user->identity->id]);
     
         return $this->render('view-notificaciones', [
@@ -190,10 +192,9 @@ class SiteController extends Controller
     }
     public function actionPortalgestionrh()
     {
-        // Obtener las solicitudes más recientes (puedes ajustar el límite según tus necesidades)
         $solicitudesRecientes = \app\models\Solicitud::find()
             ->orderBy(['fecha_creacion' => SORT_DESC])
-            ->limit(10) // Ajusta el número de solicitudes que quieres mostrar
+            ->limit(10) 
             ->all();
     
         return $this->render('portalgestionrh', [
@@ -202,10 +203,8 @@ class SiteController extends Controller
     }
     
 
-    public function actionPortalempleado()
-    {
-        return $this->render('portalempleado');
-    }
+   
+    
 
    
 
@@ -238,5 +237,38 @@ class SiteController extends Controller
         }
         return false;
     }
+
+
+   
+    
+
+    public function actionPortalempleado() {
+        $usuarioId = Yii::$app->user->identity->id; 
+        $empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();
+    
+        $juntaDirectorDireccion = JuntaGobierno::find()
+            ->where(['nivel_jerarquico' => 'Director'])
+            ->andWhere(['cat_direccion_id' => $empleado->informacionLaboral->cat_direccion_id])
+            ->one();
+    
+        $jefesDirectores = ArrayHelper::map(
+            JuntaGobierno::find()
+                ->where(['nivel_jerarquico' => 'Jefe de unidad'])
+                ->orWhere(['nivel_jerarquico' => 'Jefe de departamento'])
+                ->andWhere(['cat_direccion_id' => $empleado->informacionLaboral->cat_direccion_id])
+                ->all(),
+            'id',
+            function ($model) {
+                return $model->profesion . ' ' . $model->empleado->nombre . ' ' . $model->empleado->apellido;
+            }
+        );
+    
+        return $this->render('portalempleado', [
+            'model' => $empleado,
+            'jefesDirectores' => $jefesDirectores,
+            'juntaDirectorDireccion' => $juntaDirectorDireccion,
+        ]);
+    }
+    
     
 }

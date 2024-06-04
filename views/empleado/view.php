@@ -37,7 +37,6 @@ use app\models\CatTipoDocumento;
 /* @var $this yii\web\View */
 /* @var $model app\models\Empleado */
 
-// Obtén el valor del parámetro de la URL (si está presente)
 //$activeTab = Yii::$app->request->get('tab', 'info_p');
 
 $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
@@ -54,10 +53,9 @@ $currentDate = date('Y-m-d');
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="card">
-            <div class="card-header gradient-info text-white"><!-- Agregando las clases bg-primary y text-white -->
+            <div class="card-header gradient-info text-white">
                     <h3><?= Html::encode($this->title) ?></h3>
                     <?php
-                    // Registro de script
                     $this->registerJs("
                                // Función para abrir el cuadro de diálogo de carga de archivos cuando se hace clic en la imagen
                                $('#foto').click(function() {
@@ -100,20 +98,16 @@ $currentDate = date('Y-m-d');
 
 
                                 <?php
-                                // Mostrar los flash messages
 
 
 
-                                // En tu vista donde deseas mostrar los mensajes de flash:
                                 foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
                                     if ($type === 'error') {
-                                        // Muestra los mensajes de error en rojo
                                         echo Alert::widget([
                                             'options' => ['class' => 'alert-danger'],
                                             'body' => $message,
                                         ]);
                                     } else {
-                                        // Muestra los demás mensajes de flash con estilos predeterminados
                                         echo Alert::widget([
                                             'options' => ['class' => 'alert-' . $type],
                                             'body' => $message,
@@ -138,14 +132,14 @@ $currentDate = date('Y-m-d');
     });
     "); ?>
                             <?php Pjax::begin([
-                                'id' => 'pjax-update-info', // Un ID único para el widget Pjax
-                                'options' => ['pushState' => false], // Deshabilita el uso de la API pushState para navegadores que la soportan
+                                'id' => 'pjax-update-info',
+                                'options' => ['pushState' => false], 
                             ]); ?>
 
                             <div class="card">
                                 <?php $form = ActiveForm::begin([
                                     'action' => ['actualizar-informacion', 'id' => $model->id],
-                                    'options' => ['id' => 'personal-info-form'] // Asegúrate de que el formulario tenga un ID único
+                                    'options' => ['id' => 'personal-info-form']
                                 ]); ?>
                                 <div class="card-header bg-info text-white">
                                     <h3>Información personal</h3>
@@ -203,7 +197,7 @@ $currentDate = date('Y-m-d');
                                     var fields = document.querySelectorAll('#personal-info-form .form-control');
                                     fields.forEach(function(field) {
                                         field.readOnly = false;
-                                        field.disabled = false; // Deshabilita el atributo disabled para campos y widgets como Select2
+                                        field.disabled = false; 
                                     });
                                     document.getElementById('edit-button-personal').style.display = 'none';
                                     document.getElementById('save-button-personal').style.display = 'block';
@@ -214,8 +208,8 @@ $currentDate = date('Y-m-d');
                                     var fields = document.querySelectorAll('#personal-info-form .form-control');
                                     fields.forEach(function(field) {
                                         field.readOnly = true;
-                                        field.disabled = true; // Re-activa el atributo disabled para campos y widgets como Select2
-                                        field.value = field.defaultValue; // Restablece los campos a su valor por defecto
+                                        field.disabled = true; 
+                                        field.value = field.defaultValue; 
                                     });
                                     document.getElementById('edit-button-personal').style.display = 'block';
                                     document.getElementById('save-button-personal').style.display = 'none';
@@ -236,7 +230,7 @@ $currentDate = date('Y-m-d');
                                     <div class="card">
                                         <?php $form = ActiveForm::begin([
                                             'action' => ['actualizar-informacion-contacto', 'id' => $model->id],
-                                            'options' => ['id' => 'contact-info-form'] // Asegúrate de que el formulario tenga un ID único
+                                            'options' => ['id' => 'contact-info-form'] 
                                         ]); ?>
                                         <div class="card-header bg-info text-white">
                                             <h3>Información de contacto</h3>
@@ -274,7 +268,7 @@ $currentDate = date('Y-m-d');
                                                 field.readOnly = true;
                                                 //   field.classList.add('form-control-plaintext');
                                                 field.classList.add('form-control');
-                                                field.value = field.defaultValue; // Restablece los campos a su valor por defecto
+                                                field.value = field.defaultValue; 
                                             });
                                             document.getElementById('edit-button').style.display = 'block';
                                             document.getElementById('save-button').style.display = 'none';
@@ -290,7 +284,7 @@ $currentDate = date('Y-m-d');
                                     <div class="card">
                                         <?php $form = ActiveForm::begin([
                                             'action' => ['actualizar-informacion-contacto', 'id' => $model->id],
-                                            'options' => ['id' => 'emergency-contact-form'] // Asegúrate de que el formulario tenga un ID único
+                                            'options' => ['id' => 'emergency-contact-form']
                                         ]); ?>
                                         <div class="card-header bg-secondary text-white">
                                             <h3>Información de contacto de emergencia</h3>
@@ -322,7 +316,7 @@ $currentDate = date('Y-m-d');
                                     var fields = document.querySelectorAll('#emergency-contact-form .form-control');
                                     fields.forEach(function(field) {
                                         field.readOnly = false;
-                                        field.disabled = false; // Deshabilita el atributo disabled para campos y widgets como Select2
+                                        field.disabled = false; 
                                     });
                                     document.getElementById('edit-button-emergency').style.display = 'none';
                                     document.getElementById('save-button-emergency').style.display = 'block';
@@ -333,8 +327,8 @@ $currentDate = date('Y-m-d');
                                     var fields = document.querySelectorAll('#emergency-contact-form .form-control');
                                     fields.forEach(function(field) {
                                         field.readOnly = true;
-                                        field.disabled = true; // Re-activa el atributo disabled para campos y widgets como Select2
-                                        field.value = field.defaultValue; // Restablece los campos a su valor por defecto
+                                        field.disabled = true; 
+                                        field.value = field.defaultValue; 
                                     });
                                     document.getElementById('edit-button-emergency').style.display = 'block';
                                     document.getElementById('save-button-emergency').style.display = 'none';
@@ -348,13 +342,11 @@ $currentDate = date('Y-m-d');
                             <br>
 
                             <?php
-                            // Obtener el director a cargo basado en la dirección del modelo de información laboral
                             $juntaDirectorDireccion = JuntaGobierno::find()
                                 ->where(['nivel_jerarquico' => 'Director'])
                                 ->andWhere(['cat_direccion_id' => $model->informacionLaboral->cat_direccion_id])
                                 ->one();
 
-                            // Obtener jefes o directores para el campo desplegable de "jefe o director a cargo"
                             $jefesDirectores = ArrayHelper::map(
                                 JuntaGobierno::find()
                                     ->where(['nivel_jerarquico' => 'Jefe de unidad'])
@@ -390,12 +382,12 @@ $currentDate = date('Y-m-d');
                                         'pluginOptions' => [
                                             'allowClear' => true
                                         ],
-                                        'theme' => Select2::THEME_BOOTSTRAP, // Esto aplicará el estilo de Bootstrap al Select2
+                                        'theme' => Select2::THEME_BOOTSTRAP,
                                         'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }", // Aquí se personaliza el icono de borrar
+                                            'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }", 
                                         ],
                                         'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }", // Agregar un margen izquierdo
+                                            'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }", 
                                         ],
                                     ]) ?>
                                     <?= $form->field($model->informacionLaboral, 'fecha_ingreso')->input('date', ['disabled' => true]) ?>
@@ -406,12 +398,12 @@ $currentDate = date('Y-m-d');
                                         'pluginOptions' => [
                                             'allowClear' => true
                                         ],
-                                        'theme' => Select2::THEME_BOOTSTRAP, // Esto aplicará el estilo de Bootstrap al Select2
+                                        'theme' => Select2::THEME_BOOTSTRAP,
                                         'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }", // Aquí se personaliza el icono de borrar
+                                            'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }", 
                                         ],
                                         'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }", // Agregar un margen izquierdo
+                                            'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }", 
                                         ],
                                     ]) ?>
 
@@ -421,12 +413,12 @@ $currentDate = date('Y-m-d');
                                         'pluginOptions' => [
                                             'allowClear' => true
                                         ],
-                                        'theme' => Select2::THEME_BOOTSTRAP, // Esto aplicará el estilo de Bootstrap al Select2
+                                        'theme' => Select2::THEME_BOOTSTRAP, 
                                         'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }", // Aquí se personaliza el icono de borrar
+                                            'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }", 
                                         ],
                                         'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }", // Agregar un margen izquierdo
+                                            'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }", 
                                         ],
                                     ]) ?>
                                     <?= $form->field($model->informacionLaboral, 'horario_laboral_inicio')->input('time', ['disabled' => true]) ?>
@@ -441,12 +433,12 @@ $currentDate = date('Y-m-d');
                                         'pluginOptions' => [
                                             'allowClear' => true
                                         ],
-                                        'theme' => Select2::THEME_BOOTSTRAP, // Esto aplicará el estilo de Bootstrap al Select2
+                                        'theme' => Select2::THEME_BOOTSTRAP, 
                                         'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }", // Aquí se personaliza el icono de borrar
+                                            'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }", 
                                         ],
                                         'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }", // Agregar un margen izquierdo
+                                            'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
                                         ],
                                     ]) ?>
 
@@ -458,12 +450,12 @@ $currentDate = date('Y-m-d');
                                         'pluginOptions' => [
                                             'allowClear' => true
                                         ],
-                                        'theme' => Select2::THEME_BOOTSTRAP, // Esto aplicará el estilo de Bootstrap al Select2
+                                        'theme' => Select2::THEME_BOOTSTRAP, 
                                         'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }", // Aquí se personaliza el icono de borrar
+                                            'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
                                         ],
                                         'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }", // Agregar un margen izquierdo
+                                            'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }", 
                                         ],
                                     ]) ?>
 
@@ -473,23 +465,21 @@ $currentDate = date('Y-m-d');
                                         'pluginOptions' => [
                                             'allowClear' => true
                                         ],
-                                        'theme' => Select2::THEME_BOOTSTRAP, // Esto aplicará el estilo de Bootstrap al Select2
+                                        'theme' => Select2::THEME_BOOTSTRAP, 
                                         'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }", // Aquí se personaliza el icono de borrar
+                                            'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }", 
                                         ],
                                         'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }", // Agregar un margen izquierdo
+                                            'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }", 
                                         ],
                                     ]) ?>
 
-                                    <!-- Campo estático para el director de dirección -->
                                     <div class="form-group">
                                         <label class="control-label">Director de dirección</label>
                                         <input type="text" class="form-control" readonly value="<?= $juntaDirectorDireccion ? $juntaDirectorDireccion->profesion . ' ' . $juntaDirectorDireccion->empleado->nombre . ' ' . $juntaDirectorDireccion->empleado->apellido : 'No Asignado' ?>">
                                     </div>
 
 
-                                    <!-- Aquí puedes incluir más campos según sea necesario -->
 
                                     <?php ActiveForm::end(); ?>
                                 </div>
@@ -499,9 +489,9 @@ $currentDate = date('Y-m-d');
                                     var fields = document.querySelectorAll('#laboral-info-form input, #laboral-info-form select');
                                     fields.forEach(function(field) {
                                         field.readOnly = false;
-                                        field.disabled = false; // Habilitar campos que pueden haber sido deshabilitados
+                                        field.disabled = false; 
                                     });
-                                    $('.select2-hidden-accessible').select2('enable'); // Habilitar todos los Select2
+                                    $('.select2-hidden-accessible').select2('enable'); 
                                     document.getElementById('edit-button-laboral').style.display = 'none';
                                     document.getElementById('save-button-laboral').style.display = 'block';
                                     document.getElementById('cancel-button-laboral').style.display = 'block';
@@ -511,10 +501,10 @@ $currentDate = date('Y-m-d');
                                     var fields = document.querySelectorAll('#laboral-info-form input, #laboral-info-form select');
                                     fields.forEach(function(field) {
                                         field.readOnly = true;
-                                        field.disabled = true; // Volver a deshabilitar los campos
-                                        field.value = field.defaultValue; // Restablecer los valores originales
+                                        field.disabled = true; 
+                                        field.value = field.defaultValue; 
                                     });
-                                    $('.select2-hidden-accessible').select2('enable', false); // Deshabilitar Select2
+                                    $('.select2-hidden-accessible').select2('enable', false);
                                     document.getElementById('edit-button-laboral').style.display = 'block';
                                     document.getElementById('save-button-laboral').style.display = 'none';
                                     document.getElementById('cancel-button-laboral').style.display = 'none';
@@ -630,7 +620,7 @@ $currentDate = date('Y-m-d');
                                                         field.value = field.defaultValue;
                                                     }
                                                 });
-                                                $('.select2-hidden-accessible').select2('enable', false); // Deshabilitar Select2
+                                                $('.select2-hidden-accessible').select2('enable', false); 
                                                 document.getElementById('edit-button-first-period').style.display = 'block';
                                                 document.getElementById('save-button-first-period').style.display = 'none';
                                                 document.getElementById('cancel-button-first-period').style.display = 'none';
@@ -691,7 +681,7 @@ $currentDate = date('Y-m-d');
                                                             'autoApply' => true,
                                                         ],
 
-                                                        'options' => ['disabled' => true], // Deshabilitar el widget
+                                                        'options' => ['disabled' => true], 
                                                         'pluginEvents' => [
                                                             "apply.daterangepicker" => new JsExpression("function(ev, picker) {
                                                                 var startDate = picker.startDate.format('YYYY-MM-DD');
@@ -724,7 +714,7 @@ $currentDate = date('Y-m-d');
                                             document.getElementById('edit-button-period').addEventListener('click', function() {
                                                 var fields = document.querySelectorAll('#second-period-form input, #second-period-form select');
                                                 fields.forEach(function(field) {
-                                                    field.disabled = false; // Habilitar campos
+                                                    field.disabled = false; 
                                                 });
                                                 document.getElementById('edit-button-period').style.display = 'none';
                                                 document.getElementById('save-button-period').style.display = 'block';
@@ -734,9 +724,9 @@ $currentDate = date('Y-m-d');
                                             document.getElementById('cancel-button-period').addEventListener('click', function() {
                                                 var fields = document.querySelectorAll('#second-period-form input, #second-period-form select');
                                                 fields.forEach(function(field) {
-                                                    field.disabled = true; // Deshabilitar campos
-                                                    if (!field.type === 'select-one') { // No restablecer los valores de los campos select
-                                                        field.value = field.defaultValue; // Restablecer los valores originales
+                                                    field.disabled = true; 
+                                                    if (!field.type === 'select-one') { 
+                                                        field.value = field.defaultValue; 
                                                     }
                                                 });
                                                 document.getElementById('edit-button-period').style.display = 'block';
@@ -814,7 +804,7 @@ $currentDate = date('Y-m-d');
                         'value' => function ($model) {
                             return $model->empleado ? $model->empleado->nombre . ' ' . $model->empleado->apellido : 'N/A';
                         },
-                        'filter' => false, // Desactivar el filtro ya que solo mostramos las solicitudes del empleado actual
+                        'filter' => false,
                     ],
                     [
                         'attribute' => 'fecha_creacion',
@@ -887,7 +877,7 @@ $currentDate = date('Y-m-d');
                     ],
                     [
                         'class' => 'hail812\adminlte3\yii\grid\ActionColumn',
-                        'template' => '{view}  {delete}', // Asegúrate de incluir las acciones que necesitas
+                        'template' => '{view}  {delete}', 
                         'buttons' => [
                             'view' => function ($url, $model, $key) {
                                 return Html::a('<i class="fa fa-eye"></i>', ['solicitud/view', 'id' => $model->id], ['title' => 'Ver', 'class' => 'btn btn-primary btn-xs']);
@@ -911,14 +901,12 @@ $currentDate = date('Y-m-d');
             ]);
             Pjax::end();
 
-            // Script para actualizar el contenedor Pjax cada 30 segundos
             $script = <<< JS
                 setInterval(function(){
                     $.pjax.reload({container:'#pjax-container'});
-                }, 20000);
+                }, 60000);
             JS;
             
-            // Registrar el script en la vista
             $this->registerJs($script);
              ?>
 
@@ -1059,7 +1047,7 @@ $currentDate = date('Y-m-d');
                                             'pluginOptions' => [
                                                 'showUpload' => false,
 
-                                                'showCancel' => false, // Oculta el botón de cancelar
+                                                'showCancel' => false, 
                                             ],
                                         ])->label('Archivo') ?>
 

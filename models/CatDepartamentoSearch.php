@@ -17,7 +17,7 @@ class CatDepartamentoSearch extends CatDepartamento
     public function rules()
     {
         return [
-            [['id'], 'integer'],
+            [['id', 'cat_direccion_id'], 'integer'],
             [['nombre_departamento'], 'safe'],
         ];
     }
@@ -59,6 +59,7 @@ class CatDepartamentoSearch extends CatDepartamento
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
+            'cat_direccion_id' => $this->cat_direccion_id,
         ]);
 
         $query->andFilterWhere(['like', 'nombre_departamento', $this->nombre_departamento]);

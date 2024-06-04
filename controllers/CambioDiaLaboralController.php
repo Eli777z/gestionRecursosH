@@ -46,19 +46,14 @@ class CambioDiaLaboralController extends Controller
     public function actionIndex()
     {
         
-        // Obtener el ID del usuario que ha iniciado sesión
     $usuarioId = Yii::$app->user->identity->id;
 
-    // Buscar el modelo de Empleado asociado al usuario actual
     $empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();
 
-    // Verificar si se encontró el empleado
     if ($empleado !== null) {
-        // Si se encontró el empleado, utilizar su ID para filtrar los registros
         $searchModel = new CambioDiaLaboralSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        // Filtrar los registros por el ID del empleado
         $dataProvider->query->andFilterWhere(['empleado_id' => $empleado->id]);
 
         $this->layout = "main-trabajador";
@@ -68,9 +63,8 @@ class CambioDiaLaboralController extends Controller
             'dataProvider' => $dataProvider,
         ]);
     } else {
-        // Si no se encontró el empleado, mostrar un mensaje de error o redireccionar
         Yii::$app->session->setFlash('error', 'No se pudo encontrar el empleado asociado al usuario actual.');
-        return $this->redirect(['index']); // Redirecciona a la página de índice u otra página apropiada
+        return $this->redirect(['index']); 
     }
     }
 
@@ -141,7 +135,6 @@ class CambioDiaLaboralController extends Controller
                            $transaction->commit();
                            Yii::$app->session->setFlash('success', 'Su solicitud ha sido generada exitosamente.');
                        
-                           // Crear notificación
                            $notificacion = new Notificacion();
                            $notificacion->usuario_id = $model->empleado->usuario_id;
                            $notificacion->mensaje = 'Tienes una nueva solicitud pendiente de revisión.';
@@ -229,20 +222,15 @@ class CambioDiaLaboralController extends Controller
 
     public function actionExport($id)
     {
-        // Encuentra el modelo PermisoFueraTrabajo según el ID pasado como parámetro
         $model = CambioDiaLaboral::findOne($id);
     
         if (!$model) {
             throw new NotFoundHttpException('El registro no existe.');
         }
     
-        // Ruta a tu plantilla de Excel
         $templatePath = Yii::getAlias('@app/templates/cambio_dia_laboral.xlsx');
-    
-        // Cargar la plantilla de Excel
         $spreadsheet = IOFactory::load($templatePath);
     
-        // Modificar la plantilla con los datos del modelo
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setCellValue('F5', $model->empleado->numero_empleado);
        
@@ -274,7 +262,6 @@ $sheet->setCellValue('H11', $nombreTipoContrato);
 
 
 
-// Convertir la fecha del modelo al formato deseado
 $fecha_permiso = strftime('%A, %B %d, %Y', strtotime($model->motivoFechaPermiso->fecha_permiso));
 $sheet->setCellValue('H13', $fecha_permiso);
 
@@ -292,10 +279,8 @@ $sheet->setCellValue('B24', $nombreCompleto);
 
 $sheet->setCellValue('B25', $nombrePuesto);
 
-// Obtener la dirección asociada al empleado
 $direccion = CatDireccion::findOne($model->empleado->informacionLaboral->cat_direccion_id);
 
-// Verificar si la dirección no es '1.- GENERAL' y si se ha ingresado un nombre de Jefe de Departamento
 if ($direccion && $direccion->nombre_direccion !== '1.- GENERAL' && $model->nombre_jefe_departamento) {
     $nombreCompletoJefe = mb_strtoupper($model->nombre_jefe_departamento, 'UTF-8');
     $sheet->setCellValue('H24', $nombreCompletoJefe);
@@ -341,7 +326,7 @@ if ($juntaDirectorDireccion) {
             $tituloDireccion = 'DIRECTOR DE PLANEACION';
             break;
         default:
-            $tituloDireccion = ''; // Otra dirección no especificada
+            $tituloDireccion = ''; 
     }
 
     $sheet->setCellValue('N25', $tituloDireccion);
@@ -354,8 +339,6 @@ $tempFileName = Yii::getAlias('@app/runtime/archivos_temporales/cambio_dia_labor
 $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
 $writer->save($tempFileName);
 
-// Luego, proporciona un enlace para que el usuario descargue el archivo
-// Puedes redirigir a una acción que presente el enlace o generar directamente el enlace aquí mismo
 return $this->redirect(['download', 'filename' => basename($tempFileName)]);
     }
 
@@ -363,20 +346,16 @@ return $this->redirect(['download', 'filename' => basename($tempFileName)]);
 
     public function actionExportSegundoCaso($id)
     {
-        // Encuentra el modelo PermisoFueraTrabajo según el ID pasado como parámetro
         $model = CambioDiaLaboral::findOne($id);
     
         if (!$model) {
             throw new NotFoundHttpException('El registro no existe.');
         }
     
-        // Ruta a tu plantilla de Excel
         $templatePath = Yii::getAlias('@app/templates/cambio_dia_laboral.xlsx');
     
-        // Cargar la plantilla de Excel
         $spreadsheet = IOFactory::load($templatePath);
     
-        // Modificar la plantilla con los datos del modelo
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setCellValue('F5', $model->empleado->numero_empleado);
        
@@ -426,10 +405,8 @@ $sheet->setCellValue('B24', $nombreCompleto);
 
 $sheet->setCellValue('B25', $nombrePuesto);
 
-// Obtener la dirección asociada al empleado
 //$direccion = CatDireccion::findOne($model->empleado->informacionLaboral->cat_direccion_id);
 
-// Verificar si la dirección no es '1.- GENERAL' y si se ha ingresado un nombre de Jefe de Departamento
 //if ($direccion && $direccion->nombre_direccion !== '1.- GENERAL' && $model->nombre_jefe_departamento) {
     //$nombreCompletoJefe = mb_strtoupper($model->nombre_jefe_departamento, 'UTF-8');
   //  $sheet->setCellValue('H24', $nombreCompletoJefe);
@@ -440,14 +417,12 @@ $sheet->setCellValue('B25', $nombrePuesto);
 
 
 
-  // Buscar el registro en junta_gobierno que corresponde a un Director
   $juntaGobierno = JuntaGobierno::find()
   ->where(['nivel_jerarquico' => 'Director'])
   ->all();
 
 $directorGeneral = null;
 
-// Recorrer todos los registros de junta_gobierno encontrados
 foreach ($juntaGobierno as $junta) {
   $empleado = Empleado::findOne($junta->empleado_id);
 
@@ -457,7 +432,6 @@ foreach ($juntaGobierno as $junta) {
   }
 }
 
-// Establecer el valor en la celda N23 si se encontró un Director General
 if ($directorGeneral) {
   $nombre = mb_strtoupper($directorGeneral->nombre, 'UTF-8');
   $apellido = mb_strtoupper($directorGeneral->apellido, 'UTF-8');
@@ -473,8 +447,7 @@ $tempFileName = Yii::getAlias('@app/runtime/archivos_temporales/cambio_dia_labor
 $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
 $writer->save($tempFileName);
 
-// Luego, proporciona un enlace para que el usuario descargue el archivo
-// Puedes redirigir a una acción que presente el enlace o generar directamente el enlace aquí mismo
+
 return $this->redirect(['download', 'filename' => basename($tempFileName)]);
     }
 

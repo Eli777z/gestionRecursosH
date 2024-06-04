@@ -29,21 +29,17 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                             
                         ]) ?>
-                          <!-- Botón para exportar a Excel -->
                       
                           <?php
 
 
-// Obtener el ID del usuario que tiene la sesión iniciada
 $usuarioId = Yii::$app->user->identity->id;
 
-// Buscar el empleado relacionado con el usuario
 $empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();
 
 if ($empleado) {
     $model->empleado_id = $empleado->id;
 
-    // Buscar el registro en junta_gobierno que corresponde al empleado
     $juntaGobierno = JuntaGobierno::find()->where(['empleado_id' => $empleado->id])->one();
 
     if ($model->solicitud->status === 'Aprobado') {
@@ -64,7 +60,6 @@ if ($empleado) {
                     </p>
 
                     <?php 
-    // Mostrar los flash messages
     foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
         echo Alert::widget([
             'options' => ['class' => 'alert-' . $type],
@@ -81,13 +76,12 @@ if ($empleado) {
         [
             'label' => 'Motivo',
             'value' => function ($model) {
-                return $model->motivoFechaPermiso->motivo; // Reemplaza "nombre_del_atributo_del_motivo" con el nombre del atributo que deseas mostrar
+                return $model->motivoFechaPermiso->motivo; 
             },
         ],
         [
             'attribute' => 'hora_salida',
             'value' => function ($model) {
-                // Obtenemos la hora en formato AM/PM con minutos
                 $hora = date("g:i A", strtotime($model->hora_salida));
                 return $hora;
             },
@@ -95,7 +89,6 @@ if ($empleado) {
         [
             'attribute' => 'hora_regreso',
             'value' => function ($model) {
-                // Obtenemos la hora en formato AM/PM con minutos
                 $hora = date("g:i A", strtotime($model->hora_regreso));
                 return $hora;
             },
@@ -117,7 +110,6 @@ if ($empleado) {
         [
             'attribute' => 'horario_fecha_a_reponer',
             'value' => function ($model) {
-                // Obtenemos la hora en formato AM/PM con minutos
                 $hora = date("g:i A", strtotime($model->horario_fecha_a_reponer));
                 return $hora;
             },

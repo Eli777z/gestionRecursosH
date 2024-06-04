@@ -32,6 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'attributes' => [
                             'id',
                             'nombre_departamento',
+                            'cat_direccion_id',
                         ],
                     ]) ?>
                 </div>

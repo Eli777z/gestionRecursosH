@@ -14,6 +14,8 @@ use yii\bootstrap4\ActiveForm;
 
     <?= $form->field($model, 'nombre_departamento')->textInput(['maxlength' => true]) ?>
 
+    <?= $form->field($model, 'cat_direccion_id')->textInput() ?>
+
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
     </div>

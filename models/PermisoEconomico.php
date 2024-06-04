@@ -43,7 +43,7 @@ class PermisoEconomico extends \yii\db\ActiveRecord
             [['empleado_id'], 'exist', 'skipOnError' => true, 'targetClass' => Empleado::class, 'targetAttribute' => ['empleado_id' => 'id']],
             [['motivo_fecha_permiso_id'], 'exist', 'skipOnError' => true, 'targetClass' => MotivoFechaPermiso::class, 'targetAttribute' => ['motivo_fecha_permiso_id' => 'id']],
             [['solicitud_id'], 'exist', 'skipOnError' => true, 'targetClass' => Solicitud::class, 'targetAttribute' => ['solicitud_id' => 'id']],
-            [['jefe_departamento_id'], 'safe'], // Añadir jefe_departamento_id como seguro para asignación masiva
+            [['jefe_departamento_id'], 'safe'], 
 
         ];
     }

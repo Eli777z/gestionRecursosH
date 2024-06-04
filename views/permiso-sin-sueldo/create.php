@@ -15,7 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
                          'model' => $model,
                          'motivoFechaPermisoModel' => $motivoFechaPermisoModel,
                          'solicitudModel' => $solicitudModel,
-                         'noPermisoAnterior' => $noPermisoAnterior, // Asegúrate de pasar $noPermisoAnterior a la vista
-                         'fechaPermisoAnterior' => $fechaPermisoAnterior, // Asegúrate de pasar $fechaPermisoAnterior a la vista
+                         'noPermisoAnterior' => $noPermisoAnterior, 
+                         'fechaPermisoAnterior' => $fechaPermisoAnterior,
                     ]) ?>
             

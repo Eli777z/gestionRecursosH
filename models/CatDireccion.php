@@ -9,6 +9,10 @@ use Yii;
  *
  * @property int $id
  * @property string $nombre_direccion
+ *
+ * @property CatDepartamento[] $catDepartamentos
+ * @property InformacionLaboral[] $informacionLaborals
+ * @property JuntaGobierno[] $juntaGobiernos
  */
 class CatDireccion extends \yii\db\ActiveRecord
 {
@@ -40,5 +44,35 @@ class CatDireccion extends \yii\db\ActiveRecord
             'id' => 'ID',
             'nombre_direccion' => 'Nombre Direccion',
         ];
+    }
+
+    /**
+     * Gets query for [[CatDepartamentos]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCatDepartamentos()
+    {
+        return $this->hasMany(CatDepartamento::class, ['cat_direccion_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[InformacionLaborals]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getInformacionLaborals()
+    {
+        return $this->hasMany(InformacionLaboral::class, ['cat_direccion_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[JuntaGobiernos]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getJuntaGobiernos()
+    {
+        return $this->hasMany(JuntaGobierno::class, ['cat_direccion_id' => 'id']);
     }
 }

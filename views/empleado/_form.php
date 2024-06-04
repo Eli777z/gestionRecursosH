@@ -33,16 +33,13 @@ use yii\helpers\ArrayHelper;
                         <div class="col-md-12">
                             <div class="d-flex align-items-center mb-3">
                                 <?php
-                                // Mostrar los flash messages
                                 foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
                                     if ($type === 'error') {
-                                        // Muestra los mensajes de error en rojo
                                         echo Alert::widget([
                                             'options' => ['class' => 'alert-danger'],
                                             'body' => $message,
                                         ]);
                                     } else {
-                                        // Muestra los demás mensajes de flash con estilos predeterminados
                                         echo Alert::widget([
                                             'options' => ['class' => 'alert-' . $type],
                                             'body' => $message,

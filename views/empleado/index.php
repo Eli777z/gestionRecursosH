@@ -28,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="row">
         <div class="col-md-12">
             <div class="card">
-            <div class="card-header gradient-info text-white"><!-- Agregando las clases bg-primary y text-white -->
+            <div class="card-header gradient-info text-white">
                     <h3><?= Html::encode($this->title) ?></h3>
                 </div>
                 <div class="card-body">
@@ -40,20 +40,16 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
                                 <?php
-                                // Mostrar los flash messages
 
 
 
-                                // En tu vista donde deseas mostrar los mensajes de flash:
                                 foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
                                     if ($type === 'error') {
-                                        // Muestra los mensajes de error en rojo
                                         echo Alert::widget([
                                             'options' => ['class' => 'alert-danger'],
                                             'body' => $message,
                                         ]);
                                     } else {
-                                        // Muestra los demás mensajes de flash con estilos predeterminados
                                         echo Alert::widget([
                                             'options' => ['class' => 'alert-' . $type],
                                             'body' => $message,
@@ -113,10 +109,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                                     'pluginOptions' => [
                                                         'allowClear' => true
                                                     ],
-                                                    'theme' => Select2::THEME_KRAJEE_BS3, // Esto aplicará el estilo de Bootstrap al Select2
+                                                    'theme' => Select2::THEME_KRAJEE_BS3, 
                                                     
                                                 ]),
-                                                'contentOptions' => ['class' => 'small-font'], // Aplica la clase CSS personalizada
+                                                'contentOptions' => ['class' => 'small-font'],
 
                                             ],
                                             [
@@ -135,9 +131,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
                                                     ],
-                                                    'theme' => Select2::THEME_KRAJEE_BS3, // Esto aplicará el estilo de Bootstrap al Select2
+                                                    'theme' => Select2::THEME_KRAJEE_BS3, 
                                                 ]),
-                                                'contentOptions' => ['class' => 'small-font'], // Aplica la clase CSS personalizada
+                                                'contentOptions' => ['class' => 'small-font'], 
 
                                             ],
 
@@ -157,10 +153,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                                     'pluginOptions' => [
                                                         'allowClear' => true,
                                                     ],
-                                                    'theme' => Select2::THEME_KRAJEE_BS3, // Esto aplicará el estilo de Bootstrap al Select2
+                                                    'theme' => Select2::THEME_KRAJEE_BS3, 
                                                 ]),
-                                                'contentOptions' => ['class' => 'small-font'], // Aplica la clase CSS personalizada
-                                                'headerOptions' => ['class' => 'small-font'],  // Aplica la clase CSS personalizada al encabezado
+                                                'contentOptions' => ['class' => 'small-font'], 
+                                                'headerOptions' => ['class' => 'small-font'], 
                                             ],
                                             
                                             [
@@ -179,9 +175,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                                     'pluginOptions' => [
                                                         'allowClear' => true,
                                                     ],
-                                                    'theme' => Select2::THEME_KRAJEE_BS3, // Esto aplicará el estilo de Bootstrap al Select2
+                                                    'theme' => Select2::THEME_KRAJEE_BS3, 
                                                 ]),
-                                                'contentOptions' => ['class' => 'small-font'], // Aplica la clase CSS personalizada
+                                                'contentOptions' => ['class' => 'small-font'], 
 
                                             ],
 
@@ -189,7 +185,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                             [
                                                 'class' => ActionColumn::class,
-                                                'template' => '{view} {delete}  {toggle-activation}', //botones deseados
+                                                'template' => '{view} {delete}  {toggle-activation}',
                                                 'buttons' => [
                                                     'toggle-activation' => function ($url, $model) {
 
@@ -253,21 +249,20 @@ $this->params['breadcrumbs'][] = $this->title;
                                 </div>
                                 <div class="card-body">
                                     <?= $form->field($juntaGobiernoModel, 'cat_direccion_id')->widget(Select2::classname(), [
-                                        'data' => ArrayHelper::map(CatDireccion::find()->all(), 'id', 'nombre_direccion'), // Suponiendo que 'nombre' es el atributo que deseas mostrar en la lista desplegable
-                                        'options' => ['placeholder' => 'Selecciona una dirección...'],
+                                        'data' => ArrayHelper::map(CatDireccion::find()->all(), 'id', 'nombre_direccion'), 
                                         'pluginOptions' => [
                                             'allowClear' => true
                                         ],
-                                        'theme' => Select2::THEME_KRAJEE_BS3, // Esto aplicará el estilo de Bootstrap al Select2
+                                        'theme' => Select2::THEME_KRAJEE_BS3, 
                                     ])->label('Dirección:'); ?>
 
                                     <?= $form->field($juntaGobiernoModel, 'cat_departamento_id')->widget(Select2::classname(), [
-                                        'data' => ArrayHelper::map(CatDepartamento::find()->all(), 'id', 'nombre_departamento'), // Suponiendo que 'nombre' es el atributo que deseas mostrar en la lista desplegable
+                                        'data' => ArrayHelper::map(CatDepartamento::find()->all(), 'id', 'nombre_departamento'), 
                                         'options' => ['placeholder' => 'Selecciona un departamento...'],
                                         'pluginOptions' => [
                                             'allowClear' => true
                                         ],
-                                        'theme' => Select2::THEME_KRAJEE_BS3, // Esto aplicará el estilo de Bootstrap al Select2
+                                        'theme' => Select2::THEME_KRAJEE_BS3,
                                     ])->label('Departamento:'); ?>
 
                                     <?= $form->field($juntaGobiernoModel, 'empleado_id')->widget(Select2::classname(), [
@@ -278,7 +273,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                         'pluginOptions' => [
                                             'allowClear' => true
                                         ],
-                                        'theme' => Select2::THEME_KRAJEE_BS3, // Esto aplicará el estilo de Bootstrap al Select2
+                                        'theme' => Select2::THEME_KRAJEE_BS3, 
                                     ])->label('Empleado:'); ?>
 
 
@@ -336,19 +331,19 @@ $this->params['breadcrumbs'][] = $this->title;
                                             [
                                                 'attribute' => 'cat_direccion_id',
                                                 'value' => function ($juntaGobiernoModel) {
-                                                    return $juntaGobiernoModel->catDireccion->nombre_direccion; // Reemplaza 'nombre' con el nombre del atributo que deseas mostrar
+                                                    return $juntaGobiernoModel->catDireccion->nombre_direccion; 
                                                 },
                                             ],
                                             [
                                                 'attribute' => 'cat_departamento_id',
                                                 'value' => function ($juntaGobiernoModel) {
-                                                    return $juntaGobiernoModel->catDepartamento->nombre_departamento; // Reemplaza 'nombre' con el nombre del atributo que deseas mostrar
+                                                    return $juntaGobiernoModel->catDepartamento->nombre_departamento; 
                                                 },
                                             ],
                                             [
                                                 'attribute' => 'empleado_id',
                                                 'value' => function ($juntaGobiernoModel) {
-                                                    return $juntaGobiernoModel->empleado->nombre . ' ' . $juntaGobiernoModel->empleado->apellido; // Reemplaza 'nombreCompleto' con el nombre del método que devuelve el nombre completo
+                                                    return $juntaGobiernoModel->empleado->nombre . ' ' . $juntaGobiernoModel->empleado->apellido; 
 
                                                 },
                                             ],

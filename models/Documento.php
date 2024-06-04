@@ -97,7 +97,7 @@ class Documento extends \yii\db\ActiveRecord
             $nombreCarpetaExpedientes = $nombreCarpetaTrabajador . '/documentos';
             $rutaArchivo = $nombreCarpetaExpedientes . '/' . $this->archivoSubido->baseName . '.' . $this->archivoSubido->extension;
             $this->archivoSubido->saveAs($rutaArchivo);
-            $this->ruta = $rutaArchivo; // Guarda la ruta del archivo en la base de datos
+            $this->ruta = $rutaArchivo; 
             return true;
         } else {
             return false;
