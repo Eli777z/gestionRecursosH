@@ -44,9 +44,13 @@ class InformacionLaboral extends \yii\db\ActiveRecord
     {
         return [
             [['cat_tipo_contrato_id', 'cat_puesto_id', 'cat_departamento_id', 'vacaciones_id', 'cat_direccion_id', 'junta_gobierno_id'], 'integer'],
-            [['cat_departamento_id', 'fecha_ingreso'], 'required'],
+            [[ 'fecha_ingreso'], 'required'],
             [['fecha_ingreso', 'horario_laboral_inicio', 'horario_laboral_fin'], 'safe'],
             [['horario_dias_trabajo'], 'string', 'max' => 150],
+            ['dias_laborales', 'safe'], // Asegúrate de que safe permite array
+            [['numero_cuenta'], 'string', 'max' => 25],
+            [['salario'], 'number'],
+
             [['cat_tipo_contrato_id'], 'exist', 'skipOnError' => true, 'targetClass' => CatTipoContrato::class, 'targetAttribute' => ['cat_tipo_contrato_id' => 'id']],
             [['cat_departamento_id'], 'exist', 'skipOnError' => true, 'targetClass' => CatDepartamento::class, 'targetAttribute' => ['cat_departamento_id' => 'id']],
             [['cat_direccion_id'], 'exist', 'skipOnError' => true, 'targetClass' => CatDireccion::class, 'targetAttribute' => ['cat_direccion_id' => 'id']],
@@ -78,6 +82,9 @@ class InformacionLaboral extends \yii\db\ActiveRecord
             'horario_laboral_inicio' => 'Horario Laboral Inicio',
             'horario_laboral_fin' => 'Horario Laboral Fin',
             'horario_dias_trabajo' => 'Horario Dias Trabajo',
+            'dias_laborales' => 'Dias laborales',
+            'numero_cuenta' => 'Número de cuenta',
+            'salario' => 'Salario'
         ];
     }
 
@@ -157,4 +164,15 @@ class InformacionLaboral extends \yii\db\ActiveRecord
         return $this->hasOne(Vacaciones::class, ['id' => 'vacaciones_id']);
     }
 
+
+    public function beforeSave($insert)
+{
+    if (parent::beforeSave($insert)) {
+        if (is_array($this->dias_laborales)) {
+            $this->dias_laborales = implode(', ', $this->dias_laborales);
+        }
+        return true;
+    }
+    return false;
+}
 }

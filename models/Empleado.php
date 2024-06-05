@@ -53,8 +53,9 @@ class Empleado extends \yii\db\ActiveRecord
     {
         return [
             [['numero_empleado', 'usuario_id', 'informacion_laboral_id', 'nombre', 'apellido', 'email'], 'required'],
-            [['numero_empleado', 'usuario_id', 'informacion_laboral_id', 'cat_nivel_estudio_id', 'parametro_formato_id', 'edad', 'numero_casa', 'codigo_postal'], 'integer'],
+            [['numero_empleado', 'usuario_id', 'informacion_laboral_id', 'cat_nivel_estudio_id', 'parametro_formato_id', 'edad', 'codigo_postal'], 'integer'],
             [['fecha_nacimiento'], 'safe'],
+            [['numero_casa'], 'string', 'max' => 4],
             [['estado_civil', 'sexo'], 'string', 'max' => 12],
             [['nombre'], 'string', 'max' => 30],
             [['apellido'], 'string', 'max' => 60],
@@ -65,9 +66,16 @@ class Empleado extends \yii\db\ActiveRecord
             [['calle'], 'string', 'max' => 85],
             [['nombre_contacto_emergencia'], 'string', 'max' => 90],
             [['relacion_contacto_emergencia'], 'string', 'max' => 25],
+            [['curp'], 'string', 'max' => 18],
+            [['rfc'], 'string', 'max' => 13],
+            [['nss'], 'string', 'max' => 13],
+            [['municipio', 'estado'], 'string', 'max' => 45],
+
+
+
 
             [['institucion_educativa', 'titulo_grado'], 'string', 'max' => 65],
-            [['foto'], 'file', 'skipOnEmpty' => TRUE, 'extensions' => 'png, jpg'],
+            [['foto'], 'file', 'skipOnEmpty' => TRUE, 'extensions' => 'png, jpg, jpeg'],
 
             [['informacion_laboral_id'], 'exist', 'skipOnError' => true, 'targetClass' => InformacionLaboral::class, 'targetAttribute' => ['informacion_laboral_id' => 'id']],
             [['usuario_id'], 'exist', 'skipOnError' => true, 'targetClass' => Usuario::class, 'targetAttribute' => ['usuario_id' => 'id']],
@@ -104,7 +112,16 @@ class Empleado extends \yii\db\ActiveRecord
             'telefono_contacto_emergencia' => 'Telefono',
             'institucion_educativa' => 'Institucion Educativa',
             'titulo_grado' => 'Titulo Grado',
-            'profesion' => 'Profesion'
+            'profesion' => 'Profesion',
+            'curp' => 'CURP',
+            'rfc' => 'RFC',
+            'nss' => 'NSS',
+            'municipio' => 'Municipio',
+            'estado' => 'Estado',
+
+
+
+
         ];
     }
 

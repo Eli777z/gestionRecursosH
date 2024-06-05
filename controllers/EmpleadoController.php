@@ -212,6 +212,8 @@ class EmpleadoController extends Controller
 
                         $transaction->commit();
                         Yii::$app->session->setFlash('success', "Trabajador y usuario creados con éxito.");
+                        Yii::$app->session->setFlash('warning', "Complete los demás datos del empleado.");
+
                         return $this->redirect(['view', 'id' => $model->id]);
                     } else {
                         $transaction->rollBack();
@@ -393,7 +395,40 @@ class EmpleadoController extends Controller
     }
 
 
-
+    public function actionChangePhoto($id)
+    {
+        $model = $this->findModel2($id);
+    
+        if (Yii::$app->request->isPost) {
+            $upload = UploadedFile::getInstance($model, 'foto');
+            if ($upload) {
+                $nombreCarpetaTrabajador = Yii::getAlias('@runtime') . '/empleados/' . $model->nombre . '_' . $model->apellido;
+                if (!is_dir($nombreCarpetaTrabajador)) {
+                    mkdir($nombreCarpetaTrabajador, 0775, true);
+                }
+                $nombreCarpetaUsuarioProfile = $nombreCarpetaTrabajador . '/foto_empleado';
+                if (!is_dir($nombreCarpetaUsuarioProfile)) {
+                    mkdir($nombreCarpetaUsuarioProfile, 0775, true);
+                }
+    
+                // Eliminar la foto anterior si existe
+                if (!empty($model->foto) && file_exists($model->foto)) {
+                    unlink($model->foto);
+                }
+    
+                $upload_filename = $nombreCarpetaUsuarioProfile . '/' . $upload->baseName . '.' . $upload->extension;
+                if ($upload->saveAs($upload_filename)) {
+                    $model->foto = $upload_filename;
+                    if ($model->save(false)) {
+                        return $this->redirect(['view', 'id' => $model->id]);
+                    }
+                }
+            }
+        }
+    
+        return $this->redirect(['view', 'id' => $model->id]);
+    }
+    
 
 
 

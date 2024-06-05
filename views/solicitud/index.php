@@ -12,7 +12,7 @@ use kartik\daterange\DateRangePicker;
 /* @var $searchModel app\models\SolicitudSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Solicitudes';
+$this->title = 'Historial de solicitudes de incidencias';
 $this->params['breadcrumbs'][] = $this->title;
 $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
 
@@ -80,35 +80,35 @@ $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
         
         
         
-        [
-            'attribute' => 'status',
-            'format' => 'raw',
-            'label' => 'Estatus',
-            'value' => function ($model) {
-                $status = '';
-                switch ($model->status) {
-                    case 'Aprobado':
-                        $status = '<span class="badge badge-success">' . $model->status . '</span>';
-                        break;
-                    case 'En Proceso':
-                        $status = '<span class="badge badge-warning">' . $model->status . '</span>';
-                        break;
-                    case 'Rechazado':
-                        $status = '<span class="badge badge-danger">' . $model->status . '</span>';
-                        break;
-                    default:
-                        $status = '<span class="badge badge-secondary">' . $model->status . '</span>';
-                        break;
-                }
-                return $status;
-            },
-            'filter' => Html::activeDropDownList($searchModel, 'status', ['Aprobado' => 'Aprobado', 'En Proceso' => 'En Proceso', 'Rechazado' => 'Rechazado'], ['class' => 'form-control', 'prompt' => 'Todos']),
-        ],
-        [
-            'attribute' => 'comentario',
-            'format' => 'ntext',
-            'filter' => false,
-        ],
+     //   [
+       ///     'attribute' => 'status',
+          //  'format' => 'raw',
+        //    'label' => 'Estatus',
+          //  'value' => function ($model) {
+            //    $status = '';
+          //      switch ($model->status) {
+            //        case 'Aprobado':
+              //          $status = '<span class="badge badge-success">' . $model->status . '</span>';
+   //                    break;
+ // /                  case 'En Proceso':
+     //                   $status = '<span class="badge badge-warning">' . $model->status . '</span>';
+       //                 break;
+         ///           case 'Rechazado':
+            //            $status = '<span class="badge badge-danger">' . $model->status . '</span>';
+   //                     break;
+  //                default:
+    //                    $status = '<span class="badge badge-secondary">' . $model->status . '</span>';
+      //                  break;
+        //        }
+          ///      return $status;
+          //  },
+ //           'filter' => Html::activeDropDownList($searchModel, 'status', ['Aprobado' => 'Aprobado', 'En Proceso' => 'En Proceso', 'Rechazado' => 'Rechazado'], ['class' => 'form-control', 'prompt' => 'Todos']),
+   //     ],
+     //   [
+       //     'attribute' => 'comentario',
+         //   'format' => 'ntext',
+       //     'filter' => false,
+      //  ],
        
 
         [

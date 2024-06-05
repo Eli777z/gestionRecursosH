@@ -145,10 +145,25 @@ a.desc:after {
  
 }
 
-
+.custom-shadow {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3), 0 4px 8px rgba(0, 0, 0, 0.3);
+}
 
 /* Eliminar bordes de las celdas y establecer color de fondo */
 
+.checkbox-inline {
+    display: inline-block;
+    margin-right: 10px;
+}
+.checkbox-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px; /* Añade espacio debajo del contenedor para evitar superposición */
+}
+.checkbox-container label {
+    margin-right: 10px;
+}
 
 .card-title {
     color: #333;

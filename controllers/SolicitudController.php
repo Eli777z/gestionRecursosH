@@ -15,7 +15,12 @@ use app\models\ComisionEspecial;
 use app\models\Notificacion;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use app\models\CambioPeriodoVacacional;
+use app\models\ComisionEspecialSearch;
 use app\models\PeriodoVacacionalHistorial;
+use app\models\PermisoEconomico;
+
+use app\models\PermisoFueraTrabajo;
+
 /**
  * SolicitudController implements the CRUD actions for Solicitud model.
  */
@@ -61,15 +66,35 @@ class SolicitudController extends Controller
     public function actionView($id)
     {
         $model = $this->findModel($id);
-
+        
+        // Obtener el formato asociado
+        $formato = $this->getFormatoAsociado($model);
         $empleadoId = $model->empleado_id;
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
+            'formato' => $formato,
             'empleadoId' => $empleadoId,
 
         ]);
     }
-
+    
+    
+    
+    protected function getFormatoAsociado($solicitud)
+    {
+        switch ($solicitud->nombre_formato) {
+            case 'PERMISO FUERA DEL TRABAJO':
+                return PermisoFueraTrabajo::findOne(['solicitud_id' => $solicitud->id]);
+            case 'COMISION ESPECIAL':
+                return ComisionEspecial::findOne(['solicitud_id' => $solicitud->id]);
+            case 'PERMISO ECONOMICO':
+                return PermisoEconomico::findOne(['solicitud_id' => $solicitud->id]);
+            default:
+                return null;
+        }
+    }
+    
+    
     /**
      * Creates a new Solicitud model.
      * If creation is successful, the browser will be redirected to the 'view' page.
@@ -267,6 +292,8 @@ class SolicitudController extends Controller
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 
+
+    
 
    
 }

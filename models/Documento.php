@@ -38,12 +38,13 @@ class Documento extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['empleado_id', 'ruta', 'nombre'], 'required'],
+            [['empleado_id', 'ruta'], 'required'],
             [['empleado_id', 'cat_tipo_documento_id'], 'integer'],
             [['fecha_subida'], 'safe'],
             [['nombre'], 'string', 'max' => 85],
             [['ruta'], 'string', 'max' => 255],
             [['archivoSubido'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg, pdf, doc, docx'],
+            [['observacion'], 'string'],
 
            
             [['empleado_id'], 'exist', 'skipOnError' => true, 'targetClass' => Empleado::class, 'targetAttribute' => ['empleado_id' => 'id']],
@@ -64,6 +65,7 @@ class Documento extends \yii\db\ActiveRecord
             'ruta' => 'Archivo',
             'fecha_subida' => 'Fecha Subida',
             'archivoSubido' => 'Archivo a Subir',
+            'observacion' => 'Observaciones'
 
         ];
     }
