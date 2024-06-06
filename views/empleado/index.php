@@ -325,12 +325,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                                     return $juntaGobiernoModel->catDireccion->nombre_direccion; 
                                                 },
                                             ],
-                                            [
-                                                'attribute' => 'cat_departamento_id',
-                                                'value' => function ($juntaGobiernoModel) {
-                                                    return $juntaGobiernoModel->catDepartamento->nombre_departamento; 
-                                                },
-                                            ],
+                                          
                                             [
                                                 'attribute' => 'empleado_id',
                                                 'value' => function ($juntaGobiernoModel) {

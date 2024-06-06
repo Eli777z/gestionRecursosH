@@ -221,6 +221,255 @@ if ($formato) {
             ];
             break;
 
+
+            case 'CAMBIO DE DÍA LABORAL':
+                $formatoAttributes = [
+                    [
+                        'label' => 'Motivo',
+                        'value' => function ($formato) {
+                            return $formato->motivoFechaPermiso->motivo; 
+                        },
+                    ],
+                    [
+                        'label' => 'Fecha de Permiso',
+                        'value' => function ($formato) {
+                           
+                            setlocale(LC_TIME, "es_419.UTF-8");
+                            
+                            $fechaPermiso = strtotime($formato->motivoFechaPermiso->fecha_permiso);
+                            
+                            $fechaFormateada = strftime('%A, %B %d, %Y', $fechaPermiso);
+                            
+                            setlocale(LC_TIME, null);
+                            
+                            return $fechaFormateada;
+                        },
+                    ],
+                    [
+                        'label' => 'Fecha a Laborar',
+                        'value' => function ($formato) {
+                           
+                            setlocale(LC_TIME, "es_419.UTF-8");
+                            
+                            $fechaPermiso = strtotime($formato->fecha_permiso);
+                            
+                            $fechaFormateada = strftime('%A, %B %d, %Y', $fechaPermiso);
+                            
+                            setlocale(LC_TIME, null);
+                            
+                            return $fechaFormateada;
+                        },
+                    ],
+                    // Otros atributos específicos de PermisoEconomico
+                ];
+                break;
+
+
+                case 'CAMBIO DE DÍA LABORAL':
+                    $formatoAttributes = [
+                        [
+                            'label' => 'Motivo',
+                            'value' => function ($formato) {
+                                return $formato->motivoFechaPermiso->motivo; 
+                            },
+                        ],
+                        [
+                            'label' => 'Fecha de Permiso',
+                            'value' => function ($formato) {
+                               
+                                setlocale(LC_TIME, "es_419.UTF-8");
+                                
+                                $fechaPermiso = strtotime($formato->motivoFechaPermiso->fecha_permiso);
+                                
+                                $fechaFormateada = strftime('%A, %B %d, %Y', $fechaPermiso);
+                                
+                                setlocale(LC_TIME, null);
+                                
+                                return $fechaFormateada;
+                            },
+                        ],
+                        [
+                            'label' => 'Fecha a Laborar',
+                            'value' => function ($formato) {
+                               
+                                setlocale(LC_TIME, "es_419.UTF-8");
+                                
+                                $fechaPermiso = strtotime($formato->fecha_permiso);
+                                
+                                $fechaFormateada = strftime('%A, %B %d, %Y', $fechaPermiso);
+                                
+                                setlocale(LC_TIME, null);
+                                
+                                return $fechaFormateada;
+                            },
+                        ],
+                        // Otros atributos específicos de PermisoEconomico
+                    ];
+                    break;
+                    case 'CAMBIO DE HORARIO DE TRABAJO':
+                        $formatoAttributes = [
+                            [
+                                'label' => 'Motivo',
+                                'value' => function ($formato) {
+                                    return $formato->motivoFechaPermiso->motivo; 
+                                },
+                            ],
+                            [
+                                'label' => 'Fecha de Permiso',
+                                'value' => function ($formato) {
+                                   
+                                    setlocale(LC_TIME, "es_419.UTF-8");
+                                    
+                                    $fechaPermiso = strtotime($formato->motivoFechaPermiso->fecha_permiso);
+                                    
+                                    $fechaFormateada = strftime('%A, %B %d, %Y', $fechaPermiso);
+                                    
+                                    setlocale(LC_TIME, null);
+                                    
+                                    return $fechaFormateada;
+                                },
+                            ],
+                            [
+                                'attribute' => 'horario_inicio',
+                                'value' => function ($formato) {
+                                    $hora = date("g:i A", strtotime($formato->horario_inicio));
+                                    return $hora;
+                                },
+                            ],
+                            [
+                                'attribute' => 'horario_fin',
+                                'value' => function ($formato) {
+                                    $hora = date("g:i A", strtotime($formato->horario_fin));
+                                    return $hora;
+                                },
+                            ],
+                            [
+                                'label' => 'Fecha de Inicio',
+                                'value' => function ($formato) {
+                                   
+                                    setlocale(LC_TIME, "es_419.UTF-8");
+                                    
+                                    $fechaInicio= strtotime($formato->fecha_inicio);
+                                    
+                                    $fechaFormateada = strftime('%A, %B %d, %Y', $fechaInicio);
+                                    
+                                    setlocale(LC_TIME, null);
+                                    
+                                    return $fechaFormateada;
+                                },
+                            ],
+                            [
+                                'label' => 'Fecha de Termino',
+                                'value' => function ($formato) {
+                                   
+                                    setlocale(LC_TIME, "es_419.UTF-8");
+                                    
+                                    $fechaTermino= strtotime($formato->fecha_termino);
+                                    
+                                    $fechaFormateada = strftime('%A, %B %d, %Y', $fechaTermino);
+                                    
+                                    setlocale(LC_TIME, null);
+                                    
+                                    return $fechaFormateada;
+                                },
+                            ],
+                           
+                            // Otros atributos específicos de PermisoEconomico
+                        ];
+                        break;
+
+                        case 'PERMISO SIN GOCE DE SUELDO':
+                            $formatoAttributes = [
+                                [
+                                    'label' => 'Motivo',
+                                    'value' => function ($formato) {
+                                        return $formato->motivoFechaPermiso->motivo; 
+                                    },
+                                ],
+                                [
+                                    'label' => 'Fecha de Permiso',
+                                    'value' => function ($formato) {
+                                       
+                                        setlocale(LC_TIME, "es_419.UTF-8");
+                                        
+                                        $fechaPermiso = strtotime($formato->motivoFechaPermiso->fecha_permiso);
+                                        
+                                        $fechaFormateada = strftime('%A, %B %d, %Y', $fechaPermiso);
+                                        
+                                        setlocale(LC_TIME, null);
+                                        
+                                        return $fechaFormateada;
+                                    },
+                                ],
+                                // Otros atributos específicos de PermisoEconomico
+                            ];
+                            break;
+                
+
+                            case 'CAMBIO DE PERIODO VACACIONAL':
+                                $formatoAttributes = [
+                                    [
+                                        'label' => 'Motivo',
+                                        'value' => function ($formato) {
+                                            return $formato->motivo; 
+                                        },
+                                    ],
+                                    [
+                                        'label' => 'Año',
+                                        'value' => function ($formato) {
+                                            return $formato->año; 
+                                        },
+                                    ],
+
+                                    [
+                                        'label' => 'Primera vez',
+                                        'value' => function ($formato) {
+                                            return $formato->primera_vez; 
+                                        },
+                                    ],
+
+                                    [
+                                        'label' => 'Numero de periodo',
+                                        'value' => function ($formato) {
+                                            return $formato->numero_periodo; 
+                                        },
+                                    ],
+                                    [
+                                        'label' => 'Fecha de Inicio',
+                                        'value' => function ($formato) {
+                                           
+                                            setlocale(LC_TIME, "es_419.UTF-8");
+                                            
+                                            $fechaInicio= strtotime($formato->fecha_inicio_periodo);
+                                            
+                                            $fechaFormateada = strftime('%A, %B %d, %Y', $fechaInicio);
+                                            
+                                            setlocale(LC_TIME, null);
+                                            
+                                            return $fechaFormateada;
+                                        },
+                                    ],
+                                    [
+                                        'label' => 'Fecha de Fin',
+                                        'value' => function ($formato) {
+                                           
+                                            setlocale(LC_TIME, "es_419.UTF-8");
+                                            
+                                            $fechaInicio= strtotime($formato->fecha_fin_periodo);
+                                            
+                                            $fechaFormateada = strftime('%A, %B %d, %Y', $fechaInicio);
+                                            
+                                            setlocale(LC_TIME, null);
+                                            
+                                            return $fechaFormateada;
+                                        },
+                                    ],
+                                    // Otros atributos específicos de PermisoEconomico
+                                ];
+                                break;
+                     
+            
+
         // Agrega aquí más casos para otros formatos si es necesario...
     }
 

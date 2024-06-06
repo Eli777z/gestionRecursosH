@@ -7,6 +7,8 @@ use app\models\CatDepartamento;
 use app\models\CatDepartamentoSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use app\models\InformacionLaboral;
+use app\models\JuntaGobierno;
 use yii\filters\VerbFilter;
 
 /**
@@ -67,7 +69,7 @@ class CatDepartamentoController extends Controller
         $model = new CatDepartamento();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['create']);
         }
 
         return $this->render('create', [
@@ -104,7 +106,20 @@ class CatDepartamentoController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+    
+        // Establecer a NULL el campo `junta_gobierno_id` en la tabla `informacion_laboral`
+        InformacionLaboral::updateAll(['cat_departamento_id' => null], ['cat_departamento_id' => $id]);
+        JuntaGobierno::updateAll(['cat_departamento_id' => null], ['cat_departamento_id' => $id]);
+
+
+        if ($model->delete()) {
+            Yii::$app->session->setFlash('success', 'Empleado eliminado de junta gobierno.');
+        } else {
+            Yii::$app->session->setFlash('error', 'Hubo un error al eliminar el registro.');
+        }
+    
+       
 
         return $this->redirect(['index']);
     }

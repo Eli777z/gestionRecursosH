@@ -113,9 +113,9 @@ class JuntaGobiernoController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id, $cat_direccion_id, $cat_departamento_id, $empleado_id)
+    public function actionDelete($id, $cat_direccion_id, $empleado_id)
     {
-        $model = $this->findModel($id, $cat_direccion_id, $cat_departamento_id, $empleado_id);
+        $model = $this->findModel3($id, $cat_direccion_id, $empleado_id);
     
         // Establecer a NULL el campo `junta_gobierno_id` en la tabla `informacion_laboral`
         InformacionLaboral::updateAll(['junta_gobierno_id' => null], ['junta_gobierno_id' => $id]);
@@ -157,6 +157,13 @@ class JuntaGobiernoController extends Controller
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+    protected function findModel3($id, $cat_direccion_id, $empleado_id)
+    {
+        if (($model = JuntaGobierno::findOne(['id' => $id, 'cat_direccion_id' => $cat_direccion_id, 'empleado_id' => $empleado_id])) !== null) {
+            return $model;
+        }
 
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
     
 }

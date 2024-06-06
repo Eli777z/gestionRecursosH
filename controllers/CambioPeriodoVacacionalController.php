@@ -105,7 +105,7 @@ class CambioPeriodoVacacionalController extends Controller
         $solicitudModel->comentario = '';
         $solicitudModel->fecha_aprobacion = null;
         $solicitudModel->fecha_creacion = date('Y-m-d H:i:s');
-        $solicitudModel->nombre_formato = 'CAMBIO PERIODO VACACIONAL';
+        $solicitudModel->nombre_formato = 'CAMBIO DE PERIODO VACACIONAL';
     
         if ($model->load(Yii::$app->request->post())) {
             $transaction = Yii::$app->db->beginTransaction();

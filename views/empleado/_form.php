@@ -2,6 +2,7 @@
 
 use app\models\CatDepartamento;
 use app\models\CatDireccion;
+use app\models\CatPuesto;
 use app\models\CatTipoContrato;
 use yii\helpers\Html;
 use yii\bootstrap4\ActiveForm;
@@ -92,6 +93,16 @@ use yii\helpers\ArrayHelper;
                                                     ],
                                                     'theme' => Select2::THEME_BOOTSTRAP,
                                                 ])->label('Departamento al que pertenece:') ?>
+
+<?= $form->field($informacion_laboral, 'cat_puesto_id')->widget(Select2::classname(), [
+                                                    'data' => ArrayHelper::map(CatPuesto::find()->all(), 'id', 'nombre_puesto'),
+                                                    'language' => 'es',
+                                                    'options' => ['placeholder' => 'Seleccione puesto del empleado'],
+                                                    'pluginOptions' => [
+                                                        'allowClear' => true
+                                                    ],
+                                                    'theme' => Select2::THEME_BOOTSTRAP,
+                                                ])->label('Puesto del empleado:') ?>
 
                                               
 

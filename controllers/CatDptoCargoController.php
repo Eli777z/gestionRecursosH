@@ -8,6 +8,8 @@ use app\models\CatDptoCargoSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use app\models\InformacionLaboral;
+use app\models\JuntaGobierno;
 
 /**
  * CatDptoCargoController implements the CRUD actions for CatDptoCargo model.
@@ -104,10 +106,24 @@ class CatDptoCargoController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+    
+        // Establecer a NULL el campo `junta_gobierno_id` en la tabla `informacion_laboral`
+        InformacionLaboral::updateAll(['cat_dpto_cargo_id' => null], ['cat_dpto_cargo_id' => $id]);
+      //  JuntaGobierno::updateAll(['cat_dpto_cargo_id' => null], ['cat_dpto_cargo_id' => $id]);
+
+
+        if ($model->delete()) {
+            Yii::$app->session->setFlash('success', 'Empleado eliminado de junta gobierno.');
+        } else {
+            Yii::$app->session->setFlash('error', 'Hubo un error al eliminar el registro.');
+        }
+    
+       
 
         return $this->redirect(['index']);
     }
+
 
     /**
      * Finds the CatDptoCargo model based on its primary key value.

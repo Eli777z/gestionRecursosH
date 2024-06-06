@@ -51,8 +51,19 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
 $currentDate = date('Y-m-d');
 
 ?>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function showAlert(title, text) {
+        Swal.fire({
+            icon: 'warning',
+            title: title,
+            text: text,
+        });
+    }
+</script>
 <!-- Include Bootstrap Multiselect CSS and JS -->
 <link rel="stylesheet" href="https://cdn.rawgit.com/davidstutz/bootstrap-multiselect/master/dist/css/bootstrap-multiselect.css">
 <script src="https://cdn.rawgit.com/davidstutz/bootstrap-multiselect/master/dist/js/bootstrap-multiselect.js"></script>
@@ -158,304 +169,318 @@ $currentDate = date('Y-m-d');
                                 ?>
                             </div>
                             <?php $this->beginBlock('datos'); ?>
-
                             <?php $this->beginBlock('info_p'); ?>
-                            <br>
-                            <?php $this->registerJs("
-    $('#pjax-update-info').on('pjax:success', function(event, data, status, xhr) {
-        var response = JSON.parse(xhr.responseText);
-        if (response.success) {
-            alert(response.message); // Muestra un mensaje de éxito
-            $.pjax.reload({container: '#pjax-update-info'}); // Recarga el contenido del contenedor Pjax
-        } else {
-            alert(response.message); // Muestra un mensaje de error
-        }
+<br>
+
+<?php Pjax::begin([
+    'id' => 'pjax-update-info',
+    'options' => ['pushState' => false],
+]); ?>
+
+<div class="card">
+    <?php $form = ActiveForm::begin([
+        'action' => ['actualizar-informacion', 'id' => $model->id],
+        'options' => ['id' => 'personal-info-form']
+    ]); ?>
+    <div class="card-header bg-info text-white">
+        <h3>Información personal</h3>
+        <button type="button" id="edit-button-personal" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
+        <button type="button" id="cancel-button-personal" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
+        <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right mr-3', 'id' => 'save-button-personal', 'style' => 'display:none;']) ?>
+    </div>
+    <div class="card-body">
+        <?= $form->field($model, 'numero_empleado')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
+        <?= $form->field($model, 'nombre')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
+        <?= $form->field($model, 'apellido')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
+        <?= $form->field($model, 'fecha_nacimiento')->widget(DatePicker::class, [
+            'language' => 'es',
+            'dateFormat' => 'yyyy-MM-dd',
+            'options' => [
+                'class' => 'form-control',
+                'autocomplete' => 'off',
+                'readonly' => true
+            ],
+            'clientOptions' => [
+                'changeYear' => true,
+                'changeMonth' => true,
+                'yearRange' => '-100:+0',
+            ],
+        ]); ?>
+        <?= $form->field($model, 'profesion')->widget(Select2::className(), [
+            'data' => [
+                'No tiene' => 'No tiene',
+                'ING.' => 'ING.',
+                'LIC.' => 'LIC.',
+                'PROF.' => 'PROF.',
+                'ARQ.' => 'ARQ.',
+                'C.' => 'C.',
+                'DR.' => 'DR.',
+                'DRA.' => 'DRA.',
+                'TEC.' => 'TEC.',
+            ],
+            'options' => ['prompt' => 'Seleccionar Profesión', 'disabled' => true],
+            'pluginOptions' => [
+                'allowClear' => true
+            ],
+            'theme' => Select2::THEME_BOOTSTRAP,
+        ]); ?>
+        <?= $form->field($model, 'edad')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
+        <?= $form->field($model, 'sexo')->widget(Select2::className(), [
+            'data' => [
+                'Masculino' => 'Masculino',
+                'Femenino' => 'Femenino',
+            ],
+            'options' => ['prompt' => 'Seleccionar Sexo', 'disabled' => true],
+            'pluginOptions' => [
+                'allowClear' => true
+            ],
+            'theme' => Select2::THEME_BOOTSTRAP,
+        ]); ?>
+        <?= $form->field($model, 'estado_civil')->widget(Select2::className(), [
+            'data' => [
+                'Masculino' => [
+                    'Soltero' => 'Soltero',
+                    'Casado' => 'Casado',
+                    'Separado' => 'Separado',
+                    'Viudo' => 'Viudo',
+                ],
+                'Femenino' => [
+                    'Soltera' => 'Soltera',
+                    'Casada' => 'Casada',
+                    'Separada' => 'Separada',
+                    'Viuda' => 'Viuda',
+                ],
+            ],
+            'options' => ['prompt' => 'Seleccionar Estado Civil', 'disabled' => true],
+            'pluginOptions' => [
+                'allowClear' => true
+            ],
+            'theme' => Select2::THEME_BOOTSTRAP,
+        ]); ?>
+        <?= $form->field($model, 'curp')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
+        <?= $form->field($model, 'nss')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
+        <?= $form->field($model, 'rfc')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
+    </div>
+    <?php ActiveForm::end(); ?>
+</div>
+
+<script>
+    document.getElementById('edit-button-personal').addEventListener('click', function() {
+        var fields = document.querySelectorAll('#personal-info-form .form-control');
+        fields.forEach(function(field) {
+            field.readOnly = false;
+            field.disabled = false;
+        });
+        document.getElementById('edit-button-personal').style.display = 'none';
+        document.getElementById('save-button-personal').style.display = 'block';
+        document.getElementById('cancel-button-personal').style.display = 'block';
     });
-    "); ?>
-                            <?php Pjax::begin([
-                                'id' => 'pjax-update-info',
-                                'options' => ['pushState' => false],
-                            ]); ?>
 
-                            <div class="card">
-                                <?php $form = ActiveForm::begin([
-                                    'action' => ['actualizar-informacion', 'id' => $model->id],
-                                    'options' => ['id' => 'personal-info-form']
-                                ]); ?>
-                                <div class="card-header bg-info text-white">
-                                    <h3>Información personal</h3>
-                                    <button type="button" id="edit-button-personal" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
-                                    <button type="button" id="cancel-button-personal" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
-                                    <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right mr-3', 'id' => 'save-button-personal', 'style' => 'display:none;']) ?>
-                                </div>
-                                <div class="card-body">
-                                    <?= $form->field($model, 'numero_empleado')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
-                                    <?= $form->field($model, 'nombre')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
-                                    <?= $form->field($model, 'apellido')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
-                                    <?= $form->field($model, 'fecha_nacimiento')->widget(DatePicker::class, [
-                                        'language' => 'es',
-                                        'dateFormat' => 'yyyy-MM-dd',
-                                        'options' => [
-                                            'class' => 'form-control',
-                                            'autocomplete' => 'off',
-                                            'readonly' => true
-                                        ],
-                                        'clientOptions' => [
-                                            'changeYear' => true,
-                                            'changeMonth' => true,
-                                            'yearRange' => '-100:+0',
-                                        ],
-                                    ]); ?>
-                                    <?= $form->field($model, 'profesion')->widget(Select2::className(), [
-                                        'data' => [
-                                            'No tiene' => 'No tiene',
-                                            'ING.' => 'ING.',
-                                            'LIC.' => 'LIC.',
-                                            'PROF.' => 'PROF.',
-                                            'ARQ.' => 'ARQ.',
-                                            'C.' => 'C.',
-                                            'DR.' => 'DR.',
-                                            'DRA.' => 'DRA.',
-                                            'TEC.' => 'TEC.',
-                                        ],
-                                        'options' => ['prompt' => 'Seleccionar Profesión', 'disabled' => true],
-                                        'pluginOptions' => [
-                                            'allowClear' => true
-                                        ],
-                                        'theme' => Select2::THEME_BOOTSTRAP,
-                                    ]); ?>
+    document.getElementById('cancel-button-personal').addEventListener('click', function() {
+        var fields = document.querySelectorAll('#personal-info-form .form-control');
+        fields.forEach(function(field) {
+            field.readOnly = true;
+            field.disabled = true;
+            field.value = field.defaultValue;
+        });
+        document.getElementById('edit-button-personal').style.display = 'block';
+        document.getElementById('save-button-personal').style.display = 'none';
+        document.getElementById('cancel-button-personal').style.display = 'none';
+    });
 
-                                    <?= $form->field($model, 'edad')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
+    function checkEmptyFieldsPersonal() {
+        var fields = document.querySelectorAll('#personal-info-form .form-control');
+        var emptyFields = Array.from(fields).filter(function(field) {
+            return field.value.trim() === '';
+        });
 
-                                    <?= $form->field($model, 'sexo')->widget(Select2::className(), [
-                                        'data' => [
+        if (emptyFields.length > 0) {
+            showAlert('Falta completar datos del empleado', 'Por favor, complete todos los campos.');
+        }
+    }
 
-                                            'Masculino' => 'Masculino',
-                                            'Femenino' => 'Femenino',
+    document.addEventListener('DOMContentLoaded', function() {
+        checkEmptyFieldsPersonal();
+    });
 
+    $('#pjax-update-info').on('pjax:end', function() {
+        checkEmptyFieldsPersonal();
+    });
+</script>
 
-                                        ],
-                                        'options' => ['prompt' => 'Seleccionar Sexo', 'disabled' => true],
-                                        'pluginOptions' => [
-                                            'allowClear' => true
-                                        ],
-                                        'theme' => Select2::THEME_BOOTSTRAP,
-                                    ]); ?>
-
-
-                                    <?= $form->field($model, 'estado_civil')->widget(Select2::className(), [
-                                        'data' => [
-                                            'Masculino' => [
-                                                'Soltero' => 'Soltero',
-                                                'Casado' => 'Casado',
-                                                'Separado' => 'Separado',
-                                                'Viudo' => 'Viudo',
-                                            ],
-                                            'Femenino' => [
-                                                'Soltera' => 'Soltera',
-                                                'Casada' => 'Casada',
-                                                'Separada' => 'Separada',
-                                                'Viuda' => 'Viuda',
-                                            ],
-                                        ],
-                                        'options' => ['prompt' => 'Seleccionar Estado Civil', 'disabled' => true],
-                                        'pluginOptions' => [
-                                            'allowClear' => true
-                                        ],
-                                        'theme' => Select2::THEME_BOOTSTRAP,
-                                    ]); ?>
-                                    <?= $form->field($model, 'curp')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
-                                    <?= $form->field($model, 'nss')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
-                                    <?= $form->field($model, 'rfc')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
+<?php Pjax::end(); ?>
+<?php $this->endBlock(); ?>
 
 
 
-                                </div>
-                                <?php ActiveForm::end(); ?>
+<?php $this->beginBlock('info_c'); ?>
+<br>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <?php $form = ActiveForm::begin([
+                'action' => ['actualizar-informacion-contacto', 'id' => $model->id],
+                'options' => ['id' => 'contact-info-form']
+            ]); ?>
+            <div class="card-header bg-info text-white">
+                <h3>Información de contacto</h3>
+                <button type="button" id="edit-button-contact" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
+                <button type="button" id="cancel-button-contact" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
+                <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right mr-3', 'id' => 'save-button-contact', 'style' => 'display:none;']) ?>
+            </div>
+            <div class="card-body">
+                <?= $form->field($model, 'email')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
+                <?= $form->field($model, 'telefono')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
+                <?= $form->field($model, 'colonia')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
+                <?= $form->field($model, 'calle')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
+                <?= $form->field($model, 'numero_casa')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
+                <?= $form->field($model, 'codigo_postal')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
+                <?= $form->field($model, 'estado')->widget(Select2::classname(), [
+                    'data' => [], // Inicialmente vacío, se llenará con JS
+                    'options' => ['placeholder' => 'Selecciona un estado', 'id' => 'estado-dropdown', 'disabled' => true],
+                    'pluginOptions' => [
+                        'allowClear' => true
+                    ],
+                    'theme' => Select2::THEME_BOOTSTRAP,
+                ])->label('Estado'); ?>
+                <?= $form->field($model, 'municipio')->widget(Select2::classname(), [
+                    'data' => [], // Inicialmente vacío
+                    'options' => ['placeholder' => 'Selecciona un municipio', 'id' => 'municipio-dropdown', 'disabled' => true],
+                    'pluginOptions' => [
+                        'allowClear' => true
+                    ],
+                    'theme' => Select2::THEME_BOOTSTRAP,
+                ])->label('Municipio'); ?>
+            </div>
+            <?php ActiveForm::end(); ?>
+        </div>
 
-                            </div>
-                            <script>
-                                document.getElementById('edit-button-personal').addEventListener('click', function() {
-                                    var fields = document.querySelectorAll('#personal-info-form .form-control');
-                                    fields.forEach(function(field) {
-                                        field.readOnly = false;
-                                        field.disabled = false;
-                                    });
-                                    document.getElementById('edit-button-personal').style.display = 'none';
-                                    document.getElementById('save-button-personal').style.display = 'block';
-                                    document.getElementById('cancel-button-personal').style.display = 'block';
-                                });
+        <script>
+            document.getElementById('edit-button-contact').addEventListener('click', function() {
+                var fields = document.querySelectorAll('#contact-info-form .form-control');
+                fields.forEach(function(field) {
+                    field.readOnly = false;
+                    field.disabled = false;
+                });
+                document.getElementById('edit-button-contact').style.display = 'none';
+                document.getElementById('save-button-contact').style.display = 'block';
+                document.getElementById('cancel-button-contact').style.display = 'block';
+            });
 
-                                document.getElementById('cancel-button-personal').addEventListener('click', function() {
-                                    var fields = document.querySelectorAll('#personal-info-form .form-control');
-                                    fields.forEach(function(field) {
-                                        field.readOnly = true;
-                                        field.disabled = true;
-                                        field.value = field.defaultValue;
-                                    });
-                                    document.getElementById('edit-button-personal').style.display = 'block';
-                                    document.getElementById('save-button-personal').style.display = 'none';
-                                    document.getElementById('cancel-button-personal').style.display = 'none';
-                                });
-                            </script>
+            document.getElementById('cancel-button-contact').addEventListener('click', function() {
+                var fields = document.querySelectorAll('#contact-info-form .form-control');
+                fields.forEach(function(field) {
+                    field.readOnly = true;
+                    field.disabled = true;
+                    field.value = field.defaultValue;
+                });
+                document.getElementById('edit-button-contact').style.display = 'block';
+                document.getElementById('save-button-contact').style.display = 'none';
+                document.getElementById('cancel-button-contact').style.display = 'none';
+            });
 
+            function checkEmptyFieldsContact() {
+                var fields = document.querySelectorAll('#contact-info-form .form-control');
+                var emptyFields = Array.from(fields).filter(function(field) {
+                    return field.value.trim() === '';
+                });
 
-                            <?php Pjax::end(); ?>
-                            <?php $this->endBlock(); ?>
+                if (emptyFields.length > 0) {
+                    showAlert('Falta completar datos de contacto', 'Por favor, complete todos los campos.');
+                }
+            }
 
+            document.addEventListener('DOMContentLoaded', function() {
+                checkEmptyFieldsContact();
+            });
 
-                            <?php $this->beginBlock('info_c'); ?>
-                            <br>
-                            <div class="row">
-                                <div class="col-md-6">
+            $('#pjax-update-info').on('pjax:end', function() {
+                checkEmptyFieldsContact();
+            });
+        </script>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <?php $form = ActiveForm::begin([
+                'action' => ['actualizar-informacion-contacto', 'id' => $model->id],
+                'options' => ['id' => 'emergency-contact-form']
+            ]); ?>
+            <div class="card-header bg-success text-white">
+                <h3>Información de contacto de emergencia</h3>
+                <button type="button" id="edit-button-emergency" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
+                <button type="button" id="cancel-button-emergency" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
+                <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-info float-right  mr-3', 'id' => 'save-button-emergency', 'style' => 'display:none;']) ?>
+            </div>
+            <div class="card-body">
+                <?= $form->field($model, 'nombre_contacto_emergencia')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
+                <?= $form->field($model, 'relacion_contacto_emergencia')->widget(Select2::className(), [
+                    'data' => [
+                        'Padre' => 'Padre',
+                        'Madre' => 'Madre',
+                        'Esposo/a' => 'Esposo/a',
+                        'Hijo/a' => 'Hijo/a',
+                        'Hermano/a' => 'Hermano/a',
+                        'Compañero/a de trabajo' => 'Compañero/a de trabajo',
+                        'Tio/a' => 'Tio/a'
+                    ],
+                    'options' => ['prompt' => 'Seleccionar Parentesco', 'disabled' => true],
+                    'pluginOptions' => [
+                        'allowClear' => true
+                    ],
+                    'theme' => Select2::THEME_BOOTSTRAP,
+                ]); ?>
+                <?= $form->field($model, 'telefono_contacto_emergencia')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
+            </div>
+            <?php ActiveForm::end(); ?>
+        </div>
 
-                                    <div class="card">
-                                        <?php $form = ActiveForm::begin([
-                                            'action' => ['actualizar-informacion-contacto', 'id' => $model->id],
-                                            'options' => ['id' => 'contact-info-form']
-                                        ]); ?>
-                                        <div class="card-header bg-info text-white">
-                                            <h3>Información de contacto</h3>
-                                            <button type="button" id="edit-button" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
-                                            <button type="button" id="cancel-button" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
+        <script>
+            document.getElementById('edit-button-emergency').addEventListener('click', function() {
+                var fields = document.querySelectorAll('#emergency-contact-form .form-control');
+                fields.forEach(function(field) {
+                    field.readOnly = false;
+                    field.disabled = false;
+                });
+                document.getElementById('edit-button-emergency').style.display = 'none';
+                document.getElementById('save-button-emergency').style.display = 'block';
+                document.getElementById('cancel-button-emergency').style.display = 'block';
+            });
 
-                                            <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right mr-3', 'id' => 'save-button', 'style' => 'display:none;']) ?>
-                                        </div>
-                                        <div class="card-body">
-                                            <?= $form->field($model, 'email')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
-                                            <?= $form->field($model, 'telefono')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
-                                            <?= $form->field($model, 'colonia')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
-                                            <?= $form->field($model, 'calle')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
-                                            <?= $form->field($model, 'numero_casa')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
-                                            <?= $form->field($model, 'codigo_postal')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
-                                            <?= $form->field($model, 'estado')->widget(Select2::classname(), [
-                                                'data' => [], // Inicialmente vacío, se llenará con JS
-                                                'options' => ['placeholder' => 'Selecciona un estado', 'id' => 'estado-dropdown',  'disabled' => true],
-                                                'pluginOptions' => [
-                                                    'allowClear' => true
-                                                ],
-                                                'theme' => Select2::THEME_BOOTSTRAP,
-                                            ])->label('Estado'); ?>
+            document.getElementById('cancel-button-emergency').addEventListener('click', function() {
+                var fields = document.querySelectorAll('#emergency-contact-form .form-control');
+                fields.forEach(function(field) {
+                    field.readOnly = true;
+                    field.disabled = true;
+                    field.value = field.defaultValue;
+                });
+                document.getElementById('edit-button-emergency').style.display = 'block';
+                document.getElementById('save-button-emergency').style.display = 'none';
+                document.getElementById('cancel-button-emergency').style.display = 'none';
+            });
 
+            function checkEmptyFieldsEmergency() {
+                var fields = document.querySelectorAll('#emergency-contact-form .form-control');
+                var emptyFields = Array.from(fields).filter(function(field) {
+                    return field.value.trim() === '';
+                });
 
+                if (emptyFields.length > 0) {
+                    showAlert('Falta completar datos de contacto de emergencia', 'Por favor, complete todos los campos.');
+                }
+            }
 
+            document.addEventListener('DOMContentLoaded', function() {
+                checkEmptyFieldsEmergency();
+            });
 
-
-
-                                            <?= $form->field($model, 'municipio')->widget(Select2::classname(), [
-                                                'data' => [], // Inicialmente vacío
-                                                'options' => ['placeholder' => 'Selecciona un municipio', 'id' => 'municipio-dropdown',  'disabled' => true],
-                                                'pluginOptions' => [
-                                                    'allowClear' => true
-                                                ],
-                                                'theme' => Select2::THEME_BOOTSTRAP,
-                                            ])->label('Municipio'); ?>
-
-
-
-
-
-
-
-                                        </div>
-                                        <?php ActiveForm::end(); ?>
-                                    </div>
-
-
-
-                                    <script>
-                                        document.getElementById('edit-button').addEventListener('click', function() {
-                                            var fields = document.querySelectorAll('#contact-info-form .form-control');
-                                            fields.forEach(function(field) {
-                                                field.readOnly = false;
-                                                field.disabled = false;
-                                            });
-                                            document.getElementById('edit-button').style.display = 'none';
-                                            document.getElementById('save-button').style.display = 'block';
-                                            document.getElementById('cancel-button').style.display = 'block';
-                                        });
-
-                                        document.getElementById('cancel-button').addEventListener('click', function() {
-                                            var fields = document.querySelectorAll('#contact-info-form .form-control');
-                                            fields.forEach(function(field) {
-                                                field.readOnly = true;
-                                                field.disabled = true;
-                                                field.value = field.defaultValue;
-                                            });
-                                            document.getElementById('edit-button').style.display = 'block';
-                                            document.getElementById('save-button').style.display = 'none';
-                                            document.getElementById('cancel-button').style.display = 'none';
-                                        });
-                                    </script>
-
-                                </div>
-                                <div class="col-md-6">
-
-
-                                    <div class="card">
-                                        <?php $form = ActiveForm::begin([
-                                            'action' => ['actualizar-informacion-contacto', 'id' => $model->id],
-                                            'options' => ['id' => 'emergency-contact-form']
-                                        ]); ?>
-                                        <div class="card-header bg-success text-white">
-                                            <h3>Información de contacto de emergencia</h3>
-                                            <button type="button" id="edit-button-emergency" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
-                                            <button type="button" id="cancel-button-emergency" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
-                                            <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-info float-right  mr-3', 'id' => 'save-button-emergency', 'style' => 'display:none;']) ?>
-                                        </div>
-                                        <div class="card-body">
-                                            <?= $form->field($model, 'nombre_contacto_emergencia')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
-                                            <?= $form->field($model, 'relacion_contacto_emergencia')->widget(Select2::className(), [
-                                                'data' => [
-                                                    'Padre' => 'Padre',
-                                                    'Madre' => 'Madre',
-                                                    'Esposo/a' => 'Esposo/a',
-                                                    'Hijo/a' => 'Hijo/a',
-                                                    'Hermano/a' => 'Hermano/a',
-                                                    'Compañero/a de trabajo' => 'Compañero/a de trabajo',
-                                                    'Tio/a' => 'Tio/a'
-                                                ],
-                                                'options' => ['prompt' => 'Seleccionar Parentesco', 'disabled' => true],
-                                                'pluginOptions' => [
-                                                    'allowClear' => true
-                                                ],
-                                                'theme' => Select2::THEME_BOOTSTRAP,
-                                            ]); ?>
-                                            <?= $form->field($model, 'telefono_contacto_emergencia')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
-                                        </div>
-                                        <?php ActiveForm::end(); ?>
-                                    </div>
-
-                                </div>
-                            </div>
-
-                            <script>
-                                document.getElementById('edit-button-emergency').addEventListener('click', function() {
-                                    var fields = document.querySelectorAll('#emergency-contact-form .form-control');
-                                    fields.forEach(function(field) {
-                                        field.readOnly = false;
-                                        field.disabled = false;
-                                    });
-                                    document.getElementById('edit-button-emergency').style.display = 'none';
-                                    document.getElementById('save-button-emergency').style.display = 'block';
-                                    document.getElementById('cancel-button-emergency').style.display = 'block';
-                                });
-
-                                document.getElementById('cancel-button-emergency').addEventListener('click', function() {
-                                    var fields = document.querySelectorAll('#emergency-contact-form .form-control');
-                                    fields.forEach(function(field) {
-                                        field.readOnly = true;
-                                        field.disabled = true;
-                                        field.value = field.defaultValue;
-                                    });
-                                    document.getElementById('edit-button-emergency').style.display = 'block';
-                                    document.getElementById('save-button-emergency').style.display = 'none';
-                                    document.getElementById('cancel-button-emergency').style.display = 'none';
-                                });
-                            </script>
-
-                            <?php $this->endBlock(); ?>
-                            <!-- INFOLABORAL-->
+            $('#pjax-update-info').on('pjax:end', function() {
+                checkEmptyFieldsEmergency();
+            });
+        </script>
+    </div>
+</div>
+<?php $this->endBlock(); ?>
+<!-- INFOLABORAL-->
                             <?php $this->beginBlock('info_l'); ?>
                             <br>
 
@@ -651,31 +676,53 @@ $currentDate = date('Y-m-d');
                                 </div>
                             </div>
                             <script>
-                                document.getElementById('edit-button-laboral').addEventListener('click', function() {
-                                    var fields = document.querySelectorAll('#laboral-info-form input, #laboral-info-form select');
-                                    fields.forEach(function(field) {
-                                        field.readOnly = false;
-                                        field.disabled = false;
-                                    });
-                                    $('.select2-hidden-accessible').select2('enable');
-                                    document.getElementById('edit-button-laboral').style.display = 'none';
-                                    document.getElementById('save-button-laboral').style.display = 'block';
-                                    document.getElementById('cancel-button-laboral').style.display = 'block';
-                                });
+    document.getElementById('edit-button-laboral').addEventListener('click', function() {
+        var fields = document.querySelectorAll('#laboral-info-form input, #laboral-info-form select, #dias-laborales-checkboxes input');
+        fields.forEach(function(field) {
+            field.readOnly = false;
+            field.disabled = false;
+        });
+        document.getElementById('dias-laborales-display').style.display = 'none';
+        document.getElementById('dias-laborales-checkboxes').style.display = 'block';
+        document.getElementById('edit-button-laboral').style.display = 'none';
+        document.getElementById('save-button-laboral').style.display = 'block';
+        document.getElementById('cancel-button-laboral').style.display = 'block';
+    });
 
-                                document.getElementById('cancel-button-laboral').addEventListener('click', function() {
-                                    var fields = document.querySelectorAll('#laboral-info-form input, #laboral-info-form select');
-                                    fields.forEach(function(field) {
-                                        field.readOnly = true;
-                                        field.disabled = true;
-                                        field.value = field.defaultValue;
-                                    });
-                                    $('.select2-hidden-accessible').select2('enable', false);
-                                    document.getElementById('edit-button-laboral').style.display = 'block';
-                                    document.getElementById('save-button-laboral').style.display = 'none';
-                                    document.getElementById('cancel-button-laboral').style.display = 'none';
-                                });
-                            </script>
+    document.getElementById('cancel-button-laboral').addEventListener('click', function() {
+        var fields = document.querySelectorAll('#laboral-info-form input, #laboral-info-form select, #dias-laborales-checkboxes input');
+        fields.forEach(function(field) {
+            field.readOnly = true;
+            field.disabled = true;
+            field.value = field.defaultValue;
+        });
+        document.getElementById('dias-laborales-display').style.display = 'block';
+        document.getElementById('dias-laborales-checkboxes').style.display = 'none';
+        document.getElementById('edit-button-laboral').style.display = 'block';
+        document.getElementById('save-button-laboral').style.display = 'none';
+        document.getElementById('cancel-button-laboral').style.display = 'none';
+    });
+
+    function checkEmptyFieldsLaboral() {
+        var fields = document.querySelectorAll('#laboral-info-form input, #laboral-info-form select');
+        var emptyFields = Array.from(fields).filter(function(field) {
+            return field.value.trim() === '' && field.type !== 'hidden';
+        });
+
+        if (emptyFields.length > 0) {
+            showAlert('Falta completar datos laborales', 'Por favor, complete todos los campos.');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        checkEmptyFieldsLaboral();
+    });
+
+    $('#pjax-update-info').on('pjax:end', function() {
+        checkEmptyFieldsLaboral();
+    });
+</script>
+
                             <script>
                                 document.getElementById('edit-button-laboral').addEventListener('click', function() {
                                     var fields = document.querySelectorAll('#laboral-info-form input, #laboral-info-form select, #dias-laborales-checkboxes input');
@@ -983,7 +1030,7 @@ $currentDate = date('Y-m-d');
                             <div class="card">
                                 <div class="card-body">
                                     <div class="card-header bg-success text-dark text-center">
-                                        <h3>SOLICITUDES: </h3>
+                                        <h3>HISTORIAL DE SOLICITUDES DE INCIDENCIAS: </h3>
                                     </div>
 
                                     <li class="dropdown-divider"></li>
@@ -1026,35 +1073,35 @@ $currentDate = date('Y-m-d');
                                                         ],
                                                     ]),
                                                 ],
-                                                [
-                                                    'attribute' => 'status',
-                                                    'format' => 'raw',
-                                                    'label' => 'Estatus',
-                                                    'value' => function ($model) {
-                                                        $status = '';
-                                                        switch ($model->status) {
-                                                            case 'Aprobado':
-                                                                $status = '<span class="badge badge-success">' . $model->status . '</span>';
-                                                                break;
-                                                            case 'En Proceso':
-                                                                $status = '<span class="badge badge-warning">' . $model->status . '</span>';
-                                                                break;
-                                                            case 'Rechazado':
-                                                                $status = '<span class="badge badge-danger">' . $model->status . '</span>';
-                                                                break;
-                                                            default:
-                                                                $status = '<span class="badge badge-secondary">' . $model->status . '</span>';
-                                                                break;
-                                                        }
-                                                        return $status;
-                                                    },
-                                                    'filter' => Html::activeDropDownList($searchModel, 'status', ['Aprobado' => 'Aprobado', 'En Proceso' => 'En Proceso', 'Rechazado' => 'Rechazado'], ['class' => 'form-control', 'prompt' => 'Todos']),
-                                                ],
-                                                [
-                                                    'attribute' => 'comentario',
-                                                    'format' => 'ntext',
-                                                    'filter' => false,
-                                                ],
+                      //                          [
+                        //                            'attribute' => 'status',
+                          //                          'format' => 'raw',
+                            //                        'label' => 'Estatus',
+                              //                      'value' => function ($model) {
+                                //                        $status = '';
+                                  //                      switch ($model->status) {
+                                    //                        case 'Aprobado':
+                                      //                          $status = '<span class="badge badge-success">' . $model->status . '</span>';
+                                        //                        break;
+                                          //                  case 'En Proceso':
+                                            //                    $status = '<span class="badge badge-warning">' . $model->status . '</span>';
+                                              //                  break;
+                                                //            case 'Rechazado':
+                                                  //              $status = '<span class="badge badge-danger">' . $model->status . '</span>';
+                                                    //            break;
+                                                      //      default:
+                                                        //        $status = '<span class="badge badge-secondary">' . $model->status . '</span>';
+                                           //                     break;
+                                             //           }
+                                               //         return $status;
+                                                 //   },
+                                                   // 'filter' => Html::activeDropDownList($searchModel, 'status', ['Aprobado' => 'Aprobado', 'En Proceso' => 'En Proceso', 'Rechazado' => 'Rechazado'], ['class' => 'form-control', 'prompt' => 'Todos']),
+                                           //     ],
+                                           //     [
+                                             //       'attribute' => 'comentario',
+                                               //     'format' => 'ntext',
+                                                 //   'filter' => false,
+                                             //   ],
                                                 [
                                                     'attribute' => 'nombre_formato',
                                                     'label' => 'Tipo de solicitud',

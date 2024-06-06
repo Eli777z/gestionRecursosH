@@ -35,6 +35,8 @@ $this->params['breadcrumbs'][] = $this->title;
                             'nombre_departamento',
                             'cat_direccion_id',
 
+                            'cat_dpto_id',
+
                             ['class' => 'hail812\adminlte3\yii\grid\ActionColumn'],
                         ],
                         'summaryOptions' => ['class' => 'summary mb-2'],

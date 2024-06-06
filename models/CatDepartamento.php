@@ -10,10 +10,13 @@ use Yii;
  * @property int $id
  * @property string $nombre_departamento
  * @property int|null $cat_direccion_id
- *
+ * @property int|null $cat_dpto_id
+
  * @property CatDireccion $catDireccion
  * @property InformacionLaboral[] $informacionLaborals
  * @property JuntaGobierno[] $juntaGobiernos
+  * @property CatDptoCargo $catDpto
+
  */
 class CatDepartamento extends \yii\db\ActiveRecord
 {
@@ -33,11 +36,16 @@ class CatDepartamento extends \yii\db\ActiveRecord
         return [
             [['nombre_departamento'], 'required'],
             [['cat_direccion_id'], 'integer'],
+            [['cat_dpto_id'], 'integer'],
+
             [['nombre_departamento'], 'string', 'max' => 100],
             [['nombre_departamento'], 'unique'],
             [['cat_direccion_id'], 'exist', 'skipOnError' => true, 'targetClass' => CatDireccion::class, 'targetAttribute' => ['cat_direccion_id' => 'id']],
+            [['cat_dpto_id'], 'exist', 'skipOnError' => true, 'targetClass' => CatDptoCargo::class, 'targetAttribute' => ['cat_dpto_id' => 'id']],
+
         ];
     }
+
 
     /**
      * {@inheritdoc}
@@ -61,6 +69,11 @@ class CatDepartamento extends \yii\db\ActiveRecord
         return $this->hasOne(CatDireccion::class, ['id' => 'cat_direccion_id']);
     }
 
+
+    public function getCatDpto()
+    {
+        return $this->hasOne(CatDptoCargo::class, ['id' => 'cat_dpto_id']);
+    }
     /**
      * Gets query for [[InformacionLaborals]].
      *

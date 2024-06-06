@@ -132,7 +132,7 @@ class PermisoSinSueldoController extends Controller
                 $solicitudModel->comentario = '';
                 $solicitudModel->fecha_aprobacion = null;
                 $solicitudModel->fecha_creacion = date('Y-m-d H:i:s');
-                $solicitudModel->nombre_formato = 'PERMISO SIN SUELDO';
+                $solicitudModel->nombre_formato = 'PERMISO SIN GOCE DE SUELDO';
 
                 if ($solicitudModel->save()) {
                     $model->solicitud_id = $solicitudModel->id;

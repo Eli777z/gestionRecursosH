@@ -39,7 +39,10 @@
         "phpoffice/phpspreadsheet": "^2.1",
         "tecnickcom/tcpdf": "^6.7",
         "mpdf/mpdf": "^8.2",
-        "edofre/yii2-fullcalendar": "^1.0"
+        "edofre/yii2-fullcalendar": "^1.0",
+        "floor12/yii2-summernote": "^1.0"
+       
+      
        
         
       

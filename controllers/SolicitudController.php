@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use app\models\CambioDiaLaboral;
+use app\models\CambioHorarioTrabajo;
 use Yii;
 use app\models\Solicitud;
 use app\models\SolicitudSearch;
@@ -20,6 +22,7 @@ use app\models\PeriodoVacacionalHistorial;
 use app\models\PermisoEconomico;
 
 use app\models\PermisoFueraTrabajo;
+use app\models\PermisoSinSueldo;
 
 /**
  * SolicitudController implements the CRUD actions for Solicitud model.
@@ -89,6 +92,15 @@ class SolicitudController extends Controller
                 return ComisionEspecial::findOne(['solicitud_id' => $solicitud->id]);
             case 'PERMISO ECONOMICO':
                 return PermisoEconomico::findOne(['solicitud_id' => $solicitud->id]);
+            case 'CAMBIO DE DÍA LABORAL':
+                return CambioDiaLaboral::findOne(['solicitud_id' => $solicitud->id]);
+            case 'CAMBIO DE HORARIO DE TRABAJO':
+                return CambioHorarioTrabajo::findOne(['solicitud_id' => $solicitud->id]);
+           
+            case 'PERMISO SIN GOCE DE SUELDO':
+                return PermisoSinSueldo::findOne(['solicitud_id' => $solicitud->id]);
+            case 'CAMBIO DE PERIODO VACACIONAL':
+                return CambioPeriodoVacacional::findOne(['solicitud_id' => $solicitud->id]);
             default:
                 return null;
         }

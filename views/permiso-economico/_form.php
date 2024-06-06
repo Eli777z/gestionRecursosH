@@ -8,7 +8,7 @@ use app\models\JuntaGobierno;
 use kartik\select2\Select2;
 use app\models\Empleado;
 use hail812\adminlte\widgets\Alert;
-
+use floor12\summernote\Summernote;
 /* @var $this yii\web\View */
 /* @var $model app\models\PermisoEconomico */
 /* @var $form yii\bootstrap4\ActiveForm */
@@ -49,7 +49,6 @@ use hail812\adminlte\widgets\Alert;
                                             <div class="card-body">
 
 
-
 <div class="form-group">
     <label class="control-label">No Permiso Anterior</label>
     <?php if ($noPermisoAnterior === null): ?>
@@ -67,7 +66,6 @@ use hail812\adminlte\widgets\Alert;
         <p class="form-control-static"><?= $fechaPermisoAnterior ?></p>
     <?php endif; ?>
 </div>
-
 
 
 
@@ -96,7 +94,25 @@ use hail812\adminlte\widgets\Alert;
 
 
 
-    <?= $form->field($motivoFechaPermisoModel, 'motivo')->textarea(['rows' => 4]) ?>
+
+
+<?= $form->field($motivoFechaPermisoModel, 'motivo')->widget(Summernote::class, [
+    'options' => ['rows' => 4],
+    'clientOptions' => [
+        'height' => 120,  // altura del editor
+        'toolbar' => [
+            ['style', ['style']],
+            ['font', ['bold', 'italic', 'underline', 'clear']],
+            ['fontname', ['fontname']],
+            ['color', ['color']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['height', ['height']],
+            ['table', ['table']],
+            ['insert', ['link', 'picture', 'video']],
+            ['view', ['fullscreen', 'codeview', 'help']],
+        ],
+    ],
+]) ?>
 
 
     <?php

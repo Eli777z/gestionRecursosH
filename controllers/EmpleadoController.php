@@ -175,6 +175,11 @@ class EmpleadoController extends Controller
                         if (!is_dir($nombreCarpetaUsuarioProfile)) {
                             mkdir($nombreCarpetaUsuarioProfile, 0775, true);
                         }
+
+                        $nombreIncidenciasCarpeta = $nombreCarpetaTrabajador . '/solicitudes_incidencias_empleado';
+                        if (!is_dir( $nombreIncidenciasCarpeta)) {
+                            mkdir( $nombreIncidenciasCarpeta, 0775, true);
+                        }
                         $upload_filename = $nombreCarpetaUsuarioProfile . '/' . $upload->baseName . '.' . $upload->extension;
                         $upload->saveAs($upload_filename);
                         $model->foto = $upload_filename;
@@ -185,12 +190,15 @@ class EmpleadoController extends Controller
                         $departamento = CatDepartamento::findOne($informacion_laboral->cat_departamento_id);
                         if ($departamento) {
                             $informacion_laboral->cat_direccion_id = $departamento->cat_direccion_id;
+                            $informacion_laboral->cat_dpto_cargo_id = $departamento->cat_dpto_id;
+
                         
                             if (!empty($juntaGobiernoModel->nivel_jerarquico) && $juntaGobiernoModel->nivel_jerarquico !== 'Comun') { // Validación adicional
                                 $juntaGobiernoModel->empleado_id = $model->id;
                                 $juntaGobiernoModel->cat_departamento_id = $informacion_laboral->cat_departamento_id;
                                 $juntaGobiernoModel->cat_direccion_id = $informacion_laboral->cat_direccion_id;
-                        
+                            //    $juntaGobiernoModel->cat_dpto_id = $informacion_laboral->cat_dpto_cargo_id;
+
                                 if (!$juntaGobiernoModel->save()) {
                                     $transaction->rollBack();
                                     throw new \yii\db\Exception('Error al guardar JuntaGobierno: ' . json_encode($juntaGobiernoModel->errors));
