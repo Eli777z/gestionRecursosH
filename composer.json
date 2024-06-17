@@ -40,8 +40,9 @@
         "tecnickcom/tcpdf": "^6.7",
         "mpdf/mpdf": "^8.2",
         "edofre/yii2-fullcalendar": "^1.0",
-        "floor12/yii2-summernote": "^1.0"
-       
+        "bizley/quill": "^3.3",
+        "phpoffice/phpword": "^1.2",
+        "box/spout": "^3.3"
       
        
         

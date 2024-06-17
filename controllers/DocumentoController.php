@@ -185,7 +185,9 @@ class DocumentoController extends Controller
         $model->delete();
     
         
-        return $this->redirect(['empleado/view', 'id' => $empleado_id]);
+        Yii::$app->session->setFlash('success', 'El documento se ha eliminado exitosamente.');
+                $url = Url::to(['empleado/view', 'id' => $empleado->id]) . '#expediente';
+                return $this->redirect($url);
     }
 
     /**

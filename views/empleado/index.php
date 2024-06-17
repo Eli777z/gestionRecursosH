@@ -319,28 +319,43 @@ $this->params['breadcrumbs'][] = $this->title;
                                         'columns' => [
                                             ['class' => 'yii\grid\SerialColumn'],
                                            // 'id',
+                                           [
+                                            'attribute' => 'foto',
+                                            'format' => 'html',
+                                            'filter' => false,
+                                            'value' => function ($juntaGobiernoModel) {
+                                                if ($juntaGobiernoModel->empleado->foto) {
+                                                    $urlImagen = Yii::$app->urlManager->createUrl(['empleado/foto-empleado', 'id' => $juntaGobiernoModel->empleado->id]);
+                                                    return Html::img($urlImagen, ['width' => '80px', 'height' => '80px']);
+                                                }
+                                                return null;
+                                            },
+                                        ],
+                                        [
+                                            'label' => 'Empleado',
+                                            'attribute' => 'empleado_id',
+                                            'value' => function ($juntaGobiernoModel) {
+                                                return $juntaGobiernoModel->empleado->nombre . ' ' . $juntaGobiernoModel->empleado->apellido; 
+
+                                            },
+                                        ],
                                             [
+                                                'label' => 'Dirección',
                                                 'attribute' => 'cat_direccion_id',
                                                 'value' => function ($juntaGobiernoModel) {
                                                     return $juntaGobiernoModel->catDireccion->nombre_direccion; 
                                                 },
                                             ],
                                           
-                                            [
-                                                'attribute' => 'empleado_id',
-                                                'value' => function ($juntaGobiernoModel) {
-                                                    return $juntaGobiernoModel->empleado->nombre . ' ' . $juntaGobiernoModel->empleado->apellido; 
-
-                                                },
-                                            ],
+                                            
                                             'nivel_jerarquico',
-                                            [
-                                                'attribute' => 'profesion',
-                                                'value' => function ($juntaGobiernoModel) {
-                                                    return $juntaGobiernoModel->empleado->profesion; 
+                                            //[
+                                              //  'attribute' => 'profesion',
+                                                //'value' => function ($juntaGobiernoModel) {
+                                                  //  return $juntaGobiernoModel->empleado->profesion; 
 
-                                                },
-                                            ],
+                                     //           },
+                                       //     ],
                                             [
                                                 'class' => 'hail812\adminlte3\yii\grid\ActionColumn',
                                                 'template' => '{view} {delete}',

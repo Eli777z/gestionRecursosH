@@ -1,17 +1,22 @@
 <?php
 
 use app\models\CatDepartamento;
+use marqu3s\summernote\Summernote;
 
+use bizley\quill\Quill;
 use app\models\CatDireccion;
 use app\models\CatDptoCargo;
+use app\models\CatNivelEstudio;
 use app\models\CatPuesto;
 use app\models\CatTipoContrato;
 use hail812\adminlte3\yii\grid\ActionColumn;
 use yii\bootstrap5\Alert;
 use yii\helpers\Html;
+use yii\redactor\widgets\Redactor;
+
 //use yii\widgets\DetailView;
 use kartik\file\FileInput;
-
+use dosamigos\ckeditor\CKEditor;
 use yii\helpers\Url;
 use yii\bootstrap5\Tabs;
 use yii\grid\GridView;
@@ -176,6 +181,9 @@ $currentDate = date('Y-m-d');
     'id' => 'pjax-update-info',
     'options' => ['pushState' => false],
 ]); ?>
+<div class="row">
+
+    <div class="col-md-6">
 
 <div class="card">
     <?php $form = ActiveForm::begin([
@@ -206,24 +214,7 @@ $currentDate = date('Y-m-d');
                 'yearRange' => '-100:+0',
             ],
         ]); ?>
-        <?= $form->field($model, 'profesion')->widget(Select2::className(), [
-            'data' => [
-                'No tiene' => 'No tiene',
-                'ING.' => 'ING.',
-                'LIC.' => 'LIC.',
-                'PROF.' => 'PROF.',
-                'ARQ.' => 'ARQ.',
-                'C.' => 'C.',
-                'DR.' => 'DR.',
-                'DRA.' => 'DRA.',
-                'TEC.' => 'TEC.',
-            ],
-            'options' => ['prompt' => 'Seleccionar Profesión', 'disabled' => true],
-            'pluginOptions' => [
-                'allowClear' => true
-            ],
-            'theme' => Select2::THEME_BOOTSTRAP,
-        ]); ?>
+       
         <?= $form->field($model, 'edad')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
         <?= $form->field($model, 'sexo')->widget(Select2::className(), [
             'data' => [
@@ -262,6 +253,8 @@ $currentDate = date('Y-m-d');
         <?= $form->field($model, 'rfc')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
     </div>
     <?php ActiveForm::end(); ?>
+</div>
+
 </div>
 
 <script>
@@ -307,6 +300,106 @@ $currentDate = date('Y-m-d');
         checkEmptyFieldsPersonal();
     });
 </script>
+
+
+
+
+    <div class="col-md-6">
+
+<div class="card">
+    <?php $form = ActiveForm::begin([
+      'action' => ['actualizar-informacion', 'id' => $model->id],
+        'options' => ['id' => 'educational-info-form']
+    ]); ?>
+    <div class="card-header gradient-verde  text-white">
+        <h3>Información Educacional</h3>
+        <button type="button" id="edit-button-educational" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
+        <button type="button" id="cancel-button-educational" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
+        <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right mr-3', 'id' => 'save-button-educational', 'style' => 'display:none;']) ?>
+    </div>
+    <div class="card-body">
+        <?= $form->field($model, 'cat_nivel_estudio_id')->widget(Select2::classname(), [
+            'data' => ArrayHelper::map(CatNivelEstudio::find()->all(), 'id', 'nivel_estudio'),
+            'options' => ['placeholder' => 'Seleccionar Nivel de Estudio', 'disabled' => true],
+            'pluginOptions' => [
+                'allowClear' => true
+            ],
+            'theme' => Select2::THEME_BOOTSTRAP,
+            'pluginEvents' => [
+                'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
+                'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
+            ],
+        ])->label('Nivel de estudios') ?>
+        <?= $form->field($model, 'institucion_educativa')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
+        <?= $form->field($model, 'profesion')->widget(Select2::className(), [
+            'data' => [
+                'No tiene' => 'No tiene',
+                'ING.' => 'ING.',
+                'LIC.' => 'LIC.',
+                'PROF.' => 'PROF.',
+                'ARQ.' => 'ARQ.',
+                'C.' => 'C.',
+                'DR.' => 'DR.',
+                'DRA.' => 'DRA.',
+                'TEC.' => 'TEC.',
+            ],
+            'options' => ['prompt' => 'Seleccionar Profesión', 'disabled' => true],
+            'pluginOptions' => [
+                'allowClear' => true
+            ],
+            'theme' => Select2::THEME_BOOTSTRAP,
+        ]); ?>
+    </div>
+    <?php ActiveForm::end(); ?>
+</div>
+</div>
+
+</div>
+
+<script>
+    document.getElementById('edit-button-educational').addEventListener('click', function() {
+        var fields = document.querySelectorAll('#educational-info-form .form-control');
+        fields.forEach(function(field) {
+            field.readOnly = false;
+            field.disabled = false;
+        });
+        document.getElementById('edit-button-educational').style.display = 'none';
+        document.getElementById('save-button-educational').style.display = 'block';
+        document.getElementById('cancel-button-educational').style.display = 'block';
+    });
+
+    document.getElementById('cancel-button-educational').addEventListener('click', function() {
+        var fields = document.querySelectorAll('#educational-info-form .form-control');
+        fields.forEach(function(field) {
+            field.readOnly = true;
+            field.disabled = true;
+            field.value = field.defaultValue;
+        });
+        document.getElementById('edit-button-educational').style.display = 'block';
+        document.getElementById('save-button-educational').style.display = 'none';
+        document.getElementById('cancel-button-educational').style.display = 'none';
+    });
+
+    function checkEmptyFieldsPersonal() {
+        var fields = document.querySelectorAll('#educational-info-form .form-control');
+        var emptyFields = Array.from(fields).filter(function(field) {
+            return field.value.trim() === '';
+        });
+
+        if (emptyFields.length > 0) {
+            showAlert('Falta completar datos del empleado', 'Por favor, complete todos los campos.');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        checkEmptyFieldsPersonal();
+    });
+
+    $('#pjax-update-info').on('pjax:end', function() {
+        checkEmptyFieldsPersonal();
+    });
+</script>
+
 
 <?php Pjax::end(); ?>
 <?php $this->endBlock(); ?>
@@ -405,7 +498,7 @@ $currentDate = date('Y-m-d');
                 'action' => ['actualizar-informacion-contacto', 'id' => $model->id],
                 'options' => ['id' => 'emergency-contact-form']
             ]); ?>
-            <div class="card-header bg-success text-white">
+            <div class="card-header gradient-verde text-white">
                 <h3>Información de contacto de emergencia</h3>
                 <button type="button" id="edit-button-emergency" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
                 <button type="button" id="cancel-button-emergency" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
@@ -573,7 +666,7 @@ $currentDate = date('Y-m-d');
                                         'pluginEvents' => [
                                             'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
                                         ],
-                                    ]) ?>
+                                    ])->label('Tipo de contrato') ?>
                                     <?= $form->field($model->informacionLaboral, 'fecha_ingreso')->input('date', ['disabled' => true]) ?>
 
                                     <?= $form->field($model->informacionLaboral, 'cat_departamento_id')->widget(Select2::classname(), [
@@ -589,7 +682,7 @@ $currentDate = date('Y-m-d');
                                         'pluginEvents' => [
                                             'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
                                         ],
-                                    ]) ?>
+                                    ])->label('Departamento')  ?>
 
                                     <?= $form->field($model->informacionLaboral, 'cat_dpto_cargo_id')->widget(Select2::classname(), [
                                         'data' => ArrayHelper::map(CatDptoCargo::find()->all(), 'id', 'nombre_dpto'),
@@ -604,10 +697,10 @@ $currentDate = date('Y-m-d');
                                         'pluginEvents' => [
                                             'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
                                         ],
-                                    ]) ?>
-                                    <?= $form->field($model->informacionLaboral, 'horario_laboral_inicio')->input('time', ['disabled' => true]) ?>
+                                    ])->label('Cargo')  ?>
+                                    <?= $form->field($model->informacionLaboral, 'horario_laboral_inicio')->input('time', ['disabled' => true]) ->label('Hora de entrada')  ?>
 
-                                    <?= $form->field($model->informacionLaboral, 'horario_laboral_fin')->input('time', ['disabled' => true]) ?>
+                                    <?= $form->field($model->informacionLaboral, 'horario_laboral_fin')->input('time', ['disabled' => true]) ->label('Hora de salida') ?>
                                     <?= $form->field($model->informacionLaboral, 'numero_cuenta')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
                                     <?= $form->field($model->informacionLaboral, 'salario')->textInput([
                                         'type' => 'number',
@@ -631,7 +724,7 @@ $currentDate = date('Y-m-d');
                                         'pluginEvents' => [
                                             'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
                                         ],
-                                    ]) ?>
+                                    ])->label('Nombramiento')  ?>
 
 
 
@@ -648,7 +741,7 @@ $currentDate = date('Y-m-d');
                                         'pluginEvents' => [
                                             'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
                                         ],
-                                    ]) ?>
+                                    ]) ->label('Dirección') ?>
 
                                     <?= $form->field($model->informacionLaboral, 'junta_gobierno_id')->widget(Select2::classname(), [
                                         'data' => $jefesDirectores,
@@ -663,7 +756,7 @@ $currentDate = date('Y-m-d');
                                         'pluginEvents' => [
                                             'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
                                         ],
-                                    ]) ?>
+                                    ]) ->label('Jefe inmediato') ?>
 
                                     <div class="form-group">
                                         <label class="control-label">Director de dirección</label>
@@ -1145,13 +1238,13 @@ $currentDate = date('Y-m-d');
                                         ]);
                                         Pjax::end();
 
-                                        $script = <<< JS
-                setInterval(function(){
-                    $.pjax.reload({container:'#pjax-container'});
-                }, 60000);
-            JS;
+                                      //  $script = <<< JS
+              //  setInterval(function(){
+                //    $.pjax.reload({container:'#pjax-container'});
+               // }, 60000);
+            //JS;
 
-                                        $this->registerJs($script);
+                                       // $this->registerJs($script);
                                         ?>
 
 
@@ -1226,164 +1319,202 @@ $currentDate = date('Y-m-d');
 
 
                             <?php $this->beginBlock('expediente'); ?>
-                            <div class="card">
+                            <div class="row">
+    <div class="col-md-6">
+        <div class="card">
+    <div class="card-header bg-info text-white">
+        <h3>Expediente del empleado</h3>
+    </div>
+    <div class="card-body">
 
-                                <div class="card-header bg-info text-white">
-                                    <h3>Expediente del empleado</h3>
+            <?php $form = ActiveForm::begin([
+                'action' => ['documento/create', 'empleado_id' => $model->id],
+                'options' => ['enctype' => 'multipart/form-data', 'class' => 'narrow-form']
+            ]); ?>
 
-                                </div>
-                                <div class="card-body">
-                                <div class="documento-form">
-    <?php $form = ActiveForm::begin(['action' => ['documento/create', 'empleado_id' => $model->id], 'options' => ['enctype' => 'multipart/form-data', 'class' => 'narrow-form']]); ?>
+            <div class="form-group">
+                <?= $form->field($documentoModel, 'cat_tipo_documento_id')->widget(Select2::classname(), [
+                    'data' => ArrayHelper::map(CatTipoDocumento::find()->all(), 'id', 'nombre_tipo'),
+                    'language' => 'es',
+                    'options' => ['placeholder' => 'Seleccione el tipo de documento', 'id' => 'tipo-documento'],
+                    'pluginOptions' => [
+                        'allowClear' => true
+                    ],
+                    'theme' => Select2::THEME_BOOTSTRAP,
+                    'pluginEvents' => [
+                        'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
+                        'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '0px'); }",
+                    ],
+                ])->label('Tipo de Documento') ?>
+            </div>
 
-    <?= $form->field($documentoModel, 'cat_tipo_documento_id')->widget(Select2::classname(), [
-        'data' => ArrayHelper::map(CatTipoDocumento::find()->all(), 'id', 'nombre_tipo'),
-        'language' => 'es',
-        'options' => ['placeholder' => 'Seleccione el tipo de documento', 'id' => 'tipo-documento'],
-        'pluginOptions' => [
-            'allowClear' => true
-        ],
-        'theme' => Select2::THEME_BOOTSTRAP,
-        'pluginEvents' => [
-            'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
-            'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '0px'); }",
-        ],
-    ])->label('Tipo de Documento') ?>
+            <div class="form-group">
+                <?= $form->field($documentoModel, 'nombre')->textInput([
+                    'maxlength' => true,
+                    'id' => 'nombre-archivo',
+                    'style' => 'display:none',
+                    'placeholder' => 'Ingrese el nombre del documento'
+                ])->label(false) ?>
+            </div>
 
-    <?= $form->field($documentoModel, 'nombre')->textInput([
-        'maxlength' => true,
-        'id' => 'nombre-archivo',
-        'style' => 'display:none',
-        'placeholder' => 'Ingrese el nombre del documento'
-    ])->label(false) ?>
+            <div class="form-group">
+            <?php
 
-    <?= $form->field($documentoModel, 'observacion')->textarea([
-        'rows' => 4,
-        'placeholder' => 'Ingrese sus observaciones aquí'
-    ])->label('Observaciones') ?>
 
-    <?= $form->field($documentoModel, 'ruta')->widget(FileInput::classname(), [
-        'options' => ['accept' => 'file/*'],
-        'pluginEvents' => [
-            'fileclear' => "function() {
-                $('#nombre-archivo').val('');
-                $('#tipo-archivo').val('');
-            }",
-        ],
-        'pluginOptions' => [
-            'showUpload' => false,
-            'showCancel' => false,
-        ],
-    ])->label('Archivo') ?>
 
-    <div class="form-group">
-        <?= Html::submitButton('Subir archivo <i class="fa fa-upload"></i>', ['class' => 'btn btn-warning float-right', 'id' => 'save-button-personal']) ?>
+/*echo $form->field($documentoModel, 'observacion')->widget(Quill::className(), [
+    'theme' => 'snow', // 'snow' or 'bubble'
+    'toolbarOptions' => [
+        ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+        ['blockquote', 'code-block'],
+        [['header' => 1], ['header' => 2]],               // custom button values
+        [['list' => 'ordered'], ['list' => 'bullet']],
+        [['script' => 'sub'], ['script' => 'super']],      // superscript/subscript
+        [['indent' => '-1'], ['indent' => '+1']],          // outdent/indent
+        [['direction' => 'rtl']],                         // text direction
+        [['size' => ['small', false, 'large', 'huge']]],  // custom dropdown
+        [['header' => [1, 2, 3, 4, 5, 6, false]]],
+        [['color' => []], ['background' => []]],          // dropdown with defaults from theme
+        [['font' => []]],
+        [['align' => []]],
+        ['clean']                                         // remove formatting button
+    ],
+])->label('Observaciones');
+*/?>
+
+<?= $form->field($documentoModel, 'observacion')->textarea() ?>
+
+
+
+
+
+
+            </div>
+
+            <div class="form-group">
+                <?= $form->field($documentoModel, 'ruta')->widget(FileInput::classname(), [
+                    'options' => ['accept' => 'file/*'],
+                    'pluginEvents' => [
+                        'fileclear' => "function() {
+                            $('#nombre-archivo').val('');
+                            $('#tipo-archivo').val('');
+                        }",
+                    ],
+                    'pluginOptions' => [
+                        'showUpload' => false,
+                        'showCancel' => false,
+                    ],
+                ])->label('Archivo') ?>
+            </div>
+
+            <div class="form-group">
+                <?= Html::submitButton('Subir archivo <i class="fa fa-upload"></i>', ['class' => 'btn btn-warning float-right', 'id' => 'save-button-personal']) ?>
+            </div>
+    </div>
+            <?php ActiveForm::end(); ?>
     </div>
 
-    <?php ActiveForm::end(); ?>
+    </div>  <?php
+        $this->registerJs("
+            $('#tipo-documento').change(function(){
+                var tipoDocumentoId = $(this).val();
+                var nombreArchivoInput = $('#nombre-archivo');
+
+                // Obtener el nombre del tipo de documento seleccionado
+                var tipoDocumentoNombre = $('#tipo-documento option:selected').text();
+
+                // Verificar si se seleccionó 'OTRO'
+                if (tipoDocumentoNombre == 'OTRO') {
+                    // Mostrar el campo de nombre y limpiar su valor
+                    nombreArchivoInput.show().val('').focus();
+                } else {
+                    // Ocultar el campo de nombre y asignar el nombre del tipo de documento seleccionado
+                    nombreArchivoInput.hide().val('');
+                }
+            });
+        ");
+        ?>
+
+        <br>
+        <div class="col-md-6">
+        <div class="card">
+       
+    <div class="card-body">
+        <?php
+        $searchModel = new DocumentoSearch();
+        $params = Yii::$app->request->queryParams;
+        $params[$searchModel->formName()]['empleado_id'] = $model->id;
+        $dataProvider = $searchModel->search($params);
+        ?>
+
+            <?php Pjax::begin(); ?>
+            <br>
+            <br>
+            <li class="dropdown-divider"></li>
+
+            <?= GridView::widget([
+                'dataProvider' => $dataProvider,
+                'filterModel' => $searchModel,
+                'columns' => [
+                    ['class' => 'yii\grid\SerialColumn'],
+                    [
+                        'attribute' => 'nombre',
+                        'value' => 'nombre',
+                        'options' => ['style' => 'width: 30%;'],
+                    ],
+                    [
+                        'attribute' => 'fecha_subida',
+                        'filter' => false,
+                        'options' => ['style' => 'width: 30%;'],
+                    ],
+                    [
+                        'attribute' => 'observacion',
+                        'filter' => false,
+                        'options' => ['style' => 'width: 30%;'],
+                    ],
+                    [
+                        'class' => 'hail812\adminlte3\yii\grid\ActionColumn',
+                        'template' => '{view} {delete} {download}',
+                        'buttons' => [
+                            'view' => function ($url, $model) {
+                                return Html::a('<i class="far fa-eye"></i>', ['documento/open', 'id' => $model->id], [
+                                    'target' => '_blank',
+                                    'title' => 'Ver archivo',
+                                    'class' => 'btn btn-info btn-xs',
+                                    'data-pjax' => "0"
+                                ]);
+                            },
+                            'delete' => function ($url, $model) {
+                                return Html::a('<i class="fas fa-trash"></i>', ['documento/delete', 'id' => $model->id, 'empleado_id' => $model->empleado_id], [
+                                    'title' => Yii::t('yii', 'Eliminar'),
+                                    'data-confirm' => Yii::t('yii', '¿Estás seguro de que deseas eliminar este elemento?'),
+                                    'data-method' => 'post',
+                                    'class' => 'btn btn-danger btn-xs',
+                                ]);
+                            },
+                            'download' => function ($url, $model) {
+                                return Html::a('<i class="fas fa-download"></i>', ['documento/download', 'id' => $model->id], [
+                                    'title' => 'Descargar archivo',
+                                    'class' => 'btn btn-success btn-xs',
+                                    'data-pjax' => "0"
+                                ]);
+                            },
+                        ],
+                        // 'options' => ['style' => 'width: 15%;'], //ancho de la columna
+                    ],
+                ],
+                'summaryOptions' => ['class' => 'summary mb-2'],
+                'pager' => [
+                    'class' => 'yii\bootstrap4\LinkPager',
+                ],
+            ]); ?>
+
+            <?php Pjax::end(); ?>
+        </div>
+    </div>
 </div>
-
-<?php
-$this->registerJs("
-    $('#tipo-documento').change(function(){
-        var tipoDocumentoId = $(this).val();
-        var nombreArchivoInput = $('#nombre-archivo');
-
-        // Obtener el nombre del tipo de documento seleccionado
-        var tipoDocumentoNombre = $('#tipo-documento option:selected').text();
-
-        // Verificar si se seleccionó 'OTRO'
-        if (tipoDocumentoNombre == 'OTRO') {
-            // Mostrar el campo de nombre y limpiar su valor
-            nombreArchivoInput.show().val('').focus();
-        } else {
-            // Ocultar el campo de nombre y asignar el nombre del tipo de documento seleccionado
-            nombreArchivoInput.hide().val('');
-        }
-    });
-");
-?>
-                 <br>
-
-
-                                    <?php
-                                    $searchModel = new DocumentoSearch();
-                                    $params = Yii::$app->request->queryParams;
-                                    $params[$searchModel->formName()]['empleado_id'] = $model->id;
-                                    $dataProvider = $searchModel->search($params);
-                                    ?>
-
-                                    <?php Pjax::begin(); ?>
-                                    <br>
-                                    <br>
-                                    <li class="dropdown-divider"></li>
-
-
-
-                                    <?= GridView::widget([
-                                        'dataProvider' => $dataProvider,
-                                        'filterModel' => $searchModel,
-
-                                        'columns' => [
-                                            ['class' => 'yii\grid\SerialColumn'],
-                                            [
-                                                'attribute' => 'nombre',
-                                                'value' => 'nombre',
-                                                'options' => ['style' => 'width: 30%;'],
-                                            ],
-                                            [
-                                                'attribute' => 'fecha_subida',
-                                                'filter' => false,
-                                                'options' => ['style' => 'width: 30%;'],
-                                            ],
-                                            [
-                                                'attribute' => 'observacion',
-                                                'filter' => false,
-                                                'options' => ['style' => 'width: 30%;'],
-                                            ],
-                                            [
-                                                'class' => 'hail812\adminlte3\yii\grid\ActionColumn',
-                                                'template' => '{view} {delete} {download}',
-                                                'buttons' => [
-                                                    'view' => function ($url, $model) {
-                                                        return Html::a('<i class="far fa-eye"></i>', ['documento/open', 'id' => $model->id], [
-                                                            'target' => '_blank',
-                                                            'title' => 'Ver archivo',
-                                                            'class' => 'btn btn-info btn-xs',
-                                                            'data-pjax' => "0"
-                                                        ]);
-                                                    },
-                                                    'delete' => function ($url, $model) {
-                                                        return Html::a('<i class="fas fa-trash"></i>', ['documento/delete', 'id' => $model->id, 'empleado_id' => $model->empleado_id], [
-                                                            'title' => Yii::t('yii', 'Eliminar'),
-                                                            'data-confirm' => Yii::t('yii', '¿Estás seguro de que deseas eliminar este elemento?'),
-                                                            'data-method' => 'post',
-                                                            'class' => 'btn btn-danger btn-xs',
-                                                        ]);
-                                                    },
-                                                    'download' => function ($url, $model) {
-                                                        return Html::a('<i class="fas fa-download"></i>', ['documento/download', 'id' => $model->id], [
-                                                            'title' => 'Descargar archivo',
-                                                            'class' => 'btn btn-success btn-xs',
-                                                            'data-pjax' => "0"
-                                                        ]);
-                                                    },
-                                                ],
-                                                // 'options' => ['style' => 'width: 15%;'], //ancho de la columna
-                                            ],
-                                        ],
-                                        'summaryOptions' => ['class' => 'summary mb-2'],
-                                        'pager' => [
-                                            'class' => 'yii\bootstrap4\LinkPager',
-                                        ],
-                                    ]); ?>
-
-                                </div>
-
-
                             </div>
 
-                            <?php Pjax::end(); ?>
                             <?php $this->endBlock(); ?>
 
 

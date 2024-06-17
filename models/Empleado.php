@@ -11,6 +11,8 @@ use Yii;
  * @property int $numero_empleado
  * @property int $usuario_id
  * @property int $informacion_laboral_id
+  * @property int|null $cat_nivel_estudio_id
+
  * @property int|null $cat_nivel_estudio_id
  * @property int|null $parametro_formato_id
  * @property string $nombre
@@ -31,7 +33,8 @@ use Yii;
  * @property string|null $telefono_contacto_emergencia
  * @property string|null $institucion_educativa
  * @property string|null $titulo_grado
- *
+  * @property CatNivelEstudio $catNivelEstudio
+
  * @property Documento[] $documentos
  * @property InformacionLaboral $informacionLaboral
  * @property Usuario $usuario
@@ -70,6 +73,7 @@ class Empleado extends \yii\db\ActiveRecord
             [['rfc'], 'string', 'max' => 13],
             [['nss'], 'string', 'max' => 13],
             [['municipio', 'estado'], 'string', 'max' => 45],
+            [['cat_nivel_estudio_id'], 'exist', 'skipOnError' => true, 'targetClass' => CatNivelEstudio::class, 'targetAttribute' => ['cat_nivel_estudio_id' => 'id']],
 
 
 
@@ -153,6 +157,11 @@ class Empleado extends \yii\db\ActiveRecord
     public function getUsuario()
     {
         return $this->hasOne(Usuario::class, ['id' => 'usuario_id']);
+    }
+
+    public function getCatNivelEstudio()
+    {
+        return $this->hasOne(CatNivelEstudio::class, ['id' => 'cat_nivel_estudio_id']);
     }
 
 

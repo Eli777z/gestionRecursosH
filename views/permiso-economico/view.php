@@ -28,9 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'method' => 'post',
                             ],
                         ]) ?>
-
 <?php
-
 
 $usuarioId = Yii::$app->user->identity->id;
 $empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();
@@ -40,18 +38,27 @@ if ($empleado) {
     $juntaGobierno = JuntaGobierno::find()->where(['empleado_id' => $empleado->id])->one();
 
     if ($juntaGobierno && ($juntaGobierno->nivel_jerarquico === 'Jefe de unidad' || $juntaGobierno->nivel_jerarquico === 'Director')) {
-        echo Html::a('Exportar Excel', ['export-segundo-caso', 'id' => $model->id], ['class' => 'btn btn-success']);
+        echo Html::a('Exportar y Imprimir PDF', ['export', 'id' => $model->id], [
+            'class' => 'btn btn-success',
+            'id' => 'export-button',
+            'target' => '_blank'
+        ]);
     } else {
-        echo Html::a('Exportar Excel', ['export', 'id' => $model->id], ['class' => 'btn btn-primary']);
+        echo Html::a('Exportar y Imprimir PDF', ['export', 'id' => $model->id], [
+            'class' => 'btn btn-primary',
+            'id' => 'export-button',
+            'target' => '_blank'
+        ]);
     }
-
-    // Botón para imprimir
-    echo Html::a('Imprimir PDF', ['imprimir', 'id' => $model->id], ['class' => 'btn btn-info', 'target' => '_blank']);
 } else {
     Yii::$app->session->setFlash('error', 'No se pudo encontrar el empleado asociado al usuario actual.');
     return $this->redirect(['index']);
 }
 ?>
+
+
+
+
                     </p>
 
                     <?php 

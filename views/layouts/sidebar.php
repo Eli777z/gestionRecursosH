@@ -11,28 +11,40 @@ use yii\helpers\Html;
 
     <!-- Sidebar -->
     <div class="sidebar">
-        <!-- Sidebar user panel (optional) -->
-        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-            <div class="image">
-                <img src="<?= $assetDir ?>/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
-            </div>
-            <div class="info">
-                <?=
+    <!-- Sidebar user panel (optional) -->
+    <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+        <div class="image">
+            <?php
+            $usuario = Yii::$app->user->identity;
+            $empleado = $usuario->empleado; // Utilizando la relación definida en el modelo Usuario
+
+            if ($empleado && $empleado->foto) {
+                $fotoPath = $empleado->nombre . '_' . $empleado->apellido . '/foto_empleado/' . basename($empleado->foto);
+                $fotoUrl = Yii::$app->urlManager->createUrl(['site/get-empleado-foto', 'filename' => $fotoPath]);
+            } else {
+                $fotoUrl = Yii::getAlias('@web') . '/path/to/default-image.jpg'; // Ruta a una imagen por defecto
+            }
+            ?>
+            <img src="<?= $fotoUrl ?>" class="img-circle elevation-2" alt="User Image">
+        </div>
+        <div class="info">
+            <?=
                 Yii::$app->user->isGuest ?
                     Html::a(
                         'Log in',
                         ['/site/login'],
-                        ['class' => 'd-block']
+                        ['class'=>'d-block']
                     ) :
                     Html::a(
-                        'Log out (' . Yii::$app->user->identity->username . ')',
+                        'Cerrar sesión ('.Yii::$app->user->identity->username.')',
                         ['/site/logout'],
-                        ['class' => 'd-block', 'data-method' => 'post']
+                        ['class'=>'d-block','data-method'=>'post']
                     );
-                ?>
-
-            </div>
+            ?>
         </div>
+    </div>
+
+
         <nav class="mt-2">
             <?php
             echo \hail812\adminlte\widgets\Menu::widget([

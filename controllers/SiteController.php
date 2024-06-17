@@ -239,9 +239,15 @@ class SiteController extends Controller
     }
 
 
-   
-    
-
+    public function actionGetEmpleadoFoto($filename)
+    {
+        $filePath = Yii::getAlias('@runtime') . '/empleados/' . $filename;
+        if (file_exists($filePath)) {
+            return Yii::$app->response->sendFile($filePath);
+        } else {
+            throw new \yii\web\NotFoundHttpException("File not found");
+        }
+    }
     public function actionPortalempleado() {
         $usuarioId = Yii::$app->user->identity->id; 
         $empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();

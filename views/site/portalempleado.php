@@ -125,7 +125,7 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
 
     <div class="col-md-6">
         <div class="card">
-            <div class="card-header bg-secondary text-white">
+            <div class="card-header gradient-verde text-white">
                 <h3>Información de contacto de emergencia</h3>
             </div>
             <div class="card-body">
@@ -228,20 +228,19 @@ $this->beginBlock('informacion_laboral'); ?>
                         return $model->catDireccion->nombre_direccion; 
                     },
                 ],
-            //    [
-              //      'label' => 'Jefe',
-//
-  //                  'attribute' => 'junta_gobierno_id',
-    //               'value' => function($model) use ($jefesDirectores) {
-     //                   return $jefesDirectores[$model->junta_gobierno_id]; 
-       //           },
-        //        ],
-                //[
-          //   //       'label' => 'Director de dirección',
-            ///        'value' => function($model) use ($juntaDirectorDireccion) {
-                      //  return $juntaDirectorDireccion ? $juntaDirectorDireccion->profesion . ' ' . $juntaDirectorDireccion->empleado->nombre . ' ' . $juntaDirectorDireccion->empleado->apellido : 'No Asignado';
-                   /// },
-               // ],
+               [
+                    'label' => 'Jefe',
+                 'attribute' => 'junta_gobierno_id',
+                  'value' => function($model) use ($jefesDirectores) {
+                       return $jefesDirectores[$model->junta_gobierno_id]; 
+                  },
+            ],
+                [
+                 'label' => 'Director de dirección',
+                    'value' => function($model) use ($juntaDirectorDireccion) {
+                       return $juntaDirectorDireccion ? $juntaDirectorDireccion->empleado->profesion . ' ' . $juntaDirectorDireccion->empleado->nombre . ' ' . $juntaDirectorDireccion->empleado->apellido : 'No Asignado';
+                    },
+               ],
             ],
         ]) ?>
     </div>
@@ -321,7 +320,7 @@ $this->beginBlock('informacion_laboral'); ?>
 
     <div class="col-md-6">
         <div class="card">
-            <div class="card-header bg-secondary text-white">
+            <div class="card-header gradient-verde text-white">
                 <h3>Segundo periodo vacacional</h3>
             </div>
             <div class="card-body">
@@ -406,10 +405,10 @@ echo TabsX::widget([
             'label' => 'Información de Contacto',
             'content' => $this->blocks['informacion_contacto'],
         ],
-        //[
-          //  'label' => 'Información Laboral',
-            //'content' => $this->blocks['informacion_laboral'],
-        //],
+        [
+            'label' => 'Información Laboral',
+            'content' => $this->blocks['informacion_laboral'],
+        ],
         [
             'label' => 'Vacaciones',
             'content' => $this->blocks['informacion_vacaciones'],

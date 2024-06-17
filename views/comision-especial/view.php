@@ -44,15 +44,13 @@ if ($empleado) {
     // Buscar el registro en junta_gobierno que corresponde al empleado
     $juntaGobierno = JuntaGobierno::find()->where(['empleado_id' => $empleado->id])->one();
 
-    if ($model->solicitud->status === 'Aprobado') {
+  
         if ($juntaGobierno && ($juntaGobierno->nivel_jerarquico === 'Jefe de unidad' || $juntaGobierno->nivel_jerarquico === 'Director')){
             echo Html::a('Exportar Excel', ['export-segundo-caso', 'id' => $model->id], ['class' => 'btn btn-success']);
-            echo Html::a('Exportar PDF', ['export-pdf', 'id' => $model->id], ['class' => 'btn btn-danger']);
         } else {
             echo Html::a('Exportar Excel', ['export', 'id' => $model->id], ['class' => 'btn btn-primary']);
-            echo Html::a('Exportar PDF', ['export-pdf', 'id' => $model->id], ['class' => 'btn btn-danger']);
         }
-    }
+    
 } else {
     Yii::$app->session->setFlash('error', 'No se pudo encontrar el empleado asociado al usuario actual.');
     return $this->redirect(['index']);

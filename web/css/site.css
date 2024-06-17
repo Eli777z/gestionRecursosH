@@ -194,3 +194,12 @@ a.desc:after {
     background: radial-gradient(circle, rgba(63,203,251,1) 0%, rgba(70,113,252,1) 100%);
 
 }
+
+
+
+
+.gradient-verde {
+    background: rgb(76,172,68);
+    background: linear-gradient(90deg, rgba(76,172,68,1) 0%, rgba(10,203,60,1) 50%, rgba(44,234,14,1) 100%);
+
+}
