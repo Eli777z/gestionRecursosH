@@ -103,12 +103,12 @@ a.desc:after {
 }
 /* Agregar borde a las pestañas */
 .nav-tabs .nav-item .nav-link {
-    border-bottom: 8px solid #ced4da; /* Color del borde */
+    border-bottom: 1px solid #ced4da; /* Color del borde */
     color:#007bff;
 
-    border-top: none;
-    border-left: none;
-    border-right: none;
+ /*   border-top: none;
+ border-left: none;
+    border-right: none;*/
     /*border-bottom-left-radius: 0.25rem; /* Redondear la esquina superior izquierda */
  /*  border-bottom-right-radius: 0.25rem; /* Redondear la esquina superior derecha */
    
@@ -116,8 +116,9 @@ a.desc:after {
 
 /* Estilo del borde de la pestaña activa */
 .nav-tabs .nav-item .nav-link.active {
-    border-bottom-color:#007bff; /* Ocultar el borde inferior */
+    border-color:#007bff; /* Ocultar el borde inferior */
 }
+
 
     .narrow-form {
         max-width: 800px; /* Ajusta este valor según lo estrecho que quieras que sea el formulario */

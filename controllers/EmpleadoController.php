@@ -25,6 +25,7 @@ use app\models\SegundoPeriodoVacacional;
 use yii\helpers\Url;
 use app\models\CatTipoContrato;
 use app\models\PeriodoVacacionalHistorial;
+use app\models\ExpedienteMedico;
 
 /**
  * EmpleadoController implements the CRUD actions for Empleado model.
@@ -107,9 +108,10 @@ class EmpleadoController extends Controller
         $periodoVacacional = new PeriodoVacacional();
         $segundoPeriodoVacacional = new SegundoPeriodoVacacional();
         $juntaGobiernoModel = new JuntaGobierno();
-
+        $expedienteMedico = new ExpedienteMedico();
+    
         $usuario->scenario = Usuario::SCENARIO_CREATE;
-
+    
         if ($model->load(Yii::$app->request->post()) && $usuario->load(Yii::$app->request->post()) && $informacion_laboral->load(Yii::$app->request->post()) && $juntaGobiernoModel->load(Yii::$app->request->post())) { 
             $transaction = Yii::$app->db->beginTransaction();
             $usuario->username = $model->nombre . $model->apellido;
@@ -127,44 +129,42 @@ class EmpleadoController extends Controller
             $usuario->nuevo = 4;
             $hash = Yii::$app->security->generatePasswordHash($usuario->password);
             $usuario->password = $hash;
-
+    
             try {
                 $totalDiasVacaciones = $this->calcularDiasVacaciones($informacion_laboral->fecha_ingreso, $informacion_laboral->cat_tipo_contrato_id);
                 $diasPorPeriodo = ceil($totalDiasVacaciones / 2);
-
-              
+    
                 $periodoVacacional->dias_vacaciones_periodo = $diasPorPeriodo;
                 if (!$periodoVacacional->save()) {
                     throw new \yii\db\Exception('Error al guardar PeriodoVacacional');
                 }
-
+    
                 $segundoPeriodoVacacional->dias_vacaciones_periodo = $totalDiasVacaciones - $diasPorPeriodo; 
                 if (!$segundoPeriodoVacacional->save()) {
                     throw new \yii\db\Exception('Error al guardar SegundoPeriodoVacacional');
                 }
-
+    
                 $vacaciones->periodo_vacacional_id = $periodoVacacional->id;
                 $vacaciones->segundo_periodo_vacacional_id = $segundoPeriodoVacacional->id;
                 $vacaciones->total_dias_vacaciones = $totalDiasVacaciones;
                 if (!$vacaciones->save()) {
                     throw new \yii\db\Exception('Error al guardar Vacaciones');
                 }
-
+    
                 $informacion_laboral->vacaciones_id = $vacaciones->id;
                 if (!$informacion_laboral->save()) {
                     throw new \yii\db\Exception('Error al guardar InformacionLaboral');
                 }
-
+    
                 $model->informacion_laboral_id = $informacion_laboral->id;
                 if ($usuario->save()) {
-                    
                     $model->usuario_id = $usuario->id;
                     $rol = ($usuario->rol == 1) ? 'empleado' : 'administrador';
-
+    
                     $auth = Yii::$app->authManager;
                     $authorRole = $auth->getRole($rol);
                     $auth->assign($authorRole, $usuario->id);
-
+    
                     $upload = UploadedFile::getInstance($model, 'foto');
                     if (is_object($upload)) {
                         $nombreCarpetaTrabajador = Yii::getAlias('@runtime') . '/empleados/' . $model->nombre . '_' . $model->apellido;
@@ -175,7 +175,7 @@ class EmpleadoController extends Controller
                         if (!is_dir($nombreCarpetaUsuarioProfile)) {
                             mkdir($nombreCarpetaUsuarioProfile, 0775, true);
                         }
-
+    
                         $nombreIncidenciasCarpeta = $nombreCarpetaTrabajador . '/solicitudes_incidencias_empleado';
                         if (!is_dir( $nombreIncidenciasCarpeta)) {
                             mkdir( $nombreIncidenciasCarpeta, 0775, true);
@@ -184,44 +184,47 @@ class EmpleadoController extends Controller
                         $upload->saveAs($upload_filename);
                         $model->foto = $upload_filename;
                     }
-
+    
                     if ($model->save()) {
-                       
+                        // Crear el registro en expediente_medico
+                        $expedienteMedico->empleado_id = $model->id;
+                        if (!$expedienteMedico->save()) {
+                            throw new \yii\db\Exception('Error al guardar ExpedienteMedico');
+                        }
+    
                         $departamento = CatDepartamento::findOne($informacion_laboral->cat_departamento_id);
                         if ($departamento) {
                             $informacion_laboral->cat_direccion_id = $departamento->cat_direccion_id;
                             $informacion_laboral->cat_dpto_cargo_id = $departamento->cat_dpto_id;
-
-                        
-                            if (!empty($juntaGobiernoModel->nivel_jerarquico) && $juntaGobiernoModel->nivel_jerarquico !== 'Comun') { // Validación adicional
+    
+                            if (!empty($juntaGobiernoModel->nivel_jerarquico) && $juntaGobiernoModel->nivel_jerarquico !== 'Comun') {
                                 $juntaGobiernoModel->empleado_id = $model->id;
                                 $juntaGobiernoModel->cat_departamento_id = $informacion_laboral->cat_departamento_id;
                                 $juntaGobiernoModel->cat_direccion_id = $informacion_laboral->cat_direccion_id;
-                            //    $juntaGobiernoModel->cat_dpto_id = $informacion_laboral->cat_dpto_cargo_id;
-
+    
                                 if (!$juntaGobiernoModel->save()) {
                                     $transaction->rollBack();
                                     throw new \yii\db\Exception('Error al guardar JuntaGobierno: ' . json_encode($juntaGobiernoModel->errors));
                                 }
                             }
-                        
+    
                             if (!$informacion_laboral->save()) {
                                 $transaction->rollBack();
                                 throw new \yii\db\Exception('Error al guardar InformacionLaboral: ' . json_encode($informacion_laboral->errors));
                             }
                         }
-                
+    
                         Yii::$app->mailer->compose()
                             ->setFrom('elitaev7@gmail.com')
                             ->setTo($model->email)
                             ->setSubject('Datos de acceso al sistema')
-                            ->setTextBody("Nos comunicamos con usted, {$model->nombre}.\nAquí están tus datos de acceso:\nNombre de Usuario: {$usuario->username}\nContraseña: contrasena") // Reemplaza 'contrasena' con la contraseña generada si es diferente
+                            ->setTextBody("Nos comunicamos con usted, {$model->nombre}.\nAquí están tus datos de acceso:\nNombre de Usuario: {$usuario->username}\nContraseña: contrasena")
                             ->send();
-
+    
                         $transaction->commit();
                         Yii::$app->session->setFlash('success', "Trabajador y usuario creados con éxito.");
                         Yii::$app->session->setFlash('warning', "Complete los demás datos del empleado.");
-
+    
                         return $this->redirect(['view', 'id' => $model->id]);
                     } else {
                         $transaction->rollBack();
@@ -232,16 +235,15 @@ class EmpleadoController extends Controller
                 throw $e;
             }
         }
-
+    
         return $this->render('create', [
             'model' => $model,
             'usuario' => $usuario,
             'informacion_laboral' => $informacion_laboral,
             'juntaGobiernoModel' => $juntaGobiernoModel
-
         ]);
     }
-
+    
 
     private function calcularDiasVacaciones($fechaIngreso, $tipoContratoId)
     {

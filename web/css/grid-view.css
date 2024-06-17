@@ -1,0 +1,24 @@
+.no-style-gridview table {
+    border: none;
+    width: 100%;
+    background-color: white;
+}
+
+.no-style-gridview th, .no-style-gridview td {
+    border: none;
+    padding: 8px;
+    background-color: white;
+}
+
+.no-style-gridview th {
+    background-color: white;
+    color: black;
+}
+
+.no-style-gridview tr {
+    background-color: white;
+}
+
+.no-style-gridview .summary {
+    display: none; /* Ocultar el resumen */
+}

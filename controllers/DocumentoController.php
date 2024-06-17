@@ -67,68 +67,73 @@ class DocumentoController extends Controller
      * @return mixed
      */
     public function actionCreate($empleado_id)
-{
-    $model = new Documento();
-    $cat_tipo_documento = new CatTipoDocumento();
-
-    $model->empleado_id = $empleado_id;
-
-    if (Yii::$app->request->isPost) {
-        $model->load(Yii::$app->request->post());
-        $file = UploadedFile::getInstance($model, 'ruta');
-        $tipoDocumentoIdSeleccionado = Yii::$app->request->post('Documento')['cat_tipo_documento_id'];
-        $nombreDocumento = Yii::$app->request->post('Documento')['nombre'];
-
-        // Verificar si se seleccionó 'OTRO' y se ingresó un nuevo nombre de documento
-        if ($tipoDocumentoIdSeleccionado == 4 && !empty($nombreDocumento)) {
-            $nuevoTipoDocumento = new CatTipoDocumento();
-            $nuevoTipoDocumento->nombre_tipo = $nombreDocumento;
-            if ($nuevoTipoDocumento->save()) {
-                // Crear el nuevo tipo de documento y obtener su ID
-                $tipoDocumentoIdSeleccionado = $nuevoTipoDocumento->id;
-                Yii::$app->session->setFlash('success', 'Nuevo tipo de documento creado exitosamente.');
-            } else {
-                Yii::$app->session->setFlash('error', 'No se pudo crear el nuevo tipo de documento.');
-                return $this->render('create', [
-                    'model' => $model,
-                    'cat_tipo_documento' => $cat_tipo_documento,
-                ]);
-            }
-        }
-
-        $model->cat_tipo_documento_id = $tipoDocumentoIdSeleccionado;
-
-        if ($file && $model->cat_tipo_documento_id !== null) {
-            $empleado = Empleado::findOne($model->empleado_id);
-            $nombreCarpetaTrabajador = Yii::getAlias('@runtime') . '/empleados/' . $empleado->nombre . '_' . $empleado->apellido;
-            if (!is_dir($nombreCarpetaTrabajador)) {
-                mkdir($nombreCarpetaTrabajador, 0775, true);
-            }
-            $nombreCarpetaExpedientes = $nombreCarpetaTrabajador . '/documentos';
-            if (!is_dir($nombreCarpetaExpedientes)) {
-                mkdir($nombreCarpetaExpedientes, 0775, true);
-            }
-            $rutaArchivo = $nombreCarpetaExpedientes . '/' . $file->baseName . '.' . $file->extension;
-            $file->saveAs($rutaArchivo);
-
-            $model->ruta = $rutaArchivo;
-            $model->fecha_subida = date('Y-m-d H:i:s');
-
-            if ($model->save()) {
-                Yii::$app->session->setFlash('success', 'El documento se ha subido exitosamente.');
-                $url = Url::to(['empleado/view', 'id' => $empleado->id]) . '#expediente';
-                return $this->redirect($url);
-            }
-        }
-    }
-
-    return $this->render('create', [
-        'model' => $model,
-        'cat_tipo_documento' => $cat_tipo_documento,
-    ]);
-}
-
+    {
+        $model = new Documento();
+        $cat_tipo_documento = new CatTipoDocumento();
     
+        $model->empleado_id = $empleado_id;
+    
+        if (Yii::$app->request->isPost) {
+            $model->load(Yii::$app->request->post());
+            $file = UploadedFile::getInstance($model, 'ruta');
+            $tipoDocumentoIdSeleccionado = Yii::$app->request->post('Documento')['cat_tipo_documento_id'];
+            $nombreDocumento = Yii::$app->request->post('Documento')['nombre'];
+    
+            // Verificar si se seleccionó 'OTRO' y se ingresó un nuevo nombre de documento
+            if ($tipoDocumentoIdSeleccionado == 4 && !empty($nombreDocumento)) {
+                $nuevoTipoDocumento = new CatTipoDocumento();
+                $nuevoTipoDocumento->nombre_tipo = $nombreDocumento;
+                if ($nuevoTipoDocumento->save()) {
+                    // Crear el nuevo tipo de documento y obtener su ID
+                    $tipoDocumentoIdSeleccionado = $nuevoTipoDocumento->id;
+                    Yii::$app->session->setFlash('success', 'Nuevo tipo de documento creado exitosamente.');
+                } else {
+                    Yii::$app->session->setFlash('error', 'No se pudo crear el nuevo tipo de documento.');
+                    return $this->render('create', [
+                        'model' => $model,
+                        'cat_tipo_documento' => $cat_tipo_documento,
+                    ]);
+                }
+            }
+    
+            $model->cat_tipo_documento_id = $tipoDocumentoIdSeleccionado;
+    
+            // Asignar el nombre del documento solo si es 'OTRO'
+            if ($tipoDocumentoIdSeleccionado != 4) {
+                $nombreDocumento = CatTipoDocumento::findOne($tipoDocumentoIdSeleccionado)->nombre_tipo;
+            }
+            $model->nombre = $nombreDocumento;
+    
+            if ($file && $model->cat_tipo_documento_id !== null) {
+                $empleado = Empleado::findOne($model->empleado_id);
+                $nombreCarpetaTrabajador = Yii::getAlias('@runtime') . '/empleados/' . $empleado->nombre . '_' . $empleado->apellido;
+                if (!is_dir($nombreCarpetaTrabajador)) {
+                    mkdir($nombreCarpetaTrabajador, 0775, true);
+                }
+                $nombreCarpetaExpedientes = $nombreCarpetaTrabajador . '/documentos';
+                if (!is_dir($nombreCarpetaExpedientes)) {
+                    mkdir($nombreCarpetaExpedientes, 0775, true);
+                }
+                $rutaArchivo = $nombreCarpetaExpedientes . '/' . $file->baseName . '.' . $file->extension;
+                $file->saveAs($rutaArchivo);
+    
+                $model->ruta = $rutaArchivo;
+                $model->fecha_subida = date('Y-m-d H:i:s');
+    
+                if ($model->save()) {
+                    Yii::$app->session->setFlash('success', 'El documento se ha subido exitosamente.');
+                    $url = Url::to(['empleado/view', 'id' => $empleado->id]) . '#documentos';
+                    return $this->redirect($url);
+                }
+            }
+        }
+    
+        return $this->render('create', [
+            'model' => $model,
+            'cat_tipo_documento' => $cat_tipo_documento,
+        ]);
+    }
+     
 
     /**
      * Updates an existing Documento model.
@@ -186,7 +191,7 @@ class DocumentoController extends Controller
     
         
         Yii::$app->session->setFlash('success', 'El documento se ha eliminado exitosamente.');
-                $url = Url::to(['empleado/view', 'id' => $empleado->id]) . '#expediente';
+                $url = Url::to(['empleado/view', 'id' => $empleado->id]) . '#documentos';
                 return $this->redirect($url);
     }
 

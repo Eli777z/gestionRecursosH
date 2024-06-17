@@ -145,7 +145,14 @@ $config = [
 'cambio-horario-trabajo/*',
 'permiso-economico/*',
 'permiso-sin-sueldo/*',
-'cat-nivel-estudio/*'
+'cat-nivel-estudio/*',
+'cat-actividad-fisica/*',
+'antecedente-hereditario/*',
+'cat-antecedente-hereditario/*',
+'antecedente-no-patologico/*',
+'antecedente-patologico/*',
+'expediente-medico/*'
+
             // The actions listed here will be allowed to everyone including guests.
             // So, 'admin/*' should not appear here in the production, of course.
             // But in the earlier stages of your development, you may probably want to
