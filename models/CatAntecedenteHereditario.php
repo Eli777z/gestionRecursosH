@@ -50,6 +50,6 @@ class CatAntecedenteHereditario extends \yii\db\ActiveRecord
      */
     public function getAntecedenteHereditarios()
     {
-        return $this->hasMany(AntecedenteHereditario::class, ['cat_antecedente_hereditario_patologico_id' => 'id']);
+        return $this->hasMany(AntecedenteHereditario::class, ['cat_antecedente_hereditario_id' => 'id']);
     }
 }

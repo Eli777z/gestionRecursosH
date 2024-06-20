@@ -26,7 +26,8 @@ use yii\helpers\Url;
 use app\models\CatTipoContrato;
 use app\models\PeriodoVacacionalHistorial;
 use app\models\ExpedienteMedico;
-
+use app\models\CatAntecedenteHereditario;
+use app\models\AntecedenteHereditario;
 /**
  * EmpleadoController implements the CRUD actions for Empleado model.
  */
@@ -75,25 +76,60 @@ class EmpleadoController extends Controller
     public function actionView($id)
     {
         $modelEmpleado = $this->findModel2($id);
-
         $documentos = $modelEmpleado->documentos;
-
         $documentoModel = new Documento();
         $historial = PeriodoVacacionalHistorial::find()->where(['empleado_id' => $modelEmpleado->id])->all();
-
+    
         $searchModel = new \app\models\SolicitudSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->query->andWhere(['empleado_id' => $id]);
+    
+        // Añadir lógica para antecedentes hereditarios
+        $expedienteMedico = $modelEmpleado->expedienteMedico;
+        $antecedentes = AntecedenteHereditario::find()->where(['expediente_medico_id' => $expedienteMedico->id])->all();
+        $catAntecedentes = CatAntecedenteHereditario::find()->all();
+    
+        if (Yii::$app->request->isPost) {
+            $post = Yii::$app->request->post('AntecedenteHereditario');
+            $observacionGeneral = Yii::$app->request->post('observacion_general');
+    
+            AntecedenteHereditario::deleteAll(['expediente_medico_id' => $expedienteMedico->id]);
+    
+            foreach ($post as $catAntecedenteId => $parentezcos) {
+                foreach ($parentezcos as $parentezco => $value) {
+                    $antecedente = new AntecedenteHereditario();
+                    $antecedente->expediente_medico_id = $expedienteMedico->id;
+                    $antecedente->cat_antecedente_hereditario_id = $catAntecedenteId;
+                    $antecedente->parentezco = $parentezco;
+                    $antecedente->observacion = $observacionGeneral; // Usar la misma observación general para cada antecedente
+                    $antecedente->save();
+                }
+            }
+
+
+
+            
+    
+           /// Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información del trabajador.');
+                $url = Url::to(['view', 'id' => $id,]) . '#expediente_medico';
+                return $this->redirect($url);
+        }
+    
         return $this->render('view', [
             'model' => $modelEmpleado,
             'documentos' => $documentos,
             'documentoModel' => $documentoModel,
             'historial' => $historial,
             'searchModel' => $searchModel,
-        'dataProvider' => $dataProvider,
+            'dataProvider' => $dataProvider,
+            'expedienteMedico' => $expedienteMedico,
+            'antecedentes' => $antecedentes,
+            'catAntecedentes' => $catAntecedentes,
         ]);
     }
+        
 
+  
     /**
      * Creates a new Empleado model.
      * If creation is successful, the browser will be redirected to the 'view' page.
@@ -109,6 +145,7 @@ class EmpleadoController extends Controller
         $segundoPeriodoVacacional = new SegundoPeriodoVacacional();
         $juntaGobiernoModel = new JuntaGobierno();
         $expedienteMedico = new ExpedienteMedico();
+        $antecedenteHereditario = new AntecedenteHereditario();
     
         $usuario->scenario = Usuario::SCENARIO_CREATE;
     
@@ -159,7 +196,7 @@ class EmpleadoController extends Controller
                 $model->informacion_laboral_id = $informacion_laboral->id;
                 if ($usuario->save()) {
                     $model->usuario_id = $usuario->id;
-                    $rol = ($usuario->rol == 1) ? 'empleado' : 'administrador';
+                    $rol = ($usuario->rol == 1) ? 'empleado' : 'administrador' ;
     
                     $auth = Yii::$app->authManager;
                     $authorRole = $auth->getRole($rol);
@@ -185,49 +222,55 @@ class EmpleadoController extends Controller
                         $model->foto = $upload_filename;
                     }
     
-                    if ($model->save()) {
-                        // Crear el registro en expediente_medico
-                        $expedienteMedico->empleado_id = $model->id;
-                        if (!$expedienteMedico->save()) {
+                    if ($antecedenteHereditario->save()) {
+                        $expedienteMedico->antecedente_hereditario_id = $antecedenteHereditario->id;
+                        if ($expedienteMedico->save()) {
+                            // Asigna el id de expediente medico al empleado
+                            $model->expediente_medico_id = $expedienteMedico->id;
+                            
+                            if ($model->save()) {
+                                $departamento = CatDepartamento::findOne($informacion_laboral->cat_departamento_id);
+                                if ($departamento) {
+                                    $informacion_laboral->cat_direccion_id = $departamento->cat_direccion_id;
+                                    $informacion_laboral->cat_dpto_cargo_id = $departamento->cat_dpto_id;
+    
+                                    if (!empty($juntaGobiernoModel->nivel_jerarquico) && $juntaGobiernoModel->nivel_jerarquico !== 'Comun') {
+                                        $juntaGobiernoModel->empleado_id = $model->id;
+                                        $juntaGobiernoModel->cat_departamento_id = $informacion_laboral->cat_departamento_id;
+                                        $juntaGobiernoModel->cat_direccion_id = $informacion_laboral->cat_direccion_id;
+    
+                                        if (!$juntaGobiernoModel->save()) {
+                                            $transaction->rollBack();
+                                            throw new \yii\db\Exception('Error al guardar JuntaGobierno: ' . json_encode($juntaGobiernoModel->errors));
+                                        }
+                                    }
+    
+                                    if (!$informacion_laboral->save()) {
+                                        $transaction->rollBack();
+                                        throw new \yii\db\Exception('Error al guardar InformacionLaboral: ' . json_encode($informacion_laboral->errors));
+                                    }
+                                }
+    
+                                Yii::$app->mailer->compose()
+                                    ->setFrom('elitaev7@gmail.com')
+                                    ->setTo($model->email)
+                                    ->setSubject('Datos de acceso al sistema')
+                                    ->setTextBody("Nos comunicamos con usted, {$model->nombre}.\nAquí están tus datos de acceso:\nNombre de Usuario: {$usuario->username}\nContraseña: contrasena")
+                                    ->send();
+    
+                                $transaction->commit();
+                                Yii::$app->session->setFlash('success', "Trabajador y usuario creados con éxito.");
+                                Yii::$app->session->setFlash('warning', "Complete los demás datos del empleado.");
+    
+                                return $this->redirect(['view', 'id' => $model->id]);
+                            } else {
+                                $transaction->rollBack();
+                            }
+                        } else {
                             throw new \yii\db\Exception('Error al guardar ExpedienteMedico');
                         }
-    
-                        $departamento = CatDepartamento::findOne($informacion_laboral->cat_departamento_id);
-                        if ($departamento) {
-                            $informacion_laboral->cat_direccion_id = $departamento->cat_direccion_id;
-                            $informacion_laboral->cat_dpto_cargo_id = $departamento->cat_dpto_id;
-    
-                            if (!empty($juntaGobiernoModel->nivel_jerarquico) && $juntaGobiernoModel->nivel_jerarquico !== 'Comun') {
-                                $juntaGobiernoModel->empleado_id = $model->id;
-                                $juntaGobiernoModel->cat_departamento_id = $informacion_laboral->cat_departamento_id;
-                                $juntaGobiernoModel->cat_direccion_id = $informacion_laboral->cat_direccion_id;
-    
-                                if (!$juntaGobiernoModel->save()) {
-                                    $transaction->rollBack();
-                                    throw new \yii\db\Exception('Error al guardar JuntaGobierno: ' . json_encode($juntaGobiernoModel->errors));
-                                }
-                            }
-    
-                            if (!$informacion_laboral->save()) {
-                                $transaction->rollBack();
-                                throw new \yii\db\Exception('Error al guardar InformacionLaboral: ' . json_encode($informacion_laboral->errors));
-                            }
-                        }
-    
-                        Yii::$app->mailer->compose()
-                            ->setFrom('elitaev7@gmail.com')
-                            ->setTo($model->email)
-                            ->setSubject('Datos de acceso al sistema')
-                            ->setTextBody("Nos comunicamos con usted, {$model->nombre}.\nAquí están tus datos de acceso:\nNombre de Usuario: {$usuario->username}\nContraseña: contrasena")
-                            ->send();
-    
-                        $transaction->commit();
-                        Yii::$app->session->setFlash('success', "Trabajador y usuario creados con éxito.");
-                        Yii::$app->session->setFlash('warning', "Complete los demás datos del empleado.");
-    
-                        return $this->redirect(['view', 'id' => $model->id]);
                     } else {
-                        $transaction->rollBack();
+                        throw new \yii\db\Exception('Error al guardar AntecedenteHereditario');
                     }
                 }
             } catch (\Exception $e) {
@@ -244,7 +287,6 @@ class EmpleadoController extends Controller
         ]);
     }
     
-
     private function calcularDiasVacaciones($fechaIngreso, $tipoContratoId)
     {
         $fechaIngreso = new \DateTime($fechaIngreso);

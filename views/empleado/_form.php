@@ -11,10 +11,14 @@ use app\models\Departamento;
 use kartik\select2\Select2;
 use hail812\adminlte\widgets\Alert;
 use yii\helpers\ArrayHelper;
+use yii\web\View;
 /* @var $this yii\web\View */
 /* @var $model app\models\Empleado */
 /* @var $form yii\bootstrap4\ActiveForm */
+$this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
+$this->registerCssFile('@web/css/grid-view.css', ['position' => View::POS_HEAD]);
 ?>
+
 <div class="container-fluid">
     <div class="row justify-content-center">
         <div class="col-md-10">
@@ -59,6 +63,7 @@ use yii\helpers\ArrayHelper;
                                                 <?= $form->field($usuario, 'rol')->dropDownList([
                                                     1 => 'Trabajador',
                                                     2 => 'Gestor de recursos humanos',
+                                                    3 => 'Medico'
                                                 ])->label('Seleccione el rol del empleado:') ?>
 
                                                 <?= $form->field($model, 'numero_empleado')->textInput()->label('Número de empleado:') ?>
@@ -82,7 +87,7 @@ use yii\helpers\ArrayHelper;
                                     </div>
                                     <div class="col-md-6">
                                         <div class="card">
-                                            <div class="card-header bg-secondary text-white">Información Laboral</div>
+                                            <div class="card-header gradient-verde text-white">Información Laboral</div>
                                             <div class="card-body">
                                                 <?= $form->field($informacion_laboral, 'cat_departamento_id')->widget(Select2::classname(), [
                                                     'data' => ArrayHelper::map(CatDepartamento::find()->all(), 'id', 'nombre_departamento'),

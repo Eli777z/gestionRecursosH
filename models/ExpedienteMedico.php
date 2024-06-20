@@ -8,7 +8,6 @@ use Yii;
  * This is the model class for table "expediente_medico".
  *
  * @property int $id
- * @property int|null $empleado_id
  * @property int|null $consulta_medica_id
  * @property int|null $documento_id
  * @property int|null $antecedente_hereditario_id
@@ -17,12 +16,15 @@ use Yii;
  * @property string|null $medicacion_necesitada
  * @property string|null $alergias
  * @property int|null $no_seguridad_social
+ * @property int|null $empleado_id
  *
  * @property AntecedenteHereditario $antecedenteHereditario
+ * @property AntecedenteHereditario[] $antecedenteHereditarios
  * @property AntecedenteNoPatologico $antecedenteNoPatologico
  * @property AntecedentePatologico $antecedentePatologico
  * @property Documento $documento
  * @property Empleado $empleado
+ * @property Empleado[] $empleados
  */
 class ExpedienteMedico extends \yii\db\ActiveRecord
 {
@@ -40,7 +42,7 @@ class ExpedienteMedico extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['empleado_id', 'consulta_medica_id', 'documento_id', 'antecedente_hereditario_id', 'antecedente_patologico_id', 'antecedente_no_patologico_id', 'no_seguridad_social'], 'integer'],
+            [['consulta_medica_id', 'documento_id', 'antecedente_hereditario_id', 'antecedente_patologico_id', 'antecedente_no_patologico_id', 'no_seguridad_social', 'empleado_id'], 'integer'],
             [['medicacion_necesitada', 'alergias'], 'string'],
             [['antecedente_no_patologico_id'], 'exist', 'skipOnError' => true, 'targetClass' => AntecedenteNoPatologico::class, 'targetAttribute' => ['antecedente_no_patologico_id' => 'id']],
             [['antecedente_hereditario_id'], 'exist', 'skipOnError' => true, 'targetClass' => AntecedenteHereditario::class, 'targetAttribute' => ['antecedente_hereditario_id' => 'id']],
@@ -57,7 +59,6 @@ class ExpedienteMedico extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'empleado_id' => 'Empleado ID',
             'consulta_medica_id' => 'Consulta Medica ID',
             'documento_id' => 'Documento ID',
             'antecedente_hereditario_id' => 'Antecedente Hereditario ID',
@@ -66,6 +67,7 @@ class ExpedienteMedico extends \yii\db\ActiveRecord
             'medicacion_necesitada' => 'Medicacion Necesitada',
             'alergias' => 'Alergias',
             'no_seguridad_social' => 'No Seguridad Social',
+            'empleado_id' => 'Empleado ID',
         ];
     }
 
@@ -77,6 +79,16 @@ class ExpedienteMedico extends \yii\db\ActiveRecord
     public function getAntecedenteHereditario()
     {
         return $this->hasOne(AntecedenteHereditario::class, ['id' => 'antecedente_hereditario_id']);
+    }
+
+    /**
+     * Gets query for [[AntecedenteHereditarios]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAntecedenteHereditarios()
+    {
+        return $this->hasMany(AntecedenteHereditario::class, ['expediente_medico_id' => 'id']);
     }
 
     /**
@@ -117,5 +129,15 @@ class ExpedienteMedico extends \yii\db\ActiveRecord
     public function getEmpleado()
     {
         return $this->hasOne(Empleado::class, ['id' => 'empleado_id']);
+    }
+
+    /**
+     * Gets query for [[Empleados]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getEmpleados()
+    {
+        return $this->hasMany(Empleado::class, ['expediente_medico_id' => 'id']);
     }
 }

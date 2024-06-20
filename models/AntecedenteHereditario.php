@@ -8,14 +8,14 @@ use Yii;
  * This is the model class for table "antecedente_hereditario".
  *
  * @property int $id
+ * @property int|null $expediente_medico_id
  * @property int|null $cat_antecedente_hereditario_id
- * @property int|null $abuelos
- * @property int|null $hermanos
- * @property int|null $padre
- * @property int|null $madre
+ * @property string|null $parentezco
+ * @property string|null $observacion
  *
- * @property AntecedenteHereditario[] $antecedenteHereditarios
- * @property AntecedenteHereditario $catAntecedenteHereditario
+ * @property CatAntecedenteHereditario $catAntecedenteHereditario
+ * @property ExpedienteMedico $expedienteMedico
+ * @property ExpedienteMedico[] $expedienteMedicos
  */
 class AntecedenteHereditario extends \yii\db\ActiveRecord
 {
@@ -33,8 +33,10 @@ class AntecedenteHereditario extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['cat_antecedente_hereditario_id', 'abuelos', 'hermanos', 'padre', 'madre'], 'integer'],
-            [['cat_antecedente_hereditario_id'], 'exist', 'skipOnError' => true, 'targetClass' => AntecedenteHereditario::class, 'targetAttribute' => ['cat_antecedente_hereditario_id' => 'id']],
+            [['expediente_medico_id', 'cat_antecedente_hereditario_id'], 'integer'],
+            [['parentezco', 'observacion'], 'string'],
+            [['cat_antecedente_hereditario_id'], 'exist', 'skipOnError' => true, 'targetClass' => CatAntecedenteHereditario::class, 'targetAttribute' => ['cat_antecedente_hereditario_id' => 'id']],
+            [['expediente_medico_id'], 'exist', 'skipOnError' => true, 'targetClass' => ExpedienteMedico::class, 'targetAttribute' => ['expediente_medico_id' => 'id']],
         ];
     }
 
@@ -45,22 +47,11 @@ class AntecedenteHereditario extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
+            'expediente_medico_id' => 'Expediente Medico ID',
             'cat_antecedente_hereditario_id' => 'Cat Antecedente Hereditario ID',
-            'abuelos' => 'Abuelos',
-            'hermanos' => 'Hermanos',
-            'padre' => 'Padre',
-            'madre' => 'Madre',
+            'parentezco' => 'Parentezco',
+            'observacion' => 'Observacion',
         ];
-    }
-
-    /**
-     * Gets query for [[AntecedenteHereditarios]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getAntecedenteHereditarios()
-    {
-        return $this->hasMany(AntecedenteHereditario::class, ['cat_antecedente_hereditario_id' => 'id']);
     }
 
     /**
@@ -70,6 +61,26 @@ class AntecedenteHereditario extends \yii\db\ActiveRecord
      */
     public function getCatAntecedenteHereditario()
     {
-        return $this->hasOne(AntecedenteHereditario::class, ['id' => 'cat_antecedente_hereditario_id']);
+        return $this->hasOne(CatAntecedenteHereditario::class, ['id' => 'cat_antecedente_hereditario_id']);
+    }
+
+    /**
+     * Gets query for [[ExpedienteMedico]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getExpedienteMedico()
+    {
+        return $this->hasOne(ExpedienteMedico::class, ['id' => 'expediente_medico_id']);
+    }
+
+    /**
+     * Gets query for [[ExpedienteMedicos]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getExpedienteMedicos()
+    {
+        return $this->hasMany(ExpedienteMedico::class, ['antecedente_hereditario_id' => 'id']);
     }
 }

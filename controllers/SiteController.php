@@ -26,11 +26,11 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::class,
-                'only' => ['logout', 'user', 'admin'],
+                'only' => ['logout', 'user', 'admin', 'medico'],
                 'rules' => [
                     [
                        
-                        'actions' => ['logout', 'admin'],
+                        'actions' => ['logout', 'admin', 'medico'],
 
                         'allow' => true,
                         'roles' => ['@'],
@@ -103,8 +103,11 @@ class SiteController extends Controller
             }
             elseif (Usuario::isUserAdmin($userId)) {
                 return $this->redirect(["site/portalgestionrh"]);
-            } else {
+            } elseif(Usuario:: isUserSimple($userId)) {
                 return $this->redirect(["site/portalempleado"]);
+            }else{
+                return $this->redirect(["site/portalmedico"]);
+
             }
         }
         $model = new LoginForm();
@@ -117,9 +120,14 @@ class SiteController extends Controller
             } else {
                 if (Usuario::isUserAdmin($userId)) {
                     return $this->redirect(['site/portalgestionrh']);
-                }else{
+                }elseif (Usuario::isUserSimple($userId)) {
 
                     return $this->redirect(["site/portalempleado"]);
+                }
+                else{
+
+                    return $this->redirect(["site/portalmedico"]);
+
                 }
 
                

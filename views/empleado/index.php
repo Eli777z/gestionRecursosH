@@ -27,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-12">
-            <div class="card">
+            <div class="card bg-light">
             <div class="card-header gradient-info text-white">
                     <h3><?= Html::encode($this->title) ?></h3>
                 </div>

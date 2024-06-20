@@ -67,12 +67,23 @@ class Usuario extends  \yii\db\ActiveRecord implements \yii\web\IdentityInterfac
         $user = self::findOne(['id' => $id, 'status' => '10']);
         return $user !== null && $user->rol === 1;
     }
+
+
+    public static function isUserMedico($id)
+    {
+        $user = self::findOne(['id' => $id, 'status' => '10']);
+        return $user !== null && $user->rol === 3;
+    }
+ 
  
     public static function isUserNuevo($id)
     {
         $user = self::findOne(['id' => $id, 'status' => '10', 'nuevo' => '4']);
         return $user !== null && $user->rol === 1 && $user->nuevo !=4;
     }
+
+  
+ 
  
  
  

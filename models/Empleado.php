@@ -34,10 +34,13 @@ use Yii;
  * @property string|null $institucion_educativa
  * @property string|null $titulo_grado
   * @property CatNivelEstudio $catNivelEstudio
+ * @property int|null $expediente_medico_id
 
  * @property Documento[] $documentos
  * @property InformacionLaboral $informacionLaboral
  * @property Usuario $usuario
+  * @property ExpedienteMedico $expedienteMedico
+
  */
 class Empleado extends \yii\db\ActiveRecord
 {
@@ -56,7 +59,7 @@ class Empleado extends \yii\db\ActiveRecord
     {
         return [
             [['numero_empleado', 'usuario_id', 'informacion_laboral_id', 'nombre', 'apellido', 'email'], 'required'],
-            [['numero_empleado', 'usuario_id', 'informacion_laboral_id', 'cat_nivel_estudio_id', 'parametro_formato_id', 'edad', 'codigo_postal'], 'integer'],
+            [['numero_empleado', 'usuario_id', 'informacion_laboral_id', 'cat_nivel_estudio_id', 'parametro_formato_id', 'edad', 'codigo_postal', 'expediente_medico_id'], 'integer'],
             [['fecha_nacimiento'], 'safe'],
             [['numero_casa'], 'string', 'max' => 4],
             [['estado_civil', 'sexo'], 'string', 'max' => 12],
@@ -80,6 +83,7 @@ class Empleado extends \yii\db\ActiveRecord
 
             [['institucion_educativa', 'titulo_grado'], 'string', 'max' => 65],
             [['foto'], 'file', 'skipOnEmpty' => TRUE, 'extensions' => 'png, jpg, jpeg'],
+            [['expediente_medico_id'], 'exist', 'skipOnError' => true, 'targetClass' => ExpedienteMedico::class, 'targetAttribute' => ['expediente_medico_id' => 'id']],
 
             [['informacion_laboral_id'], 'exist', 'skipOnError' => true, 'targetClass' => InformacionLaboral::class, 'targetAttribute' => ['informacion_laboral_id' => 'id']],
             [['usuario_id'], 'exist', 'skipOnError' => true, 'targetClass' => Usuario::class, 'targetAttribute' => ['usuario_id' => 'id']],
@@ -122,6 +126,8 @@ class Empleado extends \yii\db\ActiveRecord
             'nss' => 'NSS',
             'municipio' => 'Municipio',
             'estado' => 'Estado',
+            'expediente_medico_id' => 'Expediente Medico ID',
+
 
 
 
@@ -163,7 +169,10 @@ class Empleado extends \yii\db\ActiveRecord
     {
         return $this->hasOne(CatNivelEstudio::class, ['id' => 'cat_nivel_estudio_id']);
     }
-
+    public function getExpedienteMedico()
+    {
+        return $this->hasOne(ExpedienteMedico::class, ['id' => 'expediente_medico_id']);
+    }
 
 
 }

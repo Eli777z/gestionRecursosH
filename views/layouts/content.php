@@ -4,7 +4,7 @@
 use yii\bootstrap5\Breadcrumbs;
 
 ?>
-<div class="content-wrapper">
+<div class="content-wrapper bg-white">
     <!-- Content Header (Page header) -->
     <div class="content-header">
         <div class="container-fluid">

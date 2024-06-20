@@ -58,7 +58,15 @@ $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 $activeTab = Yii::$app->request->get('tab', 'info_p');
 $currentDate = date('Y-m-d');
-
+$antecedentesExistentes = [];
+$observacionGeneral = '';
+foreach ($antecedentes as $antecedente) {
+    $antecedentesExistentes[$antecedente->cat_antecedente_hereditario_id][$antecedente->parentezco] = true;
+    // Asumimos que todos los antecedentes tienen la misma observación general, así que tomamos la observación del primer antecedente.
+    if (empty($observacionGeneral)) {
+        $observacionGeneral = $antecedente->observacion;
+    }
+}
 ?>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
@@ -79,10 +87,10 @@ $currentDate = date('Y-m-d');
 <div class="container-fluid">
     <div class="row justify-content-center">
         <div class="col-md-12">
-            <div class="card">
+            <div class="card bg-light">
                 <div class="card-header gradient-info text-white">
 
-                    <div class="d-flex align-items-center position-relative">
+                    <div class="d-flex align-items-center position-relative ml-4">
                         <div class="bg-light p-1 rounded-circle custom-shadow" style="width: 140px; height: 140px; position: relative;">
                             <?= Html::img(['empleado/foto-empleado', 'id' => $model->id], [
                                 'class' => 'rounded-circle',
@@ -95,7 +103,7 @@ $currentDate = date('Y-m-d');
                                 'data-target' => '#changePhotoModal'
                             ]) ?>
                         </div>
-                        <div class="ml-3">
+                        <div class="ml-4">
                             <div class="alert alert-light mb-0" role="alert">
                                 <h3><?= Html::encode($this->title) ?></h3>
                                 <h3 class="mb-0"><?= $model->nombre ?> <?= $model->apellido ?></h3>
@@ -1317,6 +1325,7 @@ $currentDate = date('Y-m-d');
                                 ],
                                 'position' => TabsX::POS_ABOVE,
                                 'align' => TabsX::ALIGN_CENTER,
+                              //  'bordered'=>true,
                                 'encodeLabels' => false,
                             ]);
                             ?>
@@ -1334,6 +1343,8 @@ $currentDate = date('Y-m-d');
 </button>
 
             </div>
+
+
 
             <script>
                                             document.getElementById('toggle-expediente-button').addEventListener('click', function() {
@@ -1514,14 +1525,85 @@ $this->registerJs("
 
 
                             <?php $this->endBlock(); ?>
-                            <?php $this->beginBlock('expediente-medico'); ?>
-
+                            <?php $this->beginBlock('expediente_medico'); ?>
 
                             <?php $this->beginBlock('antecedentes'); ?>
-<p>hola</p>
-                           
-        <?php $this->endBlock(); ?>
+    <?php $form = ActiveForm::begin(); ?>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+            <div class="card-header gradient-blue text-white text-center">
+            <h2>Antecedentes Hereditarios</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Enfermedad</th>
+                                            <th>Abuelos</th>
+                                            <th>Hermanos</th>
+                                            <th>Madre</th>
+                                            <th>Padre</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($catAntecedentes as $catAntecedente): ?>
+                                            <tr>
+                                                <td><?= Html::encode($catAntecedente->nombre) ?></td>
+                                                <?php foreach (['Abuelos', 'Hermanos', 'Madre', 'Padre'] as $parentezco): ?>
+                                                    <td>
+                                                        <?= Html::checkbox("AntecedenteHereditario[{$catAntecedente->id}][$parentezco]", isset($antecedentesExistentes[$catAntecedente->id][$parentezco]), [
+                                                            'value' => 1,
+                                                            'label' => '',
+                                                        ]) ?>
+                                                    </td>
+                                                <?php endforeach; ?>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-md-4 d-flex flex-column justify-content-between" style="height: 100%;">
+    <div class="form-group text-center">
+        <?= Html::label('Observaciones', 'observacion_general') ?>
+        <?= Html::textarea('observacion_general', $observacionGeneral, [
+            'class' => 'form-control',
+            'rows' => 14,
+            'style' => 'width: 100%;',
+        ]) ?>
+    </div>
+    <br>
+    <div class="form-group mt-auto d-flex justify-content-end  ">
+       
+        <?= Html::submitButton('Guardar &nbsp; &nbsp;  <i class="fa fa-save"></i> ', ['class' => 'btn btn-success']) ?>
 
+    </div>
+</div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+
+    <?php ActiveForm::end(); ?>
+    <?php $this->endBlock(); ?>
+
+
+
+
+    <?php $this->beginBlock('patologicos'); ?>
+    
+    <?php $this->endBlock(); ?>
+
+     
 
 
         <?php $this->beginBlock('no-patologicos'); ?>
@@ -1532,7 +1614,7 @@ $this->registerJs("
         
         <?php echo TabsX::widget([
                             'enableStickyTabs' => true,
-                            'options' => [],
+                            'options' => ['class' => 'nav-tabs-custom'],
                             'items' => [
                                 [
                                     'label' => 'Hereditarios',
@@ -1540,6 +1622,16 @@ $this->registerJs("
                                     'active' => true,
                                     'options' => [
                                         'id' => 'antecedentes',
+                                    ],
+
+
+                                ],
+                                [
+                                    'label' => 'Patologicos',
+                                    'content' => $this->blocks['patologicos'],
+                                 //   'active' => true,
+                                    'options' => [
+                                        'id' => 'patologicos',
                                     ],
 
 
@@ -1554,13 +1646,14 @@ $this->registerJs("
 
 
                                 ],
+                          
                               
                                
 
                             ],
-                            'position' => TabsX::POS_LEFT,
-                          //  'align' => TabsX::ALIGN_CENTER,
-                            // 'bordered'=>true,
+                          //  'position' => TabsX::POS_ABOVE,
+                           'align' => TabsX::ALIGN_CENTER,
+                       //     'bordered'=>true,
                             'encodeLabels' => false
 
 
@@ -1607,9 +1700,9 @@ $this->registerJs("
 
                                 [
                                     'label' => 'Expediente Medico',
-                                    'content' => $this->blocks['expediente-medico'],
+                                    'content' => $this->blocks['expediente_medico'],
                                     'options' => [
-                                        'id' => 'expediente-medico',
+                                        'id' => 'expediente_medico',
                                     ],
 
                                 ],
@@ -1617,8 +1710,8 @@ $this->registerJs("
 
                             ],
                             'position' => TabsX::POS_ABOVE,
-                            'align' => TabsX::ALIGN_CENTER,
-                            // 'bordered'=>true,
+                         'align' => TabsX::ALIGN_LEFT,
+                         //   'bordered'=>true,
                             'encodeLabels' => false
 
 

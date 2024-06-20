@@ -15,7 +15,7 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
         <div class="card bg-light"> 
                
 
-        <div class="card-header gradient-yellow text-white">
+        <div class="card-header gradient-info text-white">
                     <h2>INFORMACIÓN DE EMPLEADO</h2>
                    
                 </div>
