@@ -22,3 +22,23 @@
 .no-style-gridview .summary {
     display: none; /* Ocultar el resumen */
 }
+
+
+.custom-alert {
+    background: rgb(250,239,215);
+    background: linear-gradient(90deg, rgba(250,239,215,1) 0%, rgba(250,239,215,1) 35%, rgba(250,239,215,1) 100%);
+    color: #000; /* Ajusta el color del texto si es necesario */
+}
+
+.custom-nopato{
+
+    background: rgb(141,40,248);
+    background: linear-gradient(90deg, rgba(141,40,248,1) 0%, rgba(130,52,212,1) 35%, rgba(182,148,218,1) 100%);
+
+}
+
+.btn-p{
+
+    background: #EA0150;
+
+}

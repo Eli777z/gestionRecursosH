@@ -28,6 +28,8 @@ use app\models\PeriodoVacacionalHistorial;
 use app\models\ExpedienteMedico;
 use app\models\CatAntecedenteHereditario;
 use app\models\AntecedenteHereditario;
+use app\models\AntecedentePatologico;
+use app\models\AntecedenteNoPatologico;
 /**
  * EmpleadoController implements the CRUD actions for Empleado model.
  */
@@ -72,62 +74,162 @@ class EmpleadoController extends Controller
      * @param int $informacion_laboral_id Informacion Laboral ID
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionView($id)
-    {
-        $modelEmpleado = $this->findModel2($id);
-        $documentos = $modelEmpleado->documentos;
-        $documentoModel = new Documento();
-        $historial = PeriodoVacacionalHistorial::find()->where(['empleado_id' => $modelEmpleado->id])->all();
-    
-        $searchModel = new \app\models\SolicitudSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        $dataProvider->query->andWhere(['empleado_id' => $id]);
-    
-        // Añadir lógica para antecedentes hereditarios
-        $expedienteMedico = $modelEmpleado->expedienteMedico;
-        $antecedentes = AntecedenteHereditario::find()->where(['expediente_medico_id' => $expedienteMedico->id])->all();
-        $catAntecedentes = CatAntecedenteHereditario::find()->all();
-    
-        if (Yii::$app->request->isPost) {
-            $post = Yii::$app->request->post('AntecedenteHereditario');
+     */public function actionView($id)
+{
+    $modelEmpleado = $this->findModel2($id);
+    $documentos = $modelEmpleado->documentos;
+    $documentoModel = new Documento();
+    $historial = PeriodoVacacionalHistorial::find()->where(['empleado_id' => $modelEmpleado->id])->all();
+
+    $searchModel = new \app\models\SolicitudSearch();
+    $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+    $dataProvider->query->andWhere(['empleado_id' => $id]);
+
+    $expedienteMedico = $modelEmpleado->expedienteMedico;
+    $antecedentes = AntecedenteHereditario::find()->where(['expediente_medico_id' => $expedienteMedico->id])->all();
+    $catAntecedentes = CatAntecedenteHereditario::find()->all();
+
+    // Obtener o crear el registro de antecedentes patológicos
+    $antecedentePatologico = AntecedentePatologico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+    if (!$antecedentePatologico) {
+        $antecedentePatologico = new AntecedentePatologico();
+        $antecedentePatologico->expediente_medico_id = $expedienteMedico->id;
+        $antecedentePatologico->descripcion_antecedentes = ''; // Inicializar con un valor predeterminado si es necesario
+        if ($antecedentePatologico->save()) {
+            // Asignar el ID del nuevo AntecedentePatologico al ExpedienteMedico si es necesario
+            $expedienteMedico->antecedente_patologico_id = $antecedentePatologico->id;
+            $expedienteMedico->save(false); // Guardar sin validaciones adicionales
+        } else {
+            Yii::$app->session->setFlash('error', 'Hubo un error al crear el registro de antecedentes patológicos.');
+        }
+    }
+    $descripcionAntecedentes = $antecedentePatologico->descripcion_antecedentes;
+
+    // Obtener o crear el registro de antecedentes no patológicos
+    $antecedenteNoPatologico = AntecedenteNoPatologico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+    if (!$antecedenteNoPatologico) {
+        $antecedenteNoPatologico = new AntecedenteNoPatologico();
+        $antecedenteNoPatologico->expediente_medico_id = $expedienteMedico->id;
+        if (!$antecedenteNoPatologico->save()) {
+            Yii::$app->session->setFlash('error', 'Hubo un error al crear el registro de antecedentes no patológicos.');
+        }
+    }
+
+    if (Yii::$app->request->isPost) {
+        if ($post = Yii::$app->request->post('AntecedenteHereditario')) {
             $observacionGeneral = Yii::$app->request->post('observacion_general');
-    
+
             AntecedenteHereditario::deleteAll(['expediente_medico_id' => $expedienteMedico->id]);
-    
+
             foreach ($post as $catAntecedenteId => $parentezcos) {
                 foreach ($parentezcos as $parentezco => $value) {
                     $antecedente = new AntecedenteHereditario();
                     $antecedente->expediente_medico_id = $expedienteMedico->id;
                     $antecedente->cat_antecedente_hereditario_id = $catAntecedenteId;
                     $antecedente->parentezco = $parentezco;
-                    $antecedente->observacion = $observacionGeneral; // Usar la misma observación general para cada antecedente
+                    $antecedente->observacion = $observacionGeneral;
                     $antecedente->save();
                 }
             }
 
+            Yii::$app->session->setFlash('success', 'Información de antecedentes hereditarios guardada correctamente.');
+            $url = Url::to(['view', 'id' => $id]) . '#expediente_medico';
+            return $this->redirect($url);
+        }
 
+        if ($descripcionAntecedentes = Yii::$app->request->post('descripcion_antecedentes')) {
+            $antecedentePatologico->descripcion_antecedentes = $descripcionAntecedentes;
 
-            
+            if ($antecedentePatologico->save()) {
+                Yii::$app->session->setFlash('success', 'Información de antecedentes patológicos guardada correctamente.');
+            } else {
+                Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información de antecedentes patológicos.');
+            }
+
+            $url = Url::to(['view', 'id' => $id]) . '#expediente_medico';
+            return $this->redirect($url);
+        }
+    }
+
+    return $this->render('view', [
+        'model' => $modelEmpleado,
+        'documentos' => $documentos,
+        'documentoModel' => $documentoModel,
+        'historial' => $historial,
+        'searchModel' => $searchModel,
+        'dataProvider' => $dataProvider,
+        'expedienteMedico' => $expedienteMedico,
+        'antecedentes' => $antecedentes,
+        'catAntecedentes' => $catAntecedentes,
+        'descripcionAntecedentes' => $descripcionAntecedentes,
+        'antecedenteNoPatologico' => $antecedenteNoPatologico, // Pasar el modelo a la vista
+    ]);
+}
+
+    public function actionPatologicos($id)
+    {
+        $modelEmpleado = $this->findModel2($id);
+        $expedienteMedico = $modelEmpleado->expedienteMedico;
     
-           /// Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información del trabajador.');
-                $url = Url::to(['view', 'id' => $id,]) . '#expediente_medico';
+        $antecedentePatologico = AntecedentePatologico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+        if (!$antecedentePatologico) {
+            $antecedentePatologico = new AntecedentePatologico();
+        }
+    
+        if (Yii::$app->request->isPost) {
+            $descripcionAntecedentes = Yii::$app->request->post('descripcion_antecedentes');
+    
+            $antecedentePatologico->expediente_medico_id = $expedienteMedico->id;
+            $antecedentePatologico->descripcion_antecedentes = $descripcionAntecedentes;
+    
+            if ($antecedentePatologico->save()) {
+                Yii::$app->session->setFlash('success', 'Información de antecedentes patológicos guardada correctamente.');
+                $url = Url::to(['view', 'id' => $id]) . '#patologicos';
                 return $this->redirect($url);
+            } else {
+                Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información de antecedentes patológicos.');
+                $url = Url::to(['view', 'id' => $id]) . '#patologicos';
+                return $this->redirect($url);
+            }
+
+         
         }
     
         return $this->render('view', [
             'model' => $modelEmpleado,
-            'documentos' => $documentos,
-            'documentoModel' => $documentoModel,
-            'historial' => $historial,
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
             'expedienteMedico' => $expedienteMedico,
-            'antecedentes' => $antecedentes,
-            'catAntecedentes' => $catAntecedentes,
+            'descripcionAntecedentes' => $antecedentePatologico->descripcion_antecedentes,
         ]);
     }
-        
+    
+
+    public function actionNoPatologicos($id)
+{
+    $modelEmpleado = $this->findModel2($id);
+    $expedienteMedico = $modelEmpleado->expedienteMedico;
+
+    $modelAntecedenteNoPatologico = AntecedenteNoPatologico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+    if (!$modelAntecedenteNoPatologico) {
+        $modelAntecedenteNoPatologico = new AntecedenteNoPatologico();
+        $modelAntecedenteNoPatologico->expediente_medico_id = $expedienteMedico->id;
+    }
+
+    if ($modelAntecedenteNoPatologico->load(Yii::$app->request->post()) && $modelAntecedenteNoPatologico->save()) {
+        Yii::$app->session->setFlash('success', 'Información de antecedentes no patológicos guardada correctamente.');
+    } else {
+        Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información de antecedentes no patológicos.');
+    }
+
+    return $this->redirect(['view', 'id' => $id]);
+
+    return $this->render('view', [
+        'model' => $modelEmpleado,
+        'expedienteMedico' => $expedienteMedico,
+        'modelAntecedenteNoPatologico' => $modelAntecedenteNoPatologico, // Asegúrate de pasar este modelo
+    ]);
+}
+
+    
 
   
     /**

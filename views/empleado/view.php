@@ -60,11 +60,30 @@ $activeTab = Yii::$app->request->get('tab', 'info_p');
 $currentDate = date('Y-m-d');
 $antecedentesExistentes = [];
 $observacionGeneral = '';
-foreach ($antecedentes as $antecedente) {
-    $antecedentesExistentes[$antecedente->cat_antecedente_hereditario_id][$antecedente->parentezco] = true;
-    // Asumimos que todos los antecedentes tienen la misma observación general, así que tomamos la observación del primer antecedente.
-    if (empty($observacionGeneral)) {
-        $observacionGeneral = $antecedente->observacion;
+$descripcionAntecedentes = '';
+$modelAntecedenteNoPatologico = new \app\models\AntecedenteNoPatologico();
+
+if ($antecedentes) {
+    foreach ($antecedentes as $antecedente) {
+        $antecedentesExistentes[$antecedente->cat_antecedente_hereditario_id][$antecedente->parentezco] = true;
+        if (empty($observacionGeneral)) {
+            $observacionGeneral = $antecedente->observacion;
+        }
+    }
+}
+
+// Si ya existe un antecedente patológico, obtenemos su descripción
+if ($expedienteMedico) {
+    $antecedentePatologico = \app\models\AntecedentePatologico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+    if ($antecedentePatologico) {
+        $descripcionAntecedentes = $antecedentePatologico->descripcion_antecedentes;
+    }
+
+    // Obtener antecedentes no patológicos
+    $modelAntecedenteNoPatologico = \app\models\AntecedenteNoPatologico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+    if (!$modelAntecedenteNoPatologico) {
+        $modelAntecedenteNoPatologico = new \app\models\AntecedenteNoPatologico();
+        $modelAntecedenteNoPatologico->expediente_medico_id = $expedienteMedico->id;
     }
 }
 ?>
@@ -1282,7 +1301,7 @@ foreach ($antecedentes as $antecedente) {
                                     [
                                         'label' => 'Información personal',
                                         'content' => $this->blocks['info_p'],
-                                        'active' => true,
+                                      //  'active' => true,
                                         'options' => [
                                             'id' => 'informacion_personal',
                                         ],
@@ -1526,89 +1545,608 @@ $this->registerJs("
 
                             <?php $this->endBlock(); ?>
                             <?php $this->beginBlock('expediente_medico'); ?>
-
                             <?php $this->beginBlock('antecedentes'); ?>
-    <?php $form = ActiveForm::begin(); ?>
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
+
+<!-- Bloque de antecedentes hereditarios -->
+<?php $this->beginBlock('hereditarios'); ?>
+<?php $form = ActiveForm::begin(['action' => ['empleado/view', 'id' => $model->id]]); ?>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
             <div class="card-header gradient-blue text-white text-center">
-            <h2>Antecedentes Hereditarios</h2>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-8">
-                            <div class="table-responsive">
-                                <table class="table table-bordered">
-                                    <thead>
+                <h2>Antecedentes Hereditarios</h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Enfermedad</th>
+                                        <th>Abuelos</th>
+                                        <th>Hermanos</th>
+                                        <th>Madre</th>
+                                        <th>Padre</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($catAntecedentes as $catAntecedente): ?>
                                         <tr>
-                                            <th>Enfermedad</th>
-                                            <th>Abuelos</th>
-                                            <th>Hermanos</th>
-                                            <th>Madre</th>
-                                            <th>Padre</th>
+                                            <td><?= Html::encode($catAntecedente->nombre) ?></td>
+                                            <?php foreach (['Abuelos', 'Hermanos', 'Madre', 'Padre'] as $parentezco): ?>
+                                                <td>
+                                                    <?= Html::checkbox("AntecedenteHereditario[{$catAntecedente->id}][$parentezco]", isset($antecedentesExistentes[$catAntecedente->id][$parentezco]), [
+                                                        'value' => 1,
+                                                        'label' => '',
+                                                    ]) ?>
+                                                </td>
+                                            <?php endforeach; ?>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($catAntecedentes as $catAntecedente): ?>
-                                            <tr>
-                                                <td><?= Html::encode($catAntecedente->nombre) ?></td>
-                                                <?php foreach (['Abuelos', 'Hermanos', 'Madre', 'Padre'] as $parentezco): ?>
-                                                    <td>
-                                                        <?= Html::checkbox("AntecedenteHereditario[{$catAntecedente->id}][$parentezco]", isset($antecedentesExistentes[$catAntecedente->id][$parentezco]), [
-                                                            'value' => 1,
-                                                            'label' => '',
-                                                        ]) ?>
-                                                    </td>
-                                                <?php endforeach; ?>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                            </div>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
                         </div>
-                        <div class="col-md-4 d-flex flex-column justify-content-between" style="height: 100%;">
-    <div class="form-group text-center">
-        <?= Html::label('Observaciones', 'observacion_general') ?>
-        <?= Html::textarea('observacion_general', $observacionGeneral, [
-            'class' => 'form-control',
-            'rows' => 14,
-            'style' => 'width: 100%;',
-        ]) ?>
-    </div>
-    <br>
-    <div class="form-group mt-auto d-flex justify-content-end  ">
-       
-        <?= Html::submitButton('Guardar &nbsp; &nbsp;  <i class="fa fa-save"></i> ', ['class' => 'btn btn-success']) ?>
-
-    </div>
-</div>
-
-
                     </div>
+                    <div class="col-md-4 d-flex flex-column justify-content-between" style="height: 100%;">
+                        <div class="form-group text-center">
+                            <?= Html::label('Observaciones', 'observacion_general') ?>
+                            <?= Html::textarea('observacion_general', $observacionGeneral, [
+                                'class' => 'form-control',
+                                'rows' => 30,
+                                'style' => 'width: 100%;',
+                            ]) ?>
+                        </div>
+                        <br>
+                        <div class="form-group mt-auto d-flex justify-content-end">
+                            <?= Html::submitButton('Guardar &nbsp; &nbsp;  <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                        </div>
+                    </div>
+                    <div class="alert alert-white custom-alert" role="alert">
+                <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Causas de muerte, malformaciones congénitas, diabetes, cardiopatías, hipertensión arterial, infartos, ateroesclerosis, accidentes vasculares, neuropatías, tuberculosis, artropatías, hemopatías, sida, sífilis, hemopatías, neoplasias, consanguinidad, alcoholismo, toxicomanías.
+                </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
+<?php ActiveForm::end(); ?>
+<?php $this->endBlock(); ?>
 
+<!-- Bloque de antecedentes patológicos -->
+<?php $this->beginBlock('patologicos'); ?>
+<?php $form = ActiveForm::begin(['action' => ['empleado/patologicos', 'id' => $model->id]]); ?>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header gradient-blue text-white text-center">
+                <h2>Antecedentes Patológicos</h2>
+            </div>
+            <div class="card-body">
+
+                <div class="form-group">
+                    <?= Html::label('Descripción de Antecedentes Patológicos', 'descripcion_antecedentes') ?>
+                    <?= Html::textarea('descripcion_antecedentes', $descripcionAntecedentes, [
+                        'class' => 'form-control',
+                        'rows' => 15,
+                        'style' => 'width: 100%;',
+                    ]) ?>
+                </div>
+                <div class="form-group text-right">
+                    <?= Html::submitButton('Guardar &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                </div>
+                <div class="alert alert-white custom-alert" role="alert">
+                <i class="fa fa-exclamation-circle" aria-hidden="true"></i>                Peso al nacer, anormalidades perinatales, desarrollo físico y mental, y el esquema básico de vacunación.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?php ActiveForm::end(); ?>
+<?php $this->endBlock(); ?>
+
+<?php $this->beginBlock('no_patologicos'); ?>
+
+<?php $form = ActiveForm::begin(['action' => ['empleado/no-patologicos', 'id' => $model->id]]); ?>
+<div class="row">
+    <div class="col-md-12">
     
+        <div class="card">
+            <div class="card-header gradient-blue text-white text-center">
+                <h2>Antecedentes No Patológicos</h2>
+            </div>
+            <div class="card-body">
+            <div class="container">
+            <div class="card">
+    <div class="card-header custom-nopato text-white text-left">
+        <h5>ACTIVIDAD FISICA</h5>
+        <div class="form-group">
+                    <?= Html::submitButton('  <i class="fa fa-save" style="color: #007bff;"></i>&nbsp; &nbsp; Guardar', ['class' => 'btn btn-light float-right mr-3']) ?>
+                </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <!-- Columna izquierda con los campos -->
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col-6 col-sm-4">
+                        <div class="custom-control custom-checkbox">
+                            <?= Html::checkbox('AntecedenteNoPatologico[p_ejercicio]', $antecedenteNoPatologico->p_ejercicio, [
+                                'class' => 'custom-control-input',
+                                'id' => 'p_ejercicio'
+                            ]) ?>
+                            <?= Html::label('¿Realiza ejercicio?', 'p_ejercicio', ['class' => 'custom-control-label']) ?>
+                        </div>
+                    </div>
+                    <div class="col-6 col-sm-6">
+                        <?= Html::label('Minutos al día', 'p_minutos_x_dia_ejercicio') ?>
+                        <?= Html::input('number', 'AntecedenteNoPatologico[p_minutos_x_dia_ejercicio]', $antecedenteNoPatologico->p_minutos_x_dia_ejercicio, ['class' => 'form-control']) ?>
+                    </div>
+                    <div class="w-100"></div>
+                    <br>
+                    <div class="col-6 col-sm-4">
+                        <div class="custom-control custom-checkbox">
+                            <?= Html::checkbox('AntecedenteNoPatologico[p_deporte]', $modelAntecedenteNoPatologico->p_deporte, [
+                                'class' => 'custom-control-input',
+                                'id' => 'p_deporte'
+                            ]) ?>
+                            <?= Html::label('¿Realiza algún deporte?', 'p_deporte', ['class' => 'custom-control-label']) ?>
+                        </div>
+                    </div>
+                    <div class="col-6 col-sm-4">
+                        <?= Html::label('¿Cuál deporte?', 'p_a_deporte') ?>
+                        <?= Html::textInput('AntecedenteNoPatologico[p_a_deporte]', $modelAntecedenteNoPatologico->p_a_deporte, ['class' => 'form-control']) ?>
+                    </div>
+                    <div class="col-6 col-sm-4">
+                        <?= Html::label('Frecuencia con la que practica', 'p_frecuencia_deporte') ?>
+                        <?= Html::textInput('AntecedenteNoPatologico[p_frecuencia_deporte]', $modelAntecedenteNoPatologico->p_frecuencia_deporte, ['class' => 'form-control']) ?>
+                    </div>
+                    <div class="w-100"></div>
+                    <br>
+                    <div class="col-6 col-sm-4">
+                        <?= Html::label('Horas que duerme por día', 'p_horas_sueño') ?>
+                        <?= Html::input('number', 'AntecedenteNoPatologico[p_horas_sueño]', $antecedenteNoPatologico->p_horas_sueño, ['class' => 'form-control']) ?>
+                    </div>
+                    <div class="col-6 col-sm-6">
+                        <div class="custom-control custom-checkbox">
+                            <?= Html::checkbox('AntecedenteNoPatologico[p_dormir_dia]', $modelAntecedenteNoPatologico->p_dormir_dia, [
+                                'class' => 'custom-control-input',
+                                'id' => 'p_dormir_dia'
+                            ]) ?>
+                            <?= Html::label('¿Duerme durante el día?', 'p_dormir_dia', ['class' => 'custom-control-label']) ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Columna derecha con el textarea -->
+            <div class="col-md-4">
+                <div class="form-group">
+                    <?= Html::label('Observaciones', 'observacion_actividad_fisica') ?>
+                    <?= Html::textarea('AntecedenteNoPatologico[observacion_actividad_fisica]', $antecedenteNoPatologico->observacion_actividad_fisica, ['class' => 'form-control', 'rows' => 10]) ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <?php ActiveForm::end(); ?>
-    <?php $this->endBlock(); ?>
+
+<div class="card">
+    <div class="card-header custom-nopato text-white text-left">
+        <h5>HABITOS ALIMENTICIOS</h5>
+        <div class="form-group">
+                    <?= Html::submitButton('  <i class="fa fa-save" style="color: #007bff;"></i>&nbsp; &nbsp; Guardar', ['class' => 'btn btn-light float-right mr-3']) ?>
+                </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <!-- Columna izquierda con los campos -->
+            <div class="col-md-8">
+                <div class="row">
+                <div class="col-6 col-sm-3">
+                        <div class="custom-control custom-checkbox">
+                            <?= Html::checkbox('AntecedenteNoPatologico[p_desayuno]', $antecedenteNoPatologico->p_desayuno, [
+                                'class' => 'custom-control-input',
+                                'id' => 'p_desayuno'
+                            ]) ?>
+                            <?= Html::label('¿Desayuna?', 'p_desayuno', ['class' => 'custom-control-label']) ?>
+                        </div>
+                </div>
+
+                <div class="col-6 col-sm-6">
+                
+                <?= Html::label('Número de comidas al día', 'p_comidas_x_dia') ?>
+                        <?= Html::input('number', 'AntecedenteNoPatologico[p_comidas_x_dia]', $antecedenteNoPatologico->p_comidas_x_dia, ['class' => 'form-control']) ?>
+                    
+                        
+                </div>
+
+                        <div class="w-100"></div>
+
+                        <br>
+                        <div class="col-6 col-sm-3">
+
+                        <div class="custom-control custom-checkbox">
+                            <?= Html::checkbox('AntecedenteNoPatologico[p_cafe]', $antecedenteNoPatologico->p_cafe, [
+                                'class' => 'custom-control-input',
+                                'id' => 'p_cafe'
+                            ]) ?>
+                            <?= Html::label('¿Toma café?', 'p_cafe', ['class' => 'custom-control-label']) ?>
+                        </div>
+
+
+
+                </div>
+
+                <div class="col-6 col-sm-6">
+                        <?= Html::label('Tazas de café al día', 'p_tazas_x_dia') ?>
+                        <?= Html::input('number', 'AntecedenteNoPatologico[p_tazas_x_dia]', $antecedenteNoPatologico->p_tazas_x_dia, ['class' => 'form-control']) ?>
+                    </div>
+
+                    <div class="w-100"></div>
+
+<br>
+<div class="col-6 col-sm-6">
+
+                        <div class="custom-control custom-checkbox">
+                            <?= Html::checkbox('AntecedenteNoPatologico[p_refresco]', $antecedenteNoPatologico->p_refresco, [
+                                'class' => 'custom-control-input',
+                                'id' => 'p_refresco'
+                            ]) ?>
+                            <?= Html::label('¿Toma refresco?', 'p_refresco', ['class' => 'custom-control-label']) ?>
+                        </div>
+</div>
+                       
+                  
+                    
+                    <div class="w-100"></div>
+                    <br>
+                    <div class="col-6 col-sm-3">
+                    <div class="custom-control custom-checkbox">
+                            <?= Html::checkbox('AntecedenteNoPatologico[p_dieta]', $antecedenteNoPatologico->p_dieta, [
+                                'class' => 'custom-control-input',
+                                'id' => 'p_dieta'
+                            ]) ?>
+                            <?= Html::label('¿Sigue alguna dieta?', 'p_dieta', ['class' => 'custom-control-label']) ?>
+                        </div>
+                    </div>
+                    <div class="col-6 col-sm-6">
+                    <div class="form-group">
+                    <?= Html::label('Información sobre la dieta', 'p_info_dieta') ?>
+                    <?= Html::textarea('AntecedenteNoPatologico[p_info_dieta]', $antecedenteNoPatologico->p_info_dieta, ['class' => 'form-control', 'rows' => 4]) ?>
+                </div>
+                    </div>
+
+                </div>
+            </div>
+            <!-- Columna derecha con el textarea -->
+            <div class="col-md-4">
+                <div class="form-group">
+                    <?= Html::label('Observaciones', 'observacion_comida') ?>
+                    <?= Html::textarea('AntecedenteNoPatologico[observacion_comida]', $antecedenteNoPatologico->observacion_comida, ['class' => 'form-control', 'rows' => 10]) ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header custom-nopato text-white text-left">
+        <h5>ALCOHOLISMO</h5>
+        <div class="form-group">
+                    <?= Html::submitButton('  <i class="fa fa-save" style="color: #007bff;"></i>&nbsp; &nbsp; Guardar', ['class' => 'btn btn-light float-right mr-3']) ?>
+                </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <!-- Columna izquierda con los campos -->
+            <div class="col-md-7">
+                <div class="row">
+                <div class="col-6 col-sm-4">
+                        <div class="custom-control custom-checkbox">
+                            <?= Html::checkbox('AntecedenteNoPatologico[p_alcohol]', $antecedenteNoPatologico->p_alcohol, [
+                                'class' => 'custom-control-input',
+                                'id' => 'p_alcohol'
+                            ]) ?>
+                            <?= Html::label('¿Consume alcohol?', 'p_alcohol', ['class' => 'custom-control-label']) ?>
+                        </div>
+                    </div>  
+                    <div class="col-6 col-sm-6">
+  <!-- Campo dropdown -->
+  <div class="form-group">
+                    <?= Html::label('Frecuencia de Consumo de Alcohol', 'p_frecuencia_alcohol') ?>
+                    <?= Html::dropDownList('AntecedenteNoPatologico[p_frecuencia_alcohol]', $antecedenteNoPatologico->p_frecuencia_alcohol, [
+                    
+                        'Casual' => 'Casual',
+                        'Moderado' => 'Moderado',
+                        'Intenso' => 'Intenso',
+                    ], ['class' => 'form-control']) ?>
+                </div>
+                    <?= Html::label('Edad a la que comenzó a béber', 'p_edad_alcoholismo') ?>
+                        <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_alcoholismo]', $antecedenteNoPatologico->p_edad_alcoholismo, ['class' => 'form-control']) ?>
+                    
+                      
+                        <?= Html::label('Copas de licor/vino al día', 'p_copas_x_dia') ?>
+                        <?= Html::input('number', 'AntecedenteNoPatologico[p_copas_x_dia]', $antecedenteNoPatologico->p_copas_x_dia, ['class' => 'form-control']) ?>
+                    
+                        <?= Html::label('Número de cervezas al día', 'p_cervezas_x_dia') ?>
+                        <?= Html::input('number', 'AntecedenteNoPatologico[p_cervezas_x_dia]', $antecedenteNoPatologico->p_cervezas_x_dia, ['class' => 'form-control']) ?>
+                    </div>
+                 
+
+
+                    <div class="w-100"></div>
+<br>
+
+                    <div class="col-6 col-sm-4">
+                        <div class="custom-control custom-checkbox">
+                            <?= Html::checkbox('AntecedenteNoPatologico[p_ex_alcoholico]', $antecedenteNoPatologico->p_ex_alcoholico, [
+                                'class' => 'custom-control-input',
+                                'id' => 'p_ex_alcoholico'
+                            ]) ?>
+                            <?= Html::label('Ex-alcoholico', 'p_ex_alcoholico', ['class' => 'custom-control-label']) ?>
+                        </div>
+                    </div>  
+                    <div class="col-6 col-sm-6">
+                    <?= Html::label('Edad en la que dejo de beber', 'p_edad_fin_alcoholismo') ?>
+                        <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_fin_alcoholismo]', $antecedenteNoPatologico->p_edad_fin_alcoholismo, ['class' => 'form-control']) ?>
+                    
+                        
+                    
+                    </div>
+                   
 
 
 
 
-    <?php $this->beginBlock('patologicos'); ?>
-    
-    <?php $this->endBlock(); ?>
+                </div>
+            </div>
+            <!-- Columna derecha con el textarea -->
+            <div class="col-md-5">
+                <div class="form-group">
+                    <?= Html::label('Observaciones', 'observacion_alcoholismo') ?>
+                    <?= Html::textarea('AntecedenteNoPatologico[observacion_alcoholismo]', $antecedenteNoPatologico->observacion_alcoholismo, ['class' => 'form-control', 'rows' => 10]) ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-     
+
+<div class="card">
+    <div class="card-header custom-nopato text-white text-left">
+        <h5>TABAQUISMO</h5>
+        <div class="form-group">
+                    <?= Html::submitButton('  <i class="fa fa-save" style="color: #007bff;"></i>&nbsp; &nbsp; Guardar', ['class' => 'btn btn-light float-right mr-3']) ?>
+                </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <!-- Columna izquierda con los campos -->
+            <div class="col-md-8">
+                <div class="row">
+                <div class="col-6 col-sm-4">
+                        <div class="custom-control custom-checkbox">
+                            <?= Html::checkbox('AntecedenteNoPatologico[p_fuma]', $antecedenteNoPatologico->p_fuma, [
+                                'class' => 'custom-control-input',
+                                'id' => 'p_fuma'
+                            ]) ?>
+                            <?= Html::label('¿Fúma?', 'p_fuma', ['class' => 'custom-control-label']) ?>
+                        </div>
+                    </div>  
+                    <div class="col-6 col-sm-6">
+  <!-- Campo dropdown -->
+  <div class="form-group">
+                    <?= Html::label('Frecuencia de Consumo de Tabaco', 'p_frecuencia_tabaquismo') ?>
+                    <?= Html::dropDownList('AntecedenteNoPatologico[p_frecuencia_tabaquismo]', $antecedenteNoPatologico->p_frecuencia_tabaquismo, [
+                    
+                        'Casual' => 'Casual',
+                        'Moderado' => 'Moderado',
+                        'Intenso' => 'Intenso',
+                    ], ['class' => 'form-control']) ?>
+                </div>
+                    <?= Html::label('Edad a la que comenzó a fumar', 'p_edad_tabaquismo') ?>
+                        <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_tabaquismo]', $antecedenteNoPatologico->p_edad_tabaquismo, ['class' => 'form-control']) ?>
+                    
+                      
+                        <?= Html::label('Número de cigarros al día', 'p_no_cigarros_x_dia') ?>
+                        <?= Html::input('number', 'AntecedenteNoPatologico[p_no_cigarros_x_dia]', $antecedenteNoPatologico->p_no_cigarros_x_dia, ['class' => 'form-control']) ?>
+                    
+                                         </div>
+                 
 
 
-        <?php $this->beginBlock('no-patologicos'); ?>
-        <p>no</p>
-        <?php $this->endBlock(); ?>
+                    <div class="w-100"></div>
+<br>
+                    <div class="col-6 col-sm-4">
+                        <div class="custom-control custom-checkbox">
+                            <?= Html::checkbox('AntecedenteNoPatologico[p_ex_fumador]', $antecedenteNoPatologico->p_ex_fumador, [
+                                'class' => 'custom-control-input',
+                                'id' => 'p_ex_fumador'
+                            ]) ?>
+                            <?= Html::label('Ex-Fumador', 'p_ex_fumador', ['class' => 'custom-control-label']) ?>
+                        </div>
+                    </div> 
+                    <div class="col-6 col-sm-6">
+                    <?= Html::label('Edad en la que dejo de fumar', 'p_edad_fin_tabaquismo') ?>
+                        <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_fin_tabaquismo]', $antecedenteNoPatologico->p_edad_fin_tabaquismo, ['class' => 'form-control']) ?>
+                    
+                        
+                    
+                    </div> 
+                    <div class="w-100"></div>
+
+                    <div class="col-6 col-sm-4">
+                        <div class="custom-control custom-checkbox">
+                            <?= Html::checkbox('AntecedenteNoPatologico[p_fumador_pasivo]', $antecedenteNoPatologico->p_fumador_pasivo, [
+                                'class' => 'custom-control-input',
+                                'id' => 'p_fumador_pasivo'
+                            ]) ?>
+                            <?= Html::label('Fumador Pasivo', 'p_fumador_pasivo', ['class' => 'custom-control-label']) ?>
+                        </div>
+                    </div> 
+
+                </div>
+            </div>
+            <!-- Columna derecha con el textarea -->
+            <div class="col-md-4">
+                <div class="form-group">
+                    <?= Html::label('Observaciones', 'observacion_tabaquismo') ?>
+                    <?= Html::textarea('AntecedenteNoPatologico[observacion_tabaquismo]', $antecedenteNoPatologico->observacion_tabaquismo, ['class' => 'form-control', 'rows' => 10]) ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="card">
+    <div class="card-header custom-nopato text-white text-left">
+        <h5>OTROS</h5>
+        <div class="form-group">
+                    <?= Html::submitButton('  <i class="fa fa-save" style="color: #007bff;"></i>&nbsp; &nbsp; Guardar', ['class' => 'btn btn-light float-right mr-3']) ?>
+                </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <!-- Columna izquierda con los campos -->
+            <div class="col-md-6">
+                <div class="row">
+              
+                <div class="form-group">
+                    <?= Html::label('¿Qué actividades realiza en sus horas libres?', 'p_act_dias_libres') ?>
+                    <?= Html::textarea('AntecedenteNoPatologico[p_act_dias_libres]', $antecedenteNoPatologico->p_act_dias_libres, ['class' => 'form-control', 'rows' => 5]) ?>
+                </div>
+                <div class="form-group">
+                    <?= Html::label('¿Pasa por algunas de estas situaciones?', 'p_situaciones') ?>
+                    <?= Html::dropDownList('AntecedenteNoPatologico[p_situaciones]', $antecedenteNoPatologico->p_situaciones, [
+                                            'Ninguna' => 'Ninguna',
+
+                        'Duelo' => 'Duelo',
+                        'Embarazos' => 'Embarazos',
+                        'Divorcio' => 'Divorcio',
+                    ], ['class' => 'form-control']) ?>
+                </div>
+               
+
+
+                </div>
+            </div>
+            <!-- Columna derecha con el textarea -->
+            <div class="col-md-6">
+            <div class="form-group">
+                    <?= Html::label('Descripción de su vivienda (Tiene mascotas, Recursos del hogar, Etc.)', 'datos_vivienda') ?>
+                    <?= Html::textarea('AntecedenteNoPatologico[datos_vivienda]', $antecedenteNoPatologico->datos_vivienda, ['class' => 'form-control', 'rows' => 8]) ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header custom-nopato text-white text-left">
+        <h5>CONSUMO DE DROGAS</h5>
+        <div class="form-group">
+                    <?= Html::submitButton('  <i class="fa fa-save" style="color: #007bff;"></i>&nbsp; &nbsp; Guardar', ['class' => 'btn btn-light float-right mr-3']) ?>
+                </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <!-- Columna izquierda con los campos -->
+            <div class="col-md-8">
+                <div class="row">
+                <div class="col-6 col-sm-4">
+                        <div class="custom-control custom-checkbox">
+                            <?= Html::checkbox('AntecedenteNoPatologico[p_drogas]', $antecedenteNoPatologico->p_drogas, [
+                                'class' => 'custom-control-input',
+                                'id' => 'p_drogas'
+                            ]) ?>
+                            <?= Html::label('¿Consume algún tipo de droga?', 'p_drogas', ['class' => 'custom-control-label']) ?>
+                        </div>
+                    </div>  
+
+                   
+                
+                    <div class="col-6 col-sm-6">
+  <!-- Campo dropdown -->
+  <div class="form-group">
+                    <?= Html::label('Frecuencia de su consumo', 'p_frecuencia_droga') ?>
+                    <?= Html::dropDownList('AntecedenteNoPatologico[p_frecuencia_droga]', $antecedenteNoPatologico->p_frecuencia_droga, [
+                    
+                        'Casual' => 'Casual',
+                        'Moderado' => 'Moderado',
+                        'Intenso' => 'Intenso',
+                    ], ['class' => 'form-control']) ?>
+                </div>
+                    <?= Html::label('¿A qué edad se inicio el consumo?', 'p_edad_droga') ?>
+                        <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_droga]', $antecedenteNoPatologico->p_edad_droga, ['class' => 'form-control']) ?>
+                    
+
+                        <div class="custom-control custom-checkbox">
+                            <?= Html::checkbox('AntecedenteNoPatologico[p_droga_intravenosa]', $antecedenteNoPatologico->p_droga_intravenosa, [
+                                'class' => 'custom-control-input',
+                                'id' => 'p_droga_intravenosa'
+                            ]) ?>
+                            <br>
+                            <?= Html::label('¿Usa drogas intravenosa?', 'p_droga_intravenosa', ['class' => 'custom-control-label']) ?>
+                        </div>
+
+                     </div>
+
+                     <div class="w-100"></div>
+<br>
+                    <div class="col-6 col-sm-4">
+                        <div class="custom-control custom-checkbox">
+                            <?= Html::checkbox('AntecedenteNoPatologico[p_ex_adicto]', $antecedenteNoPatologico->p_ex_adicto, [
+                                'class' => 'custom-control-input',
+                                'id' => 'p_ex_adicto'
+                            ]) ?>
+                            <?= Html::label('Ex-Adicto', 'p_ex_adicto', ['class' => 'custom-control-label']) ?>
+                        </div>
+                    </div> 
+                    <div class="col-6 col-sm-6">
+                    <?= Html::label('¿A qué edad dejo de consumir?', 'p_edad_fin_droga') ?>
+                        <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_fin_droga]', $antecedenteNoPatologico->p_edad_fin_droga, ['class' => 'form-control']) ?>
+                    
+                        
+                    
+                    </div> 
+               
+
+
+                </div>
+            </div>
+            <!-- Columna derecha con el textarea -->
+            <div class="col-md-4">
+            <div class="form-group">
+                    <?= Html::label('Observaciones', 'observacion_droga') ?>
+                    <?= Html::textarea('AntecedenteNoPatologico[observacion_droga]', $antecedenteNoPatologico->observacion_droga, ['class' => 'form-control', 'rows' => 10]) ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+            </div>
+               
+
+               
+                <br>
+             
+                <!-- Agrega aquí el resto de los campos siguiendo el mismo patrón -->
+             
+            </div>
+        </div>
+    </div>
+</div>
+<?php ActiveForm::end(); ?>
+
+<?php $this->endBlock(); ?>
 
 
         
@@ -1618,10 +2156,10 @@ $this->registerJs("
                             'items' => [
                                 [
                                     'label' => 'Hereditarios',
-                                    'content' => $this->blocks['antecedentes'],
-                                    'active' => true,
+                                    'content' => $this->blocks['hereditarios'],
+                                    //'active' => true,
                                     'options' => [
-                                        'id' => 'antecedentes',
+                                        'id' => 'hereditarios',
                                     ],
 
 
@@ -1629,7 +2167,7 @@ $this->registerJs("
                                 [
                                     'label' => 'Patologicos',
                                     'content' => $this->blocks['patologicos'],
-                                 //   'active' => true,
+                               
                                     'options' => [
                                         'id' => 'patologicos',
                                     ],
@@ -1638,10 +2176,10 @@ $this->registerJs("
                                 ],
                                 [
                                     'label' => 'No Patologicos',
-                                    'content' => $this->blocks['no-patologicos'],
-                                 //   'active' => true,
+                                    'content' => $this->blocks['no_patologicos'],
+                                 
                                     'options' => [
-                                        'id' => 'no-patologicos',
+                                        'id' => 'no_patologicos',
                                     ],
 
 
@@ -1666,6 +2204,44 @@ $this->registerJs("
                             <?php $this->endBlock(); ?>
 
 
+                            <br><br>
+                            <?php echo TabsX::widget([
+                            'enableStickyTabs' => true,
+                            'options' => ['class' => 'nav-tabs-custom'],
+                            'items' => [
+                                [
+                                    'label' => 'Antecedentes',
+                                    'content' => $this->blocks['antecedentes'],
+                                   // 'active' => true,
+                                    'options' => [
+                                        'id' => 'antecedentes',
+                                    ],
+
+
+                                ],
+                               
+                           
+                              
+                               
+
+                            ],
+                           'position' => TabsX::POS_ABOVE,
+                           'align' => TabsX::ALIGN_LEFT,
+                       //     'bordered'=>true,
+                            'encodeLabels' => false
+
+
+                        ]);
+
+                        ?>
+
+
+
+                            <?php $this->endBlock(); ?>
+
+<!-- antecedentes-->
+
+
                             <?php $this->endBlock(); ?>
 
 
@@ -1682,7 +2258,7 @@ $this->registerJs("
                                 [
                                     'label' => 'Información',
                                     'content' => $this->blocks['datos'],
-                                    'active' => true,
+                                 //   'active' => true,
                                     'options' => [
                                         'id' => 'datos',
                                     ],
