@@ -17,7 +17,8 @@ use Yii;
  * @property string|null $alergias
  * @property int|null $no_seguridad_social
  * @property int|null $empleado_id
- *
+ * @property int|null $exploracion_fisica_id
+
  * @property AntecedenteHereditario $antecedenteHereditario
  * @property AntecedenteHereditario[] $antecedenteHereditarios
  * @property AntecedenteNoPatologico $antecedenteNoPatologico
@@ -25,6 +26,8 @@ use Yii;
  * @property Documento $documento
  * @property Empleado $empleado
  * @property Empleado[] $empleados
+  * @property ExploracionFisica $exploracionFisica
+ * @property ExploracionFisica[] $exploracionFisicas
  */
 class ExpedienteMedico extends \yii\db\ActiveRecord
 {
@@ -49,6 +52,8 @@ class ExpedienteMedico extends \yii\db\ActiveRecord
             [['antecedente_patologico_id'], 'exist', 'skipOnError' => true, 'targetClass' => AntecedentePatologico::class, 'targetAttribute' => ['antecedente_patologico_id' => 'id']],
             [['documento_id'], 'exist', 'skipOnError' => true, 'targetClass' => Documento::class, 'targetAttribute' => ['documento_id' => 'id']],
             [['empleado_id'], 'exist', 'skipOnError' => true, 'targetClass' => Empleado::class, 'targetAttribute' => ['empleado_id' => 'id']],
+            [['exploracion_fisica_id'], 'exist', 'skipOnError' => true, 'targetClass' => ExploracionFisica::class, 'targetAttribute' => ['exploracion_fisica_id' => 'id']],
+
         ];
     }
 
@@ -68,6 +73,8 @@ class ExpedienteMedico extends \yii\db\ActiveRecord
             'alergias' => 'Alergias',
             'no_seguridad_social' => 'No Seguridad Social',
             'empleado_id' => 'Empleado ID',
+            'exploracion_fisica_id' => 'Exploracion Fisica ID',
+
         ];
     }
 
@@ -139,5 +146,20 @@ class ExpedienteMedico extends \yii\db\ActiveRecord
     public function getEmpleados()
     {
         return $this->hasMany(Empleado::class, ['expediente_medico_id' => 'id']);
+    }
+
+    public function getExploracionFisica()
+    {
+        return $this->hasOne(ExploracionFisica::class, ['id' => 'exploracion_fisica_id']);
+    }
+
+    /**
+     * Gets query for [[ExploracionFisicas]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getExploracionFisicas()
+    {
+        return $this->hasMany(ExploracionFisica::class, ['expediente_medico_id' => 'id']);
     }
 }

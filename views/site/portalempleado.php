@@ -48,7 +48,7 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
 
 <?php $this->beginBlock('informacion_personal'); ?>
 
-<div class="card">
+<div class="card mt-4">
             <div class="card-header bg-info text-white">
                 <h3>Información personal</h3>
             </div>
@@ -201,15 +201,23 @@ $this->beginBlock('informacion_laboral'); ?>
                     'label' => 'Hora de entrada',
                     'attribute' => 'horario_laboral_inicio:time',
                     'value' => function($model) {
-                        return $model->horario_laboral_inicio;
+$hora = date("g:i A", strtotime($model->horario_laboral_inicio));
+
+
+                        return $hora;
                     },
                 ],
-                
+
+
+               
                 [
                     'label' => 'Hora de salida',
                     'attribute' => 'horario_laboral_fin:time',
                     'value' => function($model) {
-                        return $model->horario_laboral_fin;
+$hora = date("g:i A", strtotime($model->horario_laboral_fin));
+
+
+                        return $hora;
                     },
                 ],
                 [
@@ -247,6 +255,23 @@ $this->beginBlock('informacion_laboral'); ?>
 </div>
 
 <?php $this->endBlock(); ?>
+
+<?php $this->beginBlock('informacion_medica'); ?>
+
+
+<div class="card mt-4">
+    <div class="card-header bg-info text-white">
+        <h3>Información Medica</h3>
+    </div>
+    <div class="card-body">
+    
+    </div>
+</div>
+
+
+<?php $this->endBlock(); ?>
+
+
 
 <?php $this->beginBlock('informacion_vacaciones'); ?>
 
@@ -409,6 +434,12 @@ echo TabsX::widget([
             'label' => 'Información Laboral',
             'content' => $this->blocks['informacion_laboral'],
         ],
+        [
+            'label' => 'Información Medica',
+            'content' => $this->blocks['informacion_medica'],
+
+        ],
+
         [
             'label' => 'Vacaciones',
             'content' => $this->blocks['informacion_vacaciones'],

@@ -25,7 +25,7 @@ $count = count($notificaciones);
   </button>
   <div class="dropdown-menu">
     <?= Html::a('PERMISO FUERA DEL TRABAJO', Url::to(['permiso-fuera-trabajo/index']), ['class' => 'dropdown-item text-primary']) ?>
-    <div class="dropdown-divider"></div>
+   
 
     <?= Html::a('COMISIÓN ESPECIAL', Url::to(['comision-especial/index']), ['class' => 'dropdown-item text-primary']) ?>
     

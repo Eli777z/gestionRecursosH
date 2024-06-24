@@ -53,7 +53,7 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
                         <tr>
                             <th>Empleado</th>
                             <th>Tipo de Solicitud</th>
-                            <th>Status</th>
+                            
                             <th>Fecha de Creación</th>
                             <th>Acciones</th>
                         </tr>
@@ -65,26 +65,7 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
                                     <?= $solicitud->empleado ? Html::encode($solicitud->empleado->nombre . ' ' . $solicitud->empleado->apellido) : 'N/A' ?>
                                 </td>
                                 <td><?= Html::encode($solicitud->nombre_formato) ?></td>
-                                <td>
-                                    <?php
-                                    $statusClass = '';
-                                    switch ($solicitud->status) {
-                                        case 'Aprobado':
-                                            $statusClass = 'badge badge-success';
-                                            break;
-                                        case 'Rechazado':
-                                            $statusClass = 'badge badge-danger';
-                                            break;
-                                        case 'En Proceso':
-                                            $statusClass = 'badge badge-warning';
-                                            break;
-                                        default:
-                                            $statusClass = 'badge badge-secondary';
-                                            break;
-                                    }
-                                    ?>
-                                    <span class="<?= $statusClass ?>"><?= Html::encode($solicitud->status) ?></span>
-                                </td>
+                             
 
                                 <td><?= strftime('%A, %d de %B de %Y', strtotime($solicitud->fecha_creacion)) ?></td>
                                 <td>

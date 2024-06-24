@@ -142,7 +142,7 @@ $this->registerCssFile('@web/css/grid-view.css', ['position' => View::POS_HEAD])
                                     ], ['prompt' => 'Selecciona el nivel académico...'])->label('Profesión:') ?>
 
                                
-                                                <?= $form->field($informacion_laboral, 'fecha_ingreso')->input('date')->label('Fecha de contratación del empleado:') ?>
+                                                <?= $form->field($informacion_laboral, 'fecha_ingreso')->input('date')->label('Fecha de ingreso del empleado:') ?>
                                             </div>
                                         </div>
                                     </div>

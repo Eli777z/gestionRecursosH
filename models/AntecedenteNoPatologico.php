@@ -20,6 +20,8 @@ use Yii;
  * @property int|null $p_dieta 
  *  * @property int|null $p_minutos_x_dia_ejercicio
  * @property string|null $p_info_dieta
+  * @property string|null $tipo_sangre
+
  * @property int|null $p_comidas_x_dia
  * @property int|null $p_tazas_x_dia
  * @property string|null $observacion_comida
@@ -81,6 +83,8 @@ class AntecedenteNoPatologico extends \yii\db\ActiveRecord
             [['p_frecuencia_alcohol', 'p_frecuencia_tabaquismo', 'p_frecuencia_droga'], 'string', 'max' => 25],
           //  [['p_act_dias_libres'], 'string', 'max' => 150],
             [['p_situaciones'], 'string', 'max' => 20],
+            [['tipo_sangre'], 'string', 'max' => 6],
+
             [['expediente_medico_id'], 'exist', 'skipOnError' => true, 'targetClass' => ExpedienteMedico::class, 'targetAttribute' => ['expediente_medico_id' => 'id']],
         ];
     }
@@ -92,6 +96,8 @@ class AntecedenteNoPatologico extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
+            'tipo_sangre' => 'Tipo Sangre', //checkbox para marcar, marcado es 1, sin marcar 0
+
             'p_ejercicio' => 'P Ejercicio', //checkbox para marcar, marcado es 1, sin marcar 0
             'p_deporte' => 'P Deporte',  //checkbox para marcar, marcado es 1, sin marcar 0
             'p_a_deporte' => 'P A Deporte', // inputtext

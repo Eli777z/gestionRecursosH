@@ -36,13 +36,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                 },
                             ],
                         
-                            [
-                                'attribute' => 'status',
-                                'label' => 'Status',
-                                'value' => function ($model) {
-                                    return $model->solicitud->status;
-                                },
-                            ],
+            ///                [
+               ///                 'attribute' => 'status',
+                  //              'label' => 'Status',
+                    //            'value' => function ($model) {
+                      //              return $model->solicitud->status;
+                        //        },
+                          //  ],
                             [
                                 'attribute' => 'comentario',
                                 'label' => 'Comentarios',
@@ -50,13 +50,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                     return $model->solicitud->comentario;
                                 },
                             ],
-                            [
-                                'attribute' => 'nombre_aprobante',
-                                'label' => 'Aprobó',
-                                'value' => function ($model) {
-                                    return $model->solicitud->nombre_aprobante;
-                                },
-                            ],
+             //               [
+               //                 'attribute' => 'nombre_aprobante',
+                 //               'label' => 'Aprobó',
+                   //             'value' => function ($model) {
+                     //               return $model->solicitud->nombre_aprobante;
+                       //         },
+                         //   ],
 
 
                             ['class' => 'hail812\adminlte3\yii\grid\ActionColumn'],

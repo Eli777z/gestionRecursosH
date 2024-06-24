@@ -32,9 +32,9 @@ $this->params['breadcrumbs'][] = $this->title;
                             ['class' => 'yii\grid\SerialColumn'],
 
                             'id',
-                            'empleado_id',
-                            'solicitud_id',
-                            'motivo_fecha_permiso_id',
+                    //        'empleado_id',
+                      //      'solicitud_id',
+                        //    'motivo_fecha_permiso_id',
                             'fecha_a_laborar',
                             //'nombre_jefe_departamento',
 

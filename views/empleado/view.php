@@ -62,6 +62,8 @@ $antecedentesExistentes = [];
 $observacionGeneral = '';
 $descripcionAntecedentes = '';
 $modelAntecedenteNoPatologico = new \app\models\AntecedenteNoPatologico();
+$modelExploracionFisica = new \app\models\ExploracionFisica();
+
 
 if ($antecedentes) {
     foreach ($antecedentes as $antecedente) {
@@ -84,6 +86,13 @@ if ($expedienteMedico) {
     if (!$modelAntecedenteNoPatologico) {
         $modelAntecedenteNoPatologico = new \app\models\AntecedenteNoPatologico();
         $modelAntecedenteNoPatologico->expediente_medico_id = $expedienteMedico->id;
+    }
+
+
+    $modelExploracionFisica = \app\models\ExploracionFisica::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+    if (!$modelExploracionFisica) {
+        $modelExploracionFisica = new \app\models\ExploracionFisica();
+        $modelExploracionFisica->expediente_medico_id = $expedienteMedico->id;
     }
 }
 ?>
@@ -312,7 +321,7 @@ if ($expedienteMedico) {
         document.getElementById('cancel-button-personal').style.display = 'none';
     });
 
-    function checkEmptyFieldsPersonal() {
+    /*function checkEmptyFieldsPersonal() {
         var fields = document.querySelectorAll('#personal-info-form .form-control');
         var emptyFields = Array.from(fields).filter(function(field) {
             return field.value.trim() === '';
@@ -329,7 +338,7 @@ if ($expedienteMedico) {
 
     $('#pjax-update-info').on('pjax:end', function() {
         checkEmptyFieldsPersonal();
-    });
+    });*/
 </script>
 
 
@@ -411,7 +420,7 @@ if ($expedienteMedico) {
         document.getElementById('cancel-button-educational').style.display = 'none';
     });
 
-    function checkEmptyFieldsPersonal() {
+    /*function checkEmptyFieldsPersonal() {
         var fields = document.querySelectorAll('#educational-info-form .form-control');
         var emptyFields = Array.from(fields).filter(function(field) {
             return field.value.trim() === '';
@@ -428,7 +437,7 @@ if ($expedienteMedico) {
 
     $('#pjax-update-info').on('pjax:end', function() {
         checkEmptyFieldsPersonal();
-    });
+    });*/
 </script>
 
 
@@ -503,7 +512,7 @@ if ($expedienteMedico) {
                 document.getElementById('cancel-button-contact').style.display = 'none';
             });
 
-            function checkEmptyFieldsContact() {
+          /*  function checkEmptyFieldsContact() {
                 var fields = document.querySelectorAll('#contact-info-form .form-control');
                 var emptyFields = Array.from(fields).filter(function(field) {
                     return field.value.trim() === '';
@@ -520,7 +529,7 @@ if ($expedienteMedico) {
 
             $('#pjax-update-info').on('pjax:end', function() {
                 checkEmptyFieldsContact();
-            });
+            });*/
         </script>
     </div>
     <div class="col-md-6">
@@ -582,7 +591,7 @@ if ($expedienteMedico) {
                 document.getElementById('cancel-button-emergency').style.display = 'none';
             });
 
-            function checkEmptyFieldsEmergency() {
+           /* function checkEmptyFieldsEmergency() {
                 var fields = document.querySelectorAll('#emergency-contact-form .form-control');
                 var emptyFields = Array.from(fields).filter(function(field) {
                     return field.value.trim() === '';
@@ -599,7 +608,7 @@ if ($expedienteMedico) {
 
             $('#pjax-update-info').on('pjax:end', function() {
                 checkEmptyFieldsEmergency();
-            });
+            });*/
         </script>
     </div>
 </div>
@@ -827,7 +836,7 @@ if ($expedienteMedico) {
         document.getElementById('cancel-button-laboral').style.display = 'none';
     });
 
-    function checkEmptyFieldsLaboral() {
+  /*  function checkEmptyFieldsLaboral() {
         var fields = document.querySelectorAll('#laboral-info-form input, #laboral-info-form select');
         var emptyFields = Array.from(fields).filter(function(field) {
             return field.value.trim() === '' && field.type !== 'hidden';
@@ -844,7 +853,7 @@ if ($expedienteMedico) {
 
     $('#pjax-update-info').on('pjax:end', function() {
         checkEmptyFieldsLaboral();
-    });
+    });*/
 </script>
 
                             <script>
@@ -1556,7 +1565,7 @@ $this->registerJs("
             <div class="card-header gradient-blue text-white text-center">
                 <h2>Antecedentes Hereditarios</h2>
             </div>
-            <div class="card-body">
+            <div class="card-body bg-light">
                 <div class="row">
                     <div class="col-md-8">
                         <div class="table-responsive">
@@ -1622,7 +1631,7 @@ $this->registerJs("
             <div class="card-header gradient-blue text-white text-center">
                 <h2>Antecedentes Patológicos</h2>
             </div>
-            <div class="card-body">
+            <div class="card-body bg-light">
 
                 <div class="form-group">
                     <?= Html::label('Descripción de Antecedentes Patológicos', 'descripcion_antecedentes') ?>
@@ -1655,17 +1664,18 @@ $this->registerJs("
         <div class="card">
             <div class="card-header gradient-blue text-white text-center">
                 <h2>Antecedentes No Patológicos</h2>
+                <div class="float-submit-btn">
+    <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+</div>
             </div>
             <div class="card-body">
             <div class="container">
             <div class="card">
     <div class="card-header custom-nopato text-white text-left">
         <h5>ACTIVIDAD FISICA</h5>
-        <div class="form-group">
-                    <?= Html::submitButton('  <i class="fa fa-save" style="color: #007bff;"></i>&nbsp; &nbsp; Guardar', ['class' => 'btn btn-light float-right mr-3']) ?>
-                </div>
+        
     </div>
-    <div class="card-body">
+    <div class="card-body bg-light">
         <div class="row">
             <!-- Columna izquierda con los campos -->
             <div class="col-md-8">
@@ -1734,11 +1744,9 @@ $this->registerJs("
 <div class="card">
     <div class="card-header custom-nopato text-white text-left">
         <h5>HABITOS ALIMENTICIOS</h5>
-        <div class="form-group">
-                    <?= Html::submitButton('  <i class="fa fa-save" style="color: #007bff;"></i>&nbsp; &nbsp; Guardar', ['class' => 'btn btn-light float-right mr-3']) ?>
-                </div>
+       
     </div>
-    <div class="card-body">
+    <div class="card-body bg-light">
         <div class="row">
             <!-- Columna izquierda con los campos -->
             <div class="col-md-8">
@@ -1813,7 +1821,7 @@ $this->registerJs("
                     <div class="col-6 col-sm-6">
                     <div class="form-group">
                     <?= Html::label('Información sobre la dieta', 'p_info_dieta') ?>
-                    <?= Html::textarea('AntecedenteNoPatologico[p_info_dieta]', $antecedenteNoPatologico->p_info_dieta, ['class' => 'form-control', 'rows' => 4]) ?>
+                    <?= Html::textarea('AntecedenteNoPatologico[p_info_dieta]', $antecedenteNoPatologico->p_info_dieta, ['class' => 'form-control', 'rows' => 6]) ?>
                 </div>
                     </div>
 
@@ -1833,11 +1841,9 @@ $this->registerJs("
 <div class="card">
     <div class="card-header custom-nopato text-white text-left">
         <h5>ALCOHOLISMO</h5>
-        <div class="form-group">
-                    <?= Html::submitButton('  <i class="fa fa-save" style="color: #007bff;"></i>&nbsp; &nbsp; Guardar', ['class' => 'btn btn-light float-right mr-3']) ?>
-                </div>
+      
     </div>
-    <div class="card-body">
+    <div class="card-body bg-light">
         <div class="row">
             <!-- Columna izquierda con los campos -->
             <div class="col-md-7">
@@ -1916,11 +1922,9 @@ $this->registerJs("
 <div class="card">
     <div class="card-header custom-nopato text-white text-left">
         <h5>TABAQUISMO</h5>
-        <div class="form-group">
-                    <?= Html::submitButton('  <i class="fa fa-save" style="color: #007bff;"></i>&nbsp; &nbsp; Guardar', ['class' => 'btn btn-light float-right mr-3']) ?>
-                </div>
+       
     </div>
-    <div class="card-body">
+    <div class="card-body bg-light">
         <div class="row">
             <!-- Columna izquierda con los campos -->
             <div class="col-md-8">
@@ -2003,11 +2007,9 @@ $this->registerJs("
 <div class="card">
     <div class="card-header custom-nopato text-white text-left">
         <h5>OTROS</h5>
-        <div class="form-group">
-                    <?= Html::submitButton('  <i class="fa fa-save" style="color: #007bff;"></i>&nbsp; &nbsp; Guardar', ['class' => 'btn btn-light float-right mr-3']) ?>
-                </div>
+        
     </div>
-    <div class="card-body">
+    <div class="card-body bg-light">
         <div class="row">
             <!-- Columna izquierda con los campos -->
             <div class="col-md-6">
@@ -2025,6 +2027,15 @@ $this->registerJs("
                         'Duelo' => 'Duelo',
                         'Embarazos' => 'Embarazos',
                         'Divorcio' => 'Divorcio',
+                    ], ['class' => 'form-control']) ?>
+                </div>
+                <div class="form-group">
+                    <?= Html::label('Tipo de Sangre', 'tipo_sangre') ?>
+                    <?= Html::dropDownList('AntecedenteNoPatologico[tipo_sangre]', $antecedenteNoPatologico->tipo_sangre, [
+                    
+                        'A+' => 'A+',
+                        'B+' => 'B+',
+                        'O+' => 'O+',
                     ], ['class' => 'form-control']) ?>
                 </div>
                
@@ -2046,11 +2057,9 @@ $this->registerJs("
 <div class="card">
     <div class="card-header custom-nopato text-white text-left">
         <h5>CONSUMO DE DROGAS</h5>
-        <div class="form-group">
-                    <?= Html::submitButton('  <i class="fa fa-save" style="color: #007bff;"></i>&nbsp; &nbsp; Guardar', ['class' => 'btn btn-light float-right mr-3']) ?>
-                </div>
+      
     </div>
-    <div class="card-body">
+    <div class="card-body bg-light">
         <div class="row">
             <!-- Columna izquierda con los campos -->
             <div class="col-md-8">
@@ -2127,6 +2136,25 @@ $this->registerJs("
     </div>
 </div>
 
+<div class="card">
+    <div class="card-header custom-nopato text-white text-left">
+        <h5>OBSERVACION GENEREAL / OTRAS OBSERVACIONES</h5>
+       
+    </div>
+    <div class="card-body bg-light">
+        <div class="row">
+
+            <!-- Columna derecha con el textarea -->
+           
+            <div class="form-group">
+                    <?= Html::label('Observación General', 'observacion_general') ?>
+                    <?= Html::textarea('AntecedenteNoPatologico[observacion_general]', $antecedenteNoPatologico->observacion_general, ['class' => 'form-control', 'rows' => 10]) ?>
+                </div>
+            
+        </div>
+    </div>
+</div>
+
 
 
 
@@ -2147,6 +2175,8 @@ $this->registerJs("
 <?php ActiveForm::end(); ?>
 
 <?php $this->endBlock(); ?>
+
+
 
 
         
@@ -2179,7 +2209,7 @@ $this->registerJs("
                                     'content' => $this->blocks['no_patologicos'],
                                  
                                     'options' => [
-                                        'id' => 'no_patologicos',
+                                        'id' => 'nopatologicos',
                                     ],
 
 
@@ -2203,6 +2233,305 @@ $this->registerJs("
 
                             <?php $this->endBlock(); ?>
 
+                            <?php $this->beginBlock('exploracion_fisica'); ?>
+
+
+<?php $form = ActiveForm::begin(['action' => ['exploracion-fisica', 'id' => $model->id]]); ?>
+<div class="row">
+    <div class="col-md-12">
+    
+        <div class="card">
+            <div class="card-header gradient-blue text-white text-center">
+                <h2>Exploracion Fisica</h2>
+                <div class="float-submit-btn">
+    <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+</div>
+            </div>
+            <div class="card-body">
+            <div class="container">
+
+            <div class="card">
+    <div class="card-header custom-nopato text-white text-left">
+        <h5>HABITUS EXTERIOR</h5>
+    </div>
+    <div class="card-body bg-light">
+        <div class="row">
+
+            <!-- Columna derecha con el textarea -->
+           
+            <div class="form-group">
+                    <?= Html::label('Habitus Exterior', 'desc_habitus_exterior') ?>
+                    <?= Html::textarea('ExploracionFisica[desc_habitus_exterior]', $ExploracionFisica->desc_habitus_exterior, ['class' => 'form-control', 'rows' => 5]) ?>
+                </div>
+            
+        </div>
+        <div class="alert alert-white custom-alert" role="alert">
+                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i> Edad aparente, biotipo, estado de conciencia, orientación en tiempo, espacio y persona, facies, postura, marcha, movimientos anormales, estado y color de tegumentos, actitud.
+                </div>
+    </div>
+    
+
+
+
+            </div>
+            <div class="card">
+    <div class="card-header custom-nopato text-white text-left">
+        <h5>CABEZA</h5>
+    </div>
+    <div class="card-body bg-light">
+        <div class="row">
+
+            <!-- Columna derecha con el textarea -->
+           
+            <div class="form-group">
+                    <?= Html::label('Cabeza y Cara', 'desc_cabeza') ?>
+                    <?= Html::textarea('ExploracionFisica[desc_cabeza]', $ExploracionFisica->desc_cabeza, ['class' => 'form-control', 'rows' => 5]) ?>
+                </div>
+            
+        </div>
+        <div class="alert alert-white custom-alert" role="alert">
+                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>                Craneo: tipo, forma, volumen, cabello, exostosis, hundimientos, fontanelas.
+
+Cara: tinte ojos, reflejos pupilares,fondo de ojos, conjuntivas, cornea.
+
+Nariz: obstruccion, mucosa. Boca: desviacion de las comisuras, aliento, labios y paladar.
+
+Oidos: conducto auditivo, y timpano.
+
+Faringe: uvula, secreciones, amigdalas, adenoides.
+                </div>
+    </div>
+    
+
+
+
+            </div>
+
+            
+            <div class="card">
+    <div class="card-header custom-nopato text-white text-left">
+        <h5>CUELLO</h5>
+        
+    </div>
+    <div class="card-body bg-light">
+        <div class="row">
+
+            <!-- Columna derecha con el textarea -->
+           
+            <div class="form-group">
+                    <?= Html::label('Cuello', 'desc_cuello') ?>
+                    <?= Html::textarea('ExploracionFisica[desc_cuello]', $ExploracionFisica->desc_cuello, ['class' => 'form-control', 'rows' => 5]) ?>
+                </div>
+            
+        </div>
+        <div class="alert alert-white custom-alert" role="alert">
+                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i> Forma, movilidad, contracturas; arterias: pulsos, soplos venosos, fremitos. Traquea, tiroides, cadenas linfaticas, huecos supraclaviculares.            
+                </div>
+    </div>
+    
+
+
+
+            </div>
+
+            
+            <div class="card">
+    <div class="card-header custom-nopato text-white text-left">
+        <h5>TORAX</h5>
+       
+    </div>
+    <div class="card-body bg-light">
+        <div class="row">
+
+            <!-- Columna derecha con el textarea -->
+           
+            <div class="form-group">
+                    <?= Html::label('Torax', 'desc_torax') ?>
+                    <?= Html::textarea('ExploracionFisica[desc_torax]', $ExploracionFisica->desc_torax, ['class' => 'form-control', 'rows' => 5]) ?>
+                </div>
+            
+        </div>
+        <div class="alert alert-white custom-alert" role="alert">
+                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i> Inspección, forma, volumen, simetría, tiros, red venosa y puntos dolorosos, campos pulmonares, movimientos de amplexion y amplexacion, vibraciones vocales, ganglios satélites y nodulos.  </div>
+    </div>
+    
+
+
+
+            </div>
+
+            <div class="card">
+    <div class="card-header custom-nopato text-white text-left">
+        <h5>ABDOMEN</h5>
+       
+    </div>
+    <div class="card-body bg-light">
+        <div class="row">
+
+            <!-- Columna derecha con el textarea -->
+           
+            <div class="form-group">
+                    <?= Html::label('Abdomen', 'desc_torax') ?>
+                    <?= Html::textarea('ExploracionFisica[desc_abdomen]', $ExploracionFisica->desc_abdomen, ['class' => 'form-control', 'rows' => 5]) ?>
+                </div>
+            
+        </div>
+        <div class="alert alert-white custom-alert" role="alert">
+                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i> </div>
+    </div>
+    
+
+
+
+            </div>
+
+            <div class="card">
+    <div class="card-header custom-nopato text-white text-left">
+        <h5>EXPLORACIÓN GINECOLOGICA</h5>
+       
+    </div>
+    <div class="card-body bg-light">
+        <div class="row">
+
+            <!-- Columna derecha con el textarea -->
+           
+            <div class="form-group">
+                    <?= Html::label('Exploración Ginecologica', 'desc_exploración_ginecologica') ?>
+                    <?= Html::textarea('ExploracionFisica[desc_exploración_ginecologica]', $ExploracionFisica->desc_exploración_ginecologica, ['class' => 'form-control', 'rows' => 5]) ?>
+                </div>
+            
+        </div>
+        <div class="alert alert-white custom-alert" role="alert">
+                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i> Exploracion Manual: utero, forma, tamaño, volumen, posicion, consistencia, masas tumorales, fondos de saco y adeherencias.</div>
+    </div>
+    
+
+
+
+            </div>
+
+            <div class="card">
+    <div class="card-header custom-nopato text-white text-left">
+        <h5>EXPLORACIÓN DE GENITALES</h5>
+      
+    </div>
+    <div class="card-body bg-light">
+        <div class="row">
+
+            <!-- Columna derecha con el textarea -->
+           
+            <div class="form-group">
+                    <?= Html::label('Exploración Genitales', 'desc_genitales') ?>
+                    <?= Html::textarea('ExploracionFisica[desc_genitales]', $ExploracionFisica->desc_genitales, ['class' => 'form-control', 'rows' => 5]) ?>
+                </div>
+            
+        </div>
+        <div class="alert alert-white custom-alert" role="alert">
+                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i> Inspeccion, madurez, tacto vaginal, tacto rectal, secreciones, vesiculas, y ulceras, verrugas, condilomas u otras lesiones.</div>
+    </div>
+    
+
+
+
+            </div>
+
+            
+            <div class="card">
+    <div class="card-header custom-nopato text-white text-left">
+        <h5>COLUMNA VERTEBRAL</h5>
+       
+    </div>
+    <div class="card-body bg-light">
+        <div class="row">
+
+            <!-- Columna derecha con el textarea -->
+           
+            <div class="form-group">
+                    <?= Html::label('Columna Vertebral', 'desc_columna_vertebral') ?>
+                    <?= Html::textarea('ExploracionFisica[desc_columna_vertebral]', $ExploracionFisica->desc_columna_vertebral, ['class' => 'form-control', 'rows' => 5]) ?>
+                </div>
+            
+        </div>
+        <div class="alert alert-white custom-alert" role="alert">
+                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i> Inspección, posición, dolor, deformaciones, disfunción, alineación, función, simetría, movimiento, flexión,  extensión, rotación y lateralidad, curvaturas, lordosis, cifosis, escoliosis, masas musculares, lesiones cutáneas.</div>
+    </div>
+    
+            </div>
+
+
+            <div class="card">
+    <div class="card-header custom-nopato text-white text-left">
+        <h5>EXTREMIDADES</h5>
+       
+    </div>
+    <div class="card-body bg-light">
+        <div class="row">
+
+            <!-- Columna derecha con el textarea -->
+           
+            <div class="form-group">
+                    <?= Html::label('Extremidades', 'desc_extremidades') ?>
+                    <?= Html::textarea('ExploracionFisica[desc_extremidades]', $ExploracionFisica->desc_extremidades, ['class' => 'form-control', 'rows' => 5]) ?>
+                </div>
+            
+        </div>
+        <div class="alert alert-white custom-alert" role="alert">
+                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i> Forma, volumen, piel, unas, dedos, articulaciones, tono, fuerza, reflejos tendinosos, movimientos, pulsos arteriales, simetría, amplitud, frecuencia, ritmo, arcos de movilidad, varices, ulceras,  flebitis, micosis, marcha, edemas, reflejos: rotuliano, aquiliano y plantar.</div>
+    </div>
+    
+
+
+
+            </div>
+
+            <div class="card">
+    <div class="card-header custom-nopato text-white text-left">
+        <h5>EXPLORACIÓN NEUROLOGICA</h5>
+       
+    </div>
+    <div class="card-body bg-light">
+        <div class="row">
+
+            <!-- Columna derecha con el textarea -->
+           
+            <div class="form-group">
+                    <?= Html::label('Exploración Neurologica', 'desc_exploracion_neurologica') ?>
+                    <?= Html::textarea('ExploracionFisica[desc_exploracion_neurologica]', $ExploracionFisica->desc_exploracion_neurologica, ['class' => 'form-control', 'rows' => 5]) ?>
+                </div>
+            
+        </div>
+        <div class="alert alert-white custom-alert" role="alert">
+                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i> Razonamiento, atencion, memoria, ansiedad, depresion, alucinaciones, postura corporal, funciones motoras, movimientos corporales voluntarios e involuntarios, paresias, paralisis, marcha, equilibrio, pares craneales, funcion sensorial.</div>
+    </div>
+    
+
+
+
+            </div>
+
+
+
+
+
+
+
+
+
+               
+
+               
+                <br>
+             
+             
+             
+            </div>
+        </div>
+    </div>
+</div>
+<?php ActiveForm::end(); ?>
+
+<?php $this->endBlock(); ?>
+
 
                             <br><br>
                             <?php echo TabsX::widget([
@@ -2215,6 +2544,16 @@ $this->registerJs("
                                    // 'active' => true,
                                     'options' => [
                                         'id' => 'antecedentes',
+                                    ],
+
+
+                                ],
+                                [
+                                    'label' => 'Exploracion Fisica',
+                                    'content' => $this->blocks['exploracion_fisica'],
+                                   // 'active' => true,
+                                    'options' => [
+                                        'id' => 'exploracion_fisica',
                                     ],
 
 

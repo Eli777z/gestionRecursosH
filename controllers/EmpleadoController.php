@@ -30,6 +30,8 @@ use app\models\CatAntecedenteHereditario;
 use app\models\AntecedenteHereditario;
 use app\models\AntecedentePatologico;
 use app\models\AntecedenteNoPatologico;
+use app\models\ExploracionFisica;
+
 /**
  * EmpleadoController implements the CRUD actions for Empleado model.
  */
@@ -112,8 +114,29 @@ class EmpleadoController extends Controller
         $antecedenteNoPatologico->expediente_medico_id = $expedienteMedico->id;
         if (!$antecedenteNoPatologico->save()) {
             Yii::$app->session->setFlash('error', 'Hubo un error al crear el registro de antecedentes no patológicos.');
+        }else{
+
+            $expedienteMedico->antecedente_no_patologico_id = $antecedenteNoPatologico->id;
+            $expedienteMedico->save(false); // Guardar sin validaciones adicionales
         }
     }
+
+
+
+    $exploracionFisica= ExploracionFisica::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+    if (!$exploracionFisica) {
+        $exploracionFisica = new ExploracionFisica();
+        $exploracionFisica->expediente_medico_id = $expedienteMedico->id;
+        if (!$exploracionFisica->save()) {
+            Yii::$app->session->setFlash('error', 'Hubo un error al crear el registro de antecedentes no patológicos.');
+        }else{
+
+            $expedienteMedico->exploracion_fisica_id = $exploracionFisica->id;
+            $expedienteMedico->save(false); // Guardar sin validaciones adicionales
+        }
+    }
+
+
 
     if (Yii::$app->request->isPost) {
         if ($post = Yii::$app->request->post('AntecedenteHereditario')) {
@@ -163,6 +186,7 @@ class EmpleadoController extends Controller
         'catAntecedentes' => $catAntecedentes,
         'descripcionAntecedentes' => $descripcionAntecedentes,
         'antecedenteNoPatologico' => $antecedenteNoPatologico, // Pasar el modelo a la vista
+        'ExploracionFisica' => $exploracionFisica,
     ]);
 }
 
@@ -220,12 +244,41 @@ class EmpleadoController extends Controller
         Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información de antecedentes no patológicos.');
     }
 
-    return $this->redirect(['view', 'id' => $id]);
+    $url = Url::to(['view', 'id' => $id]) . '#nopatologicos';
+                return $this->redirect($url);
 
     return $this->render('view', [
         'model' => $modelEmpleado,
         'expedienteMedico' => $expedienteMedico,
         'modelAntecedenteNoPatologico' => $modelAntecedenteNoPatologico, // Asegúrate de pasar este modelo
+    ]);
+}
+
+
+
+public function actionExploracionFisica($id)
+{
+    $modelEmpleado = $this->findModel2($id);
+    $expedienteMedico = $modelEmpleado->expedienteMedico;
+
+    $modelExploracionFisica = ExploracionFisica::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+    if (!$modelExploracionFisica) {
+        $modelExploracionFisica = new ExploracionFisica();
+        $modelExploracionFisica->expediente_medico_id = $expedienteMedico->id;
+    }
+
+    if ($modelExploracionFisica->load(Yii::$app->request->post()) && $modelExploracionFisica->save()) {
+        Yii::$app->session->setFlash('success', 'Información de exploración fisica guardada correctamente.');
+    } else {
+        Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información de antecedentes no patológicos.');
+    }
+
+    return $this->redirect(['view', 'id' => $id]);
+
+    return $this->render('view', [
+        'model' => $modelEmpleado,
+        'expedienteMedico' => $expedienteMedico,
+        'modelExploracionFisica' => $modelExploracionFisica, // Asegúrate de pasar este modelo
     ]);
 }
 

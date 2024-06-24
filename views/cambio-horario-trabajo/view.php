@@ -92,45 +92,45 @@ if ($empleado) {
                                     return $fechaFormateada;
                                 },
                             ],
-                            [
-                                'label' => 'Status',
-                                'value' => function ($model) {
+//                           [
+ //                               'label' => 'Status',
+  //                           'value' => function ($model) {
+    //                               
+      //                  
+        ///                            
+           ///                         $status = $model->solicitud->status;
+                                    
+                                
+              //                      return $status;
+                //                },
+                  ///          ],
+                    
+                    
+                 //           [
+                   //             'label' => 'Aprobó',
+                     //           'value' => function ($model) {
                                    
                         
                                     
-                                    $status = $model->solicitud->status;
+                       //             $aprobante = $model->solicitud->nombre_aprobante;
                                     
                                 
-                                    return $status;
-                                },
-                            ],
+                         //           return $aprobante;
+                           //     },
+                          //  ],
                     
-                    
-                            [
-                                'label' => 'Aprobó',
-                                'value' => function ($model) {
+               //             [
+                 //               'label' => 'Se aprobó',
+                   //             'value' => function ($model) {
                                    
                         
                                     
-                                    $aprobante = $model->solicitud->nombre_aprobante;
+                     //               $aprobante = $model->solicitud->fecha_aprobacion;
                                     
                                 
-                                    return $aprobante;
-                                },
-                            ],
-                    
-                            [
-                                'label' => 'Se aprobó',
-                                'value' => function ($model) {
-                                   
-                        
-                                    
-                                    $aprobante = $model->solicitud->fecha_aprobacion;
-                                    
-                                
-                                    return $aprobante;
-                                },
-                            ],
+                       //             return $aprobante;
+                         //       },
+                           // ],
                     
                             [
                                 'label' => 'Comentario',
