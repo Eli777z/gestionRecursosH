@@ -47,7 +47,7 @@
 /* Estilos para el botón flotante */
 .float-submit-btn {
     position: fixed;
-    bottom: 20px;
+    bottom: 150px;
     right: 120px;
     z-index: 1000;
     background-color: #28a745;

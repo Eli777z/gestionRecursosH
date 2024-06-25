@@ -94,6 +94,13 @@ if ($expedienteMedico) {
         $modelExploracionFisica = new \app\models\ExploracionFisica();
         $modelExploracionFisica->expediente_medico_id = $expedienteMedico->id;
     }
+
+    $modelInterrogatorioMedico = \app\models\InterrogatorioMedico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+    if (!$modelInterrogatorioMedico) {
+        $modelInterrogatorioMedico = new \app\models\InterrogatorioMedico();
+        $modelInterrogatorioMedico->expediente_medico_id = $expedienteMedico->id;
+    }
+
 }
 ?>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -1673,7 +1680,6 @@ $this->registerJs("
             <div class="card">
     <div class="card-header custom-nopato text-white text-left">
         <h5>ACTIVIDAD FISICA</h5>
-        
     </div>
     <div class="card-body bg-light">
         <div class="row">
@@ -1689,9 +1695,9 @@ $this->registerJs("
                             <?= Html::label('¿Realiza ejercicio?', 'p_ejercicio', ['class' => 'custom-control-label']) ?>
                         </div>
                     </div>
-                    <div class="col-6 col-sm-6">
+                    <div class="col-6 col-sm-6" id="ejercicio-minutos-container">
                         <?= Html::label('Minutos al día', 'p_minutos_x_dia_ejercicio') ?>
-                        <?= Html::input('number', 'AntecedenteNoPatologico[p_minutos_x_dia_ejercicio]', $antecedenteNoPatologico->p_minutos_x_dia_ejercicio, ['class' => 'form-control']) ?>
+                        <?= Html::input('number', 'AntecedenteNoPatologico[p_minutos_x_dia_ejercicio]', $antecedenteNoPatologico->p_minutos_x_dia_ejercicio, ['class' => 'form-control', 'id' => 'p_minutos_x_dia_ejercicio']) ?>
                     </div>
                     <div class="w-100"></div>
                     <br>
@@ -1704,19 +1710,19 @@ $this->registerJs("
                             <?= Html::label('¿Realiza algún deporte?', 'p_deporte', ['class' => 'custom-control-label']) ?>
                         </div>
                     </div>
-                    <div class="col-6 col-sm-4">
+                    <div class="col-6 col-sm-4" id="deporte-cual-container">
                         <?= Html::label('¿Cuál deporte?', 'p_a_deporte') ?>
-                        <?= Html::textInput('AntecedenteNoPatologico[p_a_deporte]', $modelAntecedenteNoPatologico->p_a_deporte, ['class' => 'form-control']) ?>
+                        <?= Html::textInput('AntecedenteNoPatologico[p_a_deporte]', $modelAntecedenteNoPatologico->p_a_deporte, ['class' => 'form-control', 'id' => 'p_a_deporte']) ?>
                     </div>
-                    <div class="col-6 col-sm-4">
+                    <div class="col-6 col-sm-4" id="deporte-frecuencia-container">
                         <?= Html::label('Frecuencia con la que practica', 'p_frecuencia_deporte') ?>
-                        <?= Html::textInput('AntecedenteNoPatologico[p_frecuencia_deporte]', $modelAntecedenteNoPatologico->p_frecuencia_deporte, ['class' => 'form-control']) ?>
+                        <?= Html::textInput('AntecedenteNoPatologico[p_frecuencia_deporte]', $modelAntecedenteNoPatologico->p_frecuencia_deporte, ['class' => 'form-control', 'id' => 'p_frecuencia_deporte']) ?>
                     </div>
                     <div class="w-100"></div>
                     <br>
                     <div class="col-6 col-sm-4">
                         <?= Html::label('Horas que duerme por día', 'p_horas_sueño') ?>
-                        <?= Html::input('number', 'AntecedenteNoPatologico[p_horas_sueño]', $antecedenteNoPatologico->p_horas_sueño, ['class' => 'form-control']) ?>
+                        <?= Html::input('number', 'AntecedenteNoPatologico[p_horas_sueño]', $antecedenteNoPatologico->p_horas_sueño, ['class' => 'form-control', 'id' => 'p_horas_sueño']) ?>
                     </div>
                     <div class="col-6 col-sm-6">
                         <div class="custom-control custom-checkbox">
@@ -1733,12 +1739,49 @@ $this->registerJs("
             <div class="col-md-4">
                 <div class="form-group">
                     <?= Html::label('Observaciones', 'observacion_actividad_fisica') ?>
-                    <?= Html::textarea('AntecedenteNoPatologico[observacion_actividad_fisica]', $antecedenteNoPatologico->observacion_actividad_fisica, ['class' => 'form-control', 'rows' => 10]) ?>
+                    <?= Html::textarea('AntecedenteNoPatologico[observacion_actividad_fisica]', $antecedenteNoPatologico->observacion_actividad_fisica, ['class' => 'form-control', 'rows' => 10, 'id' => 'observacion_actividad_fisica']) ?>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<?php
+$script = <<< JS
+$(document).ready(function() {
+    function toggleEjercicioFields() {
+        if ($('#p_ejercicio').is(':checked')) {
+            $('#ejercicio-minutos-container').show();
+        } else {
+            $('#ejercicio-minutos-container').hide();
+        }
+    }
+
+    function toggleDeporteFields() {
+        if ($('#p_deporte').is(':checked')) {
+            $('#deporte-cual-container').show();
+            $('#deporte-frecuencia-container').show();
+        } else {
+            $('#deporte-cual-container').hide();
+            $('#deporte-frecuencia-container').hide();
+        }
+    }
+
+    // Initial toggle based on the current state
+    toggleEjercicioFields();
+    toggleDeporteFields();
+
+    // Toggle fields on checkbox change
+    $('#p_ejercicio').change(function() {
+        toggleEjercicioFields();
+    });
+
+    $('#p_deporte').change(function() {
+        toggleDeporteFields();
+    });
+});
+JS;
+$this->registerJs($script);
+?>
 
 
 <div class="card">
@@ -1786,7 +1829,7 @@ $this->registerJs("
 
                 </div>
 
-                <div class="col-6 col-sm-6">
+                <div class="col-6 col-sm-6" id= "cafe-x-dia-container">
                         <?= Html::label('Tazas de café al día', 'p_tazas_x_dia') ?>
                         <?= Html::input('number', 'AntecedenteNoPatologico[p_tazas_x_dia]', $antecedenteNoPatologico->p_tazas_x_dia, ['class' => 'form-control']) ?>
                     </div>
@@ -1818,7 +1861,7 @@ $this->registerJs("
                             <?= Html::label('¿Sigue alguna dieta?', 'p_dieta', ['class' => 'custom-control-label']) ?>
                         </div>
                     </div>
-                    <div class="col-6 col-sm-6">
+                    <div class="col-6 col-sm-6" id= "info-dieta-container">
                     <div class="form-group">
                     <?= Html::label('Información sobre la dieta', 'p_info_dieta') ?>
                     <?= Html::textarea('AntecedenteNoPatologico[p_info_dieta]', $antecedenteNoPatologico->p_info_dieta, ['class' => 'form-control', 'rows' => 6]) ?>
@@ -1837,6 +1880,45 @@ $this->registerJs("
         </div>
     </div>
 </div>
+
+<?php
+$script = <<< JS
+$(document).ready(function() {
+    function toggleCafeFields() {
+        if ($('#p_cafe').is(':checked')) {
+            $('#cafe-x-dia-container').show();
+        } else {
+            $('#cafe-x-dia-container').hide();
+        }
+    }
+
+    function toggleDietaFields() {
+        if ($('#p_dieta').is(':checked')) {
+            $('#info-dieta-container').show();
+           
+        } else {
+            $('#info-dieta-container').hide();
+          
+        }
+    }
+
+    // Initial toggle based on the current state
+    toggleCafeFields();
+    toggleDietaFields();
+
+    // Toggle fields on checkbox change
+    $('#p_cafe').change(function() {
+        toggleCafeFields();
+    });
+
+    $('#p_dieta').change(function() {
+        toggleDietaFields();
+    });
+});
+JS;
+$this->registerJs($script);
+?>
+
 
 <div class="card">
     <div class="card-header custom-nopato text-white text-left">
@@ -1857,17 +1939,20 @@ $this->registerJs("
                             <?= Html::label('¿Consume alcohol?', 'p_alcohol', ['class' => 'custom-control-label']) ?>
                         </div>
                     </div>  
-                    <div class="col-6 col-sm-6">
+                    <div class="col-6 col-sm-6" id="consumo-alcohol-container">
   <!-- Campo dropdown -->
   <div class="form-group">
-                    <?= Html::label('Frecuencia de Consumo de Alcohol', 'p_frecuencia_alcohol') ?>
-                    <?= Html::dropDownList('AntecedenteNoPatologico[p_frecuencia_alcohol]', $antecedenteNoPatologico->p_frecuencia_alcohol, [
-                    
-                        'Casual' => 'Casual',
-                        'Moderado' => 'Moderado',
-                        'Intenso' => 'Intenso',
-                    ], ['class' => 'form-control']) ?>
-                </div>
+    <?= Html::label('Frecuencia de Consumo de Alcohol', 'p_frecuencia_alcohol') ?>
+    <?= Html::dropDownList('AntecedenteNoPatologico[p_frecuencia_alcohol]', $antecedenteNoPatologico->p_frecuencia_alcohol, [
+        'Casual' => 'Casual',
+        'Moderado' => 'Moderado',
+        'Intenso' => 'Intenso',
+    ], [
+        'class' => 'form-control',
+        'prompt' => 'Seleccione la frecuencia'
+    ]) ?>
+</div>
+
                     <?= Html::label('Edad a la que comenzó a béber', 'p_edad_alcoholismo') ?>
                         <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_alcoholismo]', $antecedenteNoPatologico->p_edad_alcoholismo, ['class' => 'form-control']) ?>
                     
@@ -1893,7 +1978,7 @@ $this->registerJs("
                             <?= Html::label('Ex-alcoholico', 'p_ex_alcoholico', ['class' => 'custom-control-label']) ?>
                         </div>
                     </div>  
-                    <div class="col-6 col-sm-6">
+                    <div class="col-6 col-sm-6" id="ex-alcoholico-container">
                     <?= Html::label('Edad en la que dejo de beber', 'p_edad_fin_alcoholismo') ?>
                         <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_fin_alcoholismo]', $antecedenteNoPatologico->p_edad_fin_alcoholismo, ['class' => 'form-control']) ?>
                     
@@ -1918,6 +2003,44 @@ $this->registerJs("
     </div>
 </div>
 
+<?php
+$script = <<< JS
+$(document).ready(function() {
+    function toggleAlcoholFields() {
+        if ($('#p_alcohol').is(':checked')) {
+            $('#consumo-alcohol-container').show();
+        } else {
+            $('#consumo-alcohol-container').hide();
+        }
+    }
+
+    function toggleExAlcoholicoFields() {
+        if ($('#p_ex_alcoholico').is(':checked')) {
+            $('#ex-alcoholico-container').show();
+           
+        } else {
+            $('#ex-alcoholico-container').hide();
+          
+        }
+    }
+
+    // Initial toggle based on the current state
+    toggleAlcoholFields();
+    toggleExAlcoholicoFields();
+
+    // Toggle fields on checkbox change
+    $('#p_alcohol').change(function() {
+        toggleAlcoholFields();
+    });
+
+    $('#p_ex_alcoholico').change(function() {
+        toggleExAlcoholicoFields();
+    });
+});
+JS;
+$this->registerJs($script);
+?>
+
 
 <div class="card">
     <div class="card-header custom-nopato text-white text-left">
@@ -1938,7 +2061,7 @@ $this->registerJs("
                             <?= Html::label('¿Fúma?', 'p_fuma', ['class' => 'custom-control-label']) ?>
                         </div>
                     </div>  
-                    <div class="col-6 col-sm-6">
+                    <div class="col-6 col-sm-6" id= "tabaquismo-container">
   <!-- Campo dropdown -->
   <div class="form-group">
                     <?= Html::label('Frecuencia de Consumo de Tabaco', 'p_frecuencia_tabaquismo') ?>
@@ -1947,7 +2070,9 @@ $this->registerJs("
                         'Casual' => 'Casual',
                         'Moderado' => 'Moderado',
                         'Intenso' => 'Intenso',
-                    ], ['class' => 'form-control']) ?>
+                    ], ['class' => 'form-control',
+                    'prompt' => 'Seleccione la frecuencia'
+                    ]) ?>
                 </div>
                     <?= Html::label('Edad a la que comenzó a fumar', 'p_edad_tabaquismo') ?>
                         <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_tabaquismo]', $antecedenteNoPatologico->p_edad_tabaquismo, ['class' => 'form-control']) ?>
@@ -1962,7 +2087,7 @@ $this->registerJs("
 
                     <div class="w-100"></div>
 <br>
-                    <div class="col-6 col-sm-4">
+                    <div class="col-6 col-sm-4" >
                         <div class="custom-control custom-checkbox">
                             <?= Html::checkbox('AntecedenteNoPatologico[p_ex_fumador]', $antecedenteNoPatologico->p_ex_fumador, [
                                 'class' => 'custom-control-input',
@@ -1971,7 +2096,7 @@ $this->registerJs("
                             <?= Html::label('Ex-Fumador', 'p_ex_fumador', ['class' => 'custom-control-label']) ?>
                         </div>
                     </div> 
-                    <div class="col-6 col-sm-6">
+                    <div class="col-6 col-sm-6" id="ex-fumador-container">
                     <?= Html::label('Edad en la que dejo de fumar', 'p_edad_fin_tabaquismo') ?>
                         <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_fin_tabaquismo]', $antecedenteNoPatologico->p_edad_fin_tabaquismo, ['class' => 'form-control']) ?>
                     
@@ -2004,6 +2129,44 @@ $this->registerJs("
 </div>
 
 
+<?php
+$script = <<< JS
+$(document).ready(function() {
+    function toggleTabaquismoFields() {
+        if ($('#p_fuma').is(':checked')) {
+            $('#tabaquismo-container').show();
+        } else {
+            $('#tabaquismo-container').hide();
+        }
+    }
+
+    function toggleExFumadorFields() {
+        if ($('#p_ex_fumador').is(':checked')) {
+            $('#ex-fumador-container').show();
+           
+        } else {
+            $('#ex-fumador-container').hide();
+          
+        }
+    }
+
+    // Initial toggle based on the current state
+    toggleTabaquismoFields();
+    toggleExFumadorFields();
+
+    // Toggle fields on checkbox change
+    $('#p_fuma').change(function() {
+        toggleTabaquismoFields();
+    });
+
+    $('#p_ex_fumador').change(function() {
+        toggleExFumadorFields();
+    });
+});
+JS;
+$this->registerJs($script);
+?>
+
 <div class="card">
     <div class="card-header custom-nopato text-white text-left">
         <h5>OTROS</h5>
@@ -2014,7 +2177,28 @@ $this->registerJs("
             <!-- Columna izquierda con los campos -->
             <div class="col-md-6">
                 <div class="row">
-              
+                <div class="form-group">
+    <?= Html::label('Religión a la que pertenece', 'religion') ?>
+    <?= Html::dropDownList('AntecedenteNoPatologico[religion]', $antecedenteNoPatologico->religion, [
+        'Ninguna' => 'Ninguna',
+        'Católica' => 'Católica',
+        'Cristiana Evangélica' => 'Cristiana Evangélica',
+        'Testigos de Jehová' => 'Testigos de Jehová',
+        'Mormona' => 'Mormona',
+        'Bautista' => 'Bautista',
+        'Pentecostal' => 'Pentecostal',
+        'Adventista del Séptimo Día' => 'Adventista del Séptimo Día',
+        'Judía' => 'Judía',
+        'Budista' => 'Budista',
+        'Hinduista' => 'Hinduista',
+        'Musulmana' => 'Musulmana',
+        'Ateísta' => 'Ateísta',
+        'Agnóstica' => 'Agnóstica',
+        'Otra' => 'Otra'
+    ], ['class' => 'form-control',         'prompt' => 'Seleccione la religión'
+    ]) ?>
+</div>
+
                 <div class="form-group">
                     <?= Html::label('¿Qué actividades realiza en sus horas libres?', 'p_act_dias_libres') ?>
                     <?= Html::textarea('AntecedenteNoPatologico[p_act_dias_libres]', $antecedenteNoPatologico->p_act_dias_libres, ['class' => 'form-control', 'rows' => 5]) ?>
@@ -2027,7 +2211,8 @@ $this->registerJs("
                         'Duelo' => 'Duelo',
                         'Embarazos' => 'Embarazos',
                         'Divorcio' => 'Divorcio',
-                    ], ['class' => 'form-control']) ?>
+                    ], ['class' => 'form-control',         'prompt' => 'Seleccione una opción'
+                    ]) ?>
                 </div>
                 <div class="form-group">
                     <?= Html::label('Tipo de Sangre', 'tipo_sangre') ?>
@@ -2036,7 +2221,13 @@ $this->registerJs("
                         'A+' => 'A+',
                         'B+' => 'B+',
                         'O+' => 'O+',
-                    ], ['class' => 'form-control']) ?>
+                        'A-' => 'A-',
+                        'B-' => 'B-',
+                        'O-' => 'O-',
+                        'AB+' => 'AB+',
+                        'AB-' => 'AB-',
+                    ], ['class' => 'form-control',         'prompt' => 'Seleccione el tipo de sangre'
+                    ]) ?>
                 </div>
                
 
@@ -2076,7 +2267,7 @@ $this->registerJs("
 
                    
                 
-                    <div class="col-6 col-sm-6">
+                    <div class="col-6 col-sm-6" id= "droga-container">
   <!-- Campo dropdown -->
   <div class="form-group">
                     <?= Html::label('Frecuencia de su consumo', 'p_frecuencia_droga') ?>
@@ -2085,7 +2276,8 @@ $this->registerJs("
                         'Casual' => 'Casual',
                         'Moderado' => 'Moderado',
                         'Intenso' => 'Intenso',
-                    ], ['class' => 'form-control']) ?>
+                    ], ['class' => 'form-control',         'prompt' => 'Seleccione la frecuencia'
+                    ]) ?>
                 </div>
                     <?= Html::label('¿A qué edad se inicio el consumo?', 'p_edad_droga') ?>
                         <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_droga]', $antecedenteNoPatologico->p_edad_droga, ['class' => 'form-control']) ?>
@@ -2113,7 +2305,7 @@ $this->registerJs("
                             <?= Html::label('Ex-Adicto', 'p_ex_adicto', ['class' => 'custom-control-label']) ?>
                         </div>
                     </div> 
-                    <div class="col-6 col-sm-6">
+                    <div class="col-6 col-sm-6" id = "ex-adicto-container">
                     <?= Html::label('¿A qué edad dejo de consumir?', 'p_edad_fin_droga') ?>
                         <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_fin_droga]', $antecedenteNoPatologico->p_edad_fin_droga, ['class' => 'form-control']) ?>
                     
@@ -2135,6 +2327,45 @@ $this->registerJs("
         </div>
     </div>
 </div>
+
+
+<?php
+$script = <<< JS
+$(document).ready(function() {
+    function toggleDrogasFields() {
+        if ($('#p_drogas').is(':checked')) {
+            $('#droga-container').show();
+        } else {
+            $('#droga-container').hide();
+        }
+    }
+
+    function toggleExAdictoFields() {
+        if ($('#p_ex_adicto').is(':checked')) {
+            $('#ex-adicto-container').show();
+           
+        } else {
+            $('#ex-adicto-container').hide();
+          
+        }
+    }
+
+    // Initial toggle based on the current state
+    toggleDrogasFields();
+    toggleExAdictoFields();
+
+    // Toggle fields on checkbox change
+    $('#p_drogas').change(function() {
+        toggleDrogasFields();
+    });
+
+    $('#p_ex_adicto').change(function() {
+        toggleExAdictoFields();
+    });
+});
+JS;
+$this->registerJs($script);
+?>
 
 <div class="card">
     <div class="card-header custom-nopato text-white text-left">
@@ -2528,13 +2759,299 @@ Faringe: uvula, secreciones, amigdalas, adenoides.
         </div>
     </div>
 </div>
+</div>
 <?php ActiveForm::end(); ?>
 
 <?php $this->endBlock(); ?>
 
 
+<?php $this->beginBlock('interrogatorio_medico'); ?>
+
+
+<?php $form = ActiveForm::begin(['action' => ['interrogatorio-medico', 'id' => $model->id]]); ?>
+<div class="row">
+    <div class="col-md-12">
+    
+        <div class="card">
+            <div class="card-header gradient-blue text-white text-center">
+                <h2>Interrogatorio Medico</h2>
+                <div class="float-submit-btn">
+    <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+</div>
+            </div>
+            <div class="card-body">
+            <div class="container">
+
+            <div class="card">
+    <div class="card-header custom-nopato text-white text-left">
+        <h5>CARDIOVASCULAR</h5>
+    </div>
+    <div class="card-body bg-light">
+        <div class="row">
+
+            <!-- Columna derecha con el textarea -->
+           
+            <div class="form-group">
+                    <?= Html::label('Cardiovascular', 'desc_cardiovascular') ?>
+                    <?= Html::textarea('InterrogatorioMedico[desc_cardiovascular]', $InterrogatorioMedico->desc_cardiovascular, ['class' => 'form-control', 'rows' => 5]) ?>
+                </div>
+            
+        </div>
+        <div class="alert alert-white custom-alert" role="alert">
+                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Antecedentes de cardiopatías, disnea, tos, hemoptisis, bronquitis frecuente, lipotimias, vértigos, insuficiencia arterial y venosa, sincope, fatiga, palpitaciones, dolor precordial, encuclillamiento, edemas, ascitis, cianosis, estasis venosa, varices. </div>
+    </div>
+    
+
+
+
+            </div>
+
+            <div class="card">
+    <div class="card-header custom-nopato text-white text-left">
+        <h5>DIGESTIVO</h5>
+    </div>
+    <div class="card-body bg-light">
+        <div class="row">
+
+            <!-- Columna derecha con el textarea -->
+           
+            <div class="form-group">
+                    <?= Html::label('Digestivo', 'desc_digestivo') ?>
+                    <?= Html::textarea('InterrogatorioMedico[desc_digestivo]', $InterrogatorioMedico->desc_digestivo, ['class' => 'form-control', 'rows' => 5]) ?>
+                </div>
+            
+        </div>
+        <div class="alert alert-white custom-alert" role="alert">
+                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Apetito, masticación, disfagia, pirosis, regurgitación, distención abdominal, dolor, vomito, hematemesis, evacuaciones diarreicas, melena, pujo y tenesmo,  constipación, ictericia, intolerancia a alimentos. </div>
+    </div>
+
+            </div>
+            <div class="card">
+    <div class="card-header custom-nopato text-white text-left">
+        <h5>ENDOCRINO</h5>
+    </div>
+    <div class="card-body bg-light">
+        <div class="row">
+
+            <!-- Columna derecha con el textarea -->
+           
+            <div class="form-group">
+                    <?= Html::label('Endocrino', 'desc_endocrino') ?>
+                    <?= Html::textarea('InterrogatorioMedico[desc_endocrino]', $InterrogatorioMedico->desc_endocrino, ['class' => 'form-control', 'rows' => 5]) ?>
+                </div>
+            
+        </div>
+        <div class="alert alert-white custom-alert" role="alert">
+                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Crecimiento y estatura, perturbaciones somaticas, caracteres sexuales, sensibilidad al calor y al frio y faneras, exoftalmos,diabetes, acne. </div>
+    </div>
+
+            </div>
+
+
+            <div class="card">
+    <div class="card-header custom-nopato text-white text-left">
+        <h5>HEMOLINFATICO</h5>
+    </div>
+    <div class="card-body bg-light">
+        <div class="row">
+
+            <!-- Columna derecha con el textarea -->
+           
+            <div class="form-group">
+                    <?= Html::label('Hemolinfatico', 'desc_hemolinfatico') ?>
+                    <?= Html::textarea('InterrogatorioMedico[desc_hemolinfatico]', $InterrogatorioMedico->desc_hemolinfatico, ['class' => 'form-control', 'rows' => 5]) ?>
+                </div>
+            
+        </div>
+        <div class="alert alert-white custom-alert" role="alert">
+                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Anemias, hemolisis, tendencia a hemorragia, adenopatias, menor resistencia a infecciones. </div>
+    </div>
+
+            </div>
+
+            <div class="card">
+    <div class="card-header custom-nopato text-white text-left">
+        <h5>MAMAS</h5>
+    </div>
+    <div class="card-body bg-light">
+        <div class="row">
+
+            <!-- Columna derecha con el textarea -->
+           
+            <div class="form-group">
+                    <?= Html::label('Mamas', 'desc_mamas') ?>
+                    <?= Html::textarea('InterrogatorioMedico[desc_mamas]', $InterrogatorioMedico->desc_mamas, ['class' => 'form-control', 'rows' => 5]) ?>
+                </div>
+            
+        </div>
+        <div class="alert alert-white custom-alert" role="alert">
+                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Sin descripción. </div>
+    </div>
+
+            </div>
+<!-- aqui -->
+<div class="card">
+    <div class="card-header custom-nopato text-white text-left">
+        <h5>MUSCULO-ESQUELETICO</h5>
+    </div>
+    <div class="card-body bg-light">
+        <div class="row">
+
+            <!-- Columna derecha con el textarea -->
+           
+            <div class="form-group">
+                    <?= Html::label('Musculo-Esqueletico', 'desc_musculo_esqueletico') ?>
+                    <?= Html::textarea('InterrogatorioMedico[desc_musculo_esqueletico]', $InterrogatorioMedico->desc_musculo_esqueletico, ['class' => 'form-control', 'rows' => 5]) ?>
+                </div>
+            
+        </div>
+        <div class="alert alert-white custom-alert" role="alert">
+                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Deformidades oseas, limitacion de movimientos, algias, atrofias. </div>
+    </div>
+
+            </div>
+
+            <div class="card">
+    <div class="card-header custom-nopato text-white text-left">
+        <h5>PIEL Y ANEXOS</h5>
+    </div>
+    <div class="card-body bg-light">
+        <div class="row">
+
+            <!-- Columna derecha con el textarea -->
+           
+            <div class="form-group">
+                    <?= Html::label('Piel y Anexos', 'desc_piel_anexos') ?>
+                    <?= Html::textarea('InterrogatorioMedico[desc_piel_anexos]', $InterrogatorioMedico->desc_piel_anexos, ['class' => 'form-control', 'rows' => 5]) ?>
+                </div>
+            
+        </div>
+        <div class="alert alert-white custom-alert" role="alert">
+                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Mucosas, piel, pelo, unas, prurito, cambios de coloracion, alopecia, erupciones, infestaciones, micosis. </div>
+    </div>
+
+            </div>
+
+            <div class="card">
+    <div class="card-header custom-nopato text-white text-left">
+        <h5>REPRODUCTOR</h5>
+    </div>
+    <div class="card-body bg-light">
+        <div class="row">
+
+            <!-- Columna derecha con el textarea -->
+           
+            <div class="form-group">
+                    <?= Html::label('Reproductor', 'desc_reproductor') ?>
+                    <?= Html::textarea('InterrogatorioMedico[desc_reproductor]', $InterrogatorioMedico->desc_reproductor, ['class' => 'form-control', 'rows' => 5]) ?>
+                </div>
+            
+        </div>
+        <div class="alert alert-white custom-alert" role="alert">
+                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Alteraciones menstruales, dolor pelvico, colporrea patologica, alteraciones de la libido, patologia obstetrica. Alteraciones testiculares, trastornos en la ereccion y/o eyaculacion, alteraciones de la libido. </div>
+    </div>
+
+            </div>
+
+            
+            <div class="card">
+    <div class="card-header custom-nopato text-white text-left">
+        <h5>RESPIRATORIO</h5>
+    </div>
+    <div class="card-body bg-light">
+        <div class="row">
+
+            <!-- Columna derecha con el textarea -->
+           
+            <div class="form-group">
+                    <?= Html::label('Respiratorio', 'desc_respiratorio') ?>
+                    <?= Html::textarea('InterrogatorioMedico[desc_respiratorio]', $InterrogatorioMedico->desc_respiratorio, ['class' => 'form-control', 'rows' => 5]) ?>
+                </div>
+            
+        </div>
+        <div class="alert alert-white custom-alert" role="alert">
+                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Obstuccion nasal, disfonia, tos, dolor, expectoracion, disnea, cianosis, hemoptisis. </div>
+    </div>
+
+            </div>
+
+            <div class="card">
+    <div class="card-header custom-nopato text-white text-left">
+        <h5>SISTEMA NERVIOSO</h5>
+    </div>
+    <div class="card-body bg-light">
+        <div class="row">
+
+            <!-- Columna derecha con el textarea -->
+           
+            <div class="form-group">
+                    <?= Html::label('Sistema Nervioso', 'desc_sistema_nervioso') ?>
+                    <?= Html::textarea('InterrogatorioMedico[desc_sistema_nervioso]', $InterrogatorioMedico->desc_sistema_nervioso, ['class' => 'form-control', 'rows' => 5]) ?>
+                </div>
+            
+        </div>
+        <div class="alert alert-white custom-alert" role="alert">
+                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Perdida del conocimiento, paralisis, paresias, temblores, coordinacion, convulsiones atrofias, hipo o hiperestesias, cefaleas, algias, vision, audicion, equilibrio, olfato, gusto, sueno, alteraciones de la personalidad, depresion, compulsion, exitacion, atencion, atencion, memoria, cambios en la conducta, afectividad, nerviosismo, angustia. </div>
+    </div>
+
+            </div>
+
+            <div class="card">
+    <div class="card-header custom-nopato text-white text-left">
+        <h5>SISTEMAS GENERALES</h5>
+    </div>
+    <div class="card-body bg-light">
+        <div class="row">
+
+            <!-- Columna derecha con el textarea -->
+           
+            <div class="form-group">
+                    <?= Html::label('Sistemas Generales', 'desc_sistemas_generales') ?>
+                    <?= Html::textarea('InterrogatorioMedico[desc_sistemas_generales]', $InterrogatorioMedico->desc_sistemas_generales, ['class' => 'form-control', 'rows' => 5]) ?>
+                </div>
+            
+        </div>
+        <div class="alert alert-white custom-alert" role="alert">
+                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Fiebre, escalofrio, diaforesis, astenia, adinamia, anorexia y variaciones de peso. </div>
+    </div>
+
+            </div>
+
+            <div class="card">
+    <div class="card-header custom-nopato text-white text-left">
+        <h5>URINARIO</h5>
+    </div>
+    <div class="card-body bg-light">
+        <div class="row">
+
+            <!-- Columna derecha con el textarea -->
+           
+            <div class="form-group">
+                    <?= Html::label('Urinario', 'desc_urinario') ?>
+                    <?= Html::textarea('InterrogatorioMedico[desc_urinario]', $InterrogatorioMedico->desc_urinario, ['class' => 'form-control', 'rows' => 5]) ?>
+                </div>
+            
+        </div>
+        <div class="alert alert-white custom-alert" role="alert">
+                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Disuria, polaquiuria, tenesmo vesical, hematuria piuria, incontinencia, dolor lumbar, expulsion de calculos, secrecion uretral. </div>
+    </div>
+
+            </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<?php ActiveForm::end(); ?>
+
+<?php $this->endBlock(); ?>
+
+
+
                             <br><br>
                             <?php echo TabsX::widget([
+                                
                             'enableStickyTabs' => true,
                             'options' => ['class' => 'nav-tabs-custom'],
                             'items' => [
@@ -2554,6 +3071,16 @@ Faringe: uvula, secreciones, amigdalas, adenoides.
                                    // 'active' => true,
                                     'options' => [
                                         'id' => 'exploracion_fisica',
+                                    ],
+
+
+                                ],
+                                [
+                                    'label' => 'Interrogatorio Medico',
+                                    'content' => $this->blocks['interrogatorio_medico'],
+                                   // 'active' => true,
+                                    'options' => [
+                                        'id' => 'interrogatorio_medico',
                                     ],
 
 

@@ -18,6 +18,8 @@ use Yii;
  * @property int|null $no_seguridad_social
  * @property int|null $empleado_id
  * @property int|null $exploracion_fisica_id
+ * @property int|null $interrogatorio_medico_id
+
 
  * @property AntecedenteHereditario $antecedenteHereditario
  * @property AntecedenteHereditario[] $antecedenteHereditarios
@@ -26,6 +28,8 @@ use Yii;
  * @property Documento $documento
  * @property Empleado $empleado
  * @property Empleado[] $empleados
+  * @property InterrogatorioMedico $interrogatorioMedico
+ * @property InterrogatorioMedico[] $interrogatorioMedicos
   * @property ExploracionFisica $exploracionFisica
  * @property ExploracionFisica[] $exploracionFisicas
  */
@@ -53,6 +57,7 @@ class ExpedienteMedico extends \yii\db\ActiveRecord
             [['documento_id'], 'exist', 'skipOnError' => true, 'targetClass' => Documento::class, 'targetAttribute' => ['documento_id' => 'id']],
             [['empleado_id'], 'exist', 'skipOnError' => true, 'targetClass' => Empleado::class, 'targetAttribute' => ['empleado_id' => 'id']],
             [['exploracion_fisica_id'], 'exist', 'skipOnError' => true, 'targetClass' => ExploracionFisica::class, 'targetAttribute' => ['exploracion_fisica_id' => 'id']],
+            [['interrogatorio_medico_id'], 'exist', 'skipOnError' => true, 'targetClass' => InterrogatorioMedico::class, 'targetAttribute' => ['interrogatorio_medico_id' => 'id']],
 
         ];
     }
@@ -74,6 +79,7 @@ class ExpedienteMedico extends \yii\db\ActiveRecord
             'no_seguridad_social' => 'No Seguridad Social',
             'empleado_id' => 'Empleado ID',
             'exploracion_fisica_id' => 'Exploracion Fisica ID',
+            'interrogatorio_medico_id' => 'Interrogatorio Medico ID',
 
         ];
     }
@@ -162,4 +168,27 @@ class ExpedienteMedico extends \yii\db\ActiveRecord
     {
         return $this->hasMany(ExploracionFisica::class, ['expediente_medico_id' => 'id']);
     }
+
+
+ /**
+     * Gets query for [[InterrogatorioMedico]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getInterrogatorioMedico()
+    {
+        return $this->hasOne(InterrogatorioMedico::class, ['id' => 'interrogatorio_medico_id']);
+    }
+
+    /**
+     * Gets query for [[InterrogatorioMedicos]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getInterrogatorioMedicos()
+    {
+        return $this->hasMany(InterrogatorioMedico::class, ['expediente_medico_id' => 'id']);
+    }
+
+    
 }

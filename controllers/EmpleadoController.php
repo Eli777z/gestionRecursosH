@@ -31,6 +31,7 @@ use app\models\AntecedenteHereditario;
 use app\models\AntecedentePatologico;
 use app\models\AntecedenteNoPatologico;
 use app\models\ExploracionFisica;
+use app\models\InterrogatorioMedico;
 
 /**
  * EmpleadoController implements the CRUD actions for Empleado model.
@@ -137,6 +138,20 @@ class EmpleadoController extends Controller
     }
 
 
+    $interrogatorioMedico= InterrogatorioMedico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+    if (!$interrogatorioMedico) {
+        $interrogatorioMedico = new InterrogatorioMedico();
+        $interrogatorioMedico->expediente_medico_id = $expedienteMedico->id;
+        if (!$interrogatorioMedico->save()) {
+            Yii::$app->session->setFlash('error', 'Hubo un error al crear el registro de antecedentes no patológicos.');
+        }else{
+
+            $expedienteMedico->interrogatorio_medico_id = $interrogatorioMedico->id;
+            $expedienteMedico->save(false); // Guardar sin validaciones adicionales
+        }
+    }
+
+
 
     if (Yii::$app->request->isPost) {
         if ($post = Yii::$app->request->post('AntecedenteHereditario')) {
@@ -187,6 +202,7 @@ class EmpleadoController extends Controller
         'descripcionAntecedentes' => $descripcionAntecedentes,
         'antecedenteNoPatologico' => $antecedenteNoPatologico, // Pasar el modelo a la vista
         'ExploracionFisica' => $exploracionFisica,
+        'InterrogatorioMedico' => $interrogatorioMedico,
     ]);
 }
 
@@ -228,31 +244,60 @@ class EmpleadoController extends Controller
     
 
     public function actionNoPatologicos($id)
-{
-    $modelEmpleado = $this->findModel2($id);
-    $expedienteMedico = $modelEmpleado->expedienteMedico;
+    {
+        $modelEmpleado = $this->findModel2($id);
+        $expedienteMedico = $modelEmpleado->expedienteMedico;
+    
+        $modelAntecedenteNoPatologico = AntecedenteNoPatologico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+        if (!$modelAntecedenteNoPatologico) {
+            $modelAntecedenteNoPatologico = new AntecedenteNoPatologico();
+            $modelAntecedenteNoPatologico->expediente_medico_id = $expedienteMedico->id;
+        }
+    
+        if ($modelAntecedenteNoPatologico->load(Yii::$app->request->post())) {
+            // Verificar y asignar manualmente los campos de checkbox que no estén en el POST
+            $checkboxFields = ['p_ejercicio',
+             'p_deporte', 
+             'p_dormir_dia',
+              'p_desayuno',
+            'p_cafe',
+            'p_refresco',
+            'p_dieta',
+            'p_alcohol',
+            'p_ex_alcoholico',
+            'p_fuma',
+            'p_ex_fumador',
+            'p_fumador_pasivo',
+            'p_drogas',
+            'p_ex_adicto',
+            'p_droga_intravenosa'
 
-    $modelAntecedenteNoPatologico = AntecedenteNoPatologico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
-    if (!$modelAntecedenteNoPatologico) {
-        $modelAntecedenteNoPatologico = new AntecedenteNoPatologico();
-        $modelAntecedenteNoPatologico->expediente_medico_id = $expedienteMedico->id;
+            
+            
+            ];
+            foreach ($checkboxFields as $field) {
+                if (!isset(Yii::$app->request->post('AntecedenteNoPatologico')[$field])) {
+                    $modelAntecedenteNoPatologico->$field = 0;
+                }
+            }
+    
+            if ($modelAntecedenteNoPatologico->save()) {
+                Yii::$app->session->setFlash('success', 'Información de antecedentes no patológicos guardada correctamente.');
+            } else {
+                Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información de antecedentes no patológicos.');
+            }
+    
+            $url = Url::to(['view', 'id' => $id]) . '#nopatologicos';
+            return $this->redirect($url);
+        }
+    
+        return $this->render('view', [
+            'model' => $modelEmpleado,
+            'expedienteMedico' => $expedienteMedico,
+            'modelAntecedenteNoPatologico' => $modelAntecedenteNoPatologico,
+        ]);
     }
-
-    if ($modelAntecedenteNoPatologico->load(Yii::$app->request->post()) && $modelAntecedenteNoPatologico->save()) {
-        Yii::$app->session->setFlash('success', 'Información de antecedentes no patológicos guardada correctamente.');
-    } else {
-        Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información de antecedentes no patológicos.');
-    }
-
-    $url = Url::to(['view', 'id' => $id]) . '#nopatologicos';
-                return $this->redirect($url);
-
-    return $this->render('view', [
-        'model' => $modelEmpleado,
-        'expedienteMedico' => $expedienteMedico,
-        'modelAntecedenteNoPatologico' => $modelAntecedenteNoPatologico, // Asegúrate de pasar este modelo
-    ]);
-}
+    
 
 
 
@@ -273,7 +318,8 @@ public function actionExploracionFisica($id)
         Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información de antecedentes no patológicos.');
     }
 
-    return $this->redirect(['view', 'id' => $id]);
+    $url = Url::to(['view', 'id' => $id]) . '#expediente_medico';
+    return $this->redirect($url);
 
     return $this->render('view', [
         'model' => $modelEmpleado,
@@ -282,6 +328,34 @@ public function actionExploracionFisica($id)
     ]);
 }
 
+public function actionInterrogatorioMedico($id)
+{
+    $modelEmpleado = $this->findModel2($id);
+    $expedienteMedico = $modelEmpleado->expedienteMedico;
+
+    $modelInterrogatorioMedico = InterrogatorioMedico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+    if (!$modelInterrogatorioMedico) {
+        $modelInterrogatorioMedico = new InterrogatorioMedico();
+        $modelInterrogatorioMedico->expediente_medico_id = $expedienteMedico->id;
+    }
+
+    if ($modelInterrogatorioMedico->load(Yii::$app->request->post()) && $modelInterrogatorioMedico->save()) {
+        Yii::$app->session->setFlash('success', 'Información de interrogatorio medico guardada correctamente.');
+    } else {
+        Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información de interrogatorio medico.');
+    }
+
+    $url = Url::to(['view', 'id' => $id]) . '#expediente_medico';
+    return $this->redirect($url);
+
+    return $this->render('view', [
+        'model' => $modelEmpleado,
+        'expedienteMedico' => $expedienteMedico,
+        'modelInterrogatorioMedico' => $modelInterrogatorioMedico, // Asegúrate de pasar este modelo
+    ]);
+}
+
+    
     
 
   
