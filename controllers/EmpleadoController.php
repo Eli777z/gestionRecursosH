@@ -30,6 +30,7 @@ use app\models\CatAntecedenteHereditario;
 use app\models\AntecedenteHereditario;
 use app\models\AntecedentePatologico;
 use app\models\AntecedenteNoPatologico;
+use app\models\AntecedentePerinatal;
 use app\models\ExploracionFisica;
 use app\models\InterrogatorioMedico;
 
@@ -151,6 +152,21 @@ class EmpleadoController extends Controller
         }
     }
 
+    
+    $antecedentePerinatal= AntecedentePerinatal::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+    if (!$antecedentePerinatal) {
+        $antecedentePerinatal = new AntecedentePerinatal();
+        $antecedentePerinatal->expediente_medico_id = $expedienteMedico->id;
+        if (!$antecedentePerinatal->save()) {
+            Yii::$app->session->setFlash('error', 'Hubo un error al crear el registro de antecedentes no patológicos.');
+        }else{
+
+            $expedienteMedico->antecedente_perinatal_id = $antecedentePerinatal->id;
+            $expedienteMedico->save(false); // Guardar sin validaciones adicionales
+        }
+    }
+
+
 
 
     if (Yii::$app->request->isPost) {
@@ -203,6 +219,7 @@ class EmpleadoController extends Controller
         'antecedenteNoPatologico' => $antecedenteNoPatologico, // Pasar el modelo a la vista
         'ExploracionFisica' => $exploracionFisica,
         'InterrogatorioMedico' => $interrogatorioMedico,
+        'AntecedentePerinatal' => $antecedentePerinatal
     ]);
 }
 
@@ -327,6 +344,59 @@ public function actionExploracionFisica($id)
         'modelExploracionFisica' => $modelExploracionFisica, // Asegúrate de pasar este modelo
     ]);
 }
+
+public function actionAntecedentePerinatal($id)
+{
+    $modelEmpleado = $this->findModel2($id);
+    $expedienteMedico = $modelEmpleado->expedienteMedico;
+
+    $modelAntecedentePerinatal = AntecedentePerinatal::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+    if (!$modelAntecedentePerinatal) {
+        $modelAntecedentePerinatal = new AntecedentePerinatal();
+        $modelAntecedentePerinatal->expediente_medico_id = $expedienteMedico->id;
+    }
+
+    if ($modelAntecedentePerinatal->load(Yii::$app->request->post())) {
+        // Verificar y asignar manualmente los campos de checkbox que no estén en el POST
+        $checkboxFields = ['p_apnea_neonatal',
+         'p_cianosis', 
+         'p_ictericia',
+         'p_hemorragias',
+'p_convulsiones',
+'p_anestesia',
+'test',
+'p_parto',
+'p_cesarea'
+         
+
+        
+        
+        ];
+        foreach ($checkboxFields as $field) {
+            if (!isset(Yii::$app->request->post('AntecedentePerinatal')[$field])) {
+                $modelAntecedentePerinatal->$field = 0;
+            }
+        }
+
+        if ($modelAntecedentePerinatal->save()) {
+            Yii::$app->session->setFlash('success', 'Información de antecedente perinatal guardada correctamente.');
+        } else {
+            Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información de antecedentes perinatales.');
+        }
+
+        $url = Url::to(['view', 'id' => $id]) . '#perinatal';
+        return $this->redirect($url);
+    }
+
+    return $this->render('view', [
+        'model' => $modelEmpleado,
+        'expedienteMedico' => $expedienteMedico,
+        'modelAntecedentePerinatal' => $modelAntecedentePerinatal,
+    ]);
+}
+
+
+
 
 public function actionInterrogatorioMedico($id)
 {

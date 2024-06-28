@@ -17,12 +17,12 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
 
 
 <div class="container-fluid">
-    <div class="row justify-content-left">
+    <div class="row justify-content-center">
         <div class="col-sm-7">
             <div class="card">
               
             <div class="card-header gradient-yellow text-white">
-    <h2> Solicitudes Recientes <i class="fas fa-envelope"></i></h2>
+    <h2> Solicitudes de Citas Medicas Recientes <i class="fa fa-heartbeat"></i></h2>
 </div>
 
 
@@ -52,7 +52,7 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
                     <thead class="thead-dark">
                         <tr>
                             <th>Empleado</th>
-                            <th>Tipo de Solicitud</th>
+                         
                             
                             <th>Fecha de Creación</th>
                             <th>Acciones</th>
@@ -64,7 +64,7 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
                                 <td>
                                     <?= $solicitud->empleado ? Html::encode($solicitud->empleado->nombre . ' ' . $solicitud->empleado->apellido) : 'N/A' ?>
                                 </td>
-                                <td><?= Html::encode($solicitud->nombre_formato) ?></td>
+                               
                              
 
                                 <td><?= strftime('%A, %d de %B de %Y', strtotime($solicitud->fecha_creacion)) ?></td>

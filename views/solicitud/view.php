@@ -27,7 +27,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Solicitud ' . $model->id];
             <div class="card">
             <div class="card-header gradient-info text-white">
                     <div class="d-flex justify-content-between"> 
-                        <h1> <?= $model->nombre_formato?></h1>
+                        <h1> CITA MEDICA </h1>
                     <?php /* ?>
 <div class="form-group mr-2">
     <?= Html::beginForm(['aprobar-solicitud', 'id' => $model->id], 'post', ['class' => 'form-inline']) ?>

@@ -100,7 +100,12 @@ if ($expedienteMedico) {
         $modelInterrogatorioMedico = new \app\models\InterrogatorioMedico();
         $modelInterrogatorioMedico->expediente_medico_id = $expedienteMedico->id;
     }
-
+    // Obtener antecedentes no patológicos
+    $modelAntecedentePerinatal = \app\models\AntecedentePerinatal::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+    if (!$modelAntecedentePerinatal) {
+        $modelAntecedentePerinatal = new \app\models\AntecedentePerinatal();
+        $modelAntecedentePerinatal->expediente_medico_id = $expedienteMedico->id;
+    }
 }
 ?>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -222,405 +227,405 @@ if ($expedienteMedico) {
                             </div>
                             <?php $this->beginBlock('datos'); ?>
                             <?php $this->beginBlock('info_p'); ?>
-<br>
+                            <br>
 
-<?php Pjax::begin([
-    'id' => 'pjax-update-info',
-    'options' => ['pushState' => false],
-]); ?>
-<div class="row">
+                            <?php Pjax::begin([
+                                'id' => 'pjax-update-info',
+                                'options' => ['pushState' => false],
+                            ]); ?>
+                            <div class="row">
 
-    <div class="col-md-6">
+                                <div class="col-md-6">
 
-<div class="card">
-    <?php $form = ActiveForm::begin([
-        'action' => ['actualizar-informacion', 'id' => $model->id],
-        'options' => ['id' => 'personal-info-form']
-    ]); ?>
-    <div class="card-header bg-info text-white">
-        <h3>Información personal</h3>
-        <button type="button" id="edit-button-personal" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
-        <button type="button" id="cancel-button-personal" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
-        <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right mr-3', 'id' => 'save-button-personal', 'style' => 'display:none;']) ?>
-    </div>
-    <div class="card-body">
-        <?= $form->field($model, 'numero_empleado')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
-        <?= $form->field($model, 'nombre')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
-        <?= $form->field($model, 'apellido')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
-        <?= $form->field($model, 'fecha_nacimiento')->widget(DatePicker::class, [
-            'language' => 'es',
-            'dateFormat' => 'yyyy-MM-dd',
-            'options' => [
-                'class' => 'form-control',
-                'autocomplete' => 'off',
-                'readonly' => true
-            ],
-            'clientOptions' => [
-                'changeYear' => true,
-                'changeMonth' => true,
-                'yearRange' => '-100:+0',
-            ],
-        ]); ?>
-       
-        <?= $form->field($model, 'edad')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
-        <?= $form->field($model, 'sexo')->widget(Select2::className(), [
-            'data' => [
-                'Masculino' => 'Masculino',
-                'Femenino' => 'Femenino',
-            ],
-            'options' => ['prompt' => 'Seleccionar Sexo', 'disabled' => true],
-            'pluginOptions' => [
-                'allowClear' => true
-            ],
-            'theme' => Select2::THEME_BOOTSTRAP,
-        ]); ?>
-        <?= $form->field($model, 'estado_civil')->widget(Select2::className(), [
-            'data' => [
-                'Masculino' => [
-                    'Soltero' => 'Soltero',
-                    'Casado' => 'Casado',
-                    'Separado' => 'Separado',
-                    'Viudo' => 'Viudo',
-                ],
-                'Femenino' => [
-                    'Soltera' => 'Soltera',
-                    'Casada' => 'Casada',
-                    'Separada' => 'Separada',
-                    'Viuda' => 'Viuda',
-                ],
-            ],
-            'options' => ['prompt' => 'Seleccionar Estado Civil', 'disabled' => true],
-            'pluginOptions' => [
-                'allowClear' => true
-            ],
-            'theme' => Select2::THEME_BOOTSTRAP,
-        ]); ?>
-        <?= $form->field($model, 'curp')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
-        <?= $form->field($model, 'nss')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
-        <?= $form->field($model, 'rfc')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
-    </div>
-    <?php ActiveForm::end(); ?>
-</div>
+                                    <div class="card">
+                                        <?php $form = ActiveForm::begin([
+                                            'action' => ['actualizar-informacion', 'id' => $model->id],
+                                            'options' => ['id' => 'personal-info-form']
+                                        ]); ?>
+                                        <div class="card-header bg-info text-white">
+                                            <h3>Información personal</h3>
+                                            <button type="button" id="edit-button-personal" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
+                                            <button type="button" id="cancel-button-personal" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
+                                            <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right mr-3', 'id' => 'save-button-personal', 'style' => 'display:none;']) ?>
+                                        </div>
+                                        <div class="card-body">
+                                            <?= $form->field($model, 'numero_empleado')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
+                                            <?= $form->field($model, 'nombre')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
+                                            <?= $form->field($model, 'apellido')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
+                                            <?= $form->field($model, 'fecha_nacimiento')->widget(DatePicker::class, [
+                                                'language' => 'es',
+                                                'dateFormat' => 'yyyy-MM-dd',
+                                                'options' => [
+                                                    'class' => 'form-control',
+                                                    'autocomplete' => 'off',
+                                                    'readonly' => true
+                                                ],
+                                                'clientOptions' => [
+                                                    'changeYear' => true,
+                                                    'changeMonth' => true,
+                                                    'yearRange' => '-100:+0',
+                                                ],
+                                            ]); ?>
 
-</div>
+                                            <?= $form->field($model, 'edad')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
+                                            <?= $form->field($model, 'sexo')->widget(Select2::className(), [
+                                                'data' => [
+                                                    'Masculino' => 'Masculino',
+                                                    'Femenino' => 'Femenino',
+                                                ],
+                                                'options' => ['prompt' => 'Seleccionar Sexo', 'disabled' => true],
+                                                'pluginOptions' => [
+                                                    'allowClear' => true
+                                                ],
+                                                'theme' => Select2::THEME_BOOTSTRAP,
+                                            ]); ?>
+                                            <?= $form->field($model, 'estado_civil')->widget(Select2::className(), [
+                                                'data' => [
+                                                    'Masculino' => [
+                                                        'Soltero' => 'Soltero',
+                                                        'Casado' => 'Casado',
+                                                        'Separado' => 'Separado',
+                                                        'Viudo' => 'Viudo',
+                                                    ],
+                                                    'Femenino' => [
+                                                        'Soltera' => 'Soltera',
+                                                        'Casada' => 'Casada',
+                                                        'Separada' => 'Separada',
+                                                        'Viuda' => 'Viuda',
+                                                    ],
+                                                ],
+                                                'options' => ['prompt' => 'Seleccionar Estado Civil', 'disabled' => true],
+                                                'pluginOptions' => [
+                                                    'allowClear' => true
+                                                ],
+                                                'theme' => Select2::THEME_BOOTSTRAP,
+                                            ]); ?>
+                                            <?= $form->field($model, 'curp')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
+                                            <?= $form->field($model, 'nss')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
+                                            <?= $form->field($model, 'rfc')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
+                                        </div>
+                                        <?php ActiveForm::end(); ?>
+                                    </div>
 
-<script>
-    document.getElementById('edit-button-personal').addEventListener('click', function() {
-        var fields = document.querySelectorAll('#personal-info-form .form-control');
-        fields.forEach(function(field) {
-            field.readOnly = false;
-            field.disabled = false;
-        });
-        document.getElementById('edit-button-personal').style.display = 'none';
-        document.getElementById('save-button-personal').style.display = 'block';
-        document.getElementById('cancel-button-personal').style.display = 'block';
-    });
+                                </div>
 
-    document.getElementById('cancel-button-personal').addEventListener('click', function() {
-        var fields = document.querySelectorAll('#personal-info-form .form-control');
-        fields.forEach(function(field) {
-            field.readOnly = true;
-            field.disabled = true;
-            field.value = field.defaultValue;
-        });
-        document.getElementById('edit-button-personal').style.display = 'block';
-        document.getElementById('save-button-personal').style.display = 'none';
-        document.getElementById('cancel-button-personal').style.display = 'none';
-    });
+                                <script>
+                                    document.getElementById('edit-button-personal').addEventListener('click', function() {
+                                        var fields = document.querySelectorAll('#personal-info-form .form-control');
+                                        fields.forEach(function(field) {
+                                            field.readOnly = false;
+                                            field.disabled = false;
+                                        });
+                                        document.getElementById('edit-button-personal').style.display = 'none';
+                                        document.getElementById('save-button-personal').style.display = 'block';
+                                        document.getElementById('cancel-button-personal').style.display = 'block';
+                                    });
 
-    /*function checkEmptyFieldsPersonal() {
-        var fields = document.querySelectorAll('#personal-info-form .form-control');
-        var emptyFields = Array.from(fields).filter(function(field) {
-            return field.value.trim() === '';
-        });
+                                    document.getElementById('cancel-button-personal').addEventListener('click', function() {
+                                        var fields = document.querySelectorAll('#personal-info-form .form-control');
+                                        fields.forEach(function(field) {
+                                            field.readOnly = true;
+                                            field.disabled = true;
+                                            field.value = field.defaultValue;
+                                        });
+                                        document.getElementById('edit-button-personal').style.display = 'block';
+                                        document.getElementById('save-button-personal').style.display = 'none';
+                                        document.getElementById('cancel-button-personal').style.display = 'none';
+                                    });
 
-        if (emptyFields.length > 0) {
-            showAlert('Falta completar datos del empleado', 'Por favor, complete todos los campos.');
-        }
-    }
+                                    /*function checkEmptyFieldsPersonal() {
+                                        var fields = document.querySelectorAll('#personal-info-form .form-control');
+                                        var emptyFields = Array.from(fields).filter(function(field) {
+                                            return field.value.trim() === '';
+                                        });
 
-    document.addEventListener('DOMContentLoaded', function() {
-        checkEmptyFieldsPersonal();
-    });
+                                        if (emptyFields.length > 0) {
+                                            showAlert('Falta completar datos del empleado', 'Por favor, complete todos los campos.');
+                                        }
+                                    }
 
-    $('#pjax-update-info').on('pjax:end', function() {
-        checkEmptyFieldsPersonal();
-    });*/
-</script>
+                                    document.addEventListener('DOMContentLoaded', function() {
+                                        checkEmptyFieldsPersonal();
+                                    });
 
-
-
-
-    <div class="col-md-6">
-
-<div class="card">
-    <?php $form = ActiveForm::begin([
-      'action' => ['actualizar-informacion', 'id' => $model->id],
-        'options' => ['id' => 'educational-info-form']
-    ]); ?>
-    <div class="card-header gradient-verde  text-white">
-        <h3>Información Educacional</h3>
-        <button type="button" id="edit-button-educational" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
-        <button type="button" id="cancel-button-educational" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
-        <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right mr-3', 'id' => 'save-button-educational', 'style' => 'display:none;']) ?>
-    </div>
-    <div class="card-body">
-        <?= $form->field($model, 'cat_nivel_estudio_id')->widget(Select2::classname(), [
-            'data' => ArrayHelper::map(CatNivelEstudio::find()->all(), 'id', 'nivel_estudio'),
-            'options' => ['placeholder' => 'Seleccionar Nivel de Estudio', 'disabled' => true],
-            'pluginOptions' => [
-                'allowClear' => true
-            ],
-            'theme' => Select2::THEME_BOOTSTRAP,
-            'pluginEvents' => [
-                'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
-                'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
-            ],
-        ])->label('Nivel de estudios') ?>
-        <?= $form->field($model, 'institucion_educativa')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
-        <?= $form->field($model, 'profesion')->widget(Select2::className(), [
-            'data' => [
-                'No tiene' => 'No tiene',
-                'ING.' => 'ING.',
-                'LIC.' => 'LIC.',
-                'PROF.' => 'PROF.',
-                'ARQ.' => 'ARQ.',
-                'C.' => 'C.',
-                'DR.' => 'DR.',
-                'DRA.' => 'DRA.',
-                'TEC.' => 'TEC.',
-            ],
-            'options' => ['prompt' => 'Seleccionar Profesión', 'disabled' => true],
-            'pluginOptions' => [
-                'allowClear' => true
-            ],
-            'theme' => Select2::THEME_BOOTSTRAP,
-        ]); ?>
-    </div>
-    <?php ActiveForm::end(); ?>
-</div>
-</div>
-
-</div>
-
-<script>
-    document.getElementById('edit-button-educational').addEventListener('click', function() {
-        var fields = document.querySelectorAll('#educational-info-form .form-control');
-        fields.forEach(function(field) {
-            field.readOnly = false;
-            field.disabled = false;
-        });
-        document.getElementById('edit-button-educational').style.display = 'none';
-        document.getElementById('save-button-educational').style.display = 'block';
-        document.getElementById('cancel-button-educational').style.display = 'block';
-    });
-
-    document.getElementById('cancel-button-educational').addEventListener('click', function() {
-        var fields = document.querySelectorAll('#educational-info-form .form-control');
-        fields.forEach(function(field) {
-            field.readOnly = true;
-            field.disabled = true;
-            field.value = field.defaultValue;
-        });
-        document.getElementById('edit-button-educational').style.display = 'block';
-        document.getElementById('save-button-educational').style.display = 'none';
-        document.getElementById('cancel-button-educational').style.display = 'none';
-    });
-
-    /*function checkEmptyFieldsPersonal() {
-        var fields = document.querySelectorAll('#educational-info-form .form-control');
-        var emptyFields = Array.from(fields).filter(function(field) {
-            return field.value.trim() === '';
-        });
-
-        if (emptyFields.length > 0) {
-            showAlert('Falta completar datos del empleado', 'Por favor, complete todos los campos.');
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        checkEmptyFieldsPersonal();
-    });
-
-    $('#pjax-update-info').on('pjax:end', function() {
-        checkEmptyFieldsPersonal();
-    });*/
-</script>
-
-
-<?php Pjax::end(); ?>
-<?php $this->endBlock(); ?>
+                                    $('#pjax-update-info').on('pjax:end', function() {
+                                        checkEmptyFieldsPersonal();
+                                    });*/
+                                </script>
 
 
 
-<?php $this->beginBlock('info_c'); ?>
-<br>
-<div class="row">
-    <div class="col-md-6">
-        <div class="card">
-            <?php $form = ActiveForm::begin([
-                'action' => ['actualizar-informacion-contacto', 'id' => $model->id],
-                'options' => ['id' => 'contact-info-form']
-            ]); ?>
-            <div class="card-header bg-info text-white">
-                <h3>Información de contacto</h3>
-                <button type="button" id="edit-button-contact" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
-                <button type="button" id="cancel-button-contact" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
-                <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right mr-3', 'id' => 'save-button-contact', 'style' => 'display:none;']) ?>
-            </div>
-            <div class="card-body">
-                <?= $form->field($model, 'email')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
-                <?= $form->field($model, 'telefono')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
-                <?= $form->field($model, 'colonia')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
-                <?= $form->field($model, 'calle')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
-                <?= $form->field($model, 'numero_casa')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
-                <?= $form->field($model, 'codigo_postal')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
-                <?= $form->field($model, 'estado')->widget(Select2::classname(), [
-                    'data' => [], // Inicialmente vacío, se llenará con JS
-                    'options' => ['placeholder' => 'Selecciona un estado', 'id' => 'estado-dropdown', 'disabled' => true],
-                    'pluginOptions' => [
-                        'allowClear' => true
-                    ],
-                    'theme' => Select2::THEME_BOOTSTRAP,
-                ])->label('Estado'); ?>
-                <?= $form->field($model, 'municipio')->widget(Select2::classname(), [
-                    'data' => [], // Inicialmente vacío
-                    'options' => ['placeholder' => 'Selecciona un municipio', 'id' => 'municipio-dropdown', 'disabled' => true],
-                    'pluginOptions' => [
-                        'allowClear' => true
-                    ],
-                    'theme' => Select2::THEME_BOOTSTRAP,
-                ])->label('Municipio'); ?>
-            </div>
-            <?php ActiveForm::end(); ?>
-        </div>
 
-        <script>
-            document.getElementById('edit-button-contact').addEventListener('click', function() {
-                var fields = document.querySelectorAll('#contact-info-form .form-control');
-                fields.forEach(function(field) {
-                    field.readOnly = false;
-                    field.disabled = false;
-                });
-                document.getElementById('edit-button-contact').style.display = 'none';
-                document.getElementById('save-button-contact').style.display = 'block';
-                document.getElementById('cancel-button-contact').style.display = 'block';
-            });
+                                <div class="col-md-6">
 
-            document.getElementById('cancel-button-contact').addEventListener('click', function() {
-                var fields = document.querySelectorAll('#contact-info-form .form-control');
-                fields.forEach(function(field) {
-                    field.readOnly = true;
-                    field.disabled = true;
-                    field.value = field.defaultValue;
-                });
-                document.getElementById('edit-button-contact').style.display = 'block';
-                document.getElementById('save-button-contact').style.display = 'none';
-                document.getElementById('cancel-button-contact').style.display = 'none';
-            });
+                                    <div class="card">
+                                        <?php $form = ActiveForm::begin([
+                                            'action' => ['actualizar-informacion', 'id' => $model->id],
+                                            'options' => ['id' => 'educational-info-form']
+                                        ]); ?>
+                                        <div class="card-header gradient-verde  text-white">
+                                            <h3>Información Educacional</h3>
+                                            <button type="button" id="edit-button-educational" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
+                                            <button type="button" id="cancel-button-educational" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
+                                            <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right mr-3', 'id' => 'save-button-educational', 'style' => 'display:none;']) ?>
+                                        </div>
+                                        <div class="card-body">
+                                            <?= $form->field($model, 'cat_nivel_estudio_id')->widget(Select2::classname(), [
+                                                'data' => ArrayHelper::map(CatNivelEstudio::find()->all(), 'id', 'nivel_estudio'),
+                                                'options' => ['placeholder' => 'Seleccionar Nivel de Estudio', 'disabled' => true],
+                                                'pluginOptions' => [
+                                                    'allowClear' => true
+                                                ],
+                                                'theme' => Select2::THEME_BOOTSTRAP,
+                                                'pluginEvents' => [
+                                                    'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
+                                                    'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
+                                                ],
+                                            ])->label('Nivel de estudios') ?>
+                                            <?= $form->field($model, 'institucion_educativa')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
+                                            <?= $form->field($model, 'profesion')->widget(Select2::className(), [
+                                                'data' => [
+                                                    'No tiene' => 'No tiene',
+                                                    'ING.' => 'ING.',
+                                                    'LIC.' => 'LIC.',
+                                                    'PROF.' => 'PROF.',
+                                                    'ARQ.' => 'ARQ.',
+                                                    'C.' => 'C.',
+                                                    'DR.' => 'DR.',
+                                                    'DRA.' => 'DRA.',
+                                                    'TEC.' => 'TEC.',
+                                                ],
+                                                'options' => ['prompt' => 'Seleccionar Profesión', 'disabled' => true],
+                                                'pluginOptions' => [
+                                                    'allowClear' => true
+                                                ],
+                                                'theme' => Select2::THEME_BOOTSTRAP,
+                                            ]); ?>
+                                        </div>
+                                        <?php ActiveForm::end(); ?>
+                                    </div>
+                                </div>
 
-          /*  function checkEmptyFieldsContact() {
-                var fields = document.querySelectorAll('#contact-info-form .form-control');
-                var emptyFields = Array.from(fields).filter(function(field) {
-                    return field.value.trim() === '';
-                });
+                            </div>
 
-                if (emptyFields.length > 0) {
-                    showAlert('Falta completar datos de contacto', 'Por favor, complete todos los campos.');
-                }
-            }
+                            <script>
+                                document.getElementById('edit-button-educational').addEventListener('click', function() {
+                                    var fields = document.querySelectorAll('#educational-info-form .form-control');
+                                    fields.forEach(function(field) {
+                                        field.readOnly = false;
+                                        field.disabled = false;
+                                    });
+                                    document.getElementById('edit-button-educational').style.display = 'none';
+                                    document.getElementById('save-button-educational').style.display = 'block';
+                                    document.getElementById('cancel-button-educational').style.display = 'block';
+                                });
 
-            document.addEventListener('DOMContentLoaded', function() {
-                checkEmptyFieldsContact();
-            });
+                                document.getElementById('cancel-button-educational').addEventListener('click', function() {
+                                    var fields = document.querySelectorAll('#educational-info-form .form-control');
+                                    fields.forEach(function(field) {
+                                        field.readOnly = true;
+                                        field.disabled = true;
+                                        field.value = field.defaultValue;
+                                    });
+                                    document.getElementById('edit-button-educational').style.display = 'block';
+                                    document.getElementById('save-button-educational').style.display = 'none';
+                                    document.getElementById('cancel-button-educational').style.display = 'none';
+                                });
 
-            $('#pjax-update-info').on('pjax:end', function() {
-                checkEmptyFieldsContact();
-            });*/
-        </script>
-    </div>
-    <div class="col-md-6">
-        <div class="card">
-            <?php $form = ActiveForm::begin([
-                'action' => ['actualizar-informacion-contacto', 'id' => $model->id],
-                'options' => ['id' => 'emergency-contact-form']
-            ]); ?>
-            <div class="card-header gradient-verde text-white">
-                <h3>Información de contacto de emergencia</h3>
-                <button type="button" id="edit-button-emergency" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
-                <button type="button" id="cancel-button-emergency" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
-                <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-info float-right  mr-3', 'id' => 'save-button-emergency', 'style' => 'display:none;']) ?>
-            </div>
-            <div class="card-body">
-                <?= $form->field($model, 'nombre_contacto_emergencia')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
-                <?= $form->field($model, 'relacion_contacto_emergencia')->widget(Select2::className(), [
-                    'data' => [
-                        'Padre' => 'Padre',
-                        'Madre' => 'Madre',
-                        'Esposo/a' => 'Esposo/a',
-                        'Hijo/a' => 'Hijo/a',
-                        'Hermano/a' => 'Hermano/a',
-                        'Compañero/a de trabajo' => 'Compañero/a de trabajo',
-                        'Tio/a' => 'Tio/a'
-                    ],
-                    'options' => ['prompt' => 'Seleccionar Parentesco', 'disabled' => true],
-                    'pluginOptions' => [
-                        'allowClear' => true
-                    ],
-                    'theme' => Select2::THEME_BOOTSTRAP,
-                ]); ?>
-                <?= $form->field($model, 'telefono_contacto_emergencia')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
-            </div>
-            <?php ActiveForm::end(); ?>
-        </div>
+                                /*function checkEmptyFieldsPersonal() {
+                                    var fields = document.querySelectorAll('#educational-info-form .form-control');
+                                    var emptyFields = Array.from(fields).filter(function(field) {
+                                        return field.value.trim() === '';
+                                    });
 
-        <script>
-            document.getElementById('edit-button-emergency').addEventListener('click', function() {
-                var fields = document.querySelectorAll('#emergency-contact-form .form-control');
-                fields.forEach(function(field) {
-                    field.readOnly = false;
-                    field.disabled = false;
-                });
-                document.getElementById('edit-button-emergency').style.display = 'none';
-                document.getElementById('save-button-emergency').style.display = 'block';
-                document.getElementById('cancel-button-emergency').style.display = 'block';
-            });
+                                    if (emptyFields.length > 0) {
+                                        showAlert('Falta completar datos del empleado', 'Por favor, complete todos los campos.');
+                                    }
+                                }
 
-            document.getElementById('cancel-button-emergency').addEventListener('click', function() {
-                var fields = document.querySelectorAll('#emergency-contact-form .form-control');
-                fields.forEach(function(field) {
-                    field.readOnly = true;
-                    field.disabled = true;
-                    field.value = field.defaultValue;
-                });
-                document.getElementById('edit-button-emergency').style.display = 'block';
-                document.getElementById('save-button-emergency').style.display = 'none';
-                document.getElementById('cancel-button-emergency').style.display = 'none';
-            });
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    checkEmptyFieldsPersonal();
+                                });
 
-           /* function checkEmptyFieldsEmergency() {
-                var fields = document.querySelectorAll('#emergency-contact-form .form-control');
-                var emptyFields = Array.from(fields).filter(function(field) {
-                    return field.value.trim() === '';
-                });
+                                $('#pjax-update-info').on('pjax:end', function() {
+                                    checkEmptyFieldsPersonal();
+                                });*/
+                            </script>
 
-                if (emptyFields.length > 0) {
-                    showAlert('Falta completar datos de contacto de emergencia', 'Por favor, complete todos los campos.');
-                }
-            }
 
-            document.addEventListener('DOMContentLoaded', function() {
-                checkEmptyFieldsEmergency();
-            });
+                            <?php Pjax::end(); ?>
+                            <?php $this->endBlock(); ?>
 
-            $('#pjax-update-info').on('pjax:end', function() {
-                checkEmptyFieldsEmergency();
-            });*/
-        </script>
-    </div>
-</div>
-<?php $this->endBlock(); ?>
-<!-- INFOLABORAL-->
+
+
+                            <?php $this->beginBlock('info_c'); ?>
+                            <br>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <?php $form = ActiveForm::begin([
+                                            'action' => ['actualizar-informacion-contacto', 'id' => $model->id],
+                                            'options' => ['id' => 'contact-info-form']
+                                        ]); ?>
+                                        <div class="card-header bg-info text-white">
+                                            <h3>Información de contacto</h3>
+                                            <button type="button" id="edit-button-contact" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
+                                            <button type="button" id="cancel-button-contact" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
+                                            <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right mr-3', 'id' => 'save-button-contact', 'style' => 'display:none;']) ?>
+                                        </div>
+                                        <div class="card-body">
+                                            <?= $form->field($model, 'email')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
+                                            <?= $form->field($model, 'telefono')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
+                                            <?= $form->field($model, 'colonia')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
+                                            <?= $form->field($model, 'calle')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
+                                            <?= $form->field($model, 'numero_casa')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
+                                            <?= $form->field($model, 'codigo_postal')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
+                                            <?= $form->field($model, 'estado')->widget(Select2::classname(), [
+                                                'data' => [], // Inicialmente vacío, se llenará con JS
+                                                'options' => ['placeholder' => 'Selecciona un estado', 'id' => 'estado-dropdown', 'disabled' => true],
+                                                'pluginOptions' => [
+                                                    'allowClear' => true
+                                                ],
+                                                'theme' => Select2::THEME_BOOTSTRAP,
+                                            ])->label('Estado'); ?>
+                                            <?= $form->field($model, 'municipio')->widget(Select2::classname(), [
+                                                'data' => [], // Inicialmente vacío
+                                                'options' => ['placeholder' => 'Selecciona un municipio', 'id' => 'municipio-dropdown', 'disabled' => true],
+                                                'pluginOptions' => [
+                                                    'allowClear' => true
+                                                ],
+                                                'theme' => Select2::THEME_BOOTSTRAP,
+                                            ])->label('Municipio'); ?>
+                                        </div>
+                                        <?php ActiveForm::end(); ?>
+                                    </div>
+
+                                    <script>
+                                        document.getElementById('edit-button-contact').addEventListener('click', function() {
+                                            var fields = document.querySelectorAll('#contact-info-form .form-control');
+                                            fields.forEach(function(field) {
+                                                field.readOnly = false;
+                                                field.disabled = false;
+                                            });
+                                            document.getElementById('edit-button-contact').style.display = 'none';
+                                            document.getElementById('save-button-contact').style.display = 'block';
+                                            document.getElementById('cancel-button-contact').style.display = 'block';
+                                        });
+
+                                        document.getElementById('cancel-button-contact').addEventListener('click', function() {
+                                            var fields = document.querySelectorAll('#contact-info-form .form-control');
+                                            fields.forEach(function(field) {
+                                                field.readOnly = true;
+                                                field.disabled = true;
+                                                field.value = field.defaultValue;
+                                            });
+                                            document.getElementById('edit-button-contact').style.display = 'block';
+                                            document.getElementById('save-button-contact').style.display = 'none';
+                                            document.getElementById('cancel-button-contact').style.display = 'none';
+                                        });
+
+                                        /*  function checkEmptyFieldsContact() {
+                                              var fields = document.querySelectorAll('#contact-info-form .form-control');
+                                              var emptyFields = Array.from(fields).filter(function(field) {
+                                                  return field.value.trim() === '';
+                                              });
+
+                                              if (emptyFields.length > 0) {
+                                                  showAlert('Falta completar datos de contacto', 'Por favor, complete todos los campos.');
+                                              }
+                                          }
+
+                                          document.addEventListener('DOMContentLoaded', function() {
+                                              checkEmptyFieldsContact();
+                                          });
+
+                                          $('#pjax-update-info').on('pjax:end', function() {
+                                              checkEmptyFieldsContact();
+                                          });*/
+                                    </script>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <?php $form = ActiveForm::begin([
+                                            'action' => ['actualizar-informacion-contacto', 'id' => $model->id],
+                                            'options' => ['id' => 'emergency-contact-form']
+                                        ]); ?>
+                                        <div class="card-header gradient-verde text-white">
+                                            <h3>Información de contacto de emergencia</h3>
+                                            <button type="button" id="edit-button-emergency" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
+                                            <button type="button" id="cancel-button-emergency" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
+                                            <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-info float-right  mr-3', 'id' => 'save-button-emergency', 'style' => 'display:none;']) ?>
+                                        </div>
+                                        <div class="card-body">
+                                            <?= $form->field($model, 'nombre_contacto_emergencia')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
+                                            <?= $form->field($model, 'relacion_contacto_emergencia')->widget(Select2::className(), [
+                                                'data' => [
+                                                    'Padre' => 'Padre',
+                                                    'Madre' => 'Madre',
+                                                    'Esposo/a' => 'Esposo/a',
+                                                    'Hijo/a' => 'Hijo/a',
+                                                    'Hermano/a' => 'Hermano/a',
+                                                    'Compañero/a de trabajo' => 'Compañero/a de trabajo',
+                                                    'Tio/a' => 'Tio/a'
+                                                ],
+                                                'options' => ['prompt' => 'Seleccionar Parentesco', 'disabled' => true],
+                                                'pluginOptions' => [
+                                                    'allowClear' => true
+                                                ],
+                                                'theme' => Select2::THEME_BOOTSTRAP,
+                                            ]); ?>
+                                            <?= $form->field($model, 'telefono_contacto_emergencia')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
+                                        </div>
+                                        <?php ActiveForm::end(); ?>
+                                    </div>
+
+                                    <script>
+                                        document.getElementById('edit-button-emergency').addEventListener('click', function() {
+                                            var fields = document.querySelectorAll('#emergency-contact-form .form-control');
+                                            fields.forEach(function(field) {
+                                                field.readOnly = false;
+                                                field.disabled = false;
+                                            });
+                                            document.getElementById('edit-button-emergency').style.display = 'none';
+                                            document.getElementById('save-button-emergency').style.display = 'block';
+                                            document.getElementById('cancel-button-emergency').style.display = 'block';
+                                        });
+
+                                        document.getElementById('cancel-button-emergency').addEventListener('click', function() {
+                                            var fields = document.querySelectorAll('#emergency-contact-form .form-control');
+                                            fields.forEach(function(field) {
+                                                field.readOnly = true;
+                                                field.disabled = true;
+                                                field.value = field.defaultValue;
+                                            });
+                                            document.getElementById('edit-button-emergency').style.display = 'block';
+                                            document.getElementById('save-button-emergency').style.display = 'none';
+                                            document.getElementById('cancel-button-emergency').style.display = 'none';
+                                        });
+
+                                        /* function checkEmptyFieldsEmergency() {
+                                             var fields = document.querySelectorAll('#emergency-contact-form .form-control');
+                                             var emptyFields = Array.from(fields).filter(function(field) {
+                                                 return field.value.trim() === '';
+                                             });
+
+                                             if (emptyFields.length > 0) {
+                                                 showAlert('Falta completar datos de contacto de emergencia', 'Por favor, complete todos los campos.');
+                                             }
+                                         }
+
+                                         document.addEventListener('DOMContentLoaded', function() {
+                                             checkEmptyFieldsEmergency();
+                                         });
+
+                                         $('#pjax-update-info').on('pjax:end', function() {
+                                             checkEmptyFieldsEmergency();
+                                         });*/
+                                    </script>
+                                </div>
+                            </div>
+                            <?php $this->endBlock(); ?>
+                            <!-- INFOLABORAL-->
                             <?php $this->beginBlock('info_l'); ?>
                             <br>
 
@@ -745,9 +750,9 @@ if ($expedienteMedico) {
                                             'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
                                         ],
                                     ])->label('Cargo')  ?>
-                                    <?= $form->field($model->informacionLaboral, 'horario_laboral_inicio')->input('time', ['disabled' => true]) ->label('Hora de entrada')  ?>
+                                    <?= $form->field($model->informacionLaboral, 'horario_laboral_inicio')->input('time', ['disabled' => true])->label('Hora de entrada')  ?>
 
-                                    <?= $form->field($model->informacionLaboral, 'horario_laboral_fin')->input('time', ['disabled' => true]) ->label('Hora de salida') ?>
+                                    <?= $form->field($model->informacionLaboral, 'horario_laboral_fin')->input('time', ['disabled' => true])->label('Hora de salida') ?>
                                     <?= $form->field($model->informacionLaboral, 'numero_cuenta')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
                                     <?= $form->field($model->informacionLaboral, 'salario')->textInput([
                                         'type' => 'number',
@@ -788,7 +793,7 @@ if ($expedienteMedico) {
                                         'pluginEvents' => [
                                             'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
                                         ],
-                                    ]) ->label('Dirección') ?>
+                                    ])->label('Dirección') ?>
 
                                     <?= $form->field($model->informacionLaboral, 'junta_gobierno_id')->widget(Select2::classname(), [
                                         'data' => $jefesDirectores,
@@ -803,7 +808,7 @@ if ($expedienteMedico) {
                                         'pluginEvents' => [
                                             'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
                                         ],
-                                    ]) ->label('Jefe inmediato') ?>
+                                    ])->label('Jefe inmediato') ?>
 
                                     <div class="form-group">
                                         <label class="control-label">Director de dirección</label>
@@ -816,52 +821,52 @@ if ($expedienteMedico) {
                                 </div>
                             </div>
                             <script>
-    document.getElementById('edit-button-laboral').addEventListener('click', function() {
-        var fields = document.querySelectorAll('#laboral-info-form input, #laboral-info-form select, #dias-laborales-checkboxes input');
-        fields.forEach(function(field) {
-            field.readOnly = false;
-            field.disabled = false;
-        });
-        document.getElementById('dias-laborales-display').style.display = 'none';
-        document.getElementById('dias-laborales-checkboxes').style.display = 'block';
-        document.getElementById('edit-button-laboral').style.display = 'none';
-        document.getElementById('save-button-laboral').style.display = 'block';
-        document.getElementById('cancel-button-laboral').style.display = 'block';
-    });
+                                document.getElementById('edit-button-laboral').addEventListener('click', function() {
+                                    var fields = document.querySelectorAll('#laboral-info-form input, #laboral-info-form select, #dias-laborales-checkboxes input');
+                                    fields.forEach(function(field) {
+                                        field.readOnly = false;
+                                        field.disabled = false;
+                                    });
+                                    document.getElementById('dias-laborales-display').style.display = 'none';
+                                    document.getElementById('dias-laborales-checkboxes').style.display = 'block';
+                                    document.getElementById('edit-button-laboral').style.display = 'none';
+                                    document.getElementById('save-button-laboral').style.display = 'block';
+                                    document.getElementById('cancel-button-laboral').style.display = 'block';
+                                });
 
-    document.getElementById('cancel-button-laboral').addEventListener('click', function() {
-        var fields = document.querySelectorAll('#laboral-info-form input, #laboral-info-form select, #dias-laborales-checkboxes input');
-        fields.forEach(function(field) {
-            field.readOnly = true;
-            field.disabled = true;
-            field.value = field.defaultValue;
-        });
-        document.getElementById('dias-laborales-display').style.display = 'block';
-        document.getElementById('dias-laborales-checkboxes').style.display = 'none';
-        document.getElementById('edit-button-laboral').style.display = 'block';
-        document.getElementById('save-button-laboral').style.display = 'none';
-        document.getElementById('cancel-button-laboral').style.display = 'none';
-    });
+                                document.getElementById('cancel-button-laboral').addEventListener('click', function() {
+                                    var fields = document.querySelectorAll('#laboral-info-form input, #laboral-info-form select, #dias-laborales-checkboxes input');
+                                    fields.forEach(function(field) {
+                                        field.readOnly = true;
+                                        field.disabled = true;
+                                        field.value = field.defaultValue;
+                                    });
+                                    document.getElementById('dias-laborales-display').style.display = 'block';
+                                    document.getElementById('dias-laborales-checkboxes').style.display = 'none';
+                                    document.getElementById('edit-button-laboral').style.display = 'block';
+                                    document.getElementById('save-button-laboral').style.display = 'none';
+                                    document.getElementById('cancel-button-laboral').style.display = 'none';
+                                });
 
-  /*  function checkEmptyFieldsLaboral() {
-        var fields = document.querySelectorAll('#laboral-info-form input, #laboral-info-form select');
-        var emptyFields = Array.from(fields).filter(function(field) {
-            return field.value.trim() === '' && field.type !== 'hidden';
-        });
+                                /*  function checkEmptyFieldsLaboral() {
+                                      var fields = document.querySelectorAll('#laboral-info-form input, #laboral-info-form select');
+                                      var emptyFields = Array.from(fields).filter(function(field) {
+                                          return field.value.trim() === '' && field.type !== 'hidden';
+                                      });
 
-        if (emptyFields.length > 0) {
-            showAlert('Falta completar datos laborales', 'Por favor, complete todos los campos.');
-        }
-    }
+                                      if (emptyFields.length > 0) {
+                                          showAlert('Falta completar datos laborales', 'Por favor, complete todos los campos.');
+                                      }
+                                  }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        checkEmptyFieldsLaboral();
-    });
+                                  document.addEventListener('DOMContentLoaded', function() {
+                                      checkEmptyFieldsLaboral();
+                                  });
 
-    $('#pjax-update-info').on('pjax:end', function() {
-        checkEmptyFieldsLaboral();
-    });*/
-</script>
+                                  $('#pjax-update-info').on('pjax:end', function() {
+                                      checkEmptyFieldsLaboral();
+                                  });*/
+                            </script>
 
                             <script>
                                 document.getElementById('edit-button-laboral').addEventListener('click', function() {
@@ -1213,35 +1218,35 @@ if ($expedienteMedico) {
                                                         ],
                                                     ]),
                                                 ],
-                      //                          [
-                        //                            'attribute' => 'status',
-                          //                          'format' => 'raw',
-                            //                        'label' => 'Estatus',
-                              //                      'value' => function ($model) {
-                                //                        $status = '';
-                                  //                      switch ($model->status) {
-                                    //                        case 'Aprobado':
-                                      //                          $status = '<span class="badge badge-success">' . $model->status . '</span>';
-                                        //                        break;
-                                          //                  case 'En Proceso':
-                                            //                    $status = '<span class="badge badge-warning">' . $model->status . '</span>';
-                                              //                  break;
+                                                //                          [
+                                                //                            'attribute' => 'status',
+                                                //                          'format' => 'raw',
+                                                //                        'label' => 'Estatus',
+                                                //                      'value' => function ($model) {
+                                                //                        $status = '';
+                                                //                      switch ($model->status) {
+                                                //                        case 'Aprobado':
+                                                //                          $status = '<span class="badge badge-success">' . $model->status . '</span>';
+                                                //                        break;
+                                                //                  case 'En Proceso':
+                                                //                    $status = '<span class="badge badge-warning">' . $model->status . '</span>';
+                                                //                  break;
                                                 //            case 'Rechazado':
-                                                  //              $status = '<span class="badge badge-danger">' . $model->status . '</span>';
-                                                    //            break;
-                                                      //      default:
-                                                        //        $status = '<span class="badge badge-secondary">' . $model->status . '</span>';
-                                           //                     break;
-                                             //           }
-                                               //         return $status;
-                                                 //   },
-                                                   // 'filter' => Html::activeDropDownList($searchModel, 'status', ['Aprobado' => 'Aprobado', 'En Proceso' => 'En Proceso', 'Rechazado' => 'Rechazado'], ['class' => 'form-control', 'prompt' => 'Todos']),
-                                           //     ],
-                                           //     [
-                                             //       'attribute' => 'comentario',
-                                               //     'format' => 'ntext',
-                                                 //   'filter' => false,
-                                             //   ],
+                                                //              $status = '<span class="badge badge-danger">' . $model->status . '</span>';
+                                                //            break;
+                                                //      default:
+                                                //        $status = '<span class="badge badge-secondary">' . $model->status . '</span>';
+                                                //                     break;
+                                                //           }
+                                                //         return $status;
+                                                //   },
+                                                // 'filter' => Html::activeDropDownList($searchModel, 'status', ['Aprobado' => 'Aprobado', 'En Proceso' => 'En Proceso', 'Rechazado' => 'Rechazado'], ['class' => 'form-control', 'prompt' => 'Todos']),
+                                                //     ],
+                                                //     [
+                                                //       'attribute' => 'comentario',
+                                                //     'format' => 'ntext',
+                                                //   'filter' => false,
+                                                //   ],
                                                 [
                                                     'attribute' => 'nombre_formato',
                                                     'label' => 'Tipo de solicitud',
@@ -1285,13 +1290,13 @@ if ($expedienteMedico) {
                                         ]);
                                         Pjax::end();
 
-                                      //  $script = <<< JS
-              //  setInterval(function(){
-                //    $.pjax.reload({container:'#pjax-container'});
-               // }, 60000);
-            //JS;
+                                        //  $script = <<< JS
+                                        //  setInterval(function(){
+                                        //    $.pjax.reload({container:'#pjax-container'});
+                                        // }, 60000);
+                                        //JS;
 
-                                       // $this->registerJs($script);
+                                        // $this->registerJs($script);
                                         ?>
 
 
@@ -1317,7 +1322,7 @@ if ($expedienteMedico) {
                                     [
                                         'label' => 'Información personal',
                                         'content' => $this->blocks['info_p'],
-                                      //  'active' => true,
+                                        //  'active' => true,
                                         'options' => [
                                             'id' => 'informacion_personal',
                                         ],
@@ -1360,7 +1365,7 @@ if ($expedienteMedico) {
                                 ],
                                 'position' => TabsX::POS_ABOVE,
                                 'align' => TabsX::ALIGN_CENTER,
-                              //  'bordered'=>true,
+                                //  'bordered'=>true,
                                 'encodeLabels' => false,
                             ]);
                             ?>
@@ -1369,19 +1374,19 @@ if ($expedienteMedico) {
                             <?php $this->beginBlock('expediente'); ?>
                             <div class="row">
 
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header bg-info text-white">
-                <h3>Documentos del empleado</h3>
-<button type="button" id="toggle-expediente-button" class="btn btn-dark float-right">
-    <i class="fa fa-upload"></i>&nbsp; &nbsp; Agregar nuevo archivo
-</button>
+                                <div class="col-md-12">
+                                    <div class="card">
+                                        <div class="card-header bg-info text-white">
+                                            <h3>Documentos del empleado</h3>
+                                            <button type="button" id="toggle-expediente-button" class="btn btn-dark float-right">
+                                                <i class="fa fa-upload"></i>&nbsp; &nbsp; Agregar nuevo archivo
+                                            </button>
 
-            </div>
+                                        </div>
 
 
 
-            <script>
+                                        <script>
                                             document.getElementById('toggle-expediente-button').addEventListener('click', function() {
                                                 var expedienteContent = document.getElementById('expediente-content');
                                                 if (expedienteContent.style.display === 'none') {
@@ -1394,151 +1399,151 @@ if ($expedienteMedico) {
                                             });
                                         </script>
 
-            <div class="card-body" id="expediente-content" style="display: none;">
+                                        <div class="card-body" id="expediente-content" style="display: none;">
 
-                <?php $form = ActiveForm::begin([
-                    'action' => ['documento/create', 'empleado_id' => $model->id],
-                    'options' => ['enctype' => 'multipart/form-data', 'class' => 'narrow-form']
-                ]); ?>
+                                            <?php $form = ActiveForm::begin([
+                                                'action' => ['documento/create', 'empleado_id' => $model->id],
+                                                'options' => ['enctype' => 'multipart/form-data', 'class' => 'narrow-form']
+                                            ]); ?>
 
-                <div class="form-group">
-                    <?= $form->field($documentoModel, 'cat_tipo_documento_id')->widget(Select2::classname(), [
-                        'data' => ArrayHelper::map(CatTipoDocumento::find()->all(), 'id', 'nombre_tipo'),
-                        'language' => 'es',
-                        'options' => ['placeholder' => 'Seleccione el tipo de documento', 'id' => 'tipo-documento'],
-                        'pluginOptions' => [
-                            'allowClear' => true
-                        ],
-                        'theme' => Select2::THEME_BOOTSTRAP,
-                        'pluginEvents' => [
-                            'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
-                            'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '0px'); }",
-                        ],
-                    ])->label('Tipo de Documento') ?>
-                </div>
+                                            <div class="form-group">
+                                                <?= $form->field($documentoModel, 'cat_tipo_documento_id')->widget(Select2::classname(), [
+                                                    'data' => ArrayHelper::map(CatTipoDocumento::find()->all(), 'id', 'nombre_tipo'),
+                                                    'language' => 'es',
+                                                    'options' => ['placeholder' => 'Seleccione el tipo de documento', 'id' => 'tipo-documento'],
+                                                    'pluginOptions' => [
+                                                        'allowClear' => true
+                                                    ],
+                                                    'theme' => Select2::THEME_BOOTSTRAP,
+                                                    'pluginEvents' => [
+                                                        'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
+                                                        'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '0px'); }",
+                                                    ],
+                                                ])->label('Tipo de Documento') ?>
+                                            </div>
 
-                <div class="form-group">
-                    <?= $form->field($documentoModel, 'nombre')->textInput([
-                        'maxlength' => true,
-                        'id' => 'nombre-archivo',
-                        'style' => 'display:none',
-                        'placeholder' => 'Ingrese el nombre del documento'
-                    ])->label(false) ?>
-                </div>
+                                            <div class="form-group">
+                                                <?= $form->field($documentoModel, 'nombre')->textInput([
+                                                    'maxlength' => true,
+                                                    'id' => 'nombre-archivo',
+                                                    'style' => 'display:none',
+                                                    'placeholder' => 'Ingrese el nombre del documento'
+                                                ])->label(false) ?>
+                                            </div>
 
-                <div class="form-group">
-                    <?= $form->field($documentoModel, 'observacion')->textarea() ?>
-                </div>
+                                            <div class="form-group">
+                                                <?= $form->field($documentoModel, 'observacion')->textarea() ?>
+                                            </div>
 
-                <div class="form-group">
-                    <?= $form->field($documentoModel, 'ruta')->widget(FileInput::classname(), [
-                        'options' => ['accept' => 'file/*'],
-                        'pluginEvents' => [
-                            'fileclear' => "function() {
+                                            <div class="form-group">
+                                                <?= $form->field($documentoModel, 'ruta')->widget(FileInput::classname(), [
+                                                    'options' => ['accept' => 'file/*'],
+                                                    'pluginEvents' => [
+                                                        'fileclear' => "function() {
                                 $('#nombre-archivo').val('');
                                 $('#tipo-archivo').val('');
                             }",
-                        ],
-                        'pluginOptions' => [
-                            'showUpload' => false,
-                            'showCancel' => false,
-                        ],
-                    ])->label('Archivo') ?>
-                </div>
+                                                    ],
+                                                    'pluginOptions' => [
+                                                        'showUpload' => false,
+                                                        'showCancel' => false,
+                                                    ],
+                                                ])->label('Archivo') ?>
+                                            </div>
 
-                <div class="form-group">
-                    <?= Html::submitButton('Subir archivo <i class="fa fa-upload"></i>', ['class' => 'btn btn-warning float-right', 'id' => 'save-button-personal']) ?>
-                </div>
+                                            <div class="form-group">
+                                                <?= Html::submitButton('Subir archivo <i class="fa fa-upload"></i>', ['class' => 'btn btn-warning float-right', 'id' => 'save-button-personal']) ?>
+                                            </div>
 
-                <?php ActiveForm::end(); ?>
-            </div>
-        </div>
-    </div>
+                                            <?php ActiveForm::end(); ?>
+                                        </div>
+                                    </div>
+                                </div>
 
-    <div class="col-md-12 mt-3">
-        <div class="card">
-            
-            <div class="card-body">
-                <?php
-                $searchModel = new DocumentoSearch();
-                $params = Yii::$app->request->queryParams;
-                $params[$searchModel->formName()]['empleado_id'] = $model->id;
-                $dataProvider = $searchModel->search($params);
-                ?>
+                                <div class="col-md-12 mt-3">
+                                    <div class="card">
 
-                <?php Pjax::begin(); ?>
-               
+                                        <div class="card-body">
+                                            <?php
+                                            $searchModel = new DocumentoSearch();
+                                            $params = Yii::$app->request->queryParams;
+                                            $params[$searchModel->formName()]['empleado_id'] = $model->id;
+                                            $dataProvider = $searchModel->search($params);
+                                            ?>
 
-                <?= GridView::widget([
-                    'dataProvider' => $dataProvider,
-                    'filterModel' => $searchModel,
-                    'columns' => [
-                        ['class' => 'yii\grid\SerialColumn'],
-                        [
-                            'attribute' => 'nombre',
-                            'value' => 'nombre',
-                            'filter' => false,
+                                            <?php Pjax::begin(); ?>
 
-                            'options' => ['style' => 'width: 30%;'],
-                        ],
-                        [
-                            'attribute' => 'fecha_subida',
-                            'filter' => false,
-                            'options' => ['style' => 'width: 30%;'],
-                        ],
-                        [
-                            'attribute' => 'observacion',
-                            'filter' => false,
-                            'options' => ['style' => 'width: 30%;'],
-                        ],
-                        [
-                            'class' => 'hail812\adminlte3\yii\grid\ActionColumn',
-                            'template' => '{view} {delete} {download}',
-                            'buttons' => [
-                                'view' => function ($url, $model) {
-                                    return Html::a('<i class="far fa-eye"></i>', ['documento/open', 'id' => $model->id], [
-                                        'target' => '_blank',
-                                        'title' => 'Ver archivo',
-                                        'class' => 'btn btn-info btn-xs',
-                                        'data-pjax' => "0"
-                                    ]);
-                                },
-                                'delete' => function ($url, $model) {
-                                    return Html::a('<i class="fas fa-trash"></i>', ['documento/delete', 'id' => $model->id, 'empleado_id' => $model->empleado_id], [
-                                        'title' => Yii::t('yii', 'Eliminar'),
-                                        'data-confirm' => Yii::t('yii', '¿Estás seguro de que deseas eliminar este elemento?'),
-                                        'data-method' => 'post',
-                                        'class' => 'btn btn-danger btn-xs',
-                                    ]);
-                                },
-                                'download' => function ($url, $model) {
-                                    return Html::a('<i class="fas fa-download"></i>', ['documento/download', 'id' => $model->id], [
-                                        'title' => 'Descargar archivo',
-                                        'class' => 'btn btn-success btn-xs',
-                                        'data-pjax' => "0"
-                                    ]);
-                                },
-                            ],
-                        ],
-                    ],
-                    'summaryOptions' => ['class' => 'summary mb-2'],
-                    'pager' => [
-                        'class' => 'yii\bootstrap4\LinkPager',
-                    ],
-                    'tableOptions' => ['class' => 'no-style-gridview'],
-                    'rowOptions' => function($model, $key, $index, $grid) {
-                        return ['class' => 'no-style-gridview'];
-                    },
-                ]); ?>
 
-                <?php Pjax::end(); ?>
-            </div>
-        </div>
-    </div>
-</div>
+                                            <?= GridView::widget([
+                                                'dataProvider' => $dataProvider,
+                                                'filterModel' => $searchModel,
+                                                'columns' => [
+                                                    ['class' => 'yii\grid\SerialColumn'],
+                                                    [
+                                                        'attribute' => 'nombre',
+                                                        'value' => 'nombre',
+                                                        'filter' => false,
 
-<?php
-$this->registerJs("
+                                                        'options' => ['style' => 'width: 30%;'],
+                                                    ],
+                                                    [
+                                                        'attribute' => 'fecha_subida',
+                                                        'filter' => false,
+                                                        'options' => ['style' => 'width: 30%;'],
+                                                    ],
+                                                    [
+                                                        'attribute' => 'observacion',
+                                                        'filter' => false,
+                                                        'options' => ['style' => 'width: 30%;'],
+                                                    ],
+                                                    [
+                                                        'class' => 'hail812\adminlte3\yii\grid\ActionColumn',
+                                                        'template' => '{view} {delete} {download}',
+                                                        'buttons' => [
+                                                            'view' => function ($url, $model) {
+                                                                return Html::a('<i class="far fa-eye"></i>', ['documento/open', 'id' => $model->id], [
+                                                                    'target' => '_blank',
+                                                                    'title' => 'Ver archivo',
+                                                                    'class' => 'btn btn-info btn-xs',
+                                                                    'data-pjax' => "0"
+                                                                ]);
+                                                            },
+                                                            'delete' => function ($url, $model) {
+                                                                return Html::a('<i class="fas fa-trash"></i>', ['documento/delete', 'id' => $model->id, 'empleado_id' => $model->empleado_id], [
+                                                                    'title' => Yii::t('yii', 'Eliminar'),
+                                                                    'data-confirm' => Yii::t('yii', '¿Estás seguro de que deseas eliminar este elemento?'),
+                                                                    'data-method' => 'post',
+                                                                    'class' => 'btn btn-danger btn-xs',
+                                                                ]);
+                                                            },
+                                                            'download' => function ($url, $model) {
+                                                                return Html::a('<i class="fas fa-download"></i>', ['documento/download', 'id' => $model->id], [
+                                                                    'title' => 'Descargar archivo',
+                                                                    'class' => 'btn btn-success btn-xs',
+                                                                    'data-pjax' => "0"
+                                                                ]);
+                                                            },
+                                                        ],
+                                                    ],
+                                                ],
+                                                'summaryOptions' => ['class' => 'summary mb-2'],
+                                                'pager' => [
+                                                    'class' => 'yii\bootstrap4\LinkPager',
+                                                ],
+                                                'tableOptions' => ['class' => 'no-style-gridview'],
+                                                'rowOptions' => function ($model, $key, $index, $grid) {
+                                                    return ['class' => 'no-style-gridview'];
+                                                },
+                                            ]); ?>
+
+                                            <?php Pjax::end(); ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <?php
+                            $this->registerJs("
     $('#tipo-documento').change(function(){
         var tipoDocumentoId = $(this).val();
         var nombreArchivoInput = $('#nombre-archivo');
@@ -1556,197 +1561,197 @@ $this->registerJs("
         }
     });
 ");
-?>
+                            ?>
 
 
                             <?php $this->endBlock(); ?>
                             <?php $this->beginBlock('expediente_medico'); ?>
                             <?php $this->beginBlock('antecedentes'); ?>
 
-<!-- Bloque de antecedentes hereditarios -->
-<?php $this->beginBlock('hereditarios'); ?>
-<?php $form = ActiveForm::begin(['action' => ['empleado/view', 'id' => $model->id]]); ?>
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header gradient-blue text-white text-center">
-                <h2>Antecedentes Hereditarios</h2>
-            </div>
-            <div class="card-body bg-light">
-                <div class="row">
-                    <div class="col-md-8">
-                        <div class="table-responsive">
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Enfermedad</th>
-                                        <th>Abuelos</th>
-                                        <th>Hermanos</th>
-                                        <th>Madre</th>
-                                        <th>Padre</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($catAntecedentes as $catAntecedente): ?>
-                                        <tr>
-                                            <td><?= Html::encode($catAntecedente->nombre) ?></td>
-                                            <?php foreach (['Abuelos', 'Hermanos', 'Madre', 'Padre'] as $parentezco): ?>
-                                                <td>
-                                                    <?= Html::checkbox("AntecedenteHereditario[{$catAntecedente->id}][$parentezco]", isset($antecedentesExistentes[$catAntecedente->id][$parentezco]), [
-                                                        'value' => 1,
-                                                        'label' => '',
-                                                    ]) ?>
-                                                </td>
-                                            <?php endforeach; ?>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="col-md-4 d-flex flex-column justify-content-between" style="height: 100%;">
-                        <div class="form-group text-center">
-                            <?= Html::label('Observaciones', 'observacion_general') ?>
-                            <?= Html::textarea('observacion_general', $observacionGeneral, [
-                                'class' => 'form-control',
-                                'rows' => 30,
-                                'style' => 'width: 100%;',
-                            ]) ?>
-                        </div>
-                        <br>
-                        <div class="form-group mt-auto d-flex justify-content-end">
-                            <?= Html::submitButton('Guardar &nbsp; &nbsp;  <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
-                        </div>
-                    </div>
-                    <div class="alert alert-white custom-alert" role="alert">
-                <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Causas de muerte, malformaciones congénitas, diabetes, cardiopatías, hipertensión arterial, infartos, ateroesclerosis, accidentes vasculares, neuropatías, tuberculosis, artropatías, hemopatías, sida, sífilis, hemopatías, neoplasias, consanguinidad, alcoholismo, toxicomanías.
-                </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<?php ActiveForm::end(); ?>
-<?php $this->endBlock(); ?>
+                            <!-- Bloque de antecedentes hereditarios -->
+                            <?php $this->beginBlock('hereditarios'); ?>
+                            <?php $form = ActiveForm::begin(['action' => ['empleado/view', 'id' => $model->id]]); ?>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="card">
+                                        <div class="card-header gradient-blue text-white text-center">
+                                            <h2>Antecedentes Hereditarios</h2>
+                                        </div>
+                                        <div class="card-body bg-light">
+                                            <div class="row">
+                                                <div class="col-md-8">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-bordered">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Enfermedad</th>
+                                                                    <th>Abuelos</th>
+                                                                    <th>Hermanos</th>
+                                                                    <th>Madre</th>
+                                                                    <th>Padre</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <?php foreach ($catAntecedentes as $catAntecedente) : ?>
+                                                                    <tr>
+                                                                        <td><?= Html::encode($catAntecedente->nombre) ?></td>
+                                                                        <?php foreach (['Abuelos', 'Hermanos', 'Madre', 'Padre'] as $parentezco) : ?>
+                                                                            <td>
+                                                                                <?= Html::checkbox("AntecedenteHereditario[{$catAntecedente->id}][$parentezco]", isset($antecedentesExistentes[$catAntecedente->id][$parentezco]), [
+                                                                                    'value' => 1,
+                                                                                    'label' => '',
+                                                                                ]) ?>
+                                                                            </td>
+                                                                        <?php endforeach; ?>
+                                                                    </tr>
+                                                                <?php endforeach; ?>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 d-flex flex-column justify-content-between" style="height: 100%;">
+                                                    <div class="form-group text-center">
+                                                        <?= Html::label('Observaciones', 'observacion_general') ?>
+                                                        <?= Html::textarea('observacion_general', $observacionGeneral, [
+                                                            'class' => 'form-control',
+                                                            'rows' => 30,
+                                                            'style' => 'width: 100%;',
+                                                        ]) ?>
+                                                    </div>
+                                                    <br>
+                                                    <div class="form-group mt-auto d-flex justify-content-end">
+                                                        <?= Html::submitButton('Guardar &nbsp; &nbsp;  <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                                                    </div>
+                                                </div>
+                                                <div class="alert alert-white custom-alert" role="alert">
+                                                    <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Causas de muerte, malformaciones congénitas, diabetes, cardiopatías, hipertensión arterial, infartos, ateroesclerosis, accidentes vasculares, neuropatías, tuberculosis, artropatías, hemopatías, sida, sífilis, hemopatías, neoplasias, consanguinidad, alcoholismo, toxicomanías.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php ActiveForm::end(); ?>
+                            <?php $this->endBlock(); ?>
 
-<!-- Bloque de antecedentes patológicos -->
-<?php $this->beginBlock('patologicos'); ?>
-<?php $form = ActiveForm::begin(['action' => ['empleado/patologicos', 'id' => $model->id]]); ?>
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header gradient-blue text-white text-center">
-                <h2>Antecedentes Patológicos</h2>
-            </div>
-            <div class="card-body bg-light">
+                            <!-- Bloque de antecedentes patológicos -->
+                            <?php $this->beginBlock('patologicos'); ?>
+                            <?php $form = ActiveForm::begin(['action' => ['empleado/patologicos', 'id' => $model->id]]); ?>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="card">
+                                        <div class="card-header gradient-blue text-white text-center">
+                                            <h2>Antecedentes Patológicos</h2>
+                                        </div>
+                                        <div class="card-body bg-light">
 
-                <div class="form-group">
-                    <?= Html::label('Descripción de Antecedentes Patológicos', 'descripcion_antecedentes') ?>
-                    <?= Html::textarea('descripcion_antecedentes', $descripcionAntecedentes, [
-                        'class' => 'form-control',
-                        'rows' => 15,
-                        'style' => 'width: 100%;',
-                    ]) ?>
-                </div>
-                <div class="form-group text-right">
-                    <?= Html::submitButton('Guardar &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
-                </div>
-                <div class="alert alert-white custom-alert" role="alert">
-                <i class="fa fa-exclamation-circle" aria-hidden="true"></i>                Peso al nacer, anormalidades perinatales, desarrollo físico y mental, y el esquema básico de vacunación.
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+                                            <div class="form-group">
+                                                <?= Html::label('Descripción de Antecedentes Patológicos', 'descripcion_antecedentes') ?>
+                                                <?= Html::textarea('descripcion_antecedentes', $descripcionAntecedentes, [
+                                                    'class' => 'form-control',
+                                                    'rows' => 15,
+                                                    'style' => 'width: 100%;',
+                                                ]) ?>
+                                            </div>
+                                            <div class="form-group text-right">
+                                                <?= Html::submitButton('Guardar &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                                            </div>
+                                            <div class="alert alert-white custom-alert" role="alert">
+                                                <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Peso al nacer, anormalidades perinatales, desarrollo físico y mental, y el esquema básico de vacunación.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-<?php ActiveForm::end(); ?>
-<?php $this->endBlock(); ?>
+                            <?php ActiveForm::end(); ?>
+                            <?php $this->endBlock(); ?>
 
-<?php $this->beginBlock('no_patologicos'); ?>
+                            <?php $this->beginBlock('no_patologicos'); ?>
 
-<?php $form = ActiveForm::begin(['action' => ['empleado/no-patologicos', 'id' => $model->id]]); ?>
-<div class="row">
-    <div class="col-md-12">
-    
-        <div class="card">
-            <div class="card-header gradient-blue text-white text-center">
-                <h2>Antecedentes No Patológicos</h2>
-                <div class="float-submit-btn">
-    <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
-</div>
-            </div>
-            <div class="card-body">
-            <div class="container">
-            <div class="card">
-    <div class="card-header custom-nopato text-white text-left">
-        <h5>ACTIVIDAD FISICA</h5>
-    </div>
-    <div class="card-body bg-light">
-        <div class="row">
-            <!-- Columna izquierda con los campos -->
-            <div class="col-md-8">
-                <div class="row">
-                    <div class="col-6 col-sm-4">
-                        <div class="custom-control custom-checkbox">
-                            <?= Html::checkbox('AntecedenteNoPatologico[p_ejercicio]', $antecedenteNoPatologico->p_ejercicio, [
-                                'class' => 'custom-control-input',
-                                'id' => 'p_ejercicio'
-                            ]) ?>
-                            <?= Html::label('¿Realiza ejercicio?', 'p_ejercicio', ['class' => 'custom-control-label']) ?>
-                        </div>
-                    </div>
-                    <div class="col-6 col-sm-6" id="ejercicio-minutos-container">
-                        <?= Html::label('Minutos al día', 'p_minutos_x_dia_ejercicio') ?>
-                        <?= Html::input('number', 'AntecedenteNoPatologico[p_minutos_x_dia_ejercicio]', $antecedenteNoPatologico->p_minutos_x_dia_ejercicio, ['class' => 'form-control', 'id' => 'p_minutos_x_dia_ejercicio']) ?>
-                    </div>
-                    <div class="w-100"></div>
-                    <br>
-                    <div class="col-6 col-sm-4">
-                        <div class="custom-control custom-checkbox">
-                            <?= Html::checkbox('AntecedenteNoPatologico[p_deporte]', $modelAntecedenteNoPatologico->p_deporte, [
-                                'class' => 'custom-control-input',
-                                'id' => 'p_deporte'
-                            ]) ?>
-                            <?= Html::label('¿Realiza algún deporte?', 'p_deporte', ['class' => 'custom-control-label']) ?>
-                        </div>
-                    </div>
-                    <div class="col-6 col-sm-4" id="deporte-cual-container">
-                        <?= Html::label('¿Cuál deporte?', 'p_a_deporte') ?>
-                        <?= Html::textInput('AntecedenteNoPatologico[p_a_deporte]', $modelAntecedenteNoPatologico->p_a_deporte, ['class' => 'form-control', 'id' => 'p_a_deporte']) ?>
-                    </div>
-                    <div class="col-6 col-sm-4" id="deporte-frecuencia-container">
-                        <?= Html::label('Frecuencia con la que practica', 'p_frecuencia_deporte') ?>
-                        <?= Html::textInput('AntecedenteNoPatologico[p_frecuencia_deporte]', $modelAntecedenteNoPatologico->p_frecuencia_deporte, ['class' => 'form-control', 'id' => 'p_frecuencia_deporte']) ?>
-                    </div>
-                    <div class="w-100"></div>
-                    <br>
-                    <div class="col-6 col-sm-4">
-                        <?= Html::label('Horas que duerme por día', 'p_horas_sueño') ?>
-                        <?= Html::input('number', 'AntecedenteNoPatologico[p_horas_sueño]', $antecedenteNoPatologico->p_horas_sueño, ['class' => 'form-control', 'id' => 'p_horas_sueño']) ?>
-                    </div>
-                    <div class="col-6 col-sm-6">
-                        <div class="custom-control custom-checkbox">
-                            <?= Html::checkbox('AntecedenteNoPatologico[p_dormir_dia]', $modelAntecedenteNoPatologico->p_dormir_dia, [
-                                'class' => 'custom-control-input',
-                                'id' => 'p_dormir_dia'
-                            ]) ?>
-                            <?= Html::label('¿Duerme durante el día?', 'p_dormir_dia', ['class' => 'custom-control-label']) ?>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Columna derecha con el textarea -->
-            <div class="col-md-4">
-                <div class="form-group">
-                    <?= Html::label('Observaciones', 'observacion_actividad_fisica') ?>
-                    <?= Html::textarea('AntecedenteNoPatologico[observacion_actividad_fisica]', $antecedenteNoPatologico->observacion_actividad_fisica, ['class' => 'form-control', 'rows' => 10, 'id' => 'observacion_actividad_fisica']) ?>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<?php
-$script = <<< JS
+                            <?php $form = ActiveForm::begin(['action' => ['empleado/no-patologicos', 'id' => $model->id]]); ?>
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <div class="card">
+                                        <div class="card-header gradient-blue text-white text-center">
+                                            <h2>Antecedentes No Patológicos</h2>
+                                            <div class="float-submit-btn">
+                                                <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="container">
+                                                <div class="card">
+                                                    <div class="card-header custom-nopato text-white text-left">
+                                                        <h5>ACTIVIDAD FISICA</h5>
+                                                    </div>
+                                                    <div class="card-body bg-light">
+                                                        <div class="row">
+                                                            <!-- Columna izquierda con los campos -->
+                                                            <div class="col-md-8">
+                                                                <div class="row">
+                                                                    <div class="col-6 col-sm-4">
+                                                                        <div class="custom-control custom-checkbox">
+                                                                            <?= Html::checkbox('AntecedenteNoPatologico[p_ejercicio]', $antecedenteNoPatologico->p_ejercicio, [
+                                                                                'class' => 'custom-control-input',
+                                                                                'id' => 'p_ejercicio'
+                                                                            ]) ?>
+                                                                            <?= Html::label('¿Realiza ejercicio?', 'p_ejercicio', ['class' => 'custom-control-label']) ?>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-6 col-sm-6" id="ejercicio-minutos-container">
+                                                                        <?= Html::label('Minutos al día', 'p_minutos_x_dia_ejercicio') ?>
+                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_minutos_x_dia_ejercicio]', $antecedenteNoPatologico->p_minutos_x_dia_ejercicio, ['class' => 'form-control', 'id' => 'p_minutos_x_dia_ejercicio']) ?>
+                                                                    </div>
+                                                                    <div class="w-100"></div>
+                                                                    <br>
+                                                                    <div class="col-6 col-sm-4">
+                                                                        <div class="custom-control custom-checkbox">
+                                                                            <?= Html::checkbox('AntecedenteNoPatologico[p_deporte]', $modelAntecedenteNoPatologico->p_deporte, [
+                                                                                'class' => 'custom-control-input',
+                                                                                'id' => 'p_deporte'
+                                                                            ]) ?>
+                                                                            <?= Html::label('¿Realiza algún deporte?', 'p_deporte', ['class' => 'custom-control-label']) ?>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-6 col-sm-4" id="deporte-cual-container">
+                                                                        <?= Html::label('¿Cuál deporte?', 'p_a_deporte') ?>
+                                                                        <?= Html::textInput('AntecedenteNoPatologico[p_a_deporte]', $modelAntecedenteNoPatologico->p_a_deporte, ['class' => 'form-control', 'id' => 'p_a_deporte']) ?>
+                                                                    </div>
+                                                                    <div class="col-6 col-sm-4" id="deporte-frecuencia-container">
+                                                                        <?= Html::label('Frecuencia con la que practica', 'p_frecuencia_deporte') ?>
+                                                                        <?= Html::textInput('AntecedenteNoPatologico[p_frecuencia_deporte]', $modelAntecedenteNoPatologico->p_frecuencia_deporte, ['class' => 'form-control', 'id' => 'p_frecuencia_deporte']) ?>
+                                                                    </div>
+                                                                    <div class="w-100"></div>
+                                                                    <br>
+                                                                    <div class="col-6 col-sm-4">
+                                                                        <?= Html::label('Horas que duerme por día', 'p_horas_sueño') ?>
+                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_horas_sueño]', $antecedenteNoPatologico->p_horas_sueño, ['class' => 'form-control', 'id' => 'p_horas_sueño']) ?>
+                                                                    </div>
+                                                                    <div class="col-6 col-sm-6">
+                                                                        <div class="custom-control custom-checkbox">
+                                                                            <?= Html::checkbox('AntecedenteNoPatologico[p_dormir_dia]', $modelAntecedenteNoPatologico->p_dormir_dia, [
+                                                                                'class' => 'custom-control-input',
+                                                                                'id' => 'p_dormir_dia'
+                                                                            ]) ?>
+                                                                            <?= Html::label('¿Duerme durante el día?', 'p_dormir_dia', ['class' => 'custom-control-label']) ?>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <!-- Columna derecha con el textarea -->
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <?= Html::label('Observaciones', 'observacion_actividad_fisica') ?>
+                                                                    <?= Html::textarea('AntecedenteNoPatologico[observacion_actividad_fisica]', $antecedenteNoPatologico->observacion_actividad_fisica, ['class' => 'form-control', 'rows' => 10, 'id' => 'observacion_actividad_fisica']) ?>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <?php
+                                                $script = <<< JS
 $(document).ready(function() {
     function toggleEjercicioFields() {
         if ($('#p_ejercicio').is(':checked')) {
@@ -1780,109 +1785,109 @@ $(document).ready(function() {
     });
 });
 JS;
-$this->registerJs($script);
-?>
+                                                $this->registerJs($script);
+                                                ?>
 
 
-<div class="card">
-    <div class="card-header custom-nopato text-white text-left">
-        <h5>HABITOS ALIMENTICIOS</h5>
-       
-    </div>
-    <div class="card-body bg-light">
-        <div class="row">
-            <!-- Columna izquierda con los campos -->
-            <div class="col-md-8">
-                <div class="row">
-                <div class="col-6 col-sm-3">
-                        <div class="custom-control custom-checkbox">
-                            <?= Html::checkbox('AntecedenteNoPatologico[p_desayuno]', $antecedenteNoPatologico->p_desayuno, [
-                                'class' => 'custom-control-input',
-                                'id' => 'p_desayuno'
-                            ]) ?>
-                            <?= Html::label('¿Desayuna?', 'p_desayuno', ['class' => 'custom-control-label']) ?>
-                        </div>
-                </div>
+                                                <div class="card">
+                                                    <div class="card-header custom-nopato text-white text-left">
+                                                        <h5>HABITOS ALIMENTICIOS</h5>
 
-                <div class="col-6 col-sm-6">
-                
-                <?= Html::label('Número de comidas al día', 'p_comidas_x_dia') ?>
-                        <?= Html::input('number', 'AntecedenteNoPatologico[p_comidas_x_dia]', $antecedenteNoPatologico->p_comidas_x_dia, ['class' => 'form-control']) ?>
-                    
-                        
-                </div>
+                                                    </div>
+                                                    <div class="card-body bg-light">
+                                                        <div class="row">
+                                                            <!-- Columna izquierda con los campos -->
+                                                            <div class="col-md-8">
+                                                                <div class="row">
+                                                                    <div class="col-6 col-sm-3">
+                                                                        <div class="custom-control custom-checkbox">
+                                                                            <?= Html::checkbox('AntecedenteNoPatologico[p_desayuno]', $antecedenteNoPatologico->p_desayuno, [
+                                                                                'class' => 'custom-control-input',
+                                                                                'id' => 'p_desayuno'
+                                                                            ]) ?>
+                                                                            <?= Html::label('¿Desayuna?', 'p_desayuno', ['class' => 'custom-control-label']) ?>
+                                                                        </div>
+                                                                    </div>
 
-                        <div class="w-100"></div>
+                                                                    <div class="col-6 col-sm-6">
 
-                        <br>
-                        <div class="col-6 col-sm-3">
-
-                        <div class="custom-control custom-checkbox">
-                            <?= Html::checkbox('AntecedenteNoPatologico[p_cafe]', $antecedenteNoPatologico->p_cafe, [
-                                'class' => 'custom-control-input',
-                                'id' => 'p_cafe'
-                            ]) ?>
-                            <?= Html::label('¿Toma café?', 'p_cafe', ['class' => 'custom-control-label']) ?>
-                        </div>
+                                                                        <?= Html::label('Número de comidas al día', 'p_comidas_x_dia') ?>
+                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_comidas_x_dia]', $antecedenteNoPatologico->p_comidas_x_dia, ['class' => 'form-control']) ?>
 
 
+                                                                    </div>
 
-                </div>
+                                                                    <div class="w-100"></div>
 
-                <div class="col-6 col-sm-6" id= "cafe-x-dia-container">
-                        <?= Html::label('Tazas de café al día', 'p_tazas_x_dia') ?>
-                        <?= Html::input('number', 'AntecedenteNoPatologico[p_tazas_x_dia]', $antecedenteNoPatologico->p_tazas_x_dia, ['class' => 'form-control']) ?>
-                    </div>
+                                                                    <br>
+                                                                    <div class="col-6 col-sm-3">
 
-                    <div class="w-100"></div>
+                                                                        <div class="custom-control custom-checkbox">
+                                                                            <?= Html::checkbox('AntecedenteNoPatologico[p_cafe]', $antecedenteNoPatologico->p_cafe, [
+                                                                                'class' => 'custom-control-input',
+                                                                                'id' => 'p_cafe'
+                                                                            ]) ?>
+                                                                            <?= Html::label('¿Toma café?', 'p_cafe', ['class' => 'custom-control-label']) ?>
+                                                                        </div>
 
-<br>
-<div class="col-6 col-sm-6">
 
-                        <div class="custom-control custom-checkbox">
-                            <?= Html::checkbox('AntecedenteNoPatologico[p_refresco]', $antecedenteNoPatologico->p_refresco, [
-                                'class' => 'custom-control-input',
-                                'id' => 'p_refresco'
-                            ]) ?>
-                            <?= Html::label('¿Toma refresco?', 'p_refresco', ['class' => 'custom-control-label']) ?>
-                        </div>
-</div>
-                       
-                  
-                    
-                    <div class="w-100"></div>
-                    <br>
-                    <div class="col-6 col-sm-3">
-                    <div class="custom-control custom-checkbox">
-                            <?= Html::checkbox('AntecedenteNoPatologico[p_dieta]', $antecedenteNoPatologico->p_dieta, [
-                                'class' => 'custom-control-input',
-                                'id' => 'p_dieta'
-                            ]) ?>
-                            <?= Html::label('¿Sigue alguna dieta?', 'p_dieta', ['class' => 'custom-control-label']) ?>
-                        </div>
-                    </div>
-                    <div class="col-6 col-sm-6" id= "info-dieta-container">
-                    <div class="form-group">
-                    <?= Html::label('Información sobre la dieta', 'p_info_dieta') ?>
-                    <?= Html::textarea('AntecedenteNoPatologico[p_info_dieta]', $antecedenteNoPatologico->p_info_dieta, ['class' => 'form-control', 'rows' => 6]) ?>
-                </div>
-                    </div>
 
-                </div>
-            </div>
-            <!-- Columna derecha con el textarea -->
-            <div class="col-md-4">
-                <div class="form-group">
-                    <?= Html::label('Observaciones', 'observacion_comida') ?>
-                    <?= Html::textarea('AntecedenteNoPatologico[observacion_comida]', $antecedenteNoPatologico->observacion_comida, ['class' => 'form-control', 'rows' => 10]) ?>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+                                                                    </div>
 
-<?php
-$script = <<< JS
+                                                                    <div class="col-6 col-sm-6" id="cafe-x-dia-container">
+                                                                        <?= Html::label('Tazas de café al día', 'p_tazas_x_dia') ?>
+                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_tazas_x_dia]', $antecedenteNoPatologico->p_tazas_x_dia, ['class' => 'form-control']) ?>
+                                                                    </div>
+
+                                                                    <div class="w-100"></div>
+
+                                                                    <br>
+                                                                    <div class="col-6 col-sm-6">
+
+                                                                        <div class="custom-control custom-checkbox">
+                                                                            <?= Html::checkbox('AntecedenteNoPatologico[p_refresco]', $antecedenteNoPatologico->p_refresco, [
+                                                                                'class' => 'custom-control-input',
+                                                                                'id' => 'p_refresco'
+                                                                            ]) ?>
+                                                                            <?= Html::label('¿Toma refresco?', 'p_refresco', ['class' => 'custom-control-label']) ?>
+                                                                        </div>
+                                                                    </div>
+
+
+
+                                                                    <div class="w-100"></div>
+                                                                    <br>
+                                                                    <div class="col-6 col-sm-3">
+                                                                        <div class="custom-control custom-checkbox">
+                                                                            <?= Html::checkbox('AntecedenteNoPatologico[p_dieta]', $antecedenteNoPatologico->p_dieta, [
+                                                                                'class' => 'custom-control-input',
+                                                                                'id' => 'p_dieta'
+                                                                            ]) ?>
+                                                                            <?= Html::label('¿Sigue alguna dieta?', 'p_dieta', ['class' => 'custom-control-label']) ?>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-6 col-sm-6" id="info-dieta-container">
+                                                                        <div class="form-group">
+                                                                            <?= Html::label('Información sobre la dieta', 'p_info_dieta') ?>
+                                                                            <?= Html::textarea('AntecedenteNoPatologico[p_info_dieta]', $antecedenteNoPatologico->p_info_dieta, ['class' => 'form-control', 'rows' => 6]) ?>
+                                                                        </div>
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+                                                            <!-- Columna derecha con el textarea -->
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <?= Html::label('Observaciones', 'observacion_comida') ?>
+                                                                    <?= Html::textarea('AntecedenteNoPatologico[observacion_comida]', $antecedenteNoPatologico->observacion_comida, ['class' => 'form-control', 'rows' => 10]) ?>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <?php
+                                                $script = <<< JS
 $(document).ready(function() {
     function toggleCafeFields() {
         if ($('#p_cafe').is(':checked')) {
@@ -1916,95 +1921,95 @@ $(document).ready(function() {
     });
 });
 JS;
-$this->registerJs($script);
-?>
+                                                $this->registerJs($script);
+                                                ?>
 
 
-<div class="card">
-    <div class="card-header custom-nopato text-white text-left">
-        <h5>ALCOHOLISMO</h5>
-      
-    </div>
-    <div class="card-body bg-light">
-        <div class="row">
-            <!-- Columna izquierda con los campos -->
-            <div class="col-md-7">
-                <div class="row">
-                <div class="col-6 col-sm-4">
-                        <div class="custom-control custom-checkbox">
-                            <?= Html::checkbox('AntecedenteNoPatologico[p_alcohol]', $antecedenteNoPatologico->p_alcohol, [
-                                'class' => 'custom-control-input',
-                                'id' => 'p_alcohol'
-                            ]) ?>
-                            <?= Html::label('¿Consume alcohol?', 'p_alcohol', ['class' => 'custom-control-label']) ?>
-                        </div>
-                    </div>  
-                    <div class="col-6 col-sm-6" id="consumo-alcohol-container">
-  <!-- Campo dropdown -->
-  <div class="form-group">
-    <?= Html::label('Frecuencia de Consumo de Alcohol', 'p_frecuencia_alcohol') ?>
-    <?= Html::dropDownList('AntecedenteNoPatologico[p_frecuencia_alcohol]', $antecedenteNoPatologico->p_frecuencia_alcohol, [
-        'Casual' => 'Casual',
-        'Moderado' => 'Moderado',
-        'Intenso' => 'Intenso',
-    ], [
-        'class' => 'form-control',
-        'prompt' => 'Seleccione la frecuencia'
-    ]) ?>
-</div>
+                                                <div class="card">
+                                                    <div class="card-header custom-nopato text-white text-left">
+                                                        <h5>ALCOHOLISMO</h5>
 
-                    <?= Html::label('Edad a la que comenzó a béber', 'p_edad_alcoholismo') ?>
-                        <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_alcoholismo]', $antecedenteNoPatologico->p_edad_alcoholismo, ['class' => 'form-control']) ?>
-                    
-                      
-                        <?= Html::label('Copas de licor/vino al día', 'p_copas_x_dia') ?>
-                        <?= Html::input('number', 'AntecedenteNoPatologico[p_copas_x_dia]', $antecedenteNoPatologico->p_copas_x_dia, ['class' => 'form-control']) ?>
-                    
-                        <?= Html::label('Número de cervezas al día', 'p_cervezas_x_dia') ?>
-                        <?= Html::input('number', 'AntecedenteNoPatologico[p_cervezas_x_dia]', $antecedenteNoPatologico->p_cervezas_x_dia, ['class' => 'form-control']) ?>
-                    </div>
-                 
+                                                    </div>
+                                                    <div class="card-body bg-light">
+                                                        <div class="row">
+                                                            <!-- Columna izquierda con los campos -->
+                                                            <div class="col-md-7">
+                                                                <div class="row">
+                                                                    <div class="col-6 col-sm-4">
+                                                                        <div class="custom-control custom-checkbox">
+                                                                            <?= Html::checkbox('AntecedenteNoPatologico[p_alcohol]', $antecedenteNoPatologico->p_alcohol, [
+                                                                                'class' => 'custom-control-input',
+                                                                                'id' => 'p_alcohol'
+                                                                            ]) ?>
+                                                                            <?= Html::label('¿Consume alcohol?', 'p_alcohol', ['class' => 'custom-control-label']) ?>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-6 col-sm-6" id="consumo-alcohol-container">
+                                                                        <!-- Campo dropdown -->
+                                                                        <div class="form-group">
+                                                                            <?= Html::label('Frecuencia de Consumo de Alcohol', 'p_frecuencia_alcohol') ?>
+                                                                            <?= Html::dropDownList('AntecedenteNoPatologico[p_frecuencia_alcohol]', $antecedenteNoPatologico->p_frecuencia_alcohol, [
+                                                                                'Casual' => 'Casual',
+                                                                                'Moderado' => 'Moderado',
+                                                                                'Intenso' => 'Intenso',
+                                                                            ], [
+                                                                                'class' => 'form-control',
+                                                                                'prompt' => 'Seleccione la frecuencia'
+                                                                            ]) ?>
+                                                                        </div>
+
+                                                                        <?= Html::label('Edad a la que comenzó a béber', 'p_edad_alcoholismo') ?>
+                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_alcoholismo]', $antecedenteNoPatologico->p_edad_alcoholismo, ['class' => 'form-control']) ?>
 
 
-                    <div class="w-100"></div>
-<br>
+                                                                        <?= Html::label('Copas de licor/vino al día', 'p_copas_x_dia') ?>
+                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_copas_x_dia]', $antecedenteNoPatologico->p_copas_x_dia, ['class' => 'form-control']) ?>
 
-                    <div class="col-6 col-sm-4">
-                        <div class="custom-control custom-checkbox">
-                            <?= Html::checkbox('AntecedenteNoPatologico[p_ex_alcoholico]', $antecedenteNoPatologico->p_ex_alcoholico, [
-                                'class' => 'custom-control-input',
-                                'id' => 'p_ex_alcoholico'
-                            ]) ?>
-                            <?= Html::label('Ex-alcoholico', 'p_ex_alcoholico', ['class' => 'custom-control-label']) ?>
-                        </div>
-                    </div>  
-                    <div class="col-6 col-sm-6" id="ex-alcoholico-container">
-                    <?= Html::label('Edad en la que dejo de beber', 'p_edad_fin_alcoholismo') ?>
-                        <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_fin_alcoholismo]', $antecedenteNoPatologico->p_edad_fin_alcoholismo, ['class' => 'form-control']) ?>
-                    
-                        
-                    
-                    </div>
-                   
+                                                                        <?= Html::label('Número de cervezas al día', 'p_cervezas_x_dia') ?>
+                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_cervezas_x_dia]', $antecedenteNoPatologico->p_cervezas_x_dia, ['class' => 'form-control']) ?>
+                                                                    </div>
 
 
 
+                                                                    <div class="w-100"></div>
+                                                                    <br>
 
-                </div>
-            </div>
-            <!-- Columna derecha con el textarea -->
-            <div class="col-md-5">
-                <div class="form-group">
-                    <?= Html::label('Observaciones', 'observacion_alcoholismo') ?>
-                    <?= Html::textarea('AntecedenteNoPatologico[observacion_alcoholismo]', $antecedenteNoPatologico->observacion_alcoholismo, ['class' => 'form-control', 'rows' => 10]) ?>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+                                                                    <div class="col-6 col-sm-4">
+                                                                        <div class="custom-control custom-checkbox">
+                                                                            <?= Html::checkbox('AntecedenteNoPatologico[p_ex_alcoholico]', $antecedenteNoPatologico->p_ex_alcoholico, [
+                                                                                'class' => 'custom-control-input',
+                                                                                'id' => 'p_ex_alcoholico'
+                                                                            ]) ?>
+                                                                            <?= Html::label('Ex-alcoholico', 'p_ex_alcoholico', ['class' => 'custom-control-label']) ?>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-6 col-sm-6" id="ex-alcoholico-container">
+                                                                        <?= Html::label('Edad en la que dejo de beber', 'p_edad_fin_alcoholismo') ?>
+                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_fin_alcoholismo]', $antecedenteNoPatologico->p_edad_fin_alcoholismo, ['class' => 'form-control']) ?>
 
-<?php
-$script = <<< JS
+
+
+                                                                    </div>
+
+
+
+
+
+                                                                </div>
+                                                            </div>
+                                                            <!-- Columna derecha con el textarea -->
+                                                            <div class="col-md-5">
+                                                                <div class="form-group">
+                                                                    <?= Html::label('Observaciones', 'observacion_alcoholismo') ?>
+                                                                    <?= Html::textarea('AntecedenteNoPatologico[observacion_alcoholismo]', $antecedenteNoPatologico->observacion_alcoholismo, ['class' => 'form-control', 'rows' => 10]) ?>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <?php
+                                                $script = <<< JS
 $(document).ready(function() {
     function toggleAlcoholFields() {
         if ($('#p_alcohol').is(':checked')) {
@@ -2038,99 +2043,100 @@ $(document).ready(function() {
     });
 });
 JS;
-$this->registerJs($script);
-?>
+                                                $this->registerJs($script);
+                                                ?>
 
 
-<div class="card">
-    <div class="card-header custom-nopato text-white text-left">
-        <h5>TABAQUISMO</h5>
-       
-    </div>
-    <div class="card-body bg-light">
-        <div class="row">
-            <!-- Columna izquierda con los campos -->
-            <div class="col-md-8">
-                <div class="row">
-                <div class="col-6 col-sm-4">
-                        <div class="custom-control custom-checkbox">
-                            <?= Html::checkbox('AntecedenteNoPatologico[p_fuma]', $antecedenteNoPatologico->p_fuma, [
-                                'class' => 'custom-control-input',
-                                'id' => 'p_fuma'
-                            ]) ?>
-                            <?= Html::label('¿Fúma?', 'p_fuma', ['class' => 'custom-control-label']) ?>
-                        </div>
-                    </div>  
-                    <div class="col-6 col-sm-6" id= "tabaquismo-container">
-  <!-- Campo dropdown -->
-  <div class="form-group">
-                    <?= Html::label('Frecuencia de Consumo de Tabaco', 'p_frecuencia_tabaquismo') ?>
-                    <?= Html::dropDownList('AntecedenteNoPatologico[p_frecuencia_tabaquismo]', $antecedenteNoPatologico->p_frecuencia_tabaquismo, [
-                    
-                        'Casual' => 'Casual',
-                        'Moderado' => 'Moderado',
-                        'Intenso' => 'Intenso',
-                    ], ['class' => 'form-control',
-                    'prompt' => 'Seleccione la frecuencia'
-                    ]) ?>
-                </div>
-                    <?= Html::label('Edad a la que comenzó a fumar', 'p_edad_tabaquismo') ?>
-                        <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_tabaquismo]', $antecedenteNoPatologico->p_edad_tabaquismo, ['class' => 'form-control']) ?>
-                    
-                      
-                        <?= Html::label('Número de cigarros al día', 'p_no_cigarros_x_dia') ?>
-                        <?= Html::input('number', 'AntecedenteNoPatologico[p_no_cigarros_x_dia]', $antecedenteNoPatologico->p_no_cigarros_x_dia, ['class' => 'form-control']) ?>
-                    
-                                         </div>
-                 
+                                                <div class="card">
+                                                    <div class="card-header custom-nopato text-white text-left">
+                                                        <h5>TABAQUISMO</h5>
+
+                                                    </div>
+                                                    <div class="card-body bg-light">
+                                                        <div class="row">
+                                                            <!-- Columna izquierda con los campos -->
+                                                            <div class="col-md-8">
+                                                                <div class="row">
+                                                                    <div class="col-6 col-sm-4">
+                                                                        <div class="custom-control custom-checkbox">
+                                                                            <?= Html::checkbox('AntecedenteNoPatologico[p_fuma]', $antecedenteNoPatologico->p_fuma, [
+                                                                                'class' => 'custom-control-input',
+                                                                                'id' => 'p_fuma'
+                                                                            ]) ?>
+                                                                            <?= Html::label('¿Fúma?', 'p_fuma', ['class' => 'custom-control-label']) ?>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-6 col-sm-6" id="tabaquismo-container">
+                                                                        <!-- Campo dropdown -->
+                                                                        <div class="form-group">
+                                                                            <?= Html::label('Frecuencia de Consumo de Tabaco', 'p_frecuencia_tabaquismo') ?>
+                                                                            <?= Html::dropDownList('AntecedenteNoPatologico[p_frecuencia_tabaquismo]', $antecedenteNoPatologico->p_frecuencia_tabaquismo, [
+
+                                                                                'Casual' => 'Casual',
+                                                                                'Moderado' => 'Moderado',
+                                                                                'Intenso' => 'Intenso',
+                                                                            ], [
+                                                                                'class' => 'form-control',
+                                                                                'prompt' => 'Seleccione la frecuencia'
+                                                                            ]) ?>
+                                                                        </div>
+                                                                        <?= Html::label('Edad a la que comenzó a fumar', 'p_edad_tabaquismo') ?>
+                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_tabaquismo]', $antecedenteNoPatologico->p_edad_tabaquismo, ['class' => 'form-control']) ?>
 
 
-                    <div class="w-100"></div>
-<br>
-                    <div class="col-6 col-sm-4" >
-                        <div class="custom-control custom-checkbox">
-                            <?= Html::checkbox('AntecedenteNoPatologico[p_ex_fumador]', $antecedenteNoPatologico->p_ex_fumador, [
-                                'class' => 'custom-control-input',
-                                'id' => 'p_ex_fumador'
-                            ]) ?>
-                            <?= Html::label('Ex-Fumador', 'p_ex_fumador', ['class' => 'custom-control-label']) ?>
-                        </div>
-                    </div> 
-                    <div class="col-6 col-sm-6" id="ex-fumador-container">
-                    <?= Html::label('Edad en la que dejo de fumar', 'p_edad_fin_tabaquismo') ?>
-                        <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_fin_tabaquismo]', $antecedenteNoPatologico->p_edad_fin_tabaquismo, ['class' => 'form-control']) ?>
-                    
-                        
-                    
-                    </div> 
-                    <div class="w-100"></div>
+                                                                        <?= Html::label('Número de cigarros al día', 'p_no_cigarros_x_dia') ?>
+                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_no_cigarros_x_dia]', $antecedenteNoPatologico->p_no_cigarros_x_dia, ['class' => 'form-control']) ?>
 
-                    <div class="col-6 col-sm-4">
-                        <div class="custom-control custom-checkbox">
-                            <?= Html::checkbox('AntecedenteNoPatologico[p_fumador_pasivo]', $antecedenteNoPatologico->p_fumador_pasivo, [
-                                'class' => 'custom-control-input',
-                                'id' => 'p_fumador_pasivo'
-                            ]) ?>
-                            <?= Html::label('Fumador Pasivo', 'p_fumador_pasivo', ['class' => 'custom-control-label']) ?>
-                        </div>
-                    </div> 
-
-                </div>
-            </div>
-            <!-- Columna derecha con el textarea -->
-            <div class="col-md-4">
-                <div class="form-group">
-                    <?= Html::label('Observaciones', 'observacion_tabaquismo') ?>
-                    <?= Html::textarea('AntecedenteNoPatologico[observacion_tabaquismo]', $antecedenteNoPatologico->observacion_tabaquismo, ['class' => 'form-control', 'rows' => 10]) ?>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+                                                                    </div>
 
 
-<?php
-$script = <<< JS
+
+                                                                    <div class="w-100"></div>
+                                                                    <br>
+                                                                    <div class="col-6 col-sm-4">
+                                                                        <div class="custom-control custom-checkbox">
+                                                                            <?= Html::checkbox('AntecedenteNoPatologico[p_ex_fumador]', $antecedenteNoPatologico->p_ex_fumador, [
+                                                                                'class' => 'custom-control-input',
+                                                                                'id' => 'p_ex_fumador'
+                                                                            ]) ?>
+                                                                            <?= Html::label('Ex-Fumador', 'p_ex_fumador', ['class' => 'custom-control-label']) ?>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-6 col-sm-6" id="ex-fumador-container">
+                                                                        <?= Html::label('Edad en la que dejo de fumar', 'p_edad_fin_tabaquismo') ?>
+                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_fin_tabaquismo]', $antecedenteNoPatologico->p_edad_fin_tabaquismo, ['class' => 'form-control']) ?>
+
+
+
+                                                                    </div>
+                                                                    <div class="w-100"></div>
+
+                                                                    <div class="col-6 col-sm-4">
+                                                                        <div class="custom-control custom-checkbox">
+                                                                            <?= Html::checkbox('AntecedenteNoPatologico[p_fumador_pasivo]', $antecedenteNoPatologico->p_fumador_pasivo, [
+                                                                                'class' => 'custom-control-input',
+                                                                                'id' => 'p_fumador_pasivo'
+                                                                            ]) ?>
+                                                                            <?= Html::label('Fumador Pasivo', 'p_fumador_pasivo', ['class' => 'custom-control-label']) ?>
+                                                                        </div>
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+                                                            <!-- Columna derecha con el textarea -->
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <?= Html::label('Observaciones', 'observacion_tabaquismo') ?>
+                                                                    <?= Html::textarea('AntecedenteNoPatologico[observacion_tabaquismo]', $antecedenteNoPatologico->observacion_tabaquismo, ['class' => 'form-control', 'rows' => 10]) ?>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+                                                <?php
+                                                $script = <<< JS
 $(document).ready(function() {
     function toggleTabaquismoFields() {
         if ($('#p_fuma').is(':checked')) {
@@ -2164,173 +2170,177 @@ $(document).ready(function() {
     });
 });
 JS;
-$this->registerJs($script);
-?>
+                                                $this->registerJs($script);
+                                                ?>
 
-<div class="card">
-    <div class="card-header custom-nopato text-white text-left">
-        <h5>OTROS</h5>
-        
-    </div>
-    <div class="card-body bg-light">
-        <div class="row">
-            <!-- Columna izquierda con los campos -->
-            <div class="col-md-6">
-                <div class="row">
-                <div class="form-group">
-    <?= Html::label('Religión a la que pertenece', 'religion') ?>
-    <?= Html::dropDownList('AntecedenteNoPatologico[religion]', $antecedenteNoPatologico->religion, [
-        'Ninguna' => 'Ninguna',
-        'Católica' => 'Católica',
-        'Cristiana Evangélica' => 'Cristiana Evangélica',
-        'Testigos de Jehová' => 'Testigos de Jehová',
-        'Mormona' => 'Mormona',
-        'Bautista' => 'Bautista',
-        'Pentecostal' => 'Pentecostal',
-        'Adventista del Séptimo Día' => 'Adventista del Séptimo Día',
-        'Judía' => 'Judía',
-        'Budista' => 'Budista',
-        'Hinduista' => 'Hinduista',
-        'Musulmana' => 'Musulmana',
-        'Ateísta' => 'Ateísta',
-        'Agnóstica' => 'Agnóstica',
-        'Otra' => 'Otra'
-    ], ['class' => 'form-control',         'prompt' => 'Seleccione la religión'
-    ]) ?>
-</div>
+                                                <div class="card">
+                                                    <div class="card-header custom-nopato text-white text-left">
+                                                        <h5>OTROS</h5>
 
-                <div class="form-group">
-                    <?= Html::label('¿Qué actividades realiza en sus horas libres?', 'p_act_dias_libres') ?>
-                    <?= Html::textarea('AntecedenteNoPatologico[p_act_dias_libres]', $antecedenteNoPatologico->p_act_dias_libres, ['class' => 'form-control', 'rows' => 5]) ?>
-                </div>
-                <div class="form-group">
-                    <?= Html::label('¿Pasa por algunas de estas situaciones?', 'p_situaciones') ?>
-                    <?= Html::dropDownList('AntecedenteNoPatologico[p_situaciones]', $antecedenteNoPatologico->p_situaciones, [
-                                            'Ninguna' => 'Ninguna',
+                                                    </div>
+                                                    <div class="card-body bg-light">
+                                                        <div class="row">
+                                                            <!-- Columna izquierda con los campos -->
+                                                            <div class="col-md-6">
+                                                                <div class="row">
+                                                                    <div class="form-group">
+                                                                        <?= Html::label('Religión a la que pertenece', 'religion') ?>
+                                                                        <?= Html::dropDownList('AntecedenteNoPatologico[religion]', $antecedenteNoPatologico->religion, [
+                                                                            'Ninguna' => 'Ninguna',
+                                                                            'Católica' => 'Católica',
+                                                                            'Cristiana Evangélica' => 'Cristiana Evangélica',
+                                                                            'Testigos de Jehová' => 'Testigos de Jehová',
+                                                                            'Mormona' => 'Mormona',
+                                                                            'Bautista' => 'Bautista',
+                                                                            'Pentecostal' => 'Pentecostal',
+                                                                            'Adventista del Séptimo Día' => 'Adventista del Séptimo Día',
+                                                                            'Judía' => 'Judía',
+                                                                            'Budista' => 'Budista',
+                                                                            'Hinduista' => 'Hinduista',
+                                                                            'Musulmana' => 'Musulmana',
+                                                                            'Ateísta' => 'Ateísta',
+                                                                            'Agnóstica' => 'Agnóstica',
+                                                                            'Otra' => 'Otra'
+                                                                        ], [
+                                                                            'class' => 'form-control',         'prompt' => 'Seleccione la religión'
+                                                                        ]) ?>
+                                                                    </div>
 
-                        'Duelo' => 'Duelo',
-                        'Embarazos' => 'Embarazos',
-                        'Divorcio' => 'Divorcio',
-                    ], ['class' => 'form-control',         'prompt' => 'Seleccione una opción'
-                    ]) ?>
-                </div>
-                <div class="form-group">
-                    <?= Html::label('Tipo de Sangre', 'tipo_sangre') ?>
-                    <?= Html::dropDownList('AntecedenteNoPatologico[tipo_sangre]', $antecedenteNoPatologico->tipo_sangre, [
-                    
-                        'A+' => 'A+',
-                        'B+' => 'B+',
-                        'O+' => 'O+',
-                        'A-' => 'A-',
-                        'B-' => 'B-',
-                        'O-' => 'O-',
-                        'AB+' => 'AB+',
-                        'AB-' => 'AB-',
-                    ], ['class' => 'form-control',         'prompt' => 'Seleccione el tipo de sangre'
-                    ]) ?>
-                </div>
-               
+                                                                    <div class="form-group">
+                                                                        <?= Html::label('¿Qué actividades realiza en sus horas libres?', 'p_act_dias_libres') ?>
+                                                                        <?= Html::textarea('AntecedenteNoPatologico[p_act_dias_libres]', $antecedenteNoPatologico->p_act_dias_libres, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <?= Html::label('¿Pasa por algunas de estas situaciones?', 'p_situaciones') ?>
+                                                                        <?= Html::dropDownList('AntecedenteNoPatologico[p_situaciones]', $antecedenteNoPatologico->p_situaciones, [
+                                                                            'Ninguna' => 'Ninguna',
 
+                                                                            'Duelo' => 'Duelo',
+                                                                            'Embarazos' => 'Embarazos',
+                                                                            'Divorcio' => 'Divorcio',
+                                                                        ], [
+                                                                            'class' => 'form-control',         'prompt' => 'Seleccione una opción'
+                                                                        ]) ?>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <?= Html::label('Tipo de Sangre', 'tipo_sangre') ?>
+                                                                        <?= Html::dropDownList('AntecedenteNoPatologico[tipo_sangre]', $antecedenteNoPatologico->tipo_sangre, [
 
-                </div>
-            </div>
-            <!-- Columna derecha con el textarea -->
-            <div class="col-md-6">
-            <div class="form-group">
-                    <?= Html::label('Descripción de su vivienda (Tiene mascotas, Recursos del hogar, Etc.)', 'datos_vivienda') ?>
-                    <?= Html::textarea('AntecedenteNoPatologico[datos_vivienda]', $antecedenteNoPatologico->datos_vivienda, ['class' => 'form-control', 'rows' => 8]) ?>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="card">
-    <div class="card-header custom-nopato text-white text-left">
-        <h5>CONSUMO DE DROGAS</h5>
-      
-    </div>
-    <div class="card-body bg-light">
-        <div class="row">
-            <!-- Columna izquierda con los campos -->
-            <div class="col-md-8">
-                <div class="row">
-                <div class="col-6 col-sm-4">
-                        <div class="custom-control custom-checkbox">
-                            <?= Html::checkbox('AntecedenteNoPatologico[p_drogas]', $antecedenteNoPatologico->p_drogas, [
-                                'class' => 'custom-control-input',
-                                'id' => 'p_drogas'
-                            ]) ?>
-                            <?= Html::label('¿Consume algún tipo de droga?', 'p_drogas', ['class' => 'custom-control-label']) ?>
-                        </div>
-                    </div>  
-
-                   
-                
-                    <div class="col-6 col-sm-6" id= "droga-container">
-  <!-- Campo dropdown -->
-  <div class="form-group">
-                    <?= Html::label('Frecuencia de su consumo', 'p_frecuencia_droga') ?>
-                    <?= Html::dropDownList('AntecedenteNoPatologico[p_frecuencia_droga]', $antecedenteNoPatologico->p_frecuencia_droga, [
-                    
-                        'Casual' => 'Casual',
-                        'Moderado' => 'Moderado',
-                        'Intenso' => 'Intenso',
-                    ], ['class' => 'form-control',         'prompt' => 'Seleccione la frecuencia'
-                    ]) ?>
-                </div>
-                    <?= Html::label('¿A qué edad se inicio el consumo?', 'p_edad_droga') ?>
-                        <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_droga]', $antecedenteNoPatologico->p_edad_droga, ['class' => 'form-control']) ?>
-                    
-
-                        <div class="custom-control custom-checkbox">
-                            <?= Html::checkbox('AntecedenteNoPatologico[p_droga_intravenosa]', $antecedenteNoPatologico->p_droga_intravenosa, [
-                                'class' => 'custom-control-input',
-                                'id' => 'p_droga_intravenosa'
-                            ]) ?>
-                            <br>
-                            <?= Html::label('¿Usa drogas intravenosa?', 'p_droga_intravenosa', ['class' => 'custom-control-label']) ?>
-                        </div>
-
-                     </div>
-
-                     <div class="w-100"></div>
-<br>
-                    <div class="col-6 col-sm-4">
-                        <div class="custom-control custom-checkbox">
-                            <?= Html::checkbox('AntecedenteNoPatologico[p_ex_adicto]', $antecedenteNoPatologico->p_ex_adicto, [
-                                'class' => 'custom-control-input',
-                                'id' => 'p_ex_adicto'
-                            ]) ?>
-                            <?= Html::label('Ex-Adicto', 'p_ex_adicto', ['class' => 'custom-control-label']) ?>
-                        </div>
-                    </div> 
-                    <div class="col-6 col-sm-6" id = "ex-adicto-container">
-                    <?= Html::label('¿A qué edad dejo de consumir?', 'p_edad_fin_droga') ?>
-                        <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_fin_droga]', $antecedenteNoPatologico->p_edad_fin_droga, ['class' => 'form-control']) ?>
-                    
-                        
-                    
-                    </div> 
-               
+                                                                            'A+' => 'A+',
+                                                                            'B+' => 'B+',
+                                                                            'O+' => 'O+',
+                                                                            'A-' => 'A-',
+                                                                            'B-' => 'B-',
+                                                                            'O-' => 'O-',
+                                                                            'AB+' => 'AB+',
+                                                                            'AB-' => 'AB-',
+                                                                        ], [
+                                                                            'class' => 'form-control',         'prompt' => 'Seleccione el tipo de sangre'
+                                                                        ]) ?>
+                                                                    </div>
 
 
-                </div>
-            </div>
-            <!-- Columna derecha con el textarea -->
-            <div class="col-md-4">
-            <div class="form-group">
-                    <?= Html::label('Observaciones', 'observacion_droga') ?>
-                    <?= Html::textarea('AntecedenteNoPatologico[observacion_droga]', $antecedenteNoPatologico->observacion_droga, ['class' => 'form-control', 'rows' => 10]) ?>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+
+                                                                </div>
+                                                            </div>
+                                                            <!-- Columna derecha con el textarea -->
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <?= Html::label('Descripción de su vivienda (Tiene mascotas, Recursos del hogar, Etc.)', 'datos_vivienda') ?>
+                                                                    <?= Html::textarea('AntecedenteNoPatologico[datos_vivienda]', $antecedenteNoPatologico->datos_vivienda, ['class' => 'form-control', 'rows' => 8]) ?>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="card">
+                                                    <div class="card-header custom-nopato text-white text-left">
+                                                        <h5>CONSUMO DE DROGAS</h5>
+
+                                                    </div>
+                                                    <div class="card-body bg-light">
+                                                        <div class="row">
+                                                            <!-- Columna izquierda con los campos -->
+                                                            <div class="col-md-8">
+                                                                <div class="row">
+                                                                    <div class="col-6 col-sm-4">
+                                                                        <div class="custom-control custom-checkbox">
+                                                                            <?= Html::checkbox('AntecedenteNoPatologico[p_drogas]', $antecedenteNoPatologico->p_drogas, [
+                                                                                'class' => 'custom-control-input',
+                                                                                'id' => 'p_drogas'
+                                                                            ]) ?>
+                                                                            <?= Html::label('¿Consume algún tipo de droga?', 'p_drogas', ['class' => 'custom-control-label']) ?>
+                                                                        </div>
+                                                                    </div>
 
 
-<?php
-$script = <<< JS
+
+                                                                    <div class="col-6 col-sm-6" id="droga-container">
+                                                                        <!-- Campo dropdown -->
+                                                                        <div class="form-group">
+                                                                            <?= Html::label('Frecuencia de su consumo', 'p_frecuencia_droga') ?>
+                                                                            <?= Html::dropDownList('AntecedenteNoPatologico[p_frecuencia_droga]', $antecedenteNoPatologico->p_frecuencia_droga, [
+
+                                                                                'Casual' => 'Casual',
+                                                                                'Moderado' => 'Moderado',
+                                                                                'Intenso' => 'Intenso',
+                                                                            ], [
+                                                                                'class' => 'form-control',         'prompt' => 'Seleccione la frecuencia'
+                                                                            ]) ?>
+                                                                        </div>
+                                                                        <?= Html::label('¿A qué edad se inicio el consumo?', 'p_edad_droga') ?>
+                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_droga]', $antecedenteNoPatologico->p_edad_droga, ['class' => 'form-control']) ?>
+
+
+                                                                        <div class="custom-control custom-checkbox">
+                                                                            <?= Html::checkbox('AntecedenteNoPatologico[p_droga_intravenosa]', $antecedenteNoPatologico->p_droga_intravenosa, [
+                                                                                'class' => 'custom-control-input',
+                                                                                'id' => 'p_droga_intravenosa'
+                                                                            ]) ?>
+                                                                            <br>
+                                                                            <?= Html::label('¿Usa drogas intravenosa?', 'p_droga_intravenosa', ['class' => 'custom-control-label']) ?>
+                                                                        </div>
+
+                                                                    </div>
+
+                                                                    <div class="w-100"></div>
+                                                                    <br>
+                                                                    <div class="col-6 col-sm-4">
+                                                                        <div class="custom-control custom-checkbox">
+                                                                            <?= Html::checkbox('AntecedenteNoPatologico[p_ex_adicto]', $antecedenteNoPatologico->p_ex_adicto, [
+                                                                                'class' => 'custom-control-input',
+                                                                                'id' => 'p_ex_adicto'
+                                                                            ]) ?>
+                                                                            <?= Html::label('Ex-Adicto', 'p_ex_adicto', ['class' => 'custom-control-label']) ?>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-6 col-sm-6" id="ex-adicto-container">
+                                                                        <?= Html::label('¿A qué edad dejo de consumir?', 'p_edad_fin_droga') ?>
+                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_fin_droga]', $antecedenteNoPatologico->p_edad_fin_droga, ['class' => 'form-control']) ?>
+
+
+
+                                                                    </div>
+
+
+
+                                                                </div>
+                                                            </div>
+                                                            <!-- Columna derecha con el textarea -->
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <?= Html::label('Observaciones', 'observacion_droga') ?>
+                                                                    <?= Html::textarea('AntecedenteNoPatologico[observacion_droga]', $antecedenteNoPatologico->observacion_droga, ['class' => 'form-control', 'rows' => 10]) ?>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+                                                <?php
+                                                $script = <<< JS
 $(document).ready(function() {
     function toggleDrogasFields() {
         if ($('#p_drogas').is(':checked')) {
@@ -2364,101 +2374,418 @@ $(document).ready(function() {
     });
 });
 JS;
-$this->registerJs($script);
-?>
+                                                $this->registerJs($script);
+                                                ?>
 
-<div class="card">
-    <div class="card-header custom-nopato text-white text-left">
-        <h5>OBSERVACION GENEREAL / OTRAS OBSERVACIONES</h5>
-       
-    </div>
-    <div class="card-body bg-light">
-        <div class="row">
+                                                <div class="card">
+                                                    <div class="card-header custom-nopato text-white text-left">
+                                                        <h5>OBSERVACION GENEREAL / OTRAS OBSERVACIONES</h5>
 
-            <!-- Columna derecha con el textarea -->
-           
-            <div class="form-group">
-                    <?= Html::label('Observación General', 'observacion_general') ?>
-                    <?= Html::textarea('AntecedenteNoPatologico[observacion_general]', $antecedenteNoPatologico->observacion_general, ['class' => 'form-control', 'rows' => 10]) ?>
-                </div>
-            
-        </div>
+                                                    </div>
+                                                    <div class="card-body bg-light">
+                                                        <div class="row">
+
+                                                            <!-- Columna derecha con el textarea -->
+
+                                                            <div class="form-group ">
+                                                                <?= Html::label('Observación General', 'observacion_general') ?>
+                                                                <?= Html::textarea('AntecedenteNoPatologico[observacion_general]', $antecedenteNoPatologico->observacion_general, ['class' => 'form-control', 'rows' => 10]) ?>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+
+                                                <div class="form-group">
+                                                    <?= Html::submitButton('Guardar Todos los Cambios &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                                                </div>
+
+
+
+                                            </div>
+
+
+
+                                            <br>
+
+                                            <!-- Agrega aquí el resto de los campos siguiendo el mismo patrón -->
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <?php ActiveForm::end(); ?>
+
+                            <?php $this->endBlock(); ?>
+
+                            <?php $this->beginBlock('perinatales'); ?>
+                            <?php $form = ActiveForm::begin(['action' => ['antecedente-perinatal', 'id' => $model->id]]); ?>
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <div class="card">
+                                        <div class="card-header gradient-blue text-white text-center">
+                                            <h2>Antecedente Perinatal</h2>
+                                            <div class="float-submit-btn">
+                                                <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                                            </div>
+                                        </div>
+                                        <div class="card-body bg-light">
+                                            <div class="container">
+
+
+                                                <div class="row">
+                                                    <!-- Columna izquierda con los campos -->
+                                                  
+
+
+                                                    
+                                                        <div class="col-6 col-sm-2">
+                                                            <?= Html::label('Hora de Nacimiento', 'p_hora_nacimiento') ?>
+                                                            <?= Html::input('time', 'AntecedentePerinatal[p_hora_nacimiento]', $AntecedentePerinatal->p_hora_nacimiento, ['class' => 'form-control']) ?>
+                                                        </div>
+                                                        <div class="col-6 col-sm-2 ">
+                                                            <?= Html::label('No. de Gestación', 'p_no_gestacion') ?>
+                                                            <?= Html::input('number', 'AntecedentePerinatal[p_no_gestacion]', $AntecedentePerinatal->p_no_gestacion, ['class' => 'form-control']) ?>
+
+                                                        </div>
+                                                     
+                                                        <div class="col-6 col-sm-2">
+                                                            <?= Html::label('Edad Gestacional', 'p_edad_gestacional') ?>
+                                                            <?= Html::input('number', 'AntecedentePerinatal[p_edad_gestacional]', $AntecedentePerinatal->p_edad_gestacional, ['class' => 'form-control']) ?>
+
+                                                        </div>
+                                                       
+                                                        <div class="col-6 col-sm-2 bg-white rounded p-4">
+                                                            <div class="custom-control custom-checkbox">
+                                                                <?= Html::checkbox('AntecedentePerinatal[p_parto]', $AntecedentePerinatal->p_parto, [
+                                                                    'class' => 'custom-control-input',
+                                                                    'id' => 'p_parto'
+                                                                ]) ?>
+                                                                <?= Html::label('Parto', 'p_parto', ['class' => 'custom-control-label']) ?>
+                                                            </div>
+                                                            <div class="custom-control custom-checkbox">
+                                                                <?= Html::checkbox('AntecedentePerinatal[p_cesarea]', $AntecedentePerinatal->p_cesarea, [
+                                                                    'class' => 'custom-control-input',
+                                                                    'id' => 'p_cesarea'
+                                                                ]) ?>
+                                                                <?= Html::label('Cesarea', 'p_cesarea', ['class' => 'custom-control-label']) ?>
+                                                            </div>
+                                                        </div>
+
+                                                       
+                                                        <div class="w-100"></div>
+                                                        <br>
+                                                        <div class="col-6 col-sm-8">
+                                                            <?= Html::label('Sitio de atención del parto', 'p_sitio_parto') ?>
+                                                            <?= Html::textInput('AntecedentePerinatal[p_sitio_parto]', $modelAntecedentePerinatal->p_sitio_parto, ['class' => 'form-control', 'id' => 'p_sitio_parto']) ?>
+                                                        </div>
+
+
+                                                        <div class="w-100"></div>
+                                                        <br>
+                                                        <div class="col-6 col-sm-4">
+                                                            <?= Html::label('Peso al nacer', 'p_peso_nacer') ?>
+                                                            <?= Html::input('number', 'AntecedentePerinatal[p_peso_nacer]', $modelAntecedentePerinatal->p_peso_nacer, [
+                                                                'class' => 'form-control',
+                                                                'id' => 'p_peso_nacer',
+                                                                'step' => '0.01', // Define el paso para permitir decimales
+                                                            ]) ?>
+                                                        </div>
+                                                        <div class="col-6 col-sm-4">
+                                                            <?= Html::label('Talla', 'p_talla') ?>
+                                                            <?= Html::input('number', 'AntecedentePerinatal[p_talla]', $modelAntecedentePerinatal->p_talla, [
+                                                                'class' => 'form-control',
+                                                                'id' => 'p_talla',
+                                                                'step' => '0.01', // Define el paso para permitir decimales
+                                                            ]) ?>
+                                                        </div>
+
+                                                        <div class="w-100"></div>
+                                                        <br>
+                    
+                                                        <div class="col-6 col-sm-4">
+                                                           <h4>Perimetros (cm)</h4>
+                                                        </div>
+                                                        <div class="w-100"></div>
+                                                       
+                                                        <div class="col-6 col-sm-2">
+                                                        <?= Html::label('Cefálico', 'p_cefalico') ?>
+                                                            <?= Html::input('number', 'AntecedentePerinatal[p_cefalico]', $modelAntecedentePerinatal->p_cefalico, [
+                                                                'class' => 'form-control',
+                                                                'id' => 'p_cefalico',
+                                                                'step' => '0.01', // Define el paso para permitir decimales
+                                                            ]) ?>
+
+                                                        </div>
+
+                                                        <div class="col-6 col-sm-2">
+                                                        <?= Html::label('Toracico', 'p_toracico') ?>
+                                                            <?= Html::input('number', 'AntecedentePerinatal[p_toracico]', $modelAntecedentePerinatal->p_toracico, [
+                                                                'class' => 'form-control',
+                                                                'id' => 'p_toracico',
+                                                                'step' => '0.01', // Define el paso para permitir decimales
+                                                            ]) ?>
+                                                        </div>
+                                                        <div class="col-6 col-sm-2">
+                                                        <?= Html::label('Abdominal', 'p_abdominal') ?>
+                                                            <?= Html::input('number', 'AntecedentePerinatal[p_abdominal]', $modelAntecedentePerinatal->p_abdominal, [
+                                                                'class' => 'form-control',
+                                                                'id' => 'p_abdominal',
+                                                                'step' => '0.01', // Define el paso para permitir decimales
+                                                            ]) ?>
+                                                        </div>
+                                                        <div class="w-100"></div>
+                                                        <div class="dropdown-divider"></div>
+
+                                                        <br>
+                                                        <div class="col-6 col-sm-4">
+                                                        <div class="custom-control custom-checkbox">
+                                                                <?= Html::checkbox('AntecedentePerinatal[test]', $AntecedentePerinatal->test, [
+                                                                    'class' => 'custom-control-input',
+                                                                    'id' => 'test'
+                                                                ]) ?>
+                                                                <?= Html::label('¿Cuenta con evaluaciones neonatales?', 'test', ['class' => 'custom-control-label']) ?>
+                                                            </div>
+                                                        </div>
+                                                      <br>
+                                                      <br>
+                                                        <div class="row" id="test-container">
+                                                        <div class="col-6 col-sm-2">
+                                                            <?= Html::label('Apgar', 'p_apgar') ?>
+                                                            <?= Html::input('number', 'AntecedentePerinatal[p_apgar]', $AntecedentePerinatal->p_apgar, ['class' => 'form-control']) ?>
+
+                                                        </div>
+                                                        <div class="col-6 col-sm-2" >
+                                                            <?= Html::label('Ballard', 'p_ballard') ?>
+                                                            <?= Html::input('number', 'AntecedentePerinatal[p_ballard]', $AntecedentePerinatal->p_ballard, ['class' => 'form-control']) ?>
+
+                                                        </div>
+
+                                                        <div class="col-6 col-sm-2">
+                                                            <?= Html::label('Silverman', 'p_silverman') ?>
+                                                            <?= Html::input('number', 'AntecedentePerinatal[p_silverman]', $AntecedentePerinatal->p_silverman, ['class' => 'form-control']) ?>
+
+                                                        </div>
+                                                        <div class="col-6 col-sm-2" >
+                                                            <?= Html::label('Capurro', 'p_capurro') ?>
+                                                            <?= Html::input('number', 'AntecedentePerinatal[p_capurro]', $AntecedentePerinatal->p_capurro, ['class' => 'form-control']) ?>
+
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="w-100"></div>
+                                                    <br>
+                                                    <div class="col-6 col-sm-8">
+                                                    <div class="form-group">
+                                                    <?= Html::label('Complicaciones', 'p_complicacion') ?>
+                                                    <?= Html::textarea('AntecedentePerinatal[p_complicacion]', $AntecedentePerinatal->p_complicacion, ['class' => 'form-control', 'rows' => 2, 'id' => 'p_complicacion']) ?>
+                                                </div>
+                                                    </div>
+
+                                                    <div class="w-100"></div>
+                                                        <br>
+                                                        <div class="col-6 col-sm-4">
+                                                        <div class="custom-control custom-checkbox">
+                                                                <?= Html::checkbox('AntecedentePerinatal[p_anestesia]', $AntecedentePerinatal->p_anestesia, [
+                                                                    'class' => 'custom-control-input',
+                                                                    'id' => 'p_anestesia'
+                                                                ]) ?>
+                                                                <?= Html::label('Anestesia', 'p_anestesia', ['class' => 'custom-control-label']) ?>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-6 col-sm-8" id="anestesia-container">
+                                                    <div class="form-group">
+                                                    <?= Html::label('Especifique', 'p_especifique_anestecia') ?>
+                                                    <?= Html::textarea('AntecedentePerinatal[p_especifique_anestecia]', $AntecedentePerinatal->p_especifique_anestecia, ['class' => 'form-control', 'rows' => 2, 'id' => 'p_especifique_anestecia']) ?>
+                                                </div>
+                                                    </div>
+
+                                                    <div class="w-100"></div>
+                                                    <br>
+                                                    <div class= "row bg-white rounded p-4">
+                                                    <div class="col-6 col-sm-2" >
+                                                    <div class="custom-control custom-checkbox">
+                                                                <?= Html::checkbox('AntecedentePerinatal[p_apnea_neonatal]', $AntecedentePerinatal->p_apnea_neonatal, [
+                                                                    'class' => 'custom-control-input',
+                                                                    'id' => 'p_apnea_neonatal'
+                                                                ]) ?>
+                                                                <?= Html::label('Apnea Neonatal', 'p_apnea_neonatal', ['class' => 'custom-control-label']) ?>
+                                                            </div>
+                                                            
+                                                    </div>
+                                                    <div class="col-6 col-sm-2" >
+                                                            <div class="custom-control custom-checkbox">
+                                                                <?= Html::checkbox('AntecedentePerinatal[p_cianosis]', $AntecedentePerinatal->p_cianosis, [
+                                                                    'class' => 'custom-control-input',
+                                                                    'id' => 'p_cianosis'
+                                                                ]) ?>
+                                                                <?= Html::label('Cianosis', 'p_cianosis', ['class' => 'custom-control-label']) ?>
+                                                            </div>
+                                                            </div>
+
+                                                            <div class="col-6 col-sm-2" >
+                                                            <div class="custom-control custom-checkbox">
+                                                                <?= Html::checkbox('AntecedentePerinatal[p_hemorragias]', $AntecedentePerinatal->p_hemorragias, [
+                                                                    'class' => 'custom-control-input',
+                                                                    'id' => 'p_hemorragias'
+                                                                ]) ?>
+                                                                <?= Html::label('Hemorragias', 'p_hemorragias', ['class' => 'custom-control-label']) ?>
+                                                            </div>
+                                                            </div>
+                                                            <div class="col-6 col-sm-2" >
+                                                            <div class="custom-control custom-checkbox">
+                                                                <?= Html::checkbox('AntecedentePerinatal[p_convulsiones]', $AntecedentePerinatal->p_convulsiones, [
+                                                                    'class' => 'custom-control-input',
+                                                                    'id' => 'p_convulsiones'
+                                                                ]) ?>
+                                                                <?= Html::label('Convulsiones', 'p_convulsiones', ['class' => 'custom-control-label']) ?>
+                                                            </div>
+                                                            </div>
+
+                                                            <div class="col-6 col-sm-2 ">
+    <div class="custom-control custom-checkbox">
+        <?= Html::checkbox('AntecedentePerinatal[p_ictericia]', $AntecedentePerinatal->p_ictericia, [
+            'class' => 'custom-control-input',
+            'id' => 'p_ictericia'
+        ]) ?>
+        <?= Html::label('Ictericia', 'p_ictericia', ['class' => 'custom-control-label']) ?>
     </div>
 </div>
+                                                    </div>
 
 
+                                                    
+
+                                                </div>
+                                                <!-- Columna derecha con el textarea -->
+<br>
+
+                                                <div class="form-group">
+                                                    <?= Html::label('Observaciones', 'observacion') ?>
+                                                    <?= Html::textarea('AntecedentePerinatal[observacion]', $AntecedentePerinatal->observacion, ['class' => 'form-control', 'rows' => 10, 'id' => 'observacion']) ?>
+                                                </div>
 
 
+                                            </div>
 
 
-            </div>
-               
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php
+                                                $script = <<< JS
+$(document).ready(function() {
+    function toggleTestFields() {
+        if ($('#test').is(':checked')) {
+            $('#test-container').show();
+        } else {
+            $('#test-container').hide();
+        }
+    }
 
-               
-                <br>
-             
-                <!-- Agrega aquí el resto de los campos siguiendo el mismo patrón -->
-             
-            </div>
-        </div>
-    </div>
-</div>
-<?php ActiveForm::end(); ?>
+    function toggleAnestesiaFields() {
+        if ($('#p_anestesia').is(':checked')) {
+            $('#anestesia-container').show();
+        } else {
+            $('#anestesia-container').hide();
+        }
+    }
+    
 
-<?php $this->endBlock(); ?>
+    // Initial toggle based on the current state
+    toggleTestFields();
+    toggleAnestesiaFields();
+    //toggleExAdictoFields();
 
+    // Toggle fields on checkbox change
+    $('#test').change(function() {
+        toggleTestFields();
 
+    });
 
-
+    $('#p_anestesia').change(function() {
+        toggleAnestesiaFields();
         
-        <?php echo TabsX::widget([
-                            'enableStickyTabs' => true,
-                            'options' => ['class' => 'nav-tabs-custom'],
-                            'items' => [
-                                [
-                                    'label' => 'Hereditarios',
-                                    'content' => $this->blocks['hereditarios'],
-                                    //'active' => true,
-                                    'options' => [
-                                        'id' => 'hereditarios',
+    });
+
+   
+});
+JS;
+                                                $this->registerJs($script);
+                                                ?>
+
+                            <?php ActiveForm::end(); ?>
+                            <?php $this->endBlock(); ?>
+
+
+
+
+
+
+                            <?php echo TabsX::widget([
+                                'enableStickyTabs' => true,
+                                'options' => ['class' => 'nav-tabs-custom'],
+                                'items' => [
+                                    [
+                                        'label' => 'Hereditarios',
+                                        'content' => $this->blocks['hereditarios'],
+                                        //'active' => true,
+                                        'options' => [
+                                            'id' => 'hereditarios',
+                                        ],
+
+
+                                    ],
+                                    [
+                                        'label' => 'Patologicos',
+                                        'content' => $this->blocks['patologicos'],
+
+                                        'options' => [
+                                            'id' => 'patologicos',
+                                        ],
+
+
+                                    ],
+                                    [
+                                        'label' => 'No Patologicos',
+                                        'content' => $this->blocks['no_patologicos'],
+
+                                        'options' => [
+                                            'id' => 'nopatologicos',
+                                        ],
+
+
+                                    ],
+                                    [
+                                        'label' => 'Perinatales',
+                                        'content' => $this->blocks['perinatales'],
+
+                                        'options' => [
+                                            'id' => 'perinatales',
+                                        ],
+
+
                                     ],
 
 
-                                ],
-                                [
-                                    'label' => 'Patologicos',
-                                    'content' => $this->blocks['patologicos'],
-                               
-                                    'options' => [
-                                        'id' => 'patologicos',
-                                    ],
 
 
                                 ],
-                                [
-                                    'label' => 'No Patologicos',
-                                    'content' => $this->blocks['no_patologicos'],
-                                 
-                                    'options' => [
-                                        'id' => 'nopatologicos',
-                                    ],
+                                //  'position' => TabsX::POS_ABOVE,
+                                'align' => TabsX::ALIGN_CENTER,
+                                //     'bordered'=>true,
+                                'encodeLabels' => false
 
 
-                                ],
-                          
-                              
-                               
+                            ]);
 
-                            ],
-                          //  'position' => TabsX::POS_ABOVE,
-                           'align' => TabsX::ALIGN_CENTER,
-                       //     'bordered'=>true,
-                            'encodeLabels' => false
-
-
-                        ]);
-
-                        ?>
+                            ?>
 
 
 
@@ -2467,645 +2794,664 @@ $this->registerJs($script);
                             <?php $this->beginBlock('exploracion_fisica'); ?>
 
 
-<?php $form = ActiveForm::begin(['action' => ['exploracion-fisica', 'id' => $model->id]]); ?>
-<div class="row">
-    <div class="col-md-12">
-    
-        <div class="card">
-            <div class="card-header gradient-blue text-white text-center">
-                <h2>Exploracion Fisica</h2>
-                <div class="float-submit-btn">
-    <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
-</div>
-            </div>
-            <div class="card-body">
-            <div class="container">
-
-            <div class="card">
-    <div class="card-header custom-nopato text-white text-left">
-        <h5>HABITUS EXTERIOR</h5>
-    </div>
-    <div class="card-body bg-light">
-        <div class="row">
-
-            <!-- Columna derecha con el textarea -->
-           
-            <div class="form-group">
-                    <?= Html::label('Habitus Exterior', 'desc_habitus_exterior') ?>
-                    <?= Html::textarea('ExploracionFisica[desc_habitus_exterior]', $ExploracionFisica->desc_habitus_exterior, ['class' => 'form-control', 'rows' => 5]) ?>
-                </div>
-            
-        </div>
-        <div class="alert alert-white custom-alert" role="alert">
-                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i> Edad aparente, biotipo, estado de conciencia, orientación en tiempo, espacio y persona, facies, postura, marcha, movimientos anormales, estado y color de tegumentos, actitud.
-                </div>
-    </div>
-    
-
-
-
-            </div>
-            <div class="card">
-    <div class="card-header custom-nopato text-white text-left">
-        <h5>CABEZA</h5>
-    </div>
-    <div class="card-body bg-light">
-        <div class="row">
-
-            <!-- Columna derecha con el textarea -->
-           
-            <div class="form-group">
-                    <?= Html::label('Cabeza y Cara', 'desc_cabeza') ?>
-                    <?= Html::textarea('ExploracionFisica[desc_cabeza]', $ExploracionFisica->desc_cabeza, ['class' => 'form-control', 'rows' => 5]) ?>
-                </div>
-            
-        </div>
-        <div class="alert alert-white custom-alert" role="alert">
-                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>                Craneo: tipo, forma, volumen, cabello, exostosis, hundimientos, fontanelas.
-
-Cara: tinte ojos, reflejos pupilares,fondo de ojos, conjuntivas, cornea.
-
-Nariz: obstruccion, mucosa. Boca: desviacion de las comisuras, aliento, labios y paladar.
-
-Oidos: conducto auditivo, y timpano.
-
-Faringe: uvula, secreciones, amigdalas, adenoides.
-                </div>
-    </div>
-    
-
-
-
-            </div>
-
-            
-            <div class="card">
-    <div class="card-header custom-nopato text-white text-left">
-        <h5>CUELLO</h5>
-        
-    </div>
-    <div class="card-body bg-light">
-        <div class="row">
-
-            <!-- Columna derecha con el textarea -->
-           
-            <div class="form-group">
-                    <?= Html::label('Cuello', 'desc_cuello') ?>
-                    <?= Html::textarea('ExploracionFisica[desc_cuello]', $ExploracionFisica->desc_cuello, ['class' => 'form-control', 'rows' => 5]) ?>
-                </div>
-            
-        </div>
-        <div class="alert alert-white custom-alert" role="alert">
-                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i> Forma, movilidad, contracturas; arterias: pulsos, soplos venosos, fremitos. Traquea, tiroides, cadenas linfaticas, huecos supraclaviculares.            
-                </div>
-    </div>
-    
-
-
-
-            </div>
-
-            
-            <div class="card">
-    <div class="card-header custom-nopato text-white text-left">
-        <h5>TORAX</h5>
-       
-    </div>
-    <div class="card-body bg-light">
-        <div class="row">
-
-            <!-- Columna derecha con el textarea -->
-           
-            <div class="form-group">
-                    <?= Html::label('Torax', 'desc_torax') ?>
-                    <?= Html::textarea('ExploracionFisica[desc_torax]', $ExploracionFisica->desc_torax, ['class' => 'form-control', 'rows' => 5]) ?>
-                </div>
-            
-        </div>
-        <div class="alert alert-white custom-alert" role="alert">
-                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i> Inspección, forma, volumen, simetría, tiros, red venosa y puntos dolorosos, campos pulmonares, movimientos de amplexion y amplexacion, vibraciones vocales, ganglios satélites y nodulos.  </div>
-    </div>
-    
-
-
-
-            </div>
-
-            <div class="card">
-    <div class="card-header custom-nopato text-white text-left">
-        <h5>ABDOMEN</h5>
-       
-    </div>
-    <div class="card-body bg-light">
-        <div class="row">
-
-            <!-- Columna derecha con el textarea -->
-           
-            <div class="form-group">
-                    <?= Html::label('Abdomen', 'desc_torax') ?>
-                    <?= Html::textarea('ExploracionFisica[desc_abdomen]', $ExploracionFisica->desc_abdomen, ['class' => 'form-control', 'rows' => 5]) ?>
-                </div>
-            
-        </div>
-        <div class="alert alert-white custom-alert" role="alert">
-                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i> </div>
-    </div>
-    
-
-
-
-            </div>
-
-            <div class="card">
-    <div class="card-header custom-nopato text-white text-left">
-        <h5>EXPLORACIÓN GINECOLOGICA</h5>
-       
-    </div>
-    <div class="card-body bg-light">
-        <div class="row">
-
-            <!-- Columna derecha con el textarea -->
-           
-            <div class="form-group">
-                    <?= Html::label('Exploración Ginecologica', 'desc_exploración_ginecologica') ?>
-                    <?= Html::textarea('ExploracionFisica[desc_exploración_ginecologica]', $ExploracionFisica->desc_exploración_ginecologica, ['class' => 'form-control', 'rows' => 5]) ?>
-                </div>
-            
-        </div>
-        <div class="alert alert-white custom-alert" role="alert">
-                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i> Exploracion Manual: utero, forma, tamaño, volumen, posicion, consistencia, masas tumorales, fondos de saco y adeherencias.</div>
-    </div>
-    
-
-
-
-            </div>
-
-            <div class="card">
-    <div class="card-header custom-nopato text-white text-left">
-        <h5>EXPLORACIÓN DE GENITALES</h5>
-      
-    </div>
-    <div class="card-body bg-light">
-        <div class="row">
-
-            <!-- Columna derecha con el textarea -->
-           
-            <div class="form-group">
-                    <?= Html::label('Exploración Genitales', 'desc_genitales') ?>
-                    <?= Html::textarea('ExploracionFisica[desc_genitales]', $ExploracionFisica->desc_genitales, ['class' => 'form-control', 'rows' => 5]) ?>
-                </div>
-            
-        </div>
-        <div class="alert alert-white custom-alert" role="alert">
-                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i> Inspeccion, madurez, tacto vaginal, tacto rectal, secreciones, vesiculas, y ulceras, verrugas, condilomas u otras lesiones.</div>
-    </div>
-    
-
-
-
-            </div>
-
-            
-            <div class="card">
-    <div class="card-header custom-nopato text-white text-left">
-        <h5>COLUMNA VERTEBRAL</h5>
-       
-    </div>
-    <div class="card-body bg-light">
-        <div class="row">
-
-            <!-- Columna derecha con el textarea -->
-           
-            <div class="form-group">
-                    <?= Html::label('Columna Vertebral', 'desc_columna_vertebral') ?>
-                    <?= Html::textarea('ExploracionFisica[desc_columna_vertebral]', $ExploracionFisica->desc_columna_vertebral, ['class' => 'form-control', 'rows' => 5]) ?>
-                </div>
-            
-        </div>
-        <div class="alert alert-white custom-alert" role="alert">
-                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i> Inspección, posición, dolor, deformaciones, disfunción, alineación, función, simetría, movimiento, flexión,  extensión, rotación y lateralidad, curvaturas, lordosis, cifosis, escoliosis, masas musculares, lesiones cutáneas.</div>
-    </div>
-    
-            </div>
-
-
-            <div class="card">
-    <div class="card-header custom-nopato text-white text-left">
-        <h5>EXTREMIDADES</h5>
-       
-    </div>
-    <div class="card-body bg-light">
-        <div class="row">
-
-            <!-- Columna derecha con el textarea -->
-           
-            <div class="form-group">
-                    <?= Html::label('Extremidades', 'desc_extremidades') ?>
-                    <?= Html::textarea('ExploracionFisica[desc_extremidades]', $ExploracionFisica->desc_extremidades, ['class' => 'form-control', 'rows' => 5]) ?>
-                </div>
-            
-        </div>
-        <div class="alert alert-white custom-alert" role="alert">
-                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i> Forma, volumen, piel, unas, dedos, articulaciones, tono, fuerza, reflejos tendinosos, movimientos, pulsos arteriales, simetría, amplitud, frecuencia, ritmo, arcos de movilidad, varices, ulceras,  flebitis, micosis, marcha, edemas, reflejos: rotuliano, aquiliano y plantar.</div>
-    </div>
-    
-
-
-
-            </div>
-
-            <div class="card">
-    <div class="card-header custom-nopato text-white text-left">
-        <h5>EXPLORACIÓN NEUROLOGICA</h5>
-       
-    </div>
-    <div class="card-body bg-light">
-        <div class="row">
-
-            <!-- Columna derecha con el textarea -->
-           
-            <div class="form-group">
-                    <?= Html::label('Exploración Neurologica', 'desc_exploracion_neurologica') ?>
-                    <?= Html::textarea('ExploracionFisica[desc_exploracion_neurologica]', $ExploracionFisica->desc_exploracion_neurologica, ['class' => 'form-control', 'rows' => 5]) ?>
-                </div>
-            
-        </div>
-        <div class="alert alert-white custom-alert" role="alert">
-                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i> Razonamiento, atencion, memoria, ansiedad, depresion, alucinaciones, postura corporal, funciones motoras, movimientos corporales voluntarios e involuntarios, paresias, paralisis, marcha, equilibrio, pares craneales, funcion sensorial.</div>
-    </div>
-    
-
-
-
-            </div>
-
-
-
-
-
-
-
-
-
-               
-
-               
-                <br>
-             
-             
-             
-            </div>
-        </div>
-    </div>
-</div>
-</div>
-<?php ActiveForm::end(); ?>
-
-<?php $this->endBlock(); ?>
-
-
-<?php $this->beginBlock('interrogatorio_medico'); ?>
-
-
-<?php $form = ActiveForm::begin(['action' => ['interrogatorio-medico', 'id' => $model->id]]); ?>
-<div class="row">
-    <div class="col-md-12">
-    
-        <div class="card">
-            <div class="card-header gradient-blue text-white text-center">
-                <h2>Interrogatorio Medico</h2>
-                <div class="float-submit-btn">
-    <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
-</div>
-            </div>
-            <div class="card-body">
-            <div class="container">
-
-            <div class="card">
-    <div class="card-header custom-nopato text-white text-left">
-        <h5>CARDIOVASCULAR</h5>
-    </div>
-    <div class="card-body bg-light">
-        <div class="row">
-
-            <!-- Columna derecha con el textarea -->
-           
-            <div class="form-group">
-                    <?= Html::label('Cardiovascular', 'desc_cardiovascular') ?>
-                    <?= Html::textarea('InterrogatorioMedico[desc_cardiovascular]', $InterrogatorioMedico->desc_cardiovascular, ['class' => 'form-control', 'rows' => 5]) ?>
-                </div>
-            
-        </div>
-        <div class="alert alert-white custom-alert" role="alert">
-                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Antecedentes de cardiopatías, disnea, tos, hemoptisis, bronquitis frecuente, lipotimias, vértigos, insuficiencia arterial y venosa, sincope, fatiga, palpitaciones, dolor precordial, encuclillamiento, edemas, ascitis, cianosis, estasis venosa, varices. </div>
-    </div>
-    
-
-
-
-            </div>
-
-            <div class="card">
-    <div class="card-header custom-nopato text-white text-left">
-        <h5>DIGESTIVO</h5>
-    </div>
-    <div class="card-body bg-light">
-        <div class="row">
-
-            <!-- Columna derecha con el textarea -->
-           
-            <div class="form-group">
-                    <?= Html::label('Digestivo', 'desc_digestivo') ?>
-                    <?= Html::textarea('InterrogatorioMedico[desc_digestivo]', $InterrogatorioMedico->desc_digestivo, ['class' => 'form-control', 'rows' => 5]) ?>
-                </div>
-            
-        </div>
-        <div class="alert alert-white custom-alert" role="alert">
-                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Apetito, masticación, disfagia, pirosis, regurgitación, distención abdominal, dolor, vomito, hematemesis, evacuaciones diarreicas, melena, pujo y tenesmo,  constipación, ictericia, intolerancia a alimentos. </div>
-    </div>
-
-            </div>
-            <div class="card">
-    <div class="card-header custom-nopato text-white text-left">
-        <h5>ENDOCRINO</h5>
-    </div>
-    <div class="card-body bg-light">
-        <div class="row">
-
-            <!-- Columna derecha con el textarea -->
-           
-            <div class="form-group">
-                    <?= Html::label('Endocrino', 'desc_endocrino') ?>
-                    <?= Html::textarea('InterrogatorioMedico[desc_endocrino]', $InterrogatorioMedico->desc_endocrino, ['class' => 'form-control', 'rows' => 5]) ?>
-                </div>
-            
-        </div>
-        <div class="alert alert-white custom-alert" role="alert">
-                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Crecimiento y estatura, perturbaciones somaticas, caracteres sexuales, sensibilidad al calor y al frio y faneras, exoftalmos,diabetes, acne. </div>
-    </div>
-
-            </div>
-
-
-            <div class="card">
-    <div class="card-header custom-nopato text-white text-left">
-        <h5>HEMOLINFATICO</h5>
-    </div>
-    <div class="card-body bg-light">
-        <div class="row">
-
-            <!-- Columna derecha con el textarea -->
-           
-            <div class="form-group">
-                    <?= Html::label('Hemolinfatico', 'desc_hemolinfatico') ?>
-                    <?= Html::textarea('InterrogatorioMedico[desc_hemolinfatico]', $InterrogatorioMedico->desc_hemolinfatico, ['class' => 'form-control', 'rows' => 5]) ?>
-                </div>
-            
-        </div>
-        <div class="alert alert-white custom-alert" role="alert">
-                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Anemias, hemolisis, tendencia a hemorragia, adenopatias, menor resistencia a infecciones. </div>
-    </div>
-
-            </div>
-
-            <div class="card">
-    <div class="card-header custom-nopato text-white text-left">
-        <h5>MAMAS</h5>
-    </div>
-    <div class="card-body bg-light">
-        <div class="row">
-
-            <!-- Columna derecha con el textarea -->
-           
-            <div class="form-group">
-                    <?= Html::label('Mamas', 'desc_mamas') ?>
-                    <?= Html::textarea('InterrogatorioMedico[desc_mamas]', $InterrogatorioMedico->desc_mamas, ['class' => 'form-control', 'rows' => 5]) ?>
-                </div>
-            
-        </div>
-        <div class="alert alert-white custom-alert" role="alert">
-                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Sin descripción. </div>
-    </div>
-
-            </div>
-<!-- aqui -->
-<div class="card">
-    <div class="card-header custom-nopato text-white text-left">
-        <h5>MUSCULO-ESQUELETICO</h5>
-    </div>
-    <div class="card-body bg-light">
-        <div class="row">
-
-            <!-- Columna derecha con el textarea -->
-           
-            <div class="form-group">
-                    <?= Html::label('Musculo-Esqueletico', 'desc_musculo_esqueletico') ?>
-                    <?= Html::textarea('InterrogatorioMedico[desc_musculo_esqueletico]', $InterrogatorioMedico->desc_musculo_esqueletico, ['class' => 'form-control', 'rows' => 5]) ?>
-                </div>
-            
-        </div>
-        <div class="alert alert-white custom-alert" role="alert">
-                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Deformidades oseas, limitacion de movimientos, algias, atrofias. </div>
-    </div>
-
-            </div>
-
-            <div class="card">
-    <div class="card-header custom-nopato text-white text-left">
-        <h5>PIEL Y ANEXOS</h5>
-    </div>
-    <div class="card-body bg-light">
-        <div class="row">
-
-            <!-- Columna derecha con el textarea -->
-           
-            <div class="form-group">
-                    <?= Html::label('Piel y Anexos', 'desc_piel_anexos') ?>
-                    <?= Html::textarea('InterrogatorioMedico[desc_piel_anexos]', $InterrogatorioMedico->desc_piel_anexos, ['class' => 'form-control', 'rows' => 5]) ?>
-                </div>
-            
-        </div>
-        <div class="alert alert-white custom-alert" role="alert">
-                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Mucosas, piel, pelo, unas, prurito, cambios de coloracion, alopecia, erupciones, infestaciones, micosis. </div>
-    </div>
-
-            </div>
-
-            <div class="card">
-    <div class="card-header custom-nopato text-white text-left">
-        <h5>REPRODUCTOR</h5>
-    </div>
-    <div class="card-body bg-light">
-        <div class="row">
-
-            <!-- Columna derecha con el textarea -->
-           
-            <div class="form-group">
-                    <?= Html::label('Reproductor', 'desc_reproductor') ?>
-                    <?= Html::textarea('InterrogatorioMedico[desc_reproductor]', $InterrogatorioMedico->desc_reproductor, ['class' => 'form-control', 'rows' => 5]) ?>
-                </div>
-            
-        </div>
-        <div class="alert alert-white custom-alert" role="alert">
-                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Alteraciones menstruales, dolor pelvico, colporrea patologica, alteraciones de la libido, patologia obstetrica. Alteraciones testiculares, trastornos en la ereccion y/o eyaculacion, alteraciones de la libido. </div>
-    </div>
-
-            </div>
-
-            
-            <div class="card">
-    <div class="card-header custom-nopato text-white text-left">
-        <h5>RESPIRATORIO</h5>
-    </div>
-    <div class="card-body bg-light">
-        <div class="row">
-
-            <!-- Columna derecha con el textarea -->
-           
-            <div class="form-group">
-                    <?= Html::label('Respiratorio', 'desc_respiratorio') ?>
-                    <?= Html::textarea('InterrogatorioMedico[desc_respiratorio]', $InterrogatorioMedico->desc_respiratorio, ['class' => 'form-control', 'rows' => 5]) ?>
-                </div>
-            
-        </div>
-        <div class="alert alert-white custom-alert" role="alert">
-                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Obstuccion nasal, disfonia, tos, dolor, expectoracion, disnea, cianosis, hemoptisis. </div>
-    </div>
-
-            </div>
-
-            <div class="card">
-    <div class="card-header custom-nopato text-white text-left">
-        <h5>SISTEMA NERVIOSO</h5>
-    </div>
-    <div class="card-body bg-light">
-        <div class="row">
-
-            <!-- Columna derecha con el textarea -->
-           
-            <div class="form-group">
-                    <?= Html::label('Sistema Nervioso', 'desc_sistema_nervioso') ?>
-                    <?= Html::textarea('InterrogatorioMedico[desc_sistema_nervioso]', $InterrogatorioMedico->desc_sistema_nervioso, ['class' => 'form-control', 'rows' => 5]) ?>
-                </div>
-            
-        </div>
-        <div class="alert alert-white custom-alert" role="alert">
-                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Perdida del conocimiento, paralisis, paresias, temblores, coordinacion, convulsiones atrofias, hipo o hiperestesias, cefaleas, algias, vision, audicion, equilibrio, olfato, gusto, sueno, alteraciones de la personalidad, depresion, compulsion, exitacion, atencion, atencion, memoria, cambios en la conducta, afectividad, nerviosismo, angustia. </div>
-    </div>
-
-            </div>
-
-            <div class="card">
-    <div class="card-header custom-nopato text-white text-left">
-        <h5>SISTEMAS GENERALES</h5>
-    </div>
-    <div class="card-body bg-light">
-        <div class="row">
-
-            <!-- Columna derecha con el textarea -->
-           
-            <div class="form-group">
-                    <?= Html::label('Sistemas Generales', 'desc_sistemas_generales') ?>
-                    <?= Html::textarea('InterrogatorioMedico[desc_sistemas_generales]', $InterrogatorioMedico->desc_sistemas_generales, ['class' => 'form-control', 'rows' => 5]) ?>
-                </div>
-            
-        </div>
-        <div class="alert alert-white custom-alert" role="alert">
-                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Fiebre, escalofrio, diaforesis, astenia, adinamia, anorexia y variaciones de peso. </div>
-    </div>
-
-            </div>
-
-            <div class="card">
-    <div class="card-header custom-nopato text-white text-left">
-        <h5>URINARIO</h5>
-    </div>
-    <div class="card-body bg-light">
-        <div class="row">
-
-            <!-- Columna derecha con el textarea -->
-           
-            <div class="form-group">
-                    <?= Html::label('Urinario', 'desc_urinario') ?>
-                    <?= Html::textarea('InterrogatorioMedico[desc_urinario]', $InterrogatorioMedico->desc_urinario, ['class' => 'form-control', 'rows' => 5]) ?>
-                </div>
-            
-        </div>
-        <div class="alert alert-white custom-alert" role="alert">
-                <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Disuria, polaquiuria, tenesmo vesical, hematuria piuria, incontinencia, dolor lumbar, expulsion de calculos, secrecion uretral. </div>
-    </div>
-
-            </div>
-
-            </div>
-        </div>
-    </div>
-</div>
-</div>
-<?php ActiveForm::end(); ?>
-
-<?php $this->endBlock(); ?>
+                            <?php $form = ActiveForm::begin(['action' => ['exploracion-fisica', 'id' => $model->id]]); ?>
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <div class="card">
+                                        <div class="card-header gradient-blue text-white text-center">
+                                            <h2>Exploracion Fisica</h2>
+                                            <div class="float-submit-btn">
+                                                <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="container">
+
+                                                <div class="card">
+                                                    <div class="card-header custom-nopato text-white text-left">
+                                                        <h5>HABITUS EXTERIOR</h5>
+                                                    </div>
+                                                    <div class="card-body bg-light">
+                                                        <div class="row">
+
+                                                            <!-- Columna derecha con el textarea -->
+
+                                                            <div class="form-group">
+                                                                <?= Html::label('Habitus Exterior', 'desc_habitus_exterior') ?>
+                                                                <?= Html::textarea('ExploracionFisica[desc_habitus_exterior]', $ExploracionFisica->desc_habitus_exterior, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="alert alert-white custom-alert" role="alert">
+                                                            <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i> Edad aparente, biotipo, estado de conciencia, orientación en tiempo, espacio y persona, facies, postura, marcha, movimientos anormales, estado y color de tegumentos, actitud.
+                                                        </div>
+                                                    </div>
+
+
+
+
+                                                </div>
+                                                <div class="card">
+                                                    <div class="card-header custom-nopato text-white text-left">
+                                                        <h5>CABEZA</h5>
+                                                    </div>
+                                                    <div class="card-body bg-light">
+                                                        <div class="row">
+
+                                                            <!-- Columna derecha con el textarea -->
+
+                                                            <div class="form-group">
+                                                                <?= Html::label('Cabeza y Cara', 'desc_cabeza') ?>
+                                                                <?= Html::textarea('ExploracionFisica[desc_cabeza]', $ExploracionFisica->desc_cabeza, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="alert alert-white custom-alert" role="alert">
+                                                            <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i> Craneo: tipo, forma, volumen, cabello, exostosis, hundimientos, fontanelas.
+
+                                                            Cara: tinte ojos, reflejos pupilares,fondo de ojos, conjuntivas, cornea.
+
+                                                            Nariz: obstruccion, mucosa. Boca: desviacion de las comisuras, aliento, labios y paladar.
+
+                                                            Oidos: conducto auditivo, y timpano.
+
+                                                            Faringe: uvula, secreciones, amigdalas, adenoides.
+                                                        </div>
+                                                    </div>
+
+
+
+
+                                                </div>
+
+
+                                                <div class="card">
+                                                    <div class="card-header custom-nopato text-white text-left">
+                                                        <h5>CUELLO</h5>
+
+                                                    </div>
+                                                    <div class="card-body bg-light">
+                                                        <div class="row">
+
+                                                            <!-- Columna derecha con el textarea -->
+
+                                                            <div class="form-group">
+                                                                <?= Html::label('Cuello', 'desc_cuello') ?>
+                                                                <?= Html::textarea('ExploracionFisica[desc_cuello]', $ExploracionFisica->desc_cuello, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="alert alert-white custom-alert" role="alert">
+                                                            <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i> Forma, movilidad, contracturas; arterias: pulsos, soplos venosos, fremitos. Traquea, tiroides, cadenas linfaticas, huecos supraclaviculares.
+                                                        </div>
+                                                    </div>
+
+
+
+
+                                                </div>
+
+
+                                                <div class="card">
+                                                    <div class="card-header custom-nopato text-white text-left">
+                                                        <h5>TORAX</h5>
+
+                                                    </div>
+                                                    <div class="card-body bg-light">
+                                                        <div class="row">
+
+                                                            <!-- Columna derecha con el textarea -->
+
+                                                            <div class="form-group">
+                                                                <?= Html::label('Torax', 'desc_torax') ?>
+                                                                <?= Html::textarea('ExploracionFisica[desc_torax]', $ExploracionFisica->desc_torax, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="alert alert-white custom-alert" role="alert">
+                                                            <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i> Inspección, forma, volumen, simetría, tiros, red venosa y puntos dolorosos, campos pulmonares, movimientos de amplexion y amplexacion, vibraciones vocales, ganglios satélites y nodulos.
+                                                        </div>
+                                                    </div>
+
+
+
+
+                                                </div>
+
+                                                <div class="card">
+                                                    <div class="card-header custom-nopato text-white text-left">
+                                                        <h5>ABDOMEN</h5>
+
+                                                    </div>
+                                                    <div class="card-body bg-light">
+                                                        <div class="row">
+
+                                                            <!-- Columna derecha con el textarea -->
+
+                                                            <div class="form-group">
+                                                                <?= Html::label('Abdomen', 'desc_torax') ?>
+                                                                <?= Html::textarea('ExploracionFisica[desc_abdomen]', $ExploracionFisica->desc_abdomen, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="alert alert-white custom-alert" role="alert">
+                                                            <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>
+                                                        </div>
+                                                    </div>
+
+
+
+
+                                                </div>
+
+                                                <div class="card">
+                                                    <div class="card-header custom-nopato text-white text-left">
+                                                        <h5>EXPLORACIÓN GINECOLOGICA</h5>
+
+                                                    </div>
+                                                    <div class="card-body bg-light">
+                                                        <div class="row">
+
+                                                            <!-- Columna derecha con el textarea -->
+
+                                                            <div class="form-group">
+                                                                <?= Html::label('Exploración Ginecologica', 'desc_exploración_ginecologica') ?>
+                                                                <?= Html::textarea('ExploracionFisica[desc_exploración_ginecologica]', $ExploracionFisica->desc_exploración_ginecologica, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="alert alert-white custom-alert" role="alert">
+                                                            <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i> Exploracion Manual: utero, forma, tamaño, volumen, posicion, consistencia, masas tumorales, fondos de saco y adeherencias.
+                                                        </div>
+                                                    </div>
+
+
+
+
+                                                </div>
+
+                                                <div class="card">
+                                                    <div class="card-header custom-nopato text-white text-left">
+                                                        <h5>EXPLORACIÓN DE GENITALES</h5>
+
+                                                    </div>
+                                                    <div class="card-body bg-light">
+                                                        <div class="row">
+
+                                                            <!-- Columna derecha con el textarea -->
+
+                                                            <div class="form-group">
+                                                                <?= Html::label('Exploración Genitales', 'desc_genitales') ?>
+                                                                <?= Html::textarea('ExploracionFisica[desc_genitales]', $ExploracionFisica->desc_genitales, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="alert alert-white custom-alert" role="alert">
+                                                            <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i> Inspeccion, madurez, tacto vaginal, tacto rectal, secreciones, vesiculas, y ulceras, verrugas, condilomas u otras lesiones.
+                                                        </div>
+                                                    </div>
+
+
+
+
+                                                </div>
+
+
+                                                <div class="card">
+                                                    <div class="card-header custom-nopato text-white text-left">
+                                                        <h5>COLUMNA VERTEBRAL</h5>
+
+                                                    </div>
+                                                    <div class="card-body bg-light">
+                                                        <div class="row">
+
+                                                            <!-- Columna derecha con el textarea -->
+
+                                                            <div class="form-group">
+                                                                <?= Html::label('Columna Vertebral', 'desc_columna_vertebral') ?>
+                                                                <?= Html::textarea('ExploracionFisica[desc_columna_vertebral]', $ExploracionFisica->desc_columna_vertebral, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="alert alert-white custom-alert" role="alert">
+                                                            <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i> Inspección, posición, dolor, deformaciones, disfunción, alineación, función, simetría, movimiento, flexión, extensión, rotación y lateralidad, curvaturas, lordosis, cifosis, escoliosis, masas musculares, lesiones cutáneas.
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+
+                                                <div class="card">
+                                                    <div class="card-header custom-nopato text-white text-left">
+                                                        <h5>EXTREMIDADES</h5>
+
+                                                    </div>
+                                                    <div class="card-body bg-light">
+                                                        <div class="row">
+
+                                                            <!-- Columna derecha con el textarea -->
+
+                                                            <div class="form-group">
+                                                                <?= Html::label('Extremidades', 'desc_extremidades') ?>
+                                                                <?= Html::textarea('ExploracionFisica[desc_extremidades]', $ExploracionFisica->desc_extremidades, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="alert alert-white custom-alert" role="alert">
+                                                            <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i> Forma, volumen, piel, unas, dedos, articulaciones, tono, fuerza, reflejos tendinosos, movimientos, pulsos arteriales, simetría, amplitud, frecuencia, ritmo, arcos de movilidad, varices, ulceras, flebitis, micosis, marcha, edemas, reflejos: rotuliano, aquiliano y plantar.
+                                                        </div>
+                                                    </div>
+
+
+
+
+                                                </div>
+
+                                                <div class="card">
+                                                    <div class="card-header custom-nopato text-white text-left">
+                                                        <h5>EXPLORACIÓN NEUROLOGICA</h5>
+
+                                                    </div>
+                                                    <div class="card-body bg-light">
+                                                        <div class="row">
+
+                                                            <!-- Columna derecha con el textarea -->
+
+                                                            <div class="form-group">
+                                                                <?= Html::label('Exploración Neurologica', 'desc_exploracion_neurologica') ?>
+                                                                <?= Html::textarea('ExploracionFisica[desc_exploracion_neurologica]', $ExploracionFisica->desc_exploracion_neurologica, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="alert alert-white custom-alert" role="alert">
+                                                            <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i> Razonamiento, atencion, memoria, ansiedad, depresion, alucinaciones, postura corporal, funciones motoras, movimientos corporales voluntarios e involuntarios, paresias, paralisis, marcha, equilibrio, pares craneales, funcion sensorial.
+                                                        </div>
+                                                    </div>
+
+
+
+
+                                                </div>
+
+
+
+
+
+
+
+
+
+
+
+
+                                                <br>
+
+
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php ActiveForm::end(); ?>
+
+                            <?php $this->endBlock(); ?>
+
+
+                            <?php $this->beginBlock('interrogatorio_medico'); ?>
+
+
+                            <?php $form = ActiveForm::begin(['action' => ['interrogatorio-medico', 'id' => $model->id]]); ?>
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <div class="card">
+                                        <div class="card-header gradient-blue text-white text-center">
+                                            <h2>Interrogatorio Medico</h2>
+                                            <div class="float-submit-btn">
+                                                <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="container">
+
+                                                <div class="card">
+                                                    <div class="card-header custom-nopato text-white text-left">
+                                                        <h5>CARDIOVASCULAR</h5>
+                                                    </div>
+                                                    <div class="card-body bg-light">
+                                                        <div class="row">
+
+                                                            <!-- Columna derecha con el textarea -->
+
+                                                            <div class="form-group">
+                                                                <?= Html::label('Cardiovascular', 'desc_cardiovascular') ?>
+                                                                <?= Html::textarea('InterrogatorioMedico[desc_cardiovascular]', $InterrogatorioMedico->desc_cardiovascular, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="alert alert-white custom-alert" role="alert">
+                                                            <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Antecedentes de cardiopatías, disnea, tos, hemoptisis, bronquitis frecuente, lipotimias, vértigos, insuficiencia arterial y venosa, sincope, fatiga, palpitaciones, dolor precordial, encuclillamiento, edemas, ascitis, cianosis, estasis venosa, varices.
+                                                        </div>
+                                                    </div>
+
+
+
+
+                                                </div>
+
+                                                <div class="card">
+                                                    <div class="card-header custom-nopato text-white text-left">
+                                                        <h5>DIGESTIVO</h5>
+                                                    </div>
+                                                    <div class="card-body bg-light">
+                                                        <div class="row">
+
+                                                            <!-- Columna derecha con el textarea -->
+
+                                                            <div class="form-group">
+                                                                <?= Html::label('Digestivo', 'desc_digestivo') ?>
+                                                                <?= Html::textarea('InterrogatorioMedico[desc_digestivo]', $InterrogatorioMedico->desc_digestivo, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="alert alert-white custom-alert" role="alert">
+                                                            <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Apetito, masticación, disfagia, pirosis, regurgitación, distención abdominal, dolor, vomito, hematemesis, evacuaciones diarreicas, melena, pujo y tenesmo, constipación, ictericia, intolerancia a alimentos.
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <div class="card">
+                                                    <div class="card-header custom-nopato text-white text-left">
+                                                        <h5>ENDOCRINO</h5>
+                                                    </div>
+                                                    <div class="card-body bg-light">
+                                                        <div class="row">
+
+                                                            <!-- Columna derecha con el textarea -->
+
+                                                            <div class="form-group">
+                                                                <?= Html::label('Endocrino', 'desc_endocrino') ?>
+                                                                <?= Html::textarea('InterrogatorioMedico[desc_endocrino]', $InterrogatorioMedico->desc_endocrino, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="alert alert-white custom-alert" role="alert">
+                                                            <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Crecimiento y estatura, perturbaciones somaticas, caracteres sexuales, sensibilidad al calor y al frio y faneras, exoftalmos,diabetes, acne.
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+
+                                                <div class="card">
+                                                    <div class="card-header custom-nopato text-white text-left">
+                                                        <h5>HEMOLINFATICO</h5>
+                                                    </div>
+                                                    <div class="card-body bg-light">
+                                                        <div class="row">
+
+                                                            <!-- Columna derecha con el textarea -->
+
+                                                            <div class="form-group">
+                                                                <?= Html::label('Hemolinfatico', 'desc_hemolinfatico') ?>
+                                                                <?= Html::textarea('InterrogatorioMedico[desc_hemolinfatico]', $InterrogatorioMedico->desc_hemolinfatico, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="alert alert-white custom-alert" role="alert">
+                                                            <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Anemias, hemolisis, tendencia a hemorragia, adenopatias, menor resistencia a infecciones.
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+                                                <div class="card">
+                                                    <div class="card-header custom-nopato text-white text-left">
+                                                        <h5>MAMAS</h5>
+                                                    </div>
+                                                    <div class="card-body bg-light">
+                                                        <div class="row">
+
+                                                            <!-- Columna derecha con el textarea -->
+
+                                                            <div class="form-group">
+                                                                <?= Html::label('Mamas', 'desc_mamas') ?>
+                                                                <?= Html::textarea('InterrogatorioMedico[desc_mamas]', $InterrogatorioMedico->desc_mamas, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="alert alert-white custom-alert" role="alert">
+                                                            <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Sin descripción.
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <!-- aqui -->
+                                                <div class="card">
+                                                    <div class="card-header custom-nopato text-white text-left">
+                                                        <h5>MUSCULO-ESQUELETICO</h5>
+                                                    </div>
+                                                    <div class="card-body bg-light">
+                                                        <div class="row">
+
+                                                            <!-- Columna derecha con el textarea -->
+
+                                                            <div class="form-group">
+                                                                <?= Html::label('Musculo-Esqueletico', 'desc_musculo_esqueletico') ?>
+                                                                <?= Html::textarea('InterrogatorioMedico[desc_musculo_esqueletico]', $InterrogatorioMedico->desc_musculo_esqueletico, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="alert alert-white custom-alert" role="alert">
+                                                            <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Deformidades oseas, limitacion de movimientos, algias, atrofias.
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+                                                <div class="card">
+                                                    <div class="card-header custom-nopato text-white text-left">
+                                                        <h5>PIEL Y ANEXOS</h5>
+                                                    </div>
+                                                    <div class="card-body bg-light">
+                                                        <div class="row">
+
+                                                            <!-- Columna derecha con el textarea -->
+
+                                                            <div class="form-group">
+                                                                <?= Html::label('Piel y Anexos', 'desc_piel_anexos') ?>
+                                                                <?= Html::textarea('InterrogatorioMedico[desc_piel_anexos]', $InterrogatorioMedico->desc_piel_anexos, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="alert alert-white custom-alert" role="alert">
+                                                            <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Mucosas, piel, pelo, unas, prurito, cambios de coloracion, alopecia, erupciones, infestaciones, micosis.
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+                                                <div class="card">
+                                                    <div class="card-header custom-nopato text-white text-left">
+                                                        <h5>REPRODUCTOR</h5>
+                                                    </div>
+                                                    <div class="card-body bg-light">
+                                                        <div class="row">
+
+                                                            <!-- Columna derecha con el textarea -->
+
+                                                            <div class="form-group">
+                                                                <?= Html::label('Reproductor', 'desc_reproductor') ?>
+                                                                <?= Html::textarea('InterrogatorioMedico[desc_reproductor]', $InterrogatorioMedico->desc_reproductor, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="alert alert-white custom-alert" role="alert">
+                                                            <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Alteraciones menstruales, dolor pelvico, colporrea patologica, alteraciones de la libido, patologia obstetrica. Alteraciones testiculares, trastornos en la ereccion y/o eyaculacion, alteraciones de la libido.
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+
+                                                <div class="card">
+                                                    <div class="card-header custom-nopato text-white text-left">
+                                                        <h5>RESPIRATORIO</h5>
+                                                    </div>
+                                                    <div class="card-body bg-light">
+                                                        <div class="row">
+
+                                                            <!-- Columna derecha con el textarea -->
+
+                                                            <div class="form-group">
+                                                                <?= Html::label('Respiratorio', 'desc_respiratorio') ?>
+                                                                <?= Html::textarea('InterrogatorioMedico[desc_respiratorio]', $InterrogatorioMedico->desc_respiratorio, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="alert alert-white custom-alert" role="alert">
+                                                            <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Obstuccion nasal, disfonia, tos, dolor, expectoracion, disnea, cianosis, hemoptisis.
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+                                                <div class="card">
+                                                    <div class="card-header custom-nopato text-white text-left">
+                                                        <h5>SISTEMA NERVIOSO</h5>
+                                                    </div>
+                                                    <div class="card-body bg-light">
+                                                        <div class="row">
+
+                                                            <!-- Columna derecha con el textarea -->
+
+                                                            <div class="form-group">
+                                                                <?= Html::label('Sistema Nervioso', 'desc_sistema_nervioso') ?>
+                                                                <?= Html::textarea('InterrogatorioMedico[desc_sistema_nervioso]', $InterrogatorioMedico->desc_sistema_nervioso, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="alert alert-white custom-alert" role="alert">
+                                                            <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Perdida del conocimiento, paralisis, paresias, temblores, coordinacion, convulsiones atrofias, hipo o hiperestesias, cefaleas, algias, vision, audicion, equilibrio, olfato, gusto, sueno, alteraciones de la personalidad, depresion, compulsion, exitacion, atencion, atencion, memoria, cambios en la conducta, afectividad, nerviosismo, angustia.
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+                                                <div class="card">
+                                                    <div class="card-header custom-nopato text-white text-left">
+                                                        <h5>SISTEMAS GENERALES</h5>
+                                                    </div>
+                                                    <div class="card-body bg-light">
+                                                        <div class="row">
+
+                                                            <!-- Columna derecha con el textarea -->
+
+                                                            <div class="form-group">
+                                                                <?= Html::label('Sistemas Generales', 'desc_sistemas_generales') ?>
+                                                                <?= Html::textarea('InterrogatorioMedico[desc_sistemas_generales]', $InterrogatorioMedico->desc_sistemas_generales, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="alert alert-white custom-alert" role="alert">
+                                                            <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Fiebre, escalofrio, diaforesis, astenia, adinamia, anorexia y variaciones de peso.
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+                                                <div class="card">
+                                                    <div class="card-header custom-nopato text-white text-left">
+                                                        <h5>URINARIO</h5>
+                                                    </div>
+                                                    <div class="card-body bg-light">
+                                                        <div class="row">
+
+                                                            <!-- Columna derecha con el textarea -->
+
+                                                            <div class="form-group">
+                                                                <?= Html::label('Urinario', 'desc_urinario') ?>
+                                                                <?= Html::textarea('InterrogatorioMedico[desc_urinario]', $InterrogatorioMedico->desc_urinario, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="alert alert-white custom-alert" role="alert">
+                                                            <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Disuria, polaquiuria, tenesmo vesical, hematuria piuria, incontinencia, dolor lumbar, expulsion de calculos, secrecion uretral.
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php ActiveForm::end(); ?>
+
+                            <?php $this->endBlock(); ?>
 
 
 
                             <br><br>
                             <?php echo TabsX::widget([
-                                
-                            'enableStickyTabs' => true,
-                            'options' => ['class' => 'nav-tabs-custom'],
-                            'items' => [
-                                [
-                                    'label' => 'Antecedentes',
-                                    'content' => $this->blocks['antecedentes'],
-                                   // 'active' => true,
-                                    'options' => [
-                                        'id' => 'antecedentes',
+
+                                'enableStickyTabs' => true,
+                                'options' => ['class' => 'nav-tabs-custom'],
+                                'items' => [
+                                    [
+                                        'label' => 'Antecedentes',
+                                        'content' => $this->blocks['antecedentes'],
+                                        // 'active' => true,
+                                        'options' => [
+                                            'id' => 'antecedentes',
+                                        ],
+
+
+                                    ],
+                                    [
+                                        'label' => 'Exploracion Fisica',
+                                        'content' => $this->blocks['exploracion_fisica'],
+                                        // 'active' => true,
+                                        'options' => [
+                                            'id' => 'exploracion_fisica',
+                                        ],
+
+
+                                    ],
+                                    [
+                                        'label' => 'Interrogatorio Medico',
+                                        'content' => $this->blocks['interrogatorio_medico'],
+                                        // 'active' => true,
+                                        'options' => [
+                                            'id' => 'interrogatorio_medico',
+                                        ],
+
+
                                     ],
 
 
-                                ],
-                                [
-                                    'label' => 'Exploracion Fisica',
-                                    'content' => $this->blocks['exploracion_fisica'],
-                                   // 'active' => true,
-                                    'options' => [
-                                        'id' => 'exploracion_fisica',
-                                    ],
+
 
 
                                 ],
-                                [
-                                    'label' => 'Interrogatorio Medico',
-                                    'content' => $this->blocks['interrogatorio_medico'],
-                                   // 'active' => true,
-                                    'options' => [
-                                        'id' => 'interrogatorio_medico',
-                                    ],
+                                'position' => TabsX::POS_ABOVE,
+                                'align' => TabsX::ALIGN_LEFT,
+                                //     'bordered'=>true,
+                                'encodeLabels' => false
 
 
-                                ],
-                               
-                           
-                              
-                               
+                            ]);
 
-                            ],
-                           'position' => TabsX::POS_ABOVE,
-                           'align' => TabsX::ALIGN_LEFT,
-                       //     'bordered'=>true,
-                            'encodeLabels' => false
-
-
-                        ]);
-
-                        ?>
+                            ?>
 
 
 
                             <?php $this->endBlock(); ?>
 
-<!-- antecedentes-->
+                            <!-- antecedentes-->
 
 
                             <?php $this->endBlock(); ?>
@@ -3124,7 +3470,7 @@ Faringe: uvula, secreciones, amigdalas, adenoides.
                                 [
                                     'label' => 'Información',
                                     'content' => $this->blocks['datos'],
-                                 //   'active' => true,
+                                    //   'active' => true,
                                     'options' => [
                                         'id' => 'datos',
                                     ],
@@ -3152,8 +3498,8 @@ Faringe: uvula, secreciones, amigdalas, adenoides.
 
                             ],
                             'position' => TabsX::POS_ABOVE,
-                         'align' => TabsX::ALIGN_LEFT,
-                         //   'bordered'=>true,
+                            'align' => TabsX::ALIGN_LEFT,
+                            //   'bordered'=>true,
                             'encodeLabels' => false
 
 

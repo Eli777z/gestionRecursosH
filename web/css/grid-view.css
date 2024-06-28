@@ -65,3 +65,9 @@
 .float-submit-btn i {
     font-size: 24px;
 }
+
+.bg-azulin{
+    background: rgb(163,248,255);
+    background: linear-gradient(90deg, rgba(163,248,255,1) 0%, rgba(177,249,255,1) 35%, rgba(230,253,255,1) 100%);
+
+}

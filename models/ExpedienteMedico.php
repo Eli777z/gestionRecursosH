@@ -19,6 +19,8 @@ use Yii;
  * @property int|null $empleado_id
  * @property int|null $exploracion_fisica_id
  * @property int|null $interrogatorio_medico_id
+  * @property int|null $antecedente_perinatal_id
+
 
 
  * @property AntecedenteHereditario $antecedenteHereditario
@@ -32,6 +34,8 @@ use Yii;
  * @property InterrogatorioMedico[] $interrogatorioMedicos
   * @property ExploracionFisica $exploracionFisica
  * @property ExploracionFisica[] $exploracionFisicas
+  * @property AntecedentePerinatal $antecedentePerinatal
+ * @property AntecedentePerinatal[] $antecedentePerinatals
  */
 class ExpedienteMedico extends \yii\db\ActiveRecord
 {
@@ -58,6 +62,7 @@ class ExpedienteMedico extends \yii\db\ActiveRecord
             [['empleado_id'], 'exist', 'skipOnError' => true, 'targetClass' => Empleado::class, 'targetAttribute' => ['empleado_id' => 'id']],
             [['exploracion_fisica_id'], 'exist', 'skipOnError' => true, 'targetClass' => ExploracionFisica::class, 'targetAttribute' => ['exploracion_fisica_id' => 'id']],
             [['interrogatorio_medico_id'], 'exist', 'skipOnError' => true, 'targetClass' => InterrogatorioMedico::class, 'targetAttribute' => ['interrogatorio_medico_id' => 'id']],
+            [['antecedente_perinatal_id'], 'exist', 'skipOnError' => true, 'targetClass' => AntecedentePerinatal::class, 'targetAttribute' => ['antecedente_perinatal_id' => 'id']],
 
         ];
     }
@@ -80,6 +85,8 @@ class ExpedienteMedico extends \yii\db\ActiveRecord
             'empleado_id' => 'Empleado ID',
             'exploracion_fisica_id' => 'Exploracion Fisica ID',
             'interrogatorio_medico_id' => 'Interrogatorio Medico ID',
+            'antecedente_perinatal_id' => 'Antecedente Perinatal ID',
+
 
         ];
     }
@@ -188,6 +195,22 @@ class ExpedienteMedico extends \yii\db\ActiveRecord
     public function getInterrogatorioMedicos()
     {
         return $this->hasMany(InterrogatorioMedico::class, ['expediente_medico_id' => 'id']);
+    }
+
+
+    public function getAntecedentePerinatal()
+    {
+        return $this->hasOne(AntecedentePerinatal::class, ['id' => 'antecedente_perinatal_id']);
+    }
+
+    /**
+     * Gets query for [[AntecedentePerinatals]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAntecedentePerinatals()
+    {
+        return $this->hasMany(AntecedentePerinatal::class, ['expediente_medico_id' => 'id']);
     }
 
     

@@ -96,23 +96,7 @@ use floor12\summernote\Summernote;
 
 
 
-<?= $form->field($motivoFechaPermisoModel, 'motivo')->widget(Summernote::class, [
-    'options' => ['rows' => 4],
-    'clientOptions' => [
-        'height' => 120,  // altura del editor
-        'toolbar' => [
-            ['style', ['style']],
-            ['font', ['bold', 'italic', 'underline', 'clear']],
-            ['fontname', ['fontname']],
-            ['color', ['color']],
-            ['para', ['ul', 'ol', 'paragraph']],
-            ['height', ['height']],
-            ['table', ['table']],
-            ['insert', ['link', 'picture', 'video']],
-            ['view', ['fullscreen', 'codeview', 'help']],
-        ],
-    ],
-]) ?>
+<?= $form->field($motivoFechaPermisoModel, 'motivo')->textarea(['rows' => 4]) ?>
 
 
     <?php
@@ -157,7 +141,7 @@ use floor12\summernote\Summernote;
         <?= $form->field($model, 'nombre_jefe_departamento')->hiddenInput()->label(false) ?>
     <?php endif; ?>
 
-    <?= Html::submitButton('Solicitar  autorización <i class="fa fa-paper-plane fa-md"></i>', [
+    <?= Html::submitButton('Generar <i class="fa fa-check"></i>', [
                         'class' => 'btn btn-success btn-lg float-right', 
                         'id' => 'save-button-personal'
                     ]) ?>

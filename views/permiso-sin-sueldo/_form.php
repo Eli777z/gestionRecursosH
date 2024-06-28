@@ -141,7 +141,7 @@ use hail812\adminlte\widgets\Alert;
         <?= $form->field($model, 'nombre_jefe_departamento')->hiddenInput()->label(false) ?>
     <?php endif; ?>
 
-    <?= Html::submitButton('Solicitar  autorización <i class="fa fa-paper-plane fa-md"></i>', [
+    <?= Html::submitButton('Generar <i class="fa fa-check"></i>', [
                         'class' => 'btn btn-success btn-lg float-right', 
                         'id' => 'save-button-personal'
                     ]) ?>
