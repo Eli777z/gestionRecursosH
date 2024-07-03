@@ -5,8 +5,7 @@ use yii\helpers\Url;
 use app\models\Notificacion;
 
 
-$notificaciones = Notificacion::find()->where(['usuario_id' => Yii::$app->user->identity->id, 'leido' => 0])->orderBy(['created_at' => SORT_DESC])->all();
-$count = count($notificaciones);
+
 ?>
 <!-- Navbar -->
 <nav class="main-header navbar navbar-expand navbar-light ">
@@ -73,18 +72,12 @@ $count = count($notificaciones);
 <li class="nav-item dropdown">
     <a class="nav-link" data-toggle="dropdown" href="#">
         <i class="far fa-bell" style="color: #007bff;"></i>
-        <span class="badge badge-warning navbar-badge"><?= $count ?></span>
+        <span class="badge badge-warning navbar-badge"></span>
     </a>
     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-        <span class="dropdown-header"><?= $count ?> Notificaciones</span>
+        <span class="dropdown-header"> Notificaciones</span>
         <div class="dropdown-divider"></div>
-        <?php foreach ($notificaciones as $notificacion): ?>
-            <a href="#" class="dropdown-item">
-                <i class="fas fa-envelope mr-2"></i> <?= Html::encode($notificacion->mensaje) ?>
-                <span class="float-right text-muted text-sm"><?= Yii::$app->formatter->asRelativeTime($notificacion->created_at) ?></span>
-            </a>
-            <div class="dropdown-divider"></div>
-        <?php endforeach; ?>
+       
         <a href="<?= \yii\helpers\Url::to(['site/view-notificaciones']) ?>" class="dropdown-item dropdown-footer">Ver todas las notificaciones</a>
     </div>
 </li>

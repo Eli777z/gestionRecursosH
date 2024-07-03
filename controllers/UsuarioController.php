@@ -152,9 +152,12 @@ class UsuarioController extends Controller
 
         if (Usuario::isUserAdmin($userId)) {
             $redirectUrl = ['site/portalgestionrh'];
-        } else {
+        } elseif(Usuario::isUserSimple($userId)) {
             $redirectUrl = ['site/portalempleado'];
         }
+    elseif(Usuario::isUserMedico($userId)) {
+        $redirectUrl = ['site/portal-medico'];
+    }
 
         if ($user->nuevo != 4 && !Usuario::isUserAdmin($userId)) {
             return $this->redirect(['site/portalempleado']);

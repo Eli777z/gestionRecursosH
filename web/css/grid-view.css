@@ -1,11 +1,12 @@
 .no-style-gridview table {
-    border: none;
+    border-collapse: collapse;
     width: 100%;
     background-color: white;
 }
 
 .no-style-gridview th, .no-style-gridview td {
-    border: none;
+   
+    border-bottom: 5px solid #ddd; /* Línea horizontal inferior */
     padding: 8px;
     background-color: white;
 }

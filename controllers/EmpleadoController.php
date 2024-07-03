@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use app\models\Alergia;
+use app\models\AntecedenteGinecologico;
 use Yii;
 use app\models\Empleado;
 use app\models\EmpleadoSearch;
@@ -30,6 +32,7 @@ use app\models\CatAntecedenteHereditario;
 use app\models\AntecedenteHereditario;
 use app\models\AntecedentePatologico;
 use app\models\AntecedenteNoPatologico;
+use app\models\AntecedenteObstrectico;
 use app\models\AntecedentePerinatal;
 use app\models\ExploracionFisica;
 use app\models\InterrogatorioMedico;
@@ -98,17 +101,14 @@ class EmpleadoController extends Controller
     if (!$antecedentePatologico) {
         $antecedentePatologico = new AntecedentePatologico();
         $antecedentePatologico->expediente_medico_id = $expedienteMedico->id;
-        $antecedentePatologico->descripcion_antecedentes = ''; // Inicializar con un valor predeterminado si es necesario
-        if ($antecedentePatologico->save()) {
-            // Asignar el ID del nuevo AntecedentePatologico al ExpedienteMedico si es necesario
+        if (!$antecedentePatologico->save()) {
+            Yii::$app->session->setFlash('error', 'Hubo un error al crear el registro de antecedentes patológicos.');
+        }else{
+
             $expedienteMedico->antecedente_patologico_id = $antecedentePatologico->id;
             $expedienteMedico->save(false); // Guardar sin validaciones adicionales
-        } else {
-            Yii::$app->session->setFlash('error', 'Hubo un error al crear el registro de antecedentes patológicos.');
         }
     }
-    $descripcionAntecedentes = $antecedentePatologico->descripcion_antecedentes;
-
     // Obtener o crear el registro de antecedentes no patológicos
     $antecedenteNoPatologico = AntecedenteNoPatologico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
     if (!$antecedenteNoPatologico) {
@@ -166,6 +166,48 @@ class EmpleadoController extends Controller
         }
     }
 
+    $antecedenteGinecologico= AntecedenteGinecologico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+    if (!$antecedenteGinecologico) {
+        $antecedenteGinecologico = new AntecedenteGinecologico();
+        $antecedenteGinecologico->expediente_medico_id = $expedienteMedico->id;
+        if (!$antecedenteGinecologico->save()) {
+            Yii::$app->session->setFlash('error', 'Hubo un error al crear el registro de antecedentes ginecologicos.');
+        }else{
+
+            $expedienteMedico->antecedente_ginecologico_id = $antecedenteGinecologico->id;
+            $expedienteMedico->save(false); // Guardar sin validaciones adicionales
+        }
+    }
+
+
+    $antecedenteObstrectico= AntecedenteObstrectico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+    if (!$antecedenteObstrectico) {
+        $antecedenteObstrectico = new AntecedenteObstrectico();
+        $antecedenteObstrectico->expediente_medico_id = $expedienteMedico->id;
+        if (!$antecedenteObstrectico->save()) {
+            Yii::$app->session->setFlash('error', 'Hubo un error al crear el registro de antecedentes obstrecticos.');
+        }else{
+
+            $expedienteMedico->antecedente_obstrectico_id = $antecedenteObstrectico->id;
+            $expedienteMedico->save(false); // Guardar sin validaciones adicionales
+        }
+    }
+
+    $alergia= Alergia::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+    if (!$alergia) {
+        $alergia = new Alergia();
+        $alergia->expediente_medico_id = $expedienteMedico->id;
+        if (!$alergia->save()) {
+            Yii::$app->session->setFlash('error', 'Hubo un error al crear el registro de alergia.');
+        }else{
+
+            $expedienteMedico->alergia_id = $alergia->id;
+            $expedienteMedico->save(false); // Guardar sin validaciones adicionales
+        }
+    }
+
+
+
 
 
 
@@ -215,50 +257,46 @@ class EmpleadoController extends Controller
         'expedienteMedico' => $expedienteMedico,
         'antecedentes' => $antecedentes,
         'catAntecedentes' => $catAntecedentes,
-        'descripcionAntecedentes' => $descripcionAntecedentes,
+        
         'antecedenteNoPatologico' => $antecedenteNoPatologico, // Pasar el modelo a la vista
         'ExploracionFisica' => $exploracionFisica,
         'InterrogatorioMedico' => $interrogatorioMedico,
-        'AntecedentePerinatal' => $antecedentePerinatal
+        'AntecedentePerinatal' => $antecedentePerinatal,
+        'AntecedenteGinecologico' => $antecedenteGinecologico,
+        'AntecedenteObstrectico' => $antecedenteObstrectico,
+        'Alergia' => $alergia,
+        'antecedentePatologico' => $antecedentePatologico, // Pasar el modelo a la vista
+
     ]);
 }
 
-    public function actionPatologicos($id)
-    {
-        $modelEmpleado = $this->findModel2($id);
-        $expedienteMedico = $modelEmpleado->expedienteMedico;
-    
-        $antecedentePatologico = AntecedentePatologico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
-        if (!$antecedentePatologico) {
-            $antecedentePatologico = new AntecedentePatologico();
-        }
-    
-        if (Yii::$app->request->isPost) {
-            $descripcionAntecedentes = Yii::$app->request->post('descripcion_antecedentes');
-    
-            $antecedentePatologico->expediente_medico_id = $expedienteMedico->id;
-            $antecedentePatologico->descripcion_antecedentes = $descripcionAntecedentes;
-    
-            if ($antecedentePatologico->save()) {
-                Yii::$app->session->setFlash('success', 'Información de antecedentes patológicos guardada correctamente.');
-                $url = Url::to(['view', 'id' => $id]) . '#patologicos';
-                return $this->redirect($url);
-            } else {
-                Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información de antecedentes patológicos.');
-                $url = Url::to(['view', 'id' => $id]) . '#patologicos';
-                return $this->redirect($url);
-            }
+public function actionAntecedentePatologico($id)
+{
+    $modelEmpleado = $this->findModel2($id);
+    $expedienteMedico = $modelEmpleado->expedienteMedico;
 
-         
-        }
-    
-        return $this->render('view', [
-            'model' => $modelEmpleado,
-            'expedienteMedico' => $expedienteMedico,
-            'descripcionAntecedentes' => $antecedentePatologico->descripcion_antecedentes,
-        ]);
+    $modelAntecedentePatologico = AntecedentePatologico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+    if (!$modelAntecedentePatologico) {
+        $modelAntecedentePatologico= new AntecedentePatologico();
+        $modelAntecedentePatologico->expediente_medico_id = $expedienteMedico->id;
     }
-    
+
+    if ($modelAntecedentePatologico->load(Yii::$app->request->post()) && $modelAntecedentePatologico->save()) {
+        Yii::$app->session->setFlash('success', 'Información antecedente patologico medico guardada correctamente.');
+    } else {
+        Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información de antecedente patologico');
+    }
+
+    $url = Url::to(['view', 'id' => $id]) . '#patologico';
+    return $this->redirect($url);
+
+    return $this->render('view', [
+        'model' => $modelEmpleado,
+        'expedienteMedico' => $expedienteMedico,
+        'modelAntecedentePatologico' => $modelAntecedentePatologico, // Asegúrate de pasar este modelo
+    ]);
+}
+
 
     public function actionNoPatologicos($id)
     {
@@ -396,6 +434,116 @@ public function actionAntecedentePerinatal($id)
 }
 
 
+public function actionAntecedenteGinecologico($id)
+{
+    $modelEmpleado = $this->findModel2($id);
+    $expedienteMedico = $modelEmpleado->expedienteMedico;
+
+    $modelAntecedenteGinecologico = AntecedenteGinecologico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+    if (!$modelAntecedenteGinecologico) {
+        $modelAntecedenteGinecologico = new AntecedenteGinecologico();
+        $modelAntecedenteGinecologico->expediente_medico_id = $expedienteMedico->id;
+    }
+
+    if ($modelAntecedenteGinecologico->load(Yii::$app->request->post())) {
+        // Verificar y asignar manualmente los campos de checkbox que no estén en el POST
+        $checkboxFields = ['p_vaginits',
+        'p_cervicitis_mucopurulenta',
+        'p_chancroide',
+        'p_clamidia',
+        'p_eip',
+        'p_gonorrea',
+        'p_hepatitis',
+        'p_herpes',
+        'p_lgv',
+        'p_molusco_cont',
+        'p_ladillas',
+        'p_sarna',
+        'p_sifilis',
+        'p_tricomoniasis',
+        'p_vb',
+        'p_vih',
+        'p_vph',
+
+         
+
+        
+        
+        ];
+        foreach ($checkboxFields as $field) {
+            if (!isset(Yii::$app->request->post('AntecedenteGinecologico')[$field])) {
+                $modelAntecedenteGinecologico->$field = 0;
+            }
+        }
+
+        if ($modelAntecedenteGinecologico->save()) {
+            Yii::$app->session->setFlash('success', 'Información de antecedente ginecologico guardada correctamente.');
+        } else {
+            Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información de antecedentes ginecologicos.');
+        }
+
+        $url = Url::to(['view', 'id' => $id]) . '#ginecologico';
+        return $this->redirect($url);
+    }
+
+    return $this->render('view', [
+        'model' => $modelEmpleado,
+        'expedienteMedico' => $expedienteMedico,
+        'modelAntecedenteGinecologico' => $modelAntecedenteGinecologico,
+    ]);
+}
+
+public function actionAntecedenteObstrectico($id)
+{
+    $modelEmpleado = $this->findModel2($id);
+    $expedienteMedico = $modelEmpleado->expedienteMedico;
+
+    $modelAntecedenteObstrectico = AntecedenteObstrectico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+    if (!$modelAntecedenteObstrectico) {
+        $modelAntecedenteObstrectico = new AntecedenteGinecologico();
+        $modelAntecedenteObstrectico->expediente_medico_id = $expedienteMedico->id;
+    }
+
+    if ($modelAntecedenteObstrectico->load(Yii::$app->request->post())) {
+        // Verificar y asignar manualmente los campos de checkbox que no estén en el POST
+        $checkboxFields = ['p_intergenesia',
+        'p_malformaciones',
+        'p_atencion_prenatal',
+        'p_parto_prematuro',
+        'p_isoinmunizacion',
+        
+
+         
+
+        
+        
+        ];
+        foreach ($checkboxFields as $field) {
+            if (!isset(Yii::$app->request->post('AntecedenteObstrectico')[$field])) {
+                $modelAntecedenteObstrectico->$field = 0;
+            }
+        }
+
+        if ($modelAntecedenteObstrectico->save()) {
+            Yii::$app->session->setFlash('success', 'Información de antecedente obstrectico guardada correctamente.');
+        } else {
+            Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información de antecedentes obstrecticos.');
+        }
+
+        $url = Url::to(['view', 'id' => $id]) . '#obstrectico';
+        return $this->redirect($url);
+    }
+
+    return $this->render('view', [
+        'model' => $modelEmpleado,
+        'expedienteMedico' => $expedienteMedico,
+        'modelAntecedenteObstrectico' => $modelAntecedenteObstrectico,
+    ]);
+}
+
+
+
+
 
 
 public function actionInterrogatorioMedico($id)
@@ -422,6 +570,34 @@ public function actionInterrogatorioMedico($id)
         'model' => $modelEmpleado,
         'expedienteMedico' => $expedienteMedico,
         'modelInterrogatorioMedico' => $modelInterrogatorioMedico, // Asegúrate de pasar este modelo
+    ]);
+}
+
+
+public function actionAlergia($id)
+{
+    $modelEmpleado = $this->findModel2($id);
+    $expedienteMedico = $modelEmpleado->expedienteMedico;
+
+    $modelAlergia = Alergia::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+    if (!$modelAlergia) {
+        $modelAlergia= new Alergia();
+        $modelAlergia->expediente_medico_id = $expedienteMedico->id;
+    }
+
+    if ($modelAlergia->load(Yii::$app->request->post()) && $modelAlergia->save()) {
+        Yii::$app->session->setFlash('success', 'Información alergica medico guardada correctamente.');
+    } else {
+        Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información de alergias.');
+    }
+
+    $url = Url::to(['view', 'id' => $id]) . '#alergia';
+    return $this->redirect($url);
+
+    return $this->render('view', [
+        'model' => $modelEmpleado,
+        'expedienteMedico' => $expedienteMedico,
+        'modelAlergia' => $modelAlergia, // Asegúrate de pasar este modelo
     ]);
 }
 
@@ -495,11 +671,28 @@ public function actionInterrogatorioMedico($id)
                 $model->informacion_laboral_id = $informacion_laboral->id;
                 if ($usuario->save()) {
                     $model->usuario_id = $usuario->id;
-                    $rol = ($usuario->rol == 1) ? 'empleado' : 'administrador' ;
-    
+                
+                    // Asignar rol basado en la propiedad rol del usuario
+                    if ($usuario->rol == 1) {
+                        $rol = 'empleado';
+                    } elseif ($usuario->rol == 2) {
+                        $rol = 'administrador';
+                    } elseif ($usuario->rol == 3) {
+                        $rol = 'medico';
+                    } else {
+                        // Manejo de error o rol por defecto si es necesario
+                        $rol = 'empleado'; // o cualquier rol por defecto que desees
+                    }
+                
                     $auth = Yii::$app->authManager;
                     $authorRole = $auth->getRole($rol);
-                    $auth->assign($authorRole, $usuario->id);
+                    if ($authorRole) {
+                        $auth->assign($authorRole, $usuario->id);
+                    } else {
+                        throw new \Exception("El rol $rol no existe en el sistema de RBAC.");
+                    }
+                
+                
     
                     $upload = UploadedFile::getInstance($model, 'foto');
                     if (is_object($upload)) {

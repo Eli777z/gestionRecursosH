@@ -13,6 +13,8 @@ use hail812\adminlte3\yii\grid\ActionColumn;
 use yii\bootstrap5\Alert;
 use yii\helpers\Html;
 use yii\redactor\widgets\Redactor;
+use dosamigos\tinymce\TinyMce;
+use froala\froalaeditor\FroalaEditorWidget;
 
 //use yii\widgets\DetailView;
 use kartik\file\FileInput;
@@ -75,38 +77,57 @@ if ($antecedentes) {
 }
 
 // Si ya existe un antecedente patológico, obtenemos su descripción
-if ($expedienteMedico) {
-    $antecedentePatologico = \app\models\AntecedentePatologico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
-    if ($antecedentePatologico) {
-        $descripcionAntecedentes = $antecedentePatologico->descripcion_antecedentes;
-    }
-
-    // Obtener antecedentes no patológicos
-    $modelAntecedenteNoPatologico = \app\models\AntecedenteNoPatologico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
-    if (!$modelAntecedenteNoPatologico) {
-        $modelAntecedenteNoPatologico = new \app\models\AntecedenteNoPatologico();
-        $modelAntecedenteNoPatologico->expediente_medico_id = $expedienteMedico->id;
-    }
-
-
-    $modelExploracionFisica = \app\models\ExploracionFisica::findOne(['expediente_medico_id' => $expedienteMedico->id]);
-    if (!$modelExploracionFisica) {
-        $modelExploracionFisica = new \app\models\ExploracionFisica();
-        $modelExploracionFisica->expediente_medico_id = $expedienteMedico->id;
-    }
-
-    $modelInterrogatorioMedico = \app\models\InterrogatorioMedico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
-    if (!$modelInterrogatorioMedico) {
-        $modelInterrogatorioMedico = new \app\models\InterrogatorioMedico();
-        $modelInterrogatorioMedico->expediente_medico_id = $expedienteMedico->id;
-    }
-    // Obtener antecedentes no patológicos
-    $modelAntecedentePerinatal = \app\models\AntecedentePerinatal::findOne(['expediente_medico_id' => $expedienteMedico->id]);
-    if (!$modelAntecedentePerinatal) {
-        $modelAntecedentePerinatal = new \app\models\AntecedentePerinatal();
-        $modelAntecedentePerinatal->expediente_medico_id = $expedienteMedico->id;
-    }
+$modelAntecedentePatologico = \app\models\AntecedentePatologico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+if (!$modelAntecedentePatologico) {
+    $modelAntecedentePatologico = new \app\models\AntecedentePatologico();
+    $modelAntecedentePatologico->expediente_medico_id = $expedienteMedico->id;
 }
+
+// Obtener antecedentes no patológicos
+$modelAntecedenteNoPatologico = \app\models\AntecedenteNoPatologico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+if (!$modelAntecedenteNoPatologico) {
+    $modelAntecedenteNoPatologico = new \app\models\AntecedenteNoPatologico();
+    $modelAntecedenteNoPatologico->expediente_medico_id = $expedienteMedico->id;
+}
+
+
+$modelExploracionFisica = \app\models\ExploracionFisica::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+if (!$modelExploracionFisica) {
+    $modelExploracionFisica = new \app\models\ExploracionFisica();
+    $modelExploracionFisica->expediente_medico_id = $expedienteMedico->id;
+}
+
+$modelInterrogatorioMedico = \app\models\InterrogatorioMedico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+if (!$modelInterrogatorioMedico) {
+    $modelInterrogatorioMedico = new \app\models\InterrogatorioMedico();
+    $modelInterrogatorioMedico->expediente_medico_id = $expedienteMedico->id;
+}
+// Obtener antecedentes no patológicos
+$modelAntecedentePerinatal = \app\models\AntecedentePerinatal::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+if (!$modelAntecedentePerinatal) {
+    $modelAntecedentePerinatal = new \app\models\AntecedentePerinatal();
+    $modelAntecedentePerinatal->expediente_medico_id = $expedienteMedico->id;
+}
+
+
+$modelAntecedenteGinecologico = \app\models\AntecedenteGinecologico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+if (!$modelAntecedenteGinecologico) {
+    $modelAntecedenteGinecologico = new \app\models\AntecedenteGinecologico();
+    $modelAntecedenteGinecologico->expediente_medico_id = $expedienteMedico->id;
+}
+
+$modelAntecedenteObstrectico = \app\models\AntecedenteObstrectico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+if (!$modelAntecedenteObstrectico) {
+    $modelAntecedenteObstrectico = new \app\models\AntecedenteObstrectico();
+    $modelAntecedenteObstrectico->expediente_medico_id = $expedienteMedico->id;
+}
+
+$modelAlergia = \app\models\Alergia::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+if (!$modelAlergia) {
+    $modelAlergia = new \app\models\Alergia();
+    $modelAlergia->expediente_medico_id = $expedienteMedico->id;
+}
+
 ?>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
@@ -1430,9 +1451,30 @@ if ($expedienteMedico) {
                                                     'placeholder' => 'Ingrese el nombre del documento'
                                                 ])->label(false) ?>
                                             </div>
-
                                             <div class="form-group">
-                                                <?= $form->field($documentoModel, 'observacion')->textarea() ?>
+
+
+
+
+
+                                                <?= $form->field($documentoModel, 'observacion')->widget(FroalaEditorWidget::className(), [
+
+                                                    'clientOptions' => [
+                                                        'toolbarInline' => false,
+                                                        'theme' => 'royal', // optional: dark, red, gray, royal
+                                                        'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
+                                                        'height' => 150,
+                                                        'pluginsEnabled' => [
+                                                            'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
+                                                            'draggable', 'entities', 'fontFamily',
+                                                            'fontSize', 'fullscreen', 'inlineStyle',
+                                                            'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
+                                                            'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
+                                                        ]
+                                                    ]
+                                                ]) ?>
+
+
                                             </div>
 
                                             <div class="form-group">
@@ -1493,6 +1535,10 @@ if ($expedienteMedico) {
                                                     ],
                                                     [
                                                         'attribute' => 'observacion',
+                                                        'format' => 'html',
+                                                        'value' => function ($model) {
+                                                            return \yii\helpers\Html::decode($model->observacion);
+                                                        },
                                                         'filter' => false,
                                                         'options' => ['style' => 'width: 30%;'],
                                                     ],
@@ -1617,6 +1663,8 @@ if ($expedienteMedico) {
                                                             'rows' => 30,
                                                             'style' => 'width: 100%;',
                                                         ]) ?>
+
+
                                                     </div>
                                                     <br>
                                                     <div class="form-group mt-auto d-flex justify-content-end">
@@ -1636,7 +1684,7 @@ if ($expedienteMedico) {
 
                             <!-- Bloque de antecedentes patológicos -->
                             <?php $this->beginBlock('patologicos'); ?>
-                            <?php $form = ActiveForm::begin(['action' => ['empleado/patologicos', 'id' => $model->id]]); ?>
+                            <?php $form = ActiveForm::begin(['action' => ['empleado/antecedente-patologico', 'id' => $model->id]]); ?>
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="card">
@@ -1645,14 +1693,33 @@ if ($expedienteMedico) {
                                         </div>
                                         <div class="card-body bg-light">
 
+
+
+
+
                                             <div class="form-group">
-                                                <?= Html::label('Descripción de Antecedentes Patológicos', 'descripcion_antecedentes') ?>
-                                                <?= Html::textarea('descripcion_antecedentes', $descripcionAntecedentes, [
-                                                    'class' => 'form-control',
-                                                    'rows' => 15,
-                                                    'style' => 'width: 100%;',
+
+
+                                                <?= $form->field($antecedentePatologico, 'descripcion_antecedentes')->widget(FroalaEditorWidget::className(), [
+                                                    'clientOptions' => [
+                                                        'toolbarInline' => false,
+                                                        'theme' => 'royal', // optional: dark, red, gray, royal
+                                                        'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
+                                                        'height' => 400,
+                                                        'pluginsEnabled' => [
+                                                            'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
+                                                            'draggable', 'emoticons', 'entities', 'fontFamily',
+                                                            'fontSize', 'fullscreen', 'inlineStyle',
+                                                            'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
+                                                            'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
+                                                        ]
+                                                    ]
+
                                                 ]) ?>
+
+
                                             </div>
+
                                             <div class="form-group text-right">
                                                 <?= Html::submitButton('Guardar &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
                                             </div>
@@ -1741,12 +1808,33 @@ if ($expedienteMedico) {
                                                                 </div>
                                                             </div>
                                                             <!-- Columna derecha con el textarea -->
-                                                            <div class="col-md-4">
-                                                                <div class="form-group">
-                                                                    <?= Html::label('Observaciones', 'observacion_actividad_fisica') ?>
-                                                                    <?= Html::textarea('AntecedenteNoPatologico[observacion_actividad_fisica]', $antecedenteNoPatologico->observacion_actividad_fisica, ['class' => 'form-control', 'rows' => 10, 'id' => 'observacion_actividad_fisica']) ?>
-                                                                </div>
+                                                            <div class="w-100"></div>
+                                                            <br>
+                                                            <div class="form-group">
+
+
+
+                                                                <?= $form->field($antecedenteNoPatologico, 'observacion_actividad_fisica')->widget(FroalaEditorWidget::className(), [
+                                                                    'options' => [
+                                                                        'id' => 'content'
+                                                                    ],
+                                                                    'clientOptions' => [
+                                                                        'toolbarInline' => false,
+                                                                        'theme' => 'royal', // optional: dark, red, gray, royal
+                                                                        'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
+                                                                        'height' => 150,
+                                                                        'pluginsEnabled' => [
+                                                                            'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
+                                                                            'draggable', 'emoticons', 'entities', 'fontFamily',
+                                                                            'fontSize', 'fullscreen', 'inlineStyle',
+                                                                            'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
+                                                                            'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
+                                                                        ]
+                                                                    ]
+                                                                ]) ?>
+
                                                             </div>
+
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1876,12 +1964,26 @@ JS;
                                                                 </div>
                                                             </div>
                                                             <!-- Columna derecha con el textarea -->
-                                                            <div class="col-md-4">
-                                                                <div class="form-group">
-                                                                    <?= Html::label('Observaciones', 'observacion_comida') ?>
-                                                                    <?= Html::textarea('AntecedenteNoPatologico[observacion_comida]', $antecedenteNoPatologico->observacion_comida, ['class' => 'form-control', 'rows' => 10]) ?>
-                                                                </div>
+
+                                                            <div class="w-100"></div>
+
+
+                                                            <br>
+
+                                                            <div class="form-group">
+
+
+                                                                <?= $form->field($antecedenteNoPatologico, 'observacion_comida')->widget(FroalaEditorWidget::className(), [
+                                                                    'options' => [
+                                                                        'id' => 'content'
+                                                                    ],
+
+                                                                ]) ?>
+
                                                             </div>
+
+
+
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1998,12 +2100,22 @@ JS;
                                                                 </div>
                                                             </div>
                                                             <!-- Columna derecha con el textarea -->
-                                                            <div class="col-md-5">
-                                                                <div class="form-group">
-                                                                    <?= Html::label('Observaciones', 'observacion_alcoholismo') ?>
-                                                                    <?= Html::textarea('AntecedenteNoPatologico[observacion_alcoholismo]', $antecedenteNoPatologico->observacion_alcoholismo, ['class' => 'form-control', 'rows' => 10]) ?>
-                                                                </div>
+
+                                                            <div class="w-100"></div>
+                                                            <br>
+
+                                                            <div class="form-group">
+
+
+                                                                <?= $form->field($antecedenteNoPatologico, 'observacion_alcoholismo')->widget(FroalaEditorWidget::className(), [
+                                                                    'options' => [
+                                                                        'id' => 'content'
+                                                                    ],
+
+                                                                ]) ?>
+
                                                             </div>
+
                                                         </div>
                                                     </div>
                                                 </div>
@@ -2110,7 +2222,7 @@ JS;
 
                                                                     </div>
                                                                     <div class="w-100"></div>
-
+                                                                    <br>
                                                                     <div class="col-6 col-sm-4">
                                                                         <div class="custom-control custom-checkbox">
                                                                             <?= Html::checkbox('AntecedenteNoPatologico[p_fumador_pasivo]', $antecedenteNoPatologico->p_fumador_pasivo, [
@@ -2124,11 +2236,22 @@ JS;
                                                                 </div>
                                                             </div>
                                                             <!-- Columna derecha con el textarea -->
-                                                            <div class="col-md-4">
-                                                                <div class="form-group">
-                                                                    <?= Html::label('Observaciones', 'observacion_tabaquismo') ?>
-                                                                    <?= Html::textarea('AntecedenteNoPatologico[observacion_tabaquismo]', $antecedenteNoPatologico->observacion_tabaquismo, ['class' => 'form-control', 'rows' => 10]) ?>
-                                                                </div>
+
+
+
+                                                            <div class="w-100"></div>
+                                                            <br>
+                                                            <div class="form-group">
+
+
+                                                                <?= $form->field($antecedenteNoPatologico, 'observacion_tabaquismo')->widget(FroalaEditorWidget::className(), [
+                                                                    'options' => [
+                                                                        'id' => 'content'
+                                                                    ],
+
+                                                                ]) ?>
+
+
                                                             </div>
                                                         </div>
                                                     </div>
@@ -2244,12 +2367,23 @@ JS;
                                                                 </div>
                                                             </div>
                                                             <!-- Columna derecha con el textarea -->
-                                                            <div class="col-md-6">
-                                                                <div class="form-group">
-                                                                    <?= Html::label('Descripción de su vivienda (Tiene mascotas, Recursos del hogar, Etc.)', 'datos_vivienda') ?>
-                                                                    <?= Html::textarea('AntecedenteNoPatologico[datos_vivienda]', $antecedenteNoPatologico->datos_vivienda, ['class' => 'form-control', 'rows' => 8]) ?>
-                                                                </div>
+
+
+                                                            <div class="form-group">
+
+
+
+                                                                <?= $form->field($antecedenteNoPatologico, 'datos_vivienda')->widget(FroalaEditorWidget::className(), [
+                                                                    'options' => [
+                                                                        'id' => 'content'
+                                                                    ],
+
+                                                                ])->label('Descripción de su vivienda (Tiene mascotas, Recursos del hogar, Etc.)') ?>
                                                             </div>
+
+
+
+
                                                         </div>
                                                     </div>
                                                 </div>
@@ -2328,12 +2462,26 @@ JS;
                                                                 </div>
                                                             </div>
                                                             <!-- Columna derecha con el textarea -->
-                                                            <div class="col-md-4">
-                                                                <div class="form-group">
-                                                                    <?= Html::label('Observaciones', 'observacion_droga') ?>
-                                                                    <?= Html::textarea('AntecedenteNoPatologico[observacion_droga]', $antecedenteNoPatologico->observacion_droga, ['class' => 'form-control', 'rows' => 10]) ?>
-                                                                </div>
+
+                                                            <div class="w-100"></div>
+                                                            <br>
+                                                            <div class="form-group">
+
+
+
+
+                                                                <?= $form->field($antecedenteNoPatologico, 'observacion_droga')->widget(FroalaEditorWidget::className(), [
+                                                                    'options' => [
+                                                                        'id' => 'content'
+                                                                    ],
+
+                                                                ]) ?>
+
+
                                                             </div>
+
+
+
                                                         </div>
                                                     </div>
                                                 </div>
@@ -2388,8 +2536,27 @@ JS;
                                                             <!-- Columna derecha con el textarea -->
 
                                                             <div class="form-group ">
-                                                                <?= Html::label('Observación General', 'observacion_general') ?>
-                                                                <?= Html::textarea('AntecedenteNoPatologico[observacion_general]', $antecedenteNoPatologico->observacion_general, ['class' => 'form-control', 'rows' => 10]) ?>
+
+
+
+                                                                <?= $form->field($antecedenteNoPatologico, 'observacion_general')->widget(FroalaEditorWidget::className(), [
+
+                                                                    'clientOptions' => [
+                                                                        'toolbarInline' => false,
+                                                                        'theme' => 'royal', // optional: dark, red, gray, royal
+                                                                        'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
+                                                                        'height' => 300,
+                                                                        'pluginsEnabled' => [
+                                                                            'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
+                                                                            'draggable', 'emoticons', 'entities', 'fontFamily',
+                                                                            'fontSize', 'fullscreen', 'inlineStyle',
+                                                                            'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
+                                                                            'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
+                                                                        ]
+                                                                    ]
+
+                                                                ])->label('Observación General') ?>
+
                                                             </div>
 
                                                         </div>
@@ -2429,6 +2596,7 @@ JS;
                                     <div class="card">
                                         <div class="card-header gradient-blue text-white text-center">
                                             <h2>Antecedente Perinatal</h2>
+                                            <i class="fa fa-medkit fa-2x"></i>
                                             <div class="float-submit-btn">
                                                 <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
                                             </div>
@@ -2439,127 +2607,127 @@ JS;
 
                                                 <div class="row">
                                                     <!-- Columna izquierda con los campos -->
-                                                  
 
 
-                                                    
-                                                        <div class="col-6 col-sm-2">
-                                                            <?= Html::label('Hora de Nacimiento', 'p_hora_nacimiento') ?>
-                                                            <?= Html::input('time', 'AntecedentePerinatal[p_hora_nacimiento]', $AntecedentePerinatal->p_hora_nacimiento, ['class' => 'form-control']) ?>
-                                                        </div>
-                                                        <div class="col-6 col-sm-2 ">
-                                                            <?= Html::label('No. de Gestación', 'p_no_gestacion') ?>
-                                                            <?= Html::input('number', 'AntecedentePerinatal[p_no_gestacion]', $AntecedentePerinatal->p_no_gestacion, ['class' => 'form-control']) ?>
-
-                                                        </div>
-                                                     
-                                                        <div class="col-6 col-sm-2">
-                                                            <?= Html::label('Edad Gestacional', 'p_edad_gestacional') ?>
-                                                            <?= Html::input('number', 'AntecedentePerinatal[p_edad_gestacional]', $AntecedentePerinatal->p_edad_gestacional, ['class' => 'form-control']) ?>
-
-                                                        </div>
-                                                       
-                                                        <div class="col-6 col-sm-2 bg-white rounded p-4">
-                                                            <div class="custom-control custom-checkbox">
-                                                                <?= Html::checkbox('AntecedentePerinatal[p_parto]', $AntecedentePerinatal->p_parto, [
-                                                                    'class' => 'custom-control-input',
-                                                                    'id' => 'p_parto'
-                                                                ]) ?>
-                                                                <?= Html::label('Parto', 'p_parto', ['class' => 'custom-control-label']) ?>
-                                                            </div>
-                                                            <div class="custom-control custom-checkbox">
-                                                                <?= Html::checkbox('AntecedentePerinatal[p_cesarea]', $AntecedentePerinatal->p_cesarea, [
-                                                                    'class' => 'custom-control-input',
-                                                                    'id' => 'p_cesarea'
-                                                                ]) ?>
-                                                                <?= Html::label('Cesarea', 'p_cesarea', ['class' => 'custom-control-label']) ?>
-                                                            </div>
-                                                        </div>
-
-                                                       
-                                                        <div class="w-100"></div>
-                                                        <br>
-                                                        <div class="col-6 col-sm-8">
-                                                            <?= Html::label('Sitio de atención del parto', 'p_sitio_parto') ?>
-                                                            <?= Html::textInput('AntecedentePerinatal[p_sitio_parto]', $modelAntecedentePerinatal->p_sitio_parto, ['class' => 'form-control', 'id' => 'p_sitio_parto']) ?>
-                                                        </div>
 
 
-                                                        <div class="w-100"></div>
-                                                        <br>
-                                                        <div class="col-6 col-sm-4">
-                                                            <?= Html::label('Peso al nacer', 'p_peso_nacer') ?>
-                                                            <?= Html::input('number', 'AntecedentePerinatal[p_peso_nacer]', $modelAntecedentePerinatal->p_peso_nacer, [
-                                                                'class' => 'form-control',
-                                                                'id' => 'p_peso_nacer',
-                                                                'step' => '0.01', // Define el paso para permitir decimales
-                                                            ]) ?>
-                                                        </div>
-                                                        <div class="col-6 col-sm-4">
-                                                            <?= Html::label('Talla', 'p_talla') ?>
-                                                            <?= Html::input('number', 'AntecedentePerinatal[p_talla]', $modelAntecedentePerinatal->p_talla, [
-                                                                'class' => 'form-control',
-                                                                'id' => 'p_talla',
-                                                                'step' => '0.01', // Define el paso para permitir decimales
-                                                            ]) ?>
-                                                        </div>
+                                                    <div class="col-6 col-sm-2">
+                                                        <?= Html::label('Hora de Nacimiento', 'p_hora_nacimiento') ?>
+                                                        <?= Html::input('time', 'AntecedentePerinatal[p_hora_nacimiento]', $AntecedentePerinatal->p_hora_nacimiento, ['class' => 'form-control']) ?>
+                                                    </div>
+                                                    <div class="col-6 col-sm-2 ">
+                                                        <?= Html::label('No. de Gestación', 'p_no_gestacion') ?>
+                                                        <?= Html::input('number', 'AntecedentePerinatal[p_no_gestacion]', $AntecedentePerinatal->p_no_gestacion, ['class' => 'form-control']) ?>
 
-                                                        <div class="w-100"></div>
-                                                        <br>
-                    
-                                                        <div class="col-6 col-sm-4">
-                                                           <h4>Perimetros (cm)</h4>
-                                                        </div>
-                                                        <div class="w-100"></div>
-                                                       
-                                                        <div class="col-6 col-sm-2">
-                                                        <?= Html::label('Cefálico', 'p_cefalico') ?>
-                                                            <?= Html::input('number', 'AntecedentePerinatal[p_cefalico]', $modelAntecedentePerinatal->p_cefalico, [
-                                                                'class' => 'form-control',
-                                                                'id' => 'p_cefalico',
-                                                                'step' => '0.01', // Define el paso para permitir decimales
-                                                            ]) ?>
+                                                    </div>
 
-                                                        </div>
+                                                    <div class="col-6 col-sm-2">
+                                                        <?= Html::label('Edad Gestacional', 'p_edad_gestacional') ?>
+                                                        <?= Html::input('number', 'AntecedentePerinatal[p_edad_gestacional]', $AntecedentePerinatal->p_edad_gestacional, ['class' => 'form-control']) ?>
 
-                                                        <div class="col-6 col-sm-2">
-                                                        <?= Html::label('Toracico', 'p_toracico') ?>
-                                                            <?= Html::input('number', 'AntecedentePerinatal[p_toracico]', $modelAntecedentePerinatal->p_toracico, [
-                                                                'class' => 'form-control',
-                                                                'id' => 'p_toracico',
-                                                                'step' => '0.01', // Define el paso para permitir decimales
-                                                            ]) ?>
-                                                        </div>
-                                                        <div class="col-6 col-sm-2">
-                                                        <?= Html::label('Abdominal', 'p_abdominal') ?>
-                                                            <?= Html::input('number', 'AntecedentePerinatal[p_abdominal]', $modelAntecedentePerinatal->p_abdominal, [
-                                                                'class' => 'form-control',
-                                                                'id' => 'p_abdominal',
-                                                                'step' => '0.01', // Define el paso para permitir decimales
-                                                            ]) ?>
-                                                        </div>
-                                                        <div class="w-100"></div>
-                                                        <div class="dropdown-divider"></div>
+                                                    </div>
 
-                                                        <br>
-                                                        <div class="col-6 col-sm-4">
+                                                    <div class="col-6 col-sm-2 bg-white rounded p-4">
                                                         <div class="custom-control custom-checkbox">
-                                                                <?= Html::checkbox('AntecedentePerinatal[test]', $AntecedentePerinatal->test, [
-                                                                    'class' => 'custom-control-input',
-                                                                    'id' => 'test'
-                                                                ]) ?>
-                                                                <?= Html::label('¿Cuenta con evaluaciones neonatales?', 'test', ['class' => 'custom-control-label']) ?>
-                                                            </div>
+                                                            <?= Html::checkbox('AntecedentePerinatal[p_parto]', $AntecedentePerinatal->p_parto, [
+                                                                'class' => 'custom-control-input',
+                                                                'id' => 'p_parto'
+                                                            ]) ?>
+                                                            <?= Html::label('Parto', 'p_parto', ['class' => 'custom-control-label']) ?>
                                                         </div>
-                                                      <br>
-                                                      <br>
-                                                        <div class="row" id="test-container">
+                                                        <div class="custom-control custom-checkbox">
+                                                            <?= Html::checkbox('AntecedentePerinatal[p_cesarea]', $AntecedentePerinatal->p_cesarea, [
+                                                                'class' => 'custom-control-input',
+                                                                'id' => 'p_cesarea'
+                                                            ]) ?>
+                                                            <?= Html::label('Cesarea', 'p_cesarea', ['class' => 'custom-control-label']) ?>
+                                                        </div>
+                                                    </div>
+
+
+                                                    <div class="w-100"></div>
+                                                    <br>
+                                                    <div class="col-6 col-sm-8">
+                                                        <?= Html::label('Sitio de atención del parto', 'p_sitio_parto') ?>
+                                                        <?= Html::textInput('AntecedentePerinatal[p_sitio_parto]', $modelAntecedentePerinatal->p_sitio_parto, ['class' => 'form-control', 'id' => 'p_sitio_parto']) ?>
+                                                    </div>
+
+
+                                                    <div class="w-100"></div>
+                                                    <br>
+                                                    <div class="col-6 col-sm-4">
+                                                        <?= Html::label('Peso al nacer', 'p_peso_nacer') ?>
+                                                        <?= Html::input('number', 'AntecedentePerinatal[p_peso_nacer]', $modelAntecedentePerinatal->p_peso_nacer, [
+                                                            'class' => 'form-control',
+                                                            'id' => 'p_peso_nacer',
+                                                            'step' => '0.01', // Define el paso para permitir decimales
+                                                        ]) ?>
+                                                    </div>
+                                                    <div class="col-6 col-sm-4">
+                                                        <?= Html::label('Talla', 'p_talla') ?>
+                                                        <?= Html::input('number', 'AntecedentePerinatal[p_talla]', $modelAntecedentePerinatal->p_talla, [
+                                                            'class' => 'form-control',
+                                                            'id' => 'p_talla',
+                                                            'step' => '0.01', // Define el paso para permitir decimales
+                                                        ]) ?>
+                                                    </div>
+
+                                                    <div class="w-100"></div>
+                                                    <br>
+
+                                                    <div class="col-6 col-sm-4">
+                                                        <h4>Perimetros (cm)</h4>
+                                                    </div>
+                                                    <div class="w-100"></div>
+
+                                                    <div class="col-6 col-sm-2">
+                                                        <?= Html::label('Cefálico', 'p_cefalico') ?>
+                                                        <?= Html::input('number', 'AntecedentePerinatal[p_cefalico]', $modelAntecedentePerinatal->p_cefalico, [
+                                                            'class' => 'form-control',
+                                                            'id' => 'p_cefalico',
+                                                            'step' => '0.01', // Define el paso para permitir decimales
+                                                        ]) ?>
+
+                                                    </div>
+
+                                                    <div class="col-6 col-sm-2">
+                                                        <?= Html::label('Toracico', 'p_toracico') ?>
+                                                        <?= Html::input('number', 'AntecedentePerinatal[p_toracico]', $modelAntecedentePerinatal->p_toracico, [
+                                                            'class' => 'form-control',
+                                                            'id' => 'p_toracico',
+                                                            'step' => '0.01', // Define el paso para permitir decimales
+                                                        ]) ?>
+                                                    </div>
+                                                    <div class="col-6 col-sm-2">
+                                                        <?= Html::label('Abdominal', 'p_abdominal') ?>
+                                                        <?= Html::input('number', 'AntecedentePerinatal[p_abdominal]', $modelAntecedentePerinatal->p_abdominal, [
+                                                            'class' => 'form-control',
+                                                            'id' => 'p_abdominal',
+                                                            'step' => '0.01', // Define el paso para permitir decimales
+                                                        ]) ?>
+                                                    </div>
+                                                    <div class="w-100"></div>
+                                                    <div class="dropdown-divider"></div>
+
+                                                    <br>
+                                                    <div class="col-6 col-sm-4">
+                                                        <div class="custom-control custom-checkbox">
+                                                            <?= Html::checkbox('AntecedentePerinatal[test]', $AntecedentePerinatal->test, [
+                                                                'class' => 'custom-control-input',
+                                                                'id' => 'test'
+                                                            ]) ?>
+                                                            <?= Html::label('¿Cuenta con evaluaciones neonatales?', 'test', ['class' => 'custom-control-label']) ?>
+                                                        </div>
+                                                    </div>
+                                                    <br>
+                                                    <br>
+                                                    <div class="row" id="test-container">
                                                         <div class="col-6 col-sm-2">
                                                             <?= Html::label('Apgar', 'p_apgar') ?>
                                                             <?= Html::input('number', 'AntecedentePerinatal[p_apgar]', $AntecedentePerinatal->p_apgar, ['class' => 'form-control']) ?>
 
                                                         </div>
-                                                        <div class="col-6 col-sm-2" >
+                                                        <div class="col-6 col-sm-2">
                                                             <?= Html::label('Ballard', 'p_ballard') ?>
                                                             <?= Html::input('number', 'AntecedentePerinatal[p_ballard]', $AntecedentePerinatal->p_ballard, ['class' => 'form-control']) ?>
 
@@ -2570,7 +2738,7 @@ JS;
                                                             <?= Html::input('number', 'AntecedentePerinatal[p_silverman]', $AntecedentePerinatal->p_silverman, ['class' => 'form-control']) ?>
 
                                                         </div>
-                                                        <div class="col-6 col-sm-2" >
+                                                        <div class="col-6 col-sm-2">
                                                             <?= Html::label('Capurro', 'p_capurro') ?>
                                                             <?= Html::input('number', 'AntecedentePerinatal[p_capurro]', $AntecedentePerinatal->p_capurro, ['class' => 'form-control']) ?>
 
@@ -2581,44 +2749,44 @@ JS;
                                                     <div class="w-100"></div>
                                                     <br>
                                                     <div class="col-6 col-sm-8">
-                                                    <div class="form-group">
-                                                    <?= Html::label('Complicaciones', 'p_complicacion') ?>
-                                                    <?= Html::textarea('AntecedentePerinatal[p_complicacion]', $AntecedentePerinatal->p_complicacion, ['class' => 'form-control', 'rows' => 2, 'id' => 'p_complicacion']) ?>
-                                                </div>
-                                                    </div>
-
-                                                    <div class="w-100"></div>
-                                                        <br>
-                                                        <div class="col-6 col-sm-4">
-                                                        <div class="custom-control custom-checkbox">
-                                                                <?= Html::checkbox('AntecedentePerinatal[p_anestesia]', $AntecedentePerinatal->p_anestesia, [
-                                                                    'class' => 'custom-control-input',
-                                                                    'id' => 'p_anestesia'
-                                                                ]) ?>
-                                                                <?= Html::label('Anestesia', 'p_anestesia', ['class' => 'custom-control-label']) ?>
-                                                            </div>
+                                                        <div class="form-group">
+                                                            <?= Html::label('Complicaciones', 'p_complicacion') ?>
+                                                            <?= Html::textarea('AntecedentePerinatal[p_complicacion]', $AntecedentePerinatal->p_complicacion, ['class' => 'form-control', 'rows' => 2, 'id' => 'p_complicacion']) ?>
                                                         </div>
-                                                        <div class="col-6 col-sm-8" id="anestesia-container">
-                                                    <div class="form-group">
-                                                    <?= Html::label('Especifique', 'p_especifique_anestecia') ?>
-                                                    <?= Html::textarea('AntecedentePerinatal[p_especifique_anestecia]', $AntecedentePerinatal->p_especifique_anestecia, ['class' => 'form-control', 'rows' => 2, 'id' => 'p_especifique_anestecia']) ?>
-                                                </div>
                                                     </div>
 
                                                     <div class="w-100"></div>
                                                     <br>
-                                                    <div class= "row bg-white rounded p-4">
-                                                    <div class="col-6 col-sm-2" >
-                                                    <div class="custom-control custom-checkbox">
+                                                    <div class="col-6 col-sm-4">
+                                                        <div class="custom-control custom-checkbox">
+                                                            <?= Html::checkbox('AntecedentePerinatal[p_anestesia]', $AntecedentePerinatal->p_anestesia, [
+                                                                'class' => 'custom-control-input',
+                                                                'id' => 'p_anestesia'
+                                                            ]) ?>
+                                                            <?= Html::label('Anestesia', 'p_anestesia', ['class' => 'custom-control-label']) ?>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6 col-sm-8" id="anestesia-container">
+                                                        <div class="form-group">
+                                                            <?= Html::label('Especifique', 'p_especifique_anestecia') ?>
+                                                            <?= Html::textarea('AntecedentePerinatal[p_especifique_anestecia]', $AntecedentePerinatal->p_especifique_anestecia, ['class' => 'form-control', 'rows' => 2, 'id' => 'p_especifique_anestecia']) ?>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="w-100"></div>
+                                                    <br>
+                                                    <div class="row bg-white rounded p-4">
+                                                        <div class="col-6 col-sm-2">
+                                                            <div class="custom-control custom-checkbox">
                                                                 <?= Html::checkbox('AntecedentePerinatal[p_apnea_neonatal]', $AntecedentePerinatal->p_apnea_neonatal, [
                                                                     'class' => 'custom-control-input',
                                                                     'id' => 'p_apnea_neonatal'
                                                                 ]) ?>
                                                                 <?= Html::label('Apnea Neonatal', 'p_apnea_neonatal', ['class' => 'custom-control-label']) ?>
                                                             </div>
-                                                            
-                                                    </div>
-                                                    <div class="col-6 col-sm-2" >
+
+                                                        </div>
+                                                        <div class="col-6 col-sm-2">
                                                             <div class="custom-control custom-checkbox">
                                                                 <?= Html::checkbox('AntecedentePerinatal[p_cianosis]', $AntecedentePerinatal->p_cianosis, [
                                                                     'class' => 'custom-control-input',
@@ -2626,9 +2794,9 @@ JS;
                                                                 ]) ?>
                                                                 <?= Html::label('Cianosis', 'p_cianosis', ['class' => 'custom-control-label']) ?>
                                                             </div>
-                                                            </div>
+                                                        </div>
 
-                                                            <div class="col-6 col-sm-2" >
+                                                        <div class="col-6 col-sm-2">
                                                             <div class="custom-control custom-checkbox">
                                                                 <?= Html::checkbox('AntecedentePerinatal[p_hemorragias]', $AntecedentePerinatal->p_hemorragias, [
                                                                     'class' => 'custom-control-input',
@@ -2636,8 +2804,8 @@ JS;
                                                                 ]) ?>
                                                                 <?= Html::label('Hemorragias', 'p_hemorragias', ['class' => 'custom-control-label']) ?>
                                                             </div>
-                                                            </div>
-                                                            <div class="col-6 col-sm-2" >
+                                                        </div>
+                                                        <div class="col-6 col-sm-2">
                                                             <div class="custom-control custom-checkbox">
                                                                 <?= Html::checkbox('AntecedentePerinatal[p_convulsiones]', $AntecedentePerinatal->p_convulsiones, [
                                                                     'class' => 'custom-control-input',
@@ -2645,32 +2813,53 @@ JS;
                                                                 ]) ?>
                                                                 <?= Html::label('Convulsiones', 'p_convulsiones', ['class' => 'custom-control-label']) ?>
                                                             </div>
-                                                            </div>
+                                                        </div>
 
-                                                            <div class="col-6 col-sm-2 ">
-    <div class="custom-control custom-checkbox">
-        <?= Html::checkbox('AntecedentePerinatal[p_ictericia]', $AntecedentePerinatal->p_ictericia, [
-            'class' => 'custom-control-input',
-            'id' => 'p_ictericia'
-        ]) ?>
-        <?= Html::label('Ictericia', 'p_ictericia', ['class' => 'custom-control-label']) ?>
-    </div>
-</div>
+                                                        <div class="col-6 col-sm-2 ">
+                                                            <div class="custom-control custom-checkbox">
+                                                                <?= Html::checkbox('AntecedentePerinatal[p_ictericia]', $AntecedentePerinatal->p_ictericia, [
+                                                                    'class' => 'custom-control-input',
+                                                                    'id' => 'p_ictericia'
+                                                                ]) ?>
+                                                                <?= Html::label('Ictericia', 'p_ictericia', ['class' => 'custom-control-label']) ?>
+                                                            </div>
+                                                        </div>
                                                     </div>
 
 
-                                                    
+
 
                                                 </div>
                                                 <!-- Columna derecha con el textarea -->
-<br>
+                                                <br>
+
 
                                                 <div class="form-group">
-                                                    <?= Html::label('Observaciones', 'observacion') ?>
-                                                    <?= Html::textarea('AntecedentePerinatal[observacion]', $AntecedentePerinatal->observacion, ['class' => 'form-control', 'rows' => 10, 'id' => 'observacion']) ?>
+
+
+                                                    <?= $form->field($AntecedentePerinatal, 'observacion')->widget(FroalaEditorWidget::className(), [
+
+                                                        'clientOptions' => [
+                                                            'toolbarInline' => false,
+                                                            'theme' => 'royal', // optional: dark, red, gray, royal
+                                                            'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
+                                                            'height' => 300,
+                                                            'pluginsEnabled' => [
+                                                                'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
+                                                                'draggable', 'emoticons', 'entities', 'fontFamily',
+                                                                'fontSize', 'fullscreen', 'inlineStyle',
+                                                                'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
+                                                                'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
+                                                            ]
+                                                        ]
+
+                                                    ])->label('Observación General') ?>
+
                                                 </div>
 
-
+                                                <div class="form-group">
+                                                    <?= Html::submitButton('Guardar Todos los Cambios &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                                                </div>
                                             </div>
 
 
@@ -2678,8 +2867,11 @@ JS;
                                     </div>
                                 </div>
                             </div>
+
+
+                            <?php ActiveForm::end(); ?>
                             <?php
-                                                $script = <<< JS
+                            $script = <<< JS
 $(document).ready(function() {
     function toggleTestFields() {
         if ($('#test').is(':checked')) {
@@ -2692,36 +2884,590 @@ $(document).ready(function() {
     function toggleAnestesiaFields() {
         if ($('#p_anestesia').is(':checked')) {
             $('#anestesia-container').show();
+           
         } else {
             $('#anestesia-container').hide();
+          
         }
     }
-    
 
     // Initial toggle based on the current state
     toggleTestFields();
     toggleAnestesiaFields();
-    //toggleExAdictoFields();
 
     // Toggle fields on checkbox change
     $('#test').change(function() {
         toggleTestFields();
-
     });
 
     $('#p_anestesia').change(function() {
         toggleAnestesiaFields();
-        
     });
-
-   
 });
 JS;
-                                                $this->registerJs($script);
-                                                ?>
+                            $this->registerJs($script);
+                            ?>
+
+                            <?php $this->endBlock(); ?>
+
+
+                            <?php $this->beginBlock('ginecologicos'); ?>
+                            <?php $form = ActiveForm::begin(['action' => ['antecedente-ginecologico', 'id' => $model->id]]); ?>
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <div class="card">
+                                        <div class="card-header gradient-blue text-white text-center">
+                                            <h2>Antecedente Ginecologico</h2>
+                                            <i class="fa fa-medkit fa-2x"></i>
+                                            <div class="float-submit-btn">
+                                                <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                                            </div>
+                                        </div>
+                                        <div class="card-body bg-light">
+                                            <div class="container">
+
+
+                                                <div class="row">
+                                                    <div class="col-6 col-sm-2 ">
+                                                        <?= Html::label('Menarca', 'p_menarca') ?>
+                                                        <?= Html::input('number', 'AntecedenteGinecologico[p_menarca]', $AntecedenteGinecologico->p_menarca, ['class' => 'form-control']) ?>
+
+                                                    </div>
+
+                                                    <div class="col-6 col-sm-2">
+                                                        <?= Html::label('Menopausia', 'p_menopausia') ?>
+                                                        <?= Html::input('number', 'AntecedenteGinecologico[p_menopausia]', $AntecedenteGinecologico->p_menopausia, ['class' => 'form-control']) ?>
+
+                                                    </div>
+
+                                                    <div class="col-6 col-sm-2">
+                                                        <?= Html::label('F.U.M', 'p_f_u_m') ?>
+                                                        <?= Html::input('date', 'AntecedenteGinecologico[p_f_u_m]', $AntecedenteGinecologico->p_f_u_m, ['class' => 'form-control']) ?>
+
+                                                    </div>
+
+                                                    <div class="col-6 col-sm-2">
+                                                        <?= Html::label('F.U. Citología', 'p_f_u_m') ?>
+                                                        <?= Html::input('date', 'AntecedenteGinecologico[p_f_u_citologia]', $AntecedenteGinecologico->p_f_u_citologia, ['class' => 'form-control']) ?>
+
+                                                    </div>
+
+
+
+
+
+                                                    <div class="w-100"></div>
+
+                                                    <br>
+                                                    <hr class="solid">
+                                                    <div class="col-6 col-sm-4">
+                                                        <h4>Alteraciones de la menstruación</h4>
+                                                    </div>
+                                                    <div class="w-100"></div>
+
+                                                    <div class="col-6 col-sm-3">
+
+                                                        <div class="form-group">
+                                                            <?= Html::label('de Frecuencia', 'p_alteracion_frecuencia') ?>
+                                                            <?= Html::dropDownList('AntecedenteGinecologico[p_alteracion_frecuencia]', $AntecedenteGinecologico->p_alteracion_frecuencia, [
+
+                                                                'Amenorrea' => 'Amenorrea',
+                                                                'Polimenorrea' => 'Polimenorrea',
+                                                                'Oligomenorrea' => 'Oligomenorrea',
+                                                            ], [
+                                                                'class' => 'form-control',         'prompt' => 'Seleccione si tiene alguna'
+                                                            ]) ?>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-6 col-sm-3">
+
+                                                        <div class="form-group">
+                                                            <?= Html::label('de Duración', 'p_alteracion_duracion') ?>
+                                                            <?= Html::dropDownList('AntecedenteGinecologico[p_alteracion_duracion]', $AntecedenteGinecologico->p_alteracion_duracion, [
+
+                                                                'Menometrorragia' => 'Menometrorragia',
+
+                                                            ], [
+                                                                'class' => 'form-control',         'prompt' => 'Seleccione si tiene alguna'
+                                                            ]) ?>
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="col-6 col-sm-3">
+
+                                                        <div class="form-group">
+                                                            <?= Html::label('de Cantidad', 'p_alteracion_cantidad') ?>
+                                                            <?= Html::dropDownList('AntecedenteGinecologico[p_alteracion_cantidad]', $AntecedenteGinecologico->p_alteracion_cantidad, [
+
+                                                                'Hipermenorrea' => 'Hipermenorrea',
+                                                                'Hipomenorrea' => 'Hipomenorrea',
+                                                            ], [
+                                                                'class' => 'form-control',         'prompt' => 'Seleccione si tiene alguna'
+                                                            ]) ?>
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="w-100"></div>
+                                                    <br>
+                                                    <hr class="solid">
+
+                                                    <div class="col-6 col-sm-2 ">
+                                                        <?= Html::label('Inicio vida sexual', 'p_inicio_vida_s') ?>
+                                                        <?= Html::input('number', 'AntecedenteGinecologico[p_inicio_vida_s]', $AntecedenteGinecologico->p_inicio_vida_s, ['class' => 'form-control']) ?>
+
+                                                    </div>
+                                                    <div class="col-6 col-sm-2 ">
+                                                        <?= Html::label('Número de parejas', 'p_no_parejas') ?>
+                                                        <?= Html::input('number', 'AntecedenteGinecologico[p_no_parejas]', $AntecedenteGinecologico->p_no_parejas, ['class' => 'form-control']) ?>
+
+                                                    </div>
+
+                                                    <div class="w-100"></div>
+                                                    <br>
+
+                                                    <div class="col-6 bg-white rounded p-4">
+                                                        <div class="list-container" style="max-height: 150px; overflow-y: auto;">
+                                                            <ul class="list-unstyled">
+                                                                <li>
+                                                                    <div class="custom-control custom-checkbox">
+                                                                        <?= Html::checkbox('AntecedenteGinecologico[p_vaginits]', $AntecedenteGinecologico->p_vaginits, [
+                                                                            'class' => 'custom-control-input',
+                                                                            'id' => 'p_vaginits'
+                                                                        ]) ?>
+                                                                        <?= Html::label('Vaginitis', 'p_vaginits', ['class' => 'custom-control-label']) ?>
+                                                                    </div>
+                                                                </li>
+                                                                <li>
+                                                                    <div class="custom-control custom-checkbox">
+                                                                        <?= Html::checkbox('AntecedenteGinecologico[p_cervicitis_mucopurulenta]', $AntecedenteGinecologico->p_cervicitis_mucopurulenta, [
+                                                                            'class' => 'custom-control-input',
+                                                                            'id' => 'p_cervicitis_mucopurulenta'
+                                                                        ]) ?>
+                                                                        <?= Html::label('Cervicitis Mucopurulenta', 'p_cervicitis_mucopurulenta', ['class' => 'custom-control-label']) ?>
+                                                                    </div>
+                                                                </li>
+                                                                <li>
+                                                                    <div class="custom-control custom-checkbox">
+                                                                        <?= Html::checkbox('AntecedenteGinecologico[p_chancroide]', $AntecedenteGinecologico->p_chancroide, [
+                                                                            'class' => 'custom-control-input',
+                                                                            'id' => 'p_chancroide'
+                                                                        ]) ?>
+                                                                        <?= Html::label('Chancroide', 'p_chancroide', ['class' => 'custom-control-label']) ?>
+                                                                    </div>
+                                                                </li>
+                                                                <li>
+                                                                    <div class="custom-control custom-checkbox">
+                                                                        <?= Html::checkbox('AntecedenteGinecologico[p_clamidia]', $AntecedenteGinecologico->p_clamidia, [
+                                                                            'class' => 'custom-control-input',
+                                                                            'id' => 'p_clamidia'
+                                                                        ]) ?>
+                                                                        <?= Html::label('Clamidia', 'p_clamidia', ['class' => 'custom-control-label']) ?>
+                                                                    </div>
+                                                                </li>
+                                                                <li>
+                                                                    <div class="custom-control custom-checkbox">
+                                                                        <?= Html::checkbox('AntecedenteGinecologico[p_eip]', $AntecedenteGinecologico->p_eip, [
+                                                                            'class' => 'custom-control-input',
+                                                                            'id' => 'p_eip'
+                                                                        ]) ?>
+                                                                        <?= Html::label('Enfermedad Inflamatoria Pélvica (E.I.P.)', 'p_eip', ['class' => 'custom-control-label']) ?>
+                                                                    </div>
+                                                                </li>
+                                                                <li>
+                                                                    <div class="custom-control custom-checkbox">
+                                                                        <?= Html::checkbox('AntecedenteGinecologico[p_gonorrea]', $AntecedenteGinecologico->p_gonorrea, [
+                                                                            'class' => 'custom-control-input',
+                                                                            'id' => 'p_gonorrea'
+                                                                        ]) ?>
+                                                                        <?= Html::label('Gonorrea', 'p_gonorrea', ['class' => 'custom-control-label']) ?>
+                                                                    </div>
+                                                                </li>
+                                                                <li>
+                                                                    <div class="custom-control custom-checkbox">
+                                                                        <?= Html::checkbox('AntecedenteGinecologico[p_hepatitis]', $AntecedenteGinecologico->p_hepatitis, [
+                                                                            'class' => 'custom-control-input',
+                                                                            'id' => 'p_hepatitis'
+                                                                        ]) ?>
+                                                                        <?= Html::label('Hepatitis', 'p_hepatitis', ['class' => 'custom-control-label']) ?>
+                                                                    </div>
+                                                                </li>
+                                                                <li>
+                                                                    <div class="custom-control custom-checkbox">
+                                                                        <?= Html::checkbox('AntecedenteGinecologico[p_herpes]', $AntecedenteGinecologico->p_herpes, [
+                                                                            'class' => 'custom-control-input',
+                                                                            'id' => 'p_herpes'
+                                                                        ]) ?>
+                                                                        <?= Html::label('Herpes', 'p_herpes', ['class' => 'custom-control-label']) ?>
+                                                                    </div>
+                                                                </li>
+                                                                <li>
+                                                                    <div class="custom-control custom-checkbox">
+                                                                        <?= Html::checkbox('AntecedenteGinecologico[p_lgv]', $AntecedenteGinecologico->p_lgv, [
+                                                                            'class' => 'custom-control-input',
+                                                                            'id' => 'p_lgv'
+                                                                        ]) ?>
+                                                                        <?= Html::label('Linfogranuloma venéreo (LGV)', 'p_lgv', ['class' => 'custom-control-label']) ?>
+                                                                    </div>
+                                                                </li>
+                                                                <li>
+                                                                    <div class="custom-control custom-checkbox">
+                                                                        <?= Html::checkbox('AntecedenteGinecologico[p_molusco_cont]', $AntecedenteGinecologico->p_molusco_cont, [
+                                                                            'class' => 'custom-control-input',
+                                                                            'id' => 'p_molusco_cont'
+                                                                        ]) ?>
+                                                                        <?= Html::label('Molusco Contagioso', 'p_molusco_cont', ['class' => 'custom-control-label']) ?>
+                                                                    </div>
+                                                                </li>
+                                                                <li>
+                                                                    <div class="custom-control custom-checkbox">
+                                                                        <?= Html::checkbox('AntecedenteGinecologico[p_ladillas]', $AntecedenteGinecologico->p_ladillas, [
+                                                                            'class' => 'custom-control-input',
+                                                                            'id' => 'p_ladillas'
+                                                                        ]) ?>
+                                                                        <?= Html::label('Piojos "ladillas" pubicos', 'p_ladillas', ['class' => 'custom-control-label']) ?>
+                                                                    </div>
+                                                                </li>
+                                                                <li>
+                                                                    <div class="custom-control custom-checkbox">
+                                                                        <?= Html::checkbox('AntecedenteGinecologico[p_sarna]', $AntecedenteGinecologico->p_sarna, [
+                                                                            'class' => 'custom-control-input',
+                                                                            'id' => 'p_sarna'
+                                                                        ]) ?>
+                                                                        <?= Html::label('Sarna', 'p_sarna', ['class' => 'custom-control-label']) ?>
+                                                                    </div>
+                                                                </li>
+
+                                                                <li>
+                                                                    <div class="custom-control custom-checkbox">
+                                                                        <?= Html::checkbox('AntecedenteGinecologico[p_sifilis]', $AntecedenteGinecologico->p_sifilis, [
+                                                                            'class' => 'custom-control-input',
+                                                                            'id' => 'p_sifilis'
+                                                                        ]) ?>
+                                                                        <?= Html::label('Sifilis', 'p_sifilis', ['class' => 'custom-control-label']) ?>
+                                                                    </div>
+                                                                </li>
+
+                                                                <li>
+                                                                    <div class="custom-control custom-checkbox">
+                                                                        <?= Html::checkbox('AntecedenteGinecologico[p_tricomoniasis]', $AntecedenteGinecologico->p_tricomoniasis, [
+                                                                            'class' => 'custom-control-input',
+                                                                            'id' => 'p_tricomoniasis'
+                                                                        ]) ?>
+                                                                        <?= Html::label('Tricomoniasis', 'p_tricomoniasis', ['class' => 'custom-control-label']) ?>
+                                                                    </div>
+                                                                </li>
+                                                                <li>
+                                                                    <div class="custom-control custom-checkbox">
+                                                                        <?= Html::checkbox('AntecedenteGinecologico[p_vb]', $AntecedenteGinecologico->p_vb, [
+                                                                            'class' => 'custom-control-input',
+                                                                            'id' => 'p_vb'
+                                                                        ]) ?>
+                                                                        <?= Html::label('Vaginosis Bacteriana', 'p_vb', ['class' => 'custom-control-label']) ?>
+                                                                    </div>
+                                                                </li>
+
+                                                                <li>
+                                                                    <div class="custom-control custom-checkbox">
+                                                                        <?= Html::checkbox('AntecedenteGinecologico[p_vih]', $AntecedenteGinecologico->p_vih, [
+                                                                            'class' => 'custom-control-input',
+                                                                            'id' => 'p_vih'
+                                                                        ]) ?>
+                                                                        <?= Html::label('VIH', 'p_vih', ['class' => 'custom-control-label']) ?>
+                                                                    </div>
+                                                                </li>
+                                                                <li>
+                                                                    <div class="custom-control custom-checkbox">
+                                                                        <?= Html::checkbox('AntecedenteGinecologico[p_vph]', $AntecedenteGinecologico->p_vph, [
+                                                                            'class' => 'custom-control-input',
+                                                                            'id' => 'p_vph'
+                                                                        ]) ?>
+                                                                        <?= Html::label('Virus del papiloma humano (VPH)', 'p_vph', ['class' => 'custom-control-label']) ?>
+                                                                    </div>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="w-100"></div>
+                                                    <br>
+                                                    <div class="col-6 col-sm-4">
+                                                        <h4>Anticoncepción</h4>
+                                                    </div>
+                                                    <div class="w-100"></div>
+                                                    <div class="col-6 col-sm-6">
+                                                        <?= Html::label('Tipo', 'p_tipo_anticoncepcion') ?>
+                                                        <?= Html::textInput('AntecedenteGinecologico[p_tipo_anticoncepcion]', $modelAntecedenteGinecologico->p_tipo_anticoncepcion, ['class' => 'form-control', 'id' => 'p_tipo_anticoncepcion']) ?>
+                                                    </div>
+                                                    <div class="w-100"></div>
+
+                                                    <div class="col-6 col-sm-3">
+                                                        <?= Html::label('Inicio', 'p_inicio_anticoncepcion') ?>
+                                                        <?= Html::input('date', 'AntecedenteGinecologico[p_inicio_anticoncepcion]', $AntecedenteGinecologico->p_inicio_anticoncepcion, ['class' => 'form-control']) ?>
+
+                                                    </div>
+                                                    <div class="col-6 col-sm-3">
+                                                        <?= Html::label('Suspensión', 'p_suspension_anticoncepcion') ?>
+                                                        <?= Html::input('date', 'AntecedenteGinecologico[p_suspension_anticoncepcion]', $AntecedenteGinecologico->p_suspension_anticoncepcion, ['class' => 'form-control']) ?>
+
+                                                    </div>
+
+
+
+
+                                                </div>
+                                                <!-- Columna derecha con el textarea -->
+                                                <br>
+                                                <hr class="solid">
+
+
+
+                                                <div class="form-group">
+
+
+                                                    <?= $form->field($AntecedenteGinecologico, 'observacion')->widget(FroalaEditorWidget::className(), [
+
+                                                        'clientOptions' => [
+                                                            'toolbarInline' => false,
+                                                            'theme' => 'royal', // optional: dark, red, gray, royal
+                                                            'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
+                                                            'height' => 300,
+                                                            'pluginsEnabled' => [
+                                                                'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
+                                                                'draggable', 'emoticons', 'entities', 'fontFamily',
+                                                                'fontSize', 'fullscreen', 'inlineStyle',
+                                                                'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
+                                                                'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
+                                                            ]
+                                                        ]
+
+                                                    ])->label('Observación General') ?>
+
+                                                </div>
+                                                <div class="form-group">
+                                                    <?= Html::submitButton('Guardar Todos los Cambios &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                                                </div>
+
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
                             <?php ActiveForm::end(); ?>
                             <?php $this->endBlock(); ?>
+
+
+                            <?php $this->beginBlock('obstrecticos'); ?>
+                            <?php $form = ActiveForm::begin(['action' => ['antecedente-obstrectico', 'id' => $model->id]]); ?>
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <div class="card">
+                                        <div class="card-header gradient-blue text-white text-center">
+                                            <h2>Antecedente Obstrectico</h2>
+                                            <i class="fa fa-medkit fa-2x"></i>
+                                            <div class="float-submit-btn">
+                                                <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                                            </div>
+                                        </div>
+                                        <div class="card-body bg-light">
+                                            <div class="container">
+
+
+                                                <div class="row">
+                                                    <div class="col-6 col-sm-3 ">
+                                                        <?= Html::label('Fecha probable de parto.', 'p_f_p_p') ?>
+                                                        <?= Html::input('date', 'AntecedenteObstrectico[p_f_p_p]', $AntecedenteObstrectico->p_f_p_p, ['class' => 'form-control']) ?>
+
+
+
+                                                    </div>
+                                                    <!-- Columna derecha con el textarea -->
+                                                    <div class="w-100"></div>
+
+                                                    <br>
+                                                    <hr class="solid">
+
+                                                    <div class="col-6 col-sm-1 ">
+                                                        <?= Html::label('Gestación', 'p_gestacion') ?>
+                                                        <?= Html::input('number', 'AntecedenteObstrectico[p_gestacion]', $AntecedenteObstrectico->p_gestacion, ['class' => 'form-control']) ?>
+
+                                                    </div>
+
+                                                    <div class="col-6 col-sm-1 ">
+                                                        <?= Html::label('Aborto', 'p_aborto') ?>
+                                                        <?= Html::input('number', 'AntecedenteObstrectico[p_aborto]', $AntecedenteObstrectico->p_aborto, ['class' => 'form-control']) ?>
+
+                                                    </div>
+
+                                                    <div class="col-6 col-sm-1 ">
+                                                        <?= Html::label('Parto', 'p_parto') ?>
+                                                        <?= Html::input('number', 'AntecedenteObstrectico[p_parto]', $AntecedenteObstrectico->p_parto, ['class' => 'form-control']) ?>
+
+                                                    </div>
+
+                                                    <div class="col-6 col-sm-1 ">
+                                                        <?= Html::label('Cesarea', 'p_cesarea') ?>
+                                                        <?= Html::input('number', 'AntecedenteObstrectico[p_cesarea]', $AntecedenteObstrectico->p_cesarea, ['class' => 'form-control']) ?>
+
+                                                    </div>
+
+                                                    <div class="w-100"></div>
+                                                    <br>
+                                                    <div class="col-6 col-sm-3 ">
+                                                        <?= Html::label('Nacidos vivos', 'p_nacidos_vivo') ?>
+                                                        <?= Html::input('number', 'AntecedenteObstrectico[p_nacidos_vivo]', $AntecedenteObstrectico->p_nacidos_vivo, ['class' => 'form-control']) ?>
+
+                                                    </div>
+                                                    <div class="col-6 col-sm-3 ">
+                                                        <?= Html::label('Viven', 'p_viven') ?>
+                                                        <?= Html::input('number', 'AntecedenteObstrectico[p_viven]', $AntecedenteObstrectico->p_viven, ['class' => 'form-control']) ?>
+
+                                                    </div>
+
+                                                    <div class="w-100"></div>
+
+                                                    <div class="col-6 col-sm-3 ">
+                                                        <?= Html::label('Nacidos Muertos', 'p_nacidos_muerto') ?>
+                                                        <?= Html::input('number', 'AntecedenteObstrectico[p_nacidos_muerto]', $AntecedenteObstrectico->p_nacidos_muerto, ['class' => 'form-control']) ?>
+
+                                                    </div>
+                                                    <div class="col-6 col-sm-3 ">
+                                                        <?= Html::label('Muerto - 1ra semana', 'p_muerto_primera_semana') ?>
+                                                        <?= Html::input('number', 'AntecedenteObstrectico[p_mmuerto_primera_semana]', $AntecedenteObstrectico->p_muerto_primera_semana, ['class' => 'form-control']) ?>
+
+                                                    </div>
+                                                    <div class="w-100"></div>
+
+                                                    <div class="col-6 col-sm-3 ">
+
+                                                    </div>
+
+                                                    <div class="col-6 col-sm-3 ">
+                                                        <?= Html::label('Muerto despues - 1ra semana', 'p_muerto_despues_semana') ?>
+                                                        <?= Html::input('number', 'AntecedenteObstrectico[p_mmuerto_despues_semana]', $AntecedenteObstrectico->p_muerto_despues_semana, ['class' => 'form-control']) ?>
+
+                                                    </div>
+
+                                                    <div class="w-100"></div>
+
+                                                    <br>
+
+
+
+
+                                                    <div class="col-6 col-sm-3 ">
+
+                                                        <div class="custom-control custom-checkbox">
+                                                            <?= Html::checkbox('AntecedenteObstrectico[p_intergenesia]', $AntecedenteObstrectico->p_intergenesia, [
+                                                                'class' => 'custom-control-input',
+                                                                'id' => 'p_intergenesia'
+                                                            ]) ?>
+                                                            <?= Html::label('Intergenesia', 'p_intergenesia', ['class' => 'custom-control-label']) ?>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6 col-sm-3 ">
+
+                                                        <div class="custom-control custom-checkbox">
+                                                            <?= Html::checkbox('AntecedenteObstrectico[p_malformaciones]', $AntecedenteObstrectico->p_malformaciones, [
+                                                                'class' => 'custom-control-input',
+                                                                'id' => 'p_malformaciones'
+                                                            ]) ?>
+                                                            <?= Html::label('Malformaciones', 'p_malformaciones', ['class' => 'custom-control-label']) ?>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6 col-sm-3 ">
+
+                                                        <div class="custom-control custom-checkbox">
+                                                            <?= Html::checkbox('AntecedenteObstrectico[p_atencion_prenatal]', $AntecedenteObstrectico->p_atencion_prenatal, [
+                                                                'class' => 'custom-control-input',
+                                                                'id' => 'p_atencion_prenatal'
+                                                            ]) ?>
+                                                            <?= Html::label('Atención prenatal', 'p_atencion_prenatal', ['class' => 'custom-control-label']) ?>
+                                                        </div>
+                                                    </div>
+                                                    <div class="w-100"></div>
+                                                    <br>
+                                                    <div class="col-6 col-sm-3 ">
+
+                                                        <div class="custom-control custom-checkbox">
+                                                            <?= Html::checkbox('AntecedenteObstrectico[p_parto_prematuro]', $AntecedenteObstrectico->p_parto_prematuro, [
+                                                                'class' => 'custom-control-input',
+                                                                'id' => 'p_parto_prematuro'
+                                                            ]) ?>
+                                                            <?= Html::label('Parto prematuro', 'p_parto_prematuro', ['class' => 'custom-control-label']) ?>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6 col-sm-3 ">
+
+                                                        <div class="custom-control custom-checkbox">
+                                                            <?= Html::checkbox('AntecedenteObstrectico[p_isoinmunizacion]', $AntecedenteObstrectico->p_isoinmunizacion, [
+                                                                'class' => 'custom-control-input',
+                                                                'id' => 'p_isoinmunizacion'
+                                                            ]) ?>
+                                                            <?= Html::label('Isoinmunización', 'p_isoinmunizacion', ['class' => 'custom-control-label']) ?>
+                                                        </div>
+                                                    </div>
+
+
+                                                    <div class="w-100"></div>
+                                                    <br>
+                                                    <div class="col-6 col-sm-8 ">
+
+                                                        <div class="form-group">
+                                                            <?= Html::label('Medicación Gestacional', 'p_medicacion_gestacional') ?>
+                                                            <?= Html::textarea('AntecedenteObstrectico[p_medicacion_gestacional]', $AntecedenteObstrectico->p_medicacion_gestacional, ['class' => 'form-control', 'rows' => 2, 'id' => 'p_medicacion_gestacional']) ?>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+
+
+                                                    <?= $form->field($AntecedenteObstrectico, 'observacion')->widget(FroalaEditorWidget::className(), [
+
+                                                        'clientOptions' => [
+                                                            'toolbarInline' => false,
+                                                            'theme' => 'royal', // optional: dark, red, gray, royal
+                                                            'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
+                                                            'height' => 300,
+                                                            'pluginsEnabled' => [
+                                                                'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
+                                                                'draggable', 'emoticons', 'entities', 'fontFamily',
+                                                                'fontSize', 'fullscreen', 'inlineStyle',
+                                                                'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
+                                                                'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
+                                                            ]
+                                                        ]
+
+                                                    ])->label('Observación General') ?>
+                                                </div>
+
+
+
+                                                <div class="form-group">
+                                                    <?= Html::submitButton('Guardar Todos los Cambios &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                                                </div>
+
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <?php ActiveForm::end(); ?>
+                            <?php $this->endBlock(); ?>
+
+
+
+
 
 
 
@@ -2773,11 +3519,33 @@ JS;
 
                                     ],
 
+                                    [
+                                        'label' => 'Ginecologicos',
+                                        'content' => $this->blocks['ginecologicos'],
+
+                                        'options' => [
+                                            'id' => 'ginecologicos',
+                                        ],
+
+
+                                    ],
+
+                                    [
+                                        'label' => 'Obstrecticos',
+                                        'content' => $this->blocks['obstrecticos'],
+
+                                        'options' => [
+                                            'id' => 'obstrecticos',
+                                        ],
+
+
+                                    ],
+
 
 
 
                                 ],
-                                //  'position' => TabsX::POS_ABOVE,
+                                'position' => TabsX::POS_ABOVE,
                                 'align' => TabsX::ALIGN_CENTER,
                                 //     'bordered'=>true,
                                 'encodeLabels' => false
@@ -2790,6 +3558,74 @@ JS;
 
 
                             <?php $this->endBlock(); ?>
+
+
+
+                            <?php $this->beginBlock('alergias'); ?>
+                            <?php $form = ActiveForm::begin(['action' => ['alergia', 'id' => $model->id]]); ?>
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <div class="card">
+                                        <div class="card-header gradient-blue text-white text-center">
+                                            <h2>Alergias</h2>
+                                            <i class="fa fa-medkit fa-2x"></i>
+                                            <div class="float-submit-btn">
+                                                <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                                            </div>
+                                        </div>
+                                        <div class="card-body bg-light">
+                                            <div class="container">
+
+
+                                                <div class="row">
+
+
+                                                    <div class="form-group">
+
+
+                                                        <?= $form->field($Alergia, 'p_alergia')->widget(FroalaEditorWidget::className(), [
+
+                                                            'clientOptions' => [
+                                                                'toolbarInline' => false,
+                                                                'theme' => 'royal', // optional: dark, red, gray, royal
+                                                                'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
+                                                                'height' => 300,
+                                                                'pluginsEnabled' => [
+                                                                    'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
+                                                                    'draggable', 'emoticons', 'entities', 'fontFamily',
+                                                                    'fontSize', 'fullscreen', 'inlineStyle',
+                                                                    'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
+                                                                    'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
+                                                                ]
+                                                            ]
+
+                                                        ])->label('Observación General') ?>
+                                                    </div>
+
+
+
+                                                </div>
+                                                <div class="alert alert-white custom-alert" role="alert">
+                                                    <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i> Escriba NEGADAS o deje en blanco si el paciente no tiene nignuna alergia.
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <?= Html::submitButton('Guardar Todos los Cambios &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                                                </div>
+
+                                            </div>
+                                           
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <?php ActiveForm::end(); ?>
+                            <?php $this->endBlock(); ?>
+
+
 
                             <?php $this->beginBlock('exploracion_fisica'); ?>
 
@@ -2818,8 +3654,26 @@ JS;
                                                             <!-- Columna derecha con el textarea -->
 
                                                             <div class="form-group">
-                                                                <?= Html::label('Habitus Exterior', 'desc_habitus_exterior') ?>
-                                                                <?= Html::textarea('ExploracionFisica[desc_habitus_exterior]', $ExploracionFisica->desc_habitus_exterior, ['class' => 'form-control', 'rows' => 5]) ?>
+
+
+                                                                <?= $form->field($ExploracionFisica, 'desc_habitus_exterior')->widget(FroalaEditorWidget::className(), [
+                                                                    'options' => [
+                                                                        'id' => 'exp-fisca'
+                                                                    ],
+                                                                    'clientOptions' => [
+                                                                        'toolbarInline' => false,
+                                                                        'theme' => 'royal', // optional: dark, red, gray, royal
+                                                                        'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
+                                                                        'height' => 200,
+                                                                        'pluginsEnabled' => [
+                                                                            'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
+                                                                            'draggable', 'emoticons', 'entities', 'fontFamily',
+                                                                            'fontSize', 'fullscreen', 'inlineStyle',
+                                                                            'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
+                                                                            'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
+                                                                        ]
+                                                                    ]
+                                                                ])->label('Habitus Exterior') ?>
                                                             </div>
 
                                                         </div>
@@ -2842,8 +3696,14 @@ JS;
                                                             <!-- Columna derecha con el textarea -->
 
                                                             <div class="form-group">
-                                                                <?= Html::label('Cabeza y Cara', 'desc_cabeza') ?>
-                                                                <?= Html::textarea('ExploracionFisica[desc_cabeza]', $ExploracionFisica->desc_cabeza, ['class' => 'form-control', 'rows' => 5]) ?>
+
+                                                                <?= $form->field($ExploracionFisica, 'desc_cabeza')->widget(FroalaEditorWidget::className(), [
+                                                                    'options' => [
+                                                                        'id' => 'exp-fisca'
+                                                                    ],
+
+                                                                ])->label('Cabeza y Cara') ?>
+
                                                             </div>
 
                                                         </div>
@@ -2877,8 +3737,14 @@ JS;
                                                             <!-- Columna derecha con el textarea -->
 
                                                             <div class="form-group">
-                                                                <?= Html::label('Cuello', 'desc_cuello') ?>
-                                                                <?= Html::textarea('ExploracionFisica[desc_cuello]', $ExploracionFisica->desc_cuello, ['class' => 'form-control', 'rows' => 5]) ?>
+
+                                                                <?= $form->field($ExploracionFisica, 'desc_cuello')->widget(FroalaEditorWidget::className(), [
+                                                                    'options' => [
+                                                                        'id' => 'exp-fisca'
+                                                                    ],
+
+                                                                ])->label('Cuello') ?>
+
                                                             </div>
 
                                                         </div>
@@ -2904,8 +3770,13 @@ JS;
                                                             <!-- Columna derecha con el textarea -->
 
                                                             <div class="form-group">
-                                                                <?= Html::label('Torax', 'desc_torax') ?>
-                                                                <?= Html::textarea('ExploracionFisica[desc_torax]', $ExploracionFisica->desc_torax, ['class' => 'form-control', 'rows' => 5]) ?>
+
+                                                                <?= $form->field($ExploracionFisica, 'desc_torax')->widget(FroalaEditorWidget::className(), [
+                                                                    'options' => [
+                                                                        'id' => 'exp-fisca'
+                                                                    ],
+
+                                                                ])->label('Torax') ?>
                                                             </div>
 
                                                         </div>
@@ -2930,8 +3801,14 @@ JS;
                                                             <!-- Columna derecha con el textarea -->
 
                                                             <div class="form-group">
-                                                                <?= Html::label('Abdomen', 'desc_torax') ?>
-                                                                <?= Html::textarea('ExploracionFisica[desc_abdomen]', $ExploracionFisica->desc_abdomen, ['class' => 'form-control', 'rows' => 5]) ?>
+
+
+                                                                <?= $form->field($ExploracionFisica, 'desc_abdomen')->widget(FroalaEditorWidget::className(), [
+                                                                    'options' => [
+                                                                        'id' => 'exp-fisca'
+                                                                    ],
+
+                                                                ])->label('Abdomen') ?>
                                                             </div>
 
                                                         </div>
@@ -2956,8 +3833,14 @@ JS;
                                                             <!-- Columna derecha con el textarea -->
 
                                                             <div class="form-group">
-                                                                <?= Html::label('Exploración Ginecologica', 'desc_exploración_ginecologica') ?>
-                                                                <?= Html::textarea('ExploracionFisica[desc_exploración_ginecologica]', $ExploracionFisica->desc_exploración_ginecologica, ['class' => 'form-control', 'rows' => 5]) ?>
+
+                                                                <?= $form->field($ExploracionFisica, 'desc_exploración_ginecologica')->widget(FroalaEditorWidget::className(), [
+                                                                    'options' => [
+                                                                        'id' => 'exp-fisca'
+                                                                    ],
+
+                                                                ])->label('Exploración Ginecologica') ?>
+
                                                             </div>
 
                                                         </div>
@@ -2982,8 +3865,13 @@ JS;
                                                             <!-- Columna derecha con el textarea -->
 
                                                             <div class="form-group">
-                                                                <?= Html::label('Exploración Genitales', 'desc_genitales') ?>
-                                                                <?= Html::textarea('ExploracionFisica[desc_genitales]', $ExploracionFisica->desc_genitales, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                                <?= $form->field($ExploracionFisica, 'desc_genitales')->widget(FroalaEditorWidget::className(), [
+                                                                    'options' => [
+                                                                        'id' => 'exp-fisca'
+                                                                    ],
+
+                                                                ])->label('Exploración Genitales') ?>
+
                                                             </div>
 
                                                         </div>
@@ -3009,8 +3897,14 @@ JS;
                                                             <!-- Columna derecha con el textarea -->
 
                                                             <div class="form-group">
-                                                                <?= Html::label('Columna Vertebral', 'desc_columna_vertebral') ?>
-                                                                <?= Html::textarea('ExploracionFisica[desc_columna_vertebral]', $ExploracionFisica->desc_columna_vertebral, ['class' => 'form-control', 'rows' => 5]) ?>
+
+                                                                <?= $form->field($ExploracionFisica, 'desc_columna_vertebral')->widget(FroalaEditorWidget::className(), [
+                                                                    'options' => [
+                                                                        'id' => 'exp-fisca'
+                                                                    ],
+
+                                                                ])->label('Columna Vertebral') ?>
+
                                                             </div>
 
                                                         </div>
@@ -3033,8 +3927,13 @@ JS;
                                                             <!-- Columna derecha con el textarea -->
 
                                                             <div class="form-group">
-                                                                <?= Html::label('Extremidades', 'desc_extremidades') ?>
-                                                                <?= Html::textarea('ExploracionFisica[desc_extremidades]', $ExploracionFisica->desc_extremidades, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                                <?= $form->field($ExploracionFisica, 'desc_extremidades')->widget(FroalaEditorWidget::className(), [
+                                                                    'options' => [
+                                                                        'id' => 'exp-fisca'
+                                                                    ],
+
+                                                                ])->label('Extremidades') ?>
+
                                                             </div>
 
                                                         </div>
@@ -3059,8 +3958,13 @@ JS;
                                                             <!-- Columna derecha con el textarea -->
 
                                                             <div class="form-group">
-                                                                <?= Html::label('Exploración Neurologica', 'desc_exploracion_neurologica') ?>
-                                                                <?= Html::textarea('ExploracionFisica[desc_exploracion_neurologica]', $ExploracionFisica->desc_exploracion_neurologica, ['class' => 'form-control', 'rows' => 5]) ?>
+
+                                                                <?= $form->field($ExploracionFisica, 'desc_exploracion_neurologica')->widget(FroalaEditorWidget::className(), [
+                                                                    'options' => [
+                                                                        'id' => 'exp-fisca'
+                                                                    ],
+
+                                                                ])->label('Exploración Neurologica') ?>
                                                             </div>
 
                                                         </div>
@@ -3087,9 +3991,12 @@ JS;
 
                                                 <br>
 
-
+                                                <div class="form-group">
+                                                    <?= Html::submitButton('Guardar Todos los Cambios &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                                                </div>
 
                                             </div>
+                                           
                                         </div>
                                     </div>
                                 </div>
@@ -3126,8 +4033,15 @@ JS;
                                                             <!-- Columna derecha con el textarea -->
 
                                                             <div class="form-group">
-                                                                <?= Html::label('Cardiovascular', 'desc_cardiovascular') ?>
-                                                                <?= Html::textarea('InterrogatorioMedico[desc_cardiovascular]', $InterrogatorioMedico->desc_cardiovascular, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                             
+                                                                <?= $form->field($InterrogatorioMedico, 'desc_cardiovascular')->widget(FroalaEditorWidget::className(), [
+                                                                    'options' => [
+                                                                        'id' => 'exp-fisca'
+                                                                    ],
+
+                                                                ])->label('Cardiovascular') ?>
+
+
                                                             </div>
 
                                                         </div>
@@ -3151,8 +4065,14 @@ JS;
                                                             <!-- Columna derecha con el textarea -->
 
                                                             <div class="form-group">
-                                                                <?= Html::label('Digestivo', 'desc_digestivo') ?>
-                                                                <?= Html::textarea('InterrogatorioMedico[desc_digestivo]', $InterrogatorioMedico->desc_digestivo, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                         
+                                                                <?= $form->field($InterrogatorioMedico, 'desc_digestivo')->widget(FroalaEditorWidget::className(), [
+                                                                    'options' => [
+                                                                        'id' => 'exp-fisca'
+                                                                    ],
+
+                                                                ])->label('Digestivo') ?>
+                                                         
                                                             </div>
 
                                                         </div>
@@ -3172,8 +4092,14 @@ JS;
                                                             <!-- Columna derecha con el textarea -->
 
                                                             <div class="form-group">
-                                                                <?= Html::label('Endocrino', 'desc_endocrino') ?>
-                                                                <?= Html::textarea('InterrogatorioMedico[desc_endocrino]', $InterrogatorioMedico->desc_endocrino, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                             
+                                                            
+                                                                <?= $form->field($InterrogatorioMedico, 'desc_endocrino')->widget(FroalaEditorWidget::className(), [
+                                                                    'options' => [
+                                                                        'id' => 'exp-fisca'
+                                                                    ],
+
+                                                                ])->label('Endocrino') ?>
                                                             </div>
 
                                                         </div>
@@ -3195,8 +4121,14 @@ JS;
                                                             <!-- Columna derecha con el textarea -->
 
                                                             <div class="form-group">
-                                                                <?= Html::label('Hemolinfatico', 'desc_hemolinfatico') ?>
-                                                                <?= Html::textarea('InterrogatorioMedico[desc_hemolinfatico]', $InterrogatorioMedico->desc_hemolinfatico, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                              
+                                                          
+                                                                <?= $form->field($InterrogatorioMedico, 'desc_hemolinfatico')->widget(FroalaEditorWidget::className(), [
+                                                                    'options' => [
+                                                                        'id' => 'exp-fisca'
+                                                                    ],
+
+                                                                ])->label('Hemolinfatico') ?>
                                                             </div>
 
                                                         </div>
@@ -3217,8 +4149,13 @@ JS;
                                                             <!-- Columna derecha con el textarea -->
 
                                                             <div class="form-group">
-                                                                <?= Html::label('Mamas', 'desc_mamas') ?>
-                                                                <?= Html::textarea('InterrogatorioMedico[desc_mamas]', $InterrogatorioMedico->desc_mamas, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                            
+                                                                <?= $form->field($InterrogatorioMedico, 'desc_mamas')->widget(FroalaEditorWidget::className(), [
+                                                                    'options' => [
+                                                                        'id' => 'exp-fisca'
+                                                                    ],
+
+                                                                ])->label('Mamas') ?>
                                                             </div>
 
                                                         </div>
@@ -3239,8 +4176,14 @@ JS;
                                                             <!-- Columna derecha con el textarea -->
 
                                                             <div class="form-group">
-                                                                <?= Html::label('Musculo-Esqueletico', 'desc_musculo_esqueletico') ?>
-                                                                <?= Html::textarea('InterrogatorioMedico[desc_musculo_esqueletico]', $InterrogatorioMedico->desc_musculo_esqueletico, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                           
+                                                                <?= $form->field($InterrogatorioMedico, 'desc_musculo_esqueletico')->widget(FroalaEditorWidget::className(), [
+                                                                    'options' => [
+                                                                        'id' => 'exp-fisca'
+                                                                    ],
+
+                                                                ])->label('Musculo-Esqueletico') ?>
+                                                           
                                                             </div>
 
                                                         </div>
@@ -3261,8 +4204,15 @@ JS;
                                                             <!-- Columna derecha con el textarea -->
 
                                                             <div class="form-group">
-                                                                <?= Html::label('Piel y Anexos', 'desc_piel_anexos') ?>
-                                                                <?= Html::textarea('InterrogatorioMedico[desc_piel_anexos]', $InterrogatorioMedico->desc_piel_anexos, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                           
+                                                                <?= $form->field($InterrogatorioMedico, 'desc_piel_anexos')->widget(FroalaEditorWidget::className(), [
+                                                                    'options' => [
+                                                                        'id' => 'exp-fisca'
+                                                                    ],
+
+                                                                ])->label('Piel y Anexos') ?>
+                                                           
+                                                           
                                                             </div>
 
                                                         </div>
@@ -3285,6 +4235,14 @@ JS;
                                                             <div class="form-group">
                                                                 <?= Html::label('Reproductor', 'desc_reproductor') ?>
                                                                 <?= Html::textarea('InterrogatorioMedico[desc_reproductor]', $InterrogatorioMedico->desc_reproductor, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                          
+                                                          
+                                                                <?= $form->field($InterrogatorioMedico, 'desc_reproductor')->widget(FroalaEditorWidget::className(), [
+                                                                    'options' => [
+                                                                        'id' => 'exp-fisca'
+                                                                    ],
+
+                                                                ])->label('Reproductor') ?>
                                                             </div>
 
                                                         </div>
@@ -3306,8 +4264,14 @@ JS;
                                                             <!-- Columna derecha con el textarea -->
 
                                                             <div class="form-group">
-                                                                <?= Html::label('Respiratorio', 'desc_respiratorio') ?>
-                                                                <?= Html::textarea('InterrogatorioMedico[desc_respiratorio]', $InterrogatorioMedico->desc_respiratorio, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                              
+                                                                <?= $form->field($InterrogatorioMedico, 'desc_respiratorio')->widget(FroalaEditorWidget::className(), [
+                                                                    'options' => [
+                                                                        'id' => 'exp-fisca'
+                                                                    ],
+
+                                                                ])->label('Respiratorio') ?>
+                                                          
                                                             </div>
 
                                                         </div>
@@ -3328,8 +4292,14 @@ JS;
                                                             <!-- Columna derecha con el textarea -->
 
                                                             <div class="form-group">
-                                                                <?= Html::label('Sistema Nervioso', 'desc_sistema_nervioso') ?>
-                                                                <?= Html::textarea('InterrogatorioMedico[desc_sistema_nervioso]', $InterrogatorioMedico->desc_sistema_nervioso, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                           
+                                                                <?= $form->field($InterrogatorioMedico, 'desc_sistema_nervioso')->widget(FroalaEditorWidget::className(), [
+                                                                    'options' => [
+                                                                        'id' => 'exp-fisca'
+                                                                    ],
+
+                                                                ])->label('Sistema Nervioso') ?>
+                                                           
                                                             </div>
 
                                                         </div>
@@ -3350,8 +4320,14 @@ JS;
                                                             <!-- Columna derecha con el textarea -->
 
                                                             <div class="form-group">
-                                                                <?= Html::label('Sistemas Generales', 'desc_sistemas_generales') ?>
-                                                                <?= Html::textarea('InterrogatorioMedico[desc_sistemas_generales]', $InterrogatorioMedico->desc_sistemas_generales, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                              
+                                                          
+                                                                <?= $form->field($InterrogatorioMedico, 'desc_sistemas_generales')->widget(FroalaEditorWidget::className(), [
+                                                                    'options' => [
+                                                                        'id' => 'exp-fisca'
+                                                                    ],
+
+                                                                ])->label('Sistemas Generales') ?>
                                                             </div>
 
                                                         </div>
@@ -3372,8 +4348,14 @@ JS;
                                                             <!-- Columna derecha con el textarea -->
 
                                                             <div class="form-group">
-                                                                <?= Html::label('Urinario', 'desc_urinario') ?>
-                                                                <?= Html::textarea('InterrogatorioMedico[desc_urinario]', $InterrogatorioMedico->desc_urinario, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                              
+                                                         
+                                                                <?= $form->field($InterrogatorioMedico, 'desc_urinario')->widget(FroalaEditorWidget::className(), [
+                                                                    'options' => [
+                                                                        'id' => 'exp-fisca'
+                                                                    ],
+
+                                                                ])->label('Urinario') ?>
                                                             </div>
 
                                                         </div>
@@ -3381,10 +4363,16 @@ JS;
                                                             <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Disuria, polaquiuria, tenesmo vesical, hematuria piuria, incontinencia, dolor lumbar, expulsion de calculos, secrecion uretral.
                                                         </div>
                                                     </div>
-
+                                                    
                                                 </div>
 
+                                                <div class="form-group">
+                                                    <?= Html::submitButton('Guardar Todos los Cambios &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                                                </div>
                                             </div>
+                                            
+                                               
+                                            
                                         </div>
                                     </div>
                                 </div>
@@ -3427,6 +4415,17 @@ JS;
                                         // 'active' => true,
                                         'options' => [
                                             'id' => 'interrogatorio_medico',
+                                        ],
+
+
+                                    ],
+
+                                    [
+                                        'label' => 'Alergias',
+                                        'content' => $this->blocks['alergias'],
+                                        // 'active' => true,
+                                        'options' => [
+                                            'id' => 'alergias',
                                         ],
 
 

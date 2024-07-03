@@ -12,7 +12,7 @@ use app\models\Notificacion;
             <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars" style="color: #007bff;"></i></a>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
-            <a href="../site/portalgestionrh" class="nav-link text-primary"><i class="fas fa-home" style="color: #007bff;"></i> &nbsp;Inicio </a>
+            <a href="../site/portal-medico" class="nav-link text-primary"><i class="fas fa-home" style="color: #007bff;"></i> &nbsp;Inicio Medico </a>
         </li>
   
     </ul>

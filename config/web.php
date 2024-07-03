@@ -14,6 +14,10 @@ $config = [
         '@npm'   => '@vendor/npm-asset',
     ],
     'modules' => [
+        'redactor' => 'yii\redactor\RedactorModule',
+        'jodit' => 'yii2jodit\JoditModule',
+
+
         'admin' => [
             'class' => 'mdm\admin\Module',
             'layout' => 'left-menu',

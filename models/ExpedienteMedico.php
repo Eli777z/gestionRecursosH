@@ -20,9 +20,16 @@ use Yii;
  * @property int|null $exploracion_fisica_id
  * @property int|null $interrogatorio_medico_id
   * @property int|null $antecedente_perinatal_id
-
-
-
+ * @property int|null $antecedente_ginecologico_id
+  * @property int|null $antecedente_obstrectico_id
+ * @property int|null $alergia_id
+ *
+ * @property Alergia $alergia
+ * @property Alergia[] $alergias0
+   * @property AntecedenteObstrectico $antecedenteObstrectico
+ * @property AntecedenteObstrectico[] $antecedenteObstrecticos
+ * @property AntecedenteGinecologico $antecedenteGinecologico
+ * @property AntecedenteGinecologico[] $antecedenteGinecologicos
  * @property AntecedenteHereditario $antecedenteHereditario
  * @property AntecedenteHereditario[] $antecedenteHereditarios
  * @property AntecedenteNoPatologico $antecedenteNoPatologico
@@ -63,6 +70,9 @@ class ExpedienteMedico extends \yii\db\ActiveRecord
             [['exploracion_fisica_id'], 'exist', 'skipOnError' => true, 'targetClass' => ExploracionFisica::class, 'targetAttribute' => ['exploracion_fisica_id' => 'id']],
             [['interrogatorio_medico_id'], 'exist', 'skipOnError' => true, 'targetClass' => InterrogatorioMedico::class, 'targetAttribute' => ['interrogatorio_medico_id' => 'id']],
             [['antecedente_perinatal_id'], 'exist', 'skipOnError' => true, 'targetClass' => AntecedentePerinatal::class, 'targetAttribute' => ['antecedente_perinatal_id' => 'id']],
+            [['antecedente_ginecologico_id'], 'exist', 'skipOnError' => true, 'targetClass' => AntecedenteGinecologico::class, 'targetAttribute' => ['antecedente_ginecologico_id' => 'id']],
+            [['antecedente_obstrectico_id'], 'exist', 'skipOnError' => true, 'targetClass' => AntecedenteObstrectico::class, 'targetAttribute' => ['antecedente_obstrectico_id' => 'id']],
+            [['alergia_id'], 'exist', 'skipOnError' => true, 'targetClass' => Alergia::class, 'targetAttribute' => ['alergia_id' => 'id']],
 
         ];
     }
@@ -86,6 +96,11 @@ class ExpedienteMedico extends \yii\db\ActiveRecord
             'exploracion_fisica_id' => 'Exploracion Fisica ID',
             'interrogatorio_medico_id' => 'Interrogatorio Medico ID',
             'antecedente_perinatal_id' => 'Antecedente Perinatal ID',
+            'antecedente_ginecologico_id' => 'Antecedente Ginecologico ID',
+            'antecedente_obstrectico_id' => 'Antecedente Obstrectico ID',
+
+            'alergia_id' => 'Alergia ID',
+
 
 
         ];
@@ -212,6 +227,50 @@ class ExpedienteMedico extends \yii\db\ActiveRecord
     {
         return $this->hasMany(AntecedentePerinatal::class, ['expediente_medico_id' => 'id']);
     }
+    public function getAntecedenteGinecologico()
+    {
+        return $this->hasOne(AntecedenteGinecologico::class, ['id' => 'antecedente_ginecologico_id']);
+    }
 
+    /**
+     * Gets query for [[AntecedenteGinecologicos]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAntecedenteGinecologicos()
+    {
+        return $this->hasMany(AntecedenteGinecologico::class, ['expediente_medico_id' => 'id']);
+    }
+
+
+    public function getAntecedenteObstrectico()
+    {
+        return $this->hasOne(AntecedenteObstrectico::class, ['id' => 'antecedente_obstrectico_id']);
+    }
+
+    /**
+     * Gets query for [[AntecedenteObstrecticos]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAntecedenteObstrecticos()
+    {
+        return $this->hasMany(AntecedenteObstrectico::class, ['expediente_medico_id' => 'id']);
+    }
+    
+    public function getAlergia()
+    {
+        return $this->hasOne(Alergia::class, ['id' => 'alergia_id']);
+    }
+
+    /**
+     * Gets query for [[Alergias0]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAlergias0()
+    {
+        return $this->hasMany(Alergia::class, ['expediente_medico_id' => 'id']);
+    }
     
 }

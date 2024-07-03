@@ -14,6 +14,7 @@ use app\models\PermisoFueraTrabajo;
 use app\models\Usuario;
 use app\models\Notificacion;
 use app\models\Empleado;
+use app\models\CambiarContrasenaForm;
 use yii\helpers\ArrayHelper;
 use app\models\JuntaGobierno;
 class SiteController extends Controller
@@ -49,6 +50,18 @@ class SiteController extends Controller
                           return Usuario::isUserSimple(Yii::$app->user->identity->id);
                       },
                    ],
+
+                   [
+                    'actions' => ['logout', 'medico'],
+                    'allow' => true,
+                   
+                    'roles' => ['@'],
+                   
+                    'matchCallback' => function ($rule, $action) {
+
+                       return Usuario::isUserMedico(Yii::$app->user->identity->id);
+                   },
+                ],
                 ],
             ],
     
@@ -106,7 +119,7 @@ class SiteController extends Controller
             } elseif(Usuario:: isUserSimple($userId)) {
                 return $this->redirect(["site/portalempleado"]);
             }else{
-                return $this->redirect(["site/portalmedico"]);
+                return $this->redirect(["site/portal-medico"]);
 
             }
         }
@@ -126,7 +139,7 @@ class SiteController extends Controller
                 }
                 else{
 
-                    return $this->redirect(["site/portalmedico"]);
+                    return $this->redirect(["site/portal-medico"]);
 
                 }
 
@@ -139,6 +152,32 @@ class SiteController extends Controller
             ]);
         }
     }
+
+    public function actionCambiarcontrasena()
+{
+    // Aquí asumimos que tienes un modelo de formulario para cambiar la contraseña.
+    $model = new CambiarContrasenaForm();
+
+    if ($model->load(Yii::$app->request->post()) && $model->changePassword()) {
+        // Aquí manejamos la redirección después de que la contraseña ha sido cambiada.
+        $userId = Yii::$app->user->identity->id;
+        $user = Usuario::findOne($userId);
+
+        if (Usuario::isUserAdmin($userId)) {
+            return $this->redirect(['site/portalgestionrh']);
+        } 
+        elseif (Usuario::isUserMedico($userId)) {
+            return $this->redirect(['site/portal-medico']);
+        }
+        elseif (Usuario::isUserSimple($userId)) {
+            return $this->redirect(['site/portalempleado']);
+        }
+    }
+
+    return $this->render('cambiarcontrasena', [
+        'model' => $model,
+    ]);
+}
 
    
     
@@ -167,9 +206,9 @@ class SiteController extends Controller
     public function actionLogout()
     {
         Yii::$app->user->logout();
-
-        return $this->goHome();
+        return $this->redirect(['site/login']);
     }
+    
 
     /**
      * Displays contact page.
@@ -211,7 +250,13 @@ class SiteController extends Controller
     }
     
 
-   
+    public function actionPortalMedico()
+    {
+
+        $this->layout = "main-doctor";
+
+        return $this->render('portal-medico');
+    }
     
 
    
@@ -231,21 +276,7 @@ class SiteController extends Controller
 
     
 
-    public function actionCambiarcontrasena()
-    {
-        return $this->render('usuario/cambiarcontrasena');
-    }
-    public function actionSetActiveTab()
-    {
-        $request = Yii::$app->request;
-        if ($request->isAjax) {
-            $activeTabIndex = $request->post('activeTabIndex');
-            Yii::$app->session->set('activeTabIndex', $activeTabIndex);
-            return true;
-        }
-        return false;
-    }
-
+   
 
     public function actionGetEmpleadoFoto($filename)
     {
