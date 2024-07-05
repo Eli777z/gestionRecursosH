@@ -21,12 +21,17 @@ $config = [
         'admin' => [
             'class' => 'mdm\admin\Module',
             'layout' => 'left-menu',
+           // 'mainLayout' => '@app/views/layouts/main-doctor.php',
+
         ],
-        'gridview' =>  [
-            'class' => '\kartik\grid\Module'
-        ] 
+
+    
+      
         
     ],
+
+
+    
     'components' => [
         
         'mpdf' => [
@@ -119,51 +124,19 @@ $config = [
         'allowActions' => [
             'site/login',
             'site/logout',
-            'site/*',
-            'gii/*', 
             'admin/*',
-            'usuario/*',
-            'trabajador/*',
-          'empleado/*',
-            'infolaboral/*',
-            'cat-departamento/*',
-            'cat-direccion/*',
-            'junta-gobierno/*',
-            //'infolaboral/*',
-            'cat-puesto/*',
-            'cat-tipo-contrato/*',
-            'cat-tipo-documento/*',
-            'archivo/*',
-            'expediente/*',
-            'some-controller/some-action',
-            'prueba/*',
-            'solicitud/*',
-            'cambio-periodo-vacacional/*',
-'documento/*',
-'countries/*',
-'cat-dpto-cargo/*',
-'debug/*',
-'permiso-fuera-trabajo/*' ,
-'comision-especial/*',
-'cambio-dia-laboral/*',
-'cambio-horario-trabajo/*',
-'permiso-economico/*',
-'permiso-sin-sueldo/*',
-'cat-nivel-estudio/*',
-'cat-actividad-fisica/*',
-'antecedente-hereditario/*',
-'cat-antecedente-hereditario/*',
-'antecedente-no-patologico/*',
-'antecedente-patologico/*',
-'expediente-medico/*'
-
+            'gii/*',
+            'web/*',
+            'site/*',
+            'empleado/*'
+            //'some-controller/some-action',
             // The actions listed here will be allowed to everyone including guests.
             // So, 'admin/*' should not appear here in the production, of course.
             // But in the earlier stages of your development, you may probably want to
             // add a lot of actions here until you finally completed setting up rbac,
             // otherwise you may not even take a first step.
         ]
-    ],
+    ],    
 ];
 
 if (YII_ENV_DEV) {

@@ -15,7 +15,7 @@ use yii\helpers\Html;
 use yii\redactor\widgets\Redactor;
 use dosamigos\tinymce\TinyMce;
 use froala\froalaeditor\FroalaEditorWidget;
-
+use yii\helpers\HtmlPurifier;
 //use yii\widgets\DetailView;
 use kartik\file\FileInput;
 use dosamigos\ckeditor\CKEditor;
@@ -65,6 +65,7 @@ $observacionGeneral = '';
 $descripcionAntecedentes = '';
 $modelAntecedenteNoPatologico = new \app\models\AntecedenteNoPatologico();
 $modelExploracionFisica = new \app\models\ExploracionFisica();
+$editable = Yii::$app->user->can('editar-expediente-medico');
 
 
 if ($antecedentes) {
@@ -157,12 +158,15 @@ if (!$modelAlergia) {
                                 'class' => 'rounded-circle',
                                 'style' => 'width: 130px; height: 130px;'
                             ]) ?>
+                                 <?php if (Yii::$app->user->can('modificar-informacion-empleados')): ?>
+                                    
                             <?= Html::button('<i class="fas fa-edit"></i>', [
                                 'class' => 'btn btn-dark position-absolute',
                                 'style' => 'top: 5px; right: 5px; padding: 5px 10px;',
                                 'data-toggle' => 'modal',
                                 'data-target' => '#changePhotoModal'
                             ]) ?>
+                             <?php endif; ?>
                         </div>
                         <div class="ml-4">
                             <div class="alert alert-light mb-0" role="alert">
@@ -184,6 +188,7 @@ if (!$modelAlergia) {
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="changePhotoModalLabel">Cambiar Foto de Perfil</h5>
+
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
@@ -265,28 +270,21 @@ if (!$modelAlergia) {
                                         ]); ?>
                                         <div class="card-header bg-info text-white">
                                             <h3>Información personal</h3>
+                                            <?php if (Yii::$app->user->can('modificar-informacion-empleados')): ?>
+                                                
                                             <button type="button" id="edit-button-personal" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
                                             <button type="button" id="cancel-button-personal" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
+                                        
                                             <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right mr-3', 'id' => 'save-button-personal', 'style' => 'display:none;']) ?>
+                                            <?php endif; ?>
                                         </div>
                                         <div class="card-body">
                                             <?= $form->field($model, 'numero_empleado')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
                                             <?= $form->field($model, 'nombre')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
                                             <?= $form->field($model, 'apellido')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
-                                            <?= $form->field($model, 'fecha_nacimiento')->widget(DatePicker::class, [
-                                                'language' => 'es',
-                                                'dateFormat' => 'yyyy-MM-dd',
-                                                'options' => [
-                                                    'class' => 'form-control',
-                                                    'autocomplete' => 'off',
-                                                    'readonly' => true
-                                                ],
-                                                'clientOptions' => [
-                                                    'changeYear' => true,
-                                                    'changeMonth' => true,
-                                                    'yearRange' => '-100:+0',
-                                                ],
-                                            ]); ?>
+                                           
+
+<?= $form->field($model, 'fecha_nacimiento')->input('date', ['disabled' => true]) ?>
 
                                             <?= $form->field($model, 'edad')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
                                             <?= $form->field($model, 'sexo')->widget(Select2::className(), [
@@ -386,9 +384,12 @@ if (!$modelAlergia) {
                                         ]); ?>
                                         <div class="card-header gradient-verde  text-white">
                                             <h3>Información Educacional</h3>
+                                            <?php if (Yii::$app->user->can('modificar-informacion-empleados')): ?>
+                                              
                                             <button type="button" id="edit-button-educational" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
                                             <button type="button" id="cancel-button-educational" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
                                             <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right mr-3', 'id' => 'save-button-educational', 'style' => 'display:none;']) ?>
+                                            <?php endif; ?>
                                         </div>
                                         <div class="card-body">
                                             <?= $form->field($model, 'cat_nivel_estudio_id')->widget(Select2::classname(), [
@@ -490,9 +491,12 @@ if (!$modelAlergia) {
                                         ]); ?>
                                         <div class="card-header bg-info text-white">
                                             <h3>Información de contacto</h3>
+                                            <?php if (Yii::$app->user->can('modificar-informacion-empleados')): ?>
+                                               
                                             <button type="button" id="edit-button-contact" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
                                             <button type="button" id="cancel-button-contact" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
                                             <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right mr-3', 'id' => 'save-button-contact', 'style' => 'display:none;']) ?>
+                                            <?php endif; ?>
                                         </div>
                                         <div class="card-body">
                                             <?= $form->field($model, 'email')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
@@ -573,9 +577,12 @@ if (!$modelAlergia) {
                                         ]); ?>
                                         <div class="card-header gradient-verde text-white">
                                             <h3>Información de contacto de emergencia</h3>
+                                            <?php if (Yii::$app->user->can('modificar-informacion-empleados')): ?>
+                                              
                                             <button type="button" id="edit-button-emergency" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
                                             <button type="button" id="cancel-button-emergency" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
                                             <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-info float-right  mr-3', 'id' => 'save-button-emergency', 'style' => 'display:none;']) ?>
+                                            <?php endif; ?>
                                         </div>
                                         <div class="card-body">
                                             <?= $form->field($model, 'nombre_contacto_emergencia')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
@@ -680,9 +687,12 @@ if (!$modelAlergia) {
                                 ]); ?>
                                 <div class="card-header bg-info text-white">
                                     <h3>Información Laboral</h3>
+                                    <?php if (Yii::$app->user->can('modificar-informacion-empleados')): ?>
+                                      
                                     <button type="button" id="edit-button-laboral" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
                                     <button type="button" id="cancel-button-laboral" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
                                     <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right  mr-3', 'id' => 'save-button-laboral', 'style' => 'display:none;']) ?>
+                                    <?php endif; ?>
                                 </div>
                                 <div class="card-body">
 
@@ -725,7 +735,8 @@ if (!$modelAlergia) {
 
 
 
-
+                                    <?php if (Yii::$app->user->identity->rol == 2): ?>
+                                       
                                     <?= $form->field($model->informacionLaboral, 'cat_tipo_contrato_id')->widget(Select2::classname(), [
                                         'data' => ArrayHelper::map(CatTipoContrato::find()->all(), 'id', 'nombre_tipo'),
                                         'options' => ['placeholder' => 'Seleccionar Tipo de Contrato', 'disabled' => true],
@@ -740,6 +751,7 @@ if (!$modelAlergia) {
                                             'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
                                         ],
                                     ])->label('Tipo de contrato') ?>
+                                     <?php endif; ?>
                                     <?= $form->field($model->informacionLaboral, 'fecha_ingreso')->input('date', ['disabled' => true]) ?>
 
                                     <?= $form->field($model->informacionLaboral, 'cat_departamento_id')->widget(Select2::classname(), [
@@ -774,14 +786,19 @@ if (!$modelAlergia) {
                                     <?= $form->field($model->informacionLaboral, 'horario_laboral_inicio')->input('time', ['disabled' => true])->label('Hora de entrada')  ?>
 
                                     <?= $form->field($model->informacionLaboral, 'horario_laboral_fin')->input('time', ['disabled' => true])->label('Hora de salida') ?>
+                                    <?php if (Yii::$app->user->identity->rol == 2): ?>
+                                       
                                     <?= $form->field($model->informacionLaboral, 'numero_cuenta')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
-                                    <?= $form->field($model->informacionLaboral, 'salario')->textInput([
+                                    <?php endif; ?>
+                                    <?php if (Yii::$app->user->identity->rol == 2): ?>
+                                       
+                                   <?= $form->field($model->informacionLaboral, 'salario')->textInput([
                                         'type' => 'number',
                                         'step' => '0.01',
                                         'readonly' => true,
                                         'class' => 'form-control'
                                     ]); ?>
-
+ <?php endif; ?>
 
 
                                     <?= $form->field($model->informacionLaboral, 'cat_puesto_id')->widget(Select2::classname(), [
@@ -956,9 +973,13 @@ if (!$modelAlergia) {
                                                     </div>
                                                     <label>Dias de vacaciones disponibles: <?= $model->informacionLaboral->vacaciones->periodoVacacional->dias_vacaciones_periodo ?></label><br>
                                                     <label>Dias de vacaciones restantes: <span id="dias-disponibles"><?= $model->informacionLaboral->vacaciones->periodoVacacional->dias_disponibles ?></span></label><br>
+                                                    <?php if (Yii::$app->user->can('modificar-informacion-empleados')): ?>
+
                                                     <button type="button" id="edit-button-first-period" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
                                                     <button type="button" id="cancel-button-first-period" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
+                                                   
                                                     <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-dark float-right mr-3', 'id' => 'save-button-first-period', 'style' => 'display:none;']) ?>
+                                                    <?php endif; ?>
                                                 </div>
                                                 <div class="card-body">
                                                     <?= $form->field($model->informacionLaboral->vacaciones->periodoVacacional, 'año')->textInput(['type' => 'number', 'disabled' => true]) ?>
@@ -1067,9 +1088,13 @@ if (!$modelAlergia) {
                                                     </label>
 
                                                     <br>
+                                                    <?php if (Yii::$app->user->can('modificar-informacion-empleados')): ?>
+
                                                     <button type="button" id="edit-button-period" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
                                                     <button type="button" id="cancel-button-period" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
                                                     <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-info float-right  mr-3', 'id' => 'save-button-period', 'style' => 'display:none;']) ?>
+                                                    <?php endif; ?>
+
                                                 </div>
                                                 <div class="card-body">
                                                     <?= $form->field($model->informacionLaboral->vacaciones->segundoPeriodoVacacional, 'año')->textInput(['type' => 'number', 'disabled' => true]) ?>
@@ -1334,63 +1359,56 @@ if (!$modelAlergia) {
 
 
                             <?php
+$tabs = [
+    [
+        'label' => 'Información personal',
+        'content' => $this->blocks['info_p'],
+        'options' => [
+            'id' => 'informacion_personal',
+        ],
+    ],
+    [
+        'label' => 'Información de contacto',
+        'content' => $this->blocks['info_c'],
+        'options' => [
+            'id' => 'informacion_contacto',
+        ],
+    ],
+    [
+        'label' => 'Información laboral',
+        'content' => $this->blocks['info_l'],
+        'options' => [
+            'id' => 'informacion_laboral',
+        ],
+    ],
+    [
+        'label' => 'Solicitudes',
+        'content' => $this->blocks['info_solicitudes'],
+        'options' => [
+            'id' => 'informacion_solicitudes',
+        ],
+    ],
+];
 
+if (Yii::$app->user->can('ver-informacion-vacacional')) {
+    $tabs[] = [
+        'label' => 'Vacaciones',
+        'content' => $this->blocks['info_vacacional'],
+        'options' => [
+            'id' => 'informacion_vacaciones',
+        ],
+    ];
+}
 
-                            echo TabsX::widget([
-                                'enableStickyTabs' => true,
-                                'options' => ['class' => 'nav-tabs-custom'],
-                                'items' => [
-                                    [
-                                        'label' => 'Información personal',
-                                        'content' => $this->blocks['info_p'],
-                                        //  'active' => true,
-                                        'options' => [
-                                            'id' => 'informacion_personal',
-                                        ],
-
-                                    ],
-                                    [
-                                        'label' => 'Información de contacto',
-                                        'content' => $this->blocks['info_c'],
-                                        'options' => [
-                                            'id' => 'informacion_contacto',
-                                        ],
-
-                                    ],
-                                    [
-                                        'label' => 'Información laboral',
-                                        'content' => $this->blocks['info_l'],
-
-                                        'options' => [
-                                            'id' => 'informacion_laboral',
-                                        ],
-
-                                    ],
-                                    [
-                                        'label' => 'Vacaciones',
-                                        'content' => $this->blocks['info_vacacional'],
-                                        'options' => [
-                                            'id' => 'informacion_vacaciones',
-                                        ],
-
-                                    ],
-
-                                    [
-                                        'label' => 'Solicitudes',
-                                        'content' => $this->blocks['info_solicitudes'],
-                                        'options' => [
-                                            'id' => 'informacion_solicitudes',
-                                        ],
-
-                                    ],
-                                ],
-                                'position' => TabsX::POS_ABOVE,
-                                'align' => TabsX::ALIGN_CENTER,
-                                //  'bordered'=>true,
-                                'encodeLabels' => false,
-                            ]);
-                            ?>
-
+echo TabsX::widget([
+    'enableStickyTabs' => true,
+    'options' => ['class' => 'nav-tabs-custom'],
+    'items' => $tabs,
+    'position' => TabsX::POS_ABOVE,
+    'align' => TabsX::ALIGN_CENTER,
+    'encodeLabels' => false,
+]);
+?>
 
                             <?php $this->beginBlock('expediente'); ?>
                             <div class="row">
@@ -1616,123 +1634,146 @@ if (!$modelAlergia) {
 
                             <!-- Bloque de antecedentes hereditarios -->
                             <?php $this->beginBlock('hereditarios'); ?>
-                            <?php $form = ActiveForm::begin(['action' => ['empleado/view', 'id' => $model->id]]); ?>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="card">
-                                        <div class="card-header gradient-blue text-white text-center">
-                                            <h2>Antecedentes Hereditarios</h2>
-                                        </div>
-                                        <div class="card-body bg-light">
-                                            <div class="row">
-                                                <div class="col-md-8">
-                                                    <div class="table-responsive">
-                                                        <table class="table table-bordered">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Enfermedad</th>
-                                                                    <th>Abuelos</th>
-                                                                    <th>Hermanos</th>
-                                                                    <th>Madre</th>
-                                                                    <th>Padre</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                <?php foreach ($catAntecedentes as $catAntecedente) : ?>
-                                                                    <tr>
-                                                                        <td><?= Html::encode($catAntecedente->nombre) ?></td>
-                                                                        <?php foreach (['Abuelos', 'Hermanos', 'Madre', 'Padre'] as $parentezco) : ?>
-                                                                            <td>
-                                                                                <?= Html::checkbox("AntecedenteHereditario[{$catAntecedente->id}][$parentezco]", isset($antecedentesExistentes[$catAntecedente->id][$parentezco]), [
-                                                                                    'value' => 1,
-                                                                                    'label' => '',
-                                                                                ]) ?>
-                                                                            </td>
-                                                                        <?php endforeach; ?>
-                                                                    </tr>
-                                                                <?php endforeach; ?>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4 d-flex flex-column justify-content-between" style="height: 100%;">
-                                                    <div class="form-group text-center">
-                                                        <?= Html::label('Observaciones', 'observacion_general') ?>
-                                                        <?= Html::textarea('observacion_general', $observacionGeneral, [
-                                                            'class' => 'form-control',
-                                                            'rows' => 30,
-                                                            'style' => 'width: 100%;',
-                                                        ]) ?>
+    <?php $form = ActiveForm::begin(['action' => ['empleado/view', 'id' => $model->id]]); ?>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header gradient-blue text-white text-center">
+                    <h2>Antecedentes Hereditarios</h2>
+                </div>
+                <div class="card-body bg-light">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Enfermedad</th>
+                                            <th>Abuelos</th>
+                                            <th>Hermanos</th>
+                                            <th>Madre</th>
+                                            <th>Padre</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($catAntecedentes as $catAntecedente) : ?>
+                                            <tr>
+                                                <td><?= Html::encode($catAntecedente->nombre) ?></td>
+                                                <?php foreach (['Abuelos', 'Hermanos', 'Madre', 'Padre'] as $parentezco) : ?>
+                                                    <td>
+                                                        <?php
+                                                        // Verifica si el usuario tiene permiso para editar
 
-
-                                                    </div>
-                                                    <br>
-                                                    <div class="form-group mt-auto d-flex justify-content-end">
-                                                        <?= Html::submitButton('Guardar &nbsp; &nbsp;  <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
-                                                    </div>
-                                                </div>
-                                                <div class="alert alert-white custom-alert" role="alert">
-                                                    <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Causas de muerte, malformaciones congénitas, diabetes, cardiopatías, hipertensión arterial, infartos, ateroesclerosis, accidentes vasculares, neuropatías, tuberculosis, artropatías, hemopatías, sida, sífilis, hemopatías, neoplasias, consanguinidad, alcoholismo, toxicomanías.
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                                        // Si es editable, muestra el checkbox para editar
+                                                        // Si no es editable, muestra solo el estado actual sin checkbox
+                                                        if ($editable) {
+                                                            echo Html::checkbox("AntecedenteHereditario[{$catAntecedente->id}][$parentezco]", isset($antecedentesExistentes[$catAntecedente->id][$parentezco]), [
+                                                                'value' => 1,
+                                                                'label' => '',
+                                                            ]);
+                                                        } else {
+                                                            // Muestra solo el estado actual sin checkbox
+                                                            $checked = isset($antecedentesExistentes[$catAntecedente->id][$parentezco]) && $antecedentesExistentes[$catAntecedente->id][$parentezco] == 1;
+                                                            echo $checked ? 'X' : '';
+                                                        }
+                                                        ?>
+                                                    </td>
+                                                <?php endforeach; ?>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
                             </div>
-                            <?php ActiveForm::end(); ?>
-                            <?php $this->endBlock(); ?>
+                        </div>
+                        <div class="col-md-4 d-flex flex-column justify-content-between" style="height: 100%;">
+                            <div class="form-group text-center">
+                                <?= Html::label('Observaciones', 'observacion_general') ?>
+                                <?= Html::textarea('observacion_general', $observacionGeneral, [
+                                    'class' => 'form-control',
+                                    'rows' => 5,
+                                    'style' => 'width: 100%;',
+                                    'readonly' => !$editable, // Hace que el campo sea de solo lectura si no tiene permiso
+                                ]) ?>
+                            </div>
+                            <br>
+                            <div class="form-group mt-auto d-flex justify-content-end">
+                                <?php
+                                // Si tiene permiso, muestra el botón de guardar
+                                if ($editable) {
+                                    echo Html::submitButton('Guardar &nbsp; &nbsp;  <i class="fa fa-save"></i>', ['class' => 'btn btn-success']);
+                                }
+                                ?>
+                            </div>
+                        </div>
+                        <div class="alert alert-white custom-alert" role="alert">
+                            <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Causas de muerte, malformaciones congénitas, diabetes, cardiopatías, hipertensión arterial, infartos, ateroesclerosis, accidentes vasculares, neuropatías, tuberculosis, artropatías, hemopatías, sida, sífilis, hemopatías, neoplasias, consanguinidad, alcoholismo, toxicomanías.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php ActiveForm::end(); ?>
+<?php $this->endBlock(); ?>
+
 
                             <!-- Bloque de antecedentes patológicos -->
                             <?php $this->beginBlock('patologicos'); ?>
-                            <?php $form = ActiveForm::begin(['action' => ['empleado/antecedente-patologico', 'id' => $model->id]]); ?>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="card">
-                                        <div class="card-header gradient-blue text-white text-center">
-                                            <h2>Antecedentes Patológicos</h2>
-                                        </div>
-                                        <div class="card-body bg-light">
+    <?php $form = ActiveForm::begin(['action' => ['empleado/antecedente-patologico', 'id' => $model->id]]); ?>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header gradient-blue text-white text-center">
+                    <h2>Antecedentes Patológicos</h2>
+                </div>
+                <div class="card-body bg-light">
+                    <?php
+                    // Verifica si el usuario tiene permiso para editar
+                    $editable = Yii::$app->user->can('editar-expediente-medico');
+                    ?>
 
+                    <?php if ($editable): ?>
+                        <div class="form-group">
+                            <?= $form->field($antecedentePatologico, 'descripcion_antecedentes')->widget(FroalaEditorWidget::className(), [
+                                'clientOptions' => [
+                                    'toolbarInline' => false,
+                                    'theme' => 'royal', // optional: dark, red, gray, royal
+                                    'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
+                                    'height' => 400,
+                                    'pluginsEnabled' => [
+                                        'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
+                                        'draggable', 'emoticons', 'entities', 'fontFamily',
+                                        'fontSize', 'fullscreen', 'inlineStyle',
+                                        'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
+                                        'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
+                                    ],
+                                ]
+                            ])->label(false) ?>
+                        </div>
 
+                        <div class="form-group text-right">
+                            <?= Html::submitButton('Guardar &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                        </div>
+                    <?php else: ?>
+                        <div class="form-group">
+                            <?= Html::label('Descripción de Antecedentes Patológicos', 'descripcion_antecedentes') ?>
+                            <?php
+                            $contenidoHTML = Html::decode($antecedentePatologico->descripcion_antecedentes);
+                            echo HtmlPurifier::process($contenidoHTML);
+                            ?>
+                        </div>
+                    <?php endif; ?>
 
+                    <div class="alert alert-white custom-alert" role="alert">
+                        <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Peso al nacer, anormalidades perinatales, desarrollo físico y mental, y el esquema básico de vacunación.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php ActiveForm::end(); ?>
+<?php $this->endBlock(); ?>
 
-
-                                            <div class="form-group">
-
-
-                                                <?= $form->field($antecedentePatologico, 'descripcion_antecedentes')->widget(FroalaEditorWidget::className(), [
-                                                    'clientOptions' => [
-                                                        'toolbarInline' => false,
-                                                        'theme' => 'royal', // optional: dark, red, gray, royal
-                                                        'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
-                                                        'height' => 400,
-                                                        'pluginsEnabled' => [
-                                                            'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
-                                                            'draggable', 'emoticons', 'entities', 'fontFamily',
-                                                            'fontSize', 'fullscreen', 'inlineStyle',
-                                                            'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
-                                                            'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
-                                                        ]
-                                                    ]
-
-                                                ]) ?>
-
-
-                                            </div>
-
-                                            <div class="form-group text-right">
-                                                <?= Html::submitButton('Guardar &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
-                                            </div>
-                                            <div class="alert alert-white custom-alert" role="alert">
-                                                <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Peso al nacer, anormalidades perinatales, desarrollo físico y mental, y el esquema básico de vacunación.
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <?php ActiveForm::end(); ?>
-                            <?php $this->endBlock(); ?>
 
                             <?php $this->beginBlock('no_patologicos'); ?>
 
@@ -1749,97 +1790,133 @@ if (!$modelAlergia) {
                                         </div>
                                         <div class="card-body">
                                             <div class="container">
-                                                <div class="card">
-                                                    <div class="card-header custom-nopato text-white text-left">
-                                                        <h5>ACTIVIDAD FISICA</h5>
-                                                    </div>
-                                                    <div class="card-body bg-light">
-                                                        <div class="row">
-                                                            <!-- Columna izquierda con los campos -->
-                                                            <div class="col-md-8">
-                                                                <div class="row">
-                                                                    <div class="col-6 col-sm-4">
-                                                                        <div class="custom-control custom-checkbox">
-                                                                            <?= Html::checkbox('AntecedenteNoPatologico[p_ejercicio]', $antecedenteNoPatologico->p_ejercicio, [
-                                                                                'class' => 'custom-control-input',
-                                                                                'id' => 'p_ejercicio'
-                                                                            ]) ?>
-                                                                            <?= Html::label('¿Realiza ejercicio?', 'p_ejercicio', ['class' => 'custom-control-label']) ?>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-6 col-sm-6" id="ejercicio-minutos-container">
-                                                                        <?= Html::label('Minutos al día', 'p_minutos_x_dia_ejercicio') ?>
-                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_minutos_x_dia_ejercicio]', $antecedenteNoPatologico->p_minutos_x_dia_ejercicio, ['class' => 'form-control', 'id' => 'p_minutos_x_dia_ejercicio']) ?>
-                                                                    </div>
-                                                                    <div class="w-100"></div>
-                                                                    <br>
-                                                                    <div class="col-6 col-sm-4">
-                                                                        <div class="custom-control custom-checkbox">
-                                                                            <?= Html::checkbox('AntecedenteNoPatologico[p_deporte]', $modelAntecedenteNoPatologico->p_deporte, [
-                                                                                'class' => 'custom-control-input',
-                                                                                'id' => 'p_deporte'
-                                                                            ]) ?>
-                                                                            <?= Html::label('¿Realiza algún deporte?', 'p_deporte', ['class' => 'custom-control-label']) ?>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-6 col-sm-4" id="deporte-cual-container">
-                                                                        <?= Html::label('¿Cuál deporte?', 'p_a_deporte') ?>
-                                                                        <?= Html::textInput('AntecedenteNoPatologico[p_a_deporte]', $modelAntecedenteNoPatologico->p_a_deporte, ['class' => 'form-control', 'id' => 'p_a_deporte']) ?>
-                                                                    </div>
-                                                                    <div class="col-6 col-sm-4" id="deporte-frecuencia-container">
-                                                                        <?= Html::label('Frecuencia con la que practica', 'p_frecuencia_deporte') ?>
-                                                                        <?= Html::textInput('AntecedenteNoPatologico[p_frecuencia_deporte]', $modelAntecedenteNoPatologico->p_frecuencia_deporte, ['class' => 'form-control', 'id' => 'p_frecuencia_deporte']) ?>
-                                                                    </div>
-                                                                    <div class="w-100"></div>
-                                                                    <br>
-                                                                    <div class="col-6 col-sm-4">
-                                                                        <?= Html::label('Horas que duerme por día', 'p_horas_sueño') ?>
-                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_horas_sueño]', $antecedenteNoPatologico->p_horas_sueño, ['class' => 'form-control', 'id' => 'p_horas_sueño']) ?>
-                                                                    </div>
-                                                                    <div class="col-6 col-sm-6">
-                                                                        <div class="custom-control custom-checkbox">
-                                                                            <?= Html::checkbox('AntecedenteNoPatologico[p_dormir_dia]', $modelAntecedenteNoPatologico->p_dormir_dia, [
-                                                                                'class' => 'custom-control-input',
-                                                                                'id' => 'p_dormir_dia'
-                                                                            ]) ?>
-                                                                            <?= Html::label('¿Duerme durante el día?', 'p_dormir_dia', ['class' => 'custom-control-label']) ?>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <!-- Columna derecha con el textarea -->
-                                                            <div class="w-100"></div>
-                                                            <br>
-                                                            <div class="form-group">
+                                            <div class="card">
+        <div class="card-header custom-nopato text-white text-left">
+            <h5>ACTIVIDAD FISICA</h5>
+        </div>
+        <div class="card-body bg-light">
+            <div class="row">
+                <!-- Columna izquierda con los campos -->
+                <div class="col-md-8">
+                    <div class="row">
+                        <div class="col-6 col-sm-4">
+                            <div class="custom-control custom-checkbox">
+                                <?= Html::checkbox('AntecedenteNoPatologico[p_ejercicio]', $antecedenteNoPatologico->p_ejercicio, [
+                                    'class' => 'custom-control-input',
+                                    'id' => 'p_ejercicio',
+                                    'disabled' => !$editable // Deshabilitar si no tiene permiso
+                                ]) ?>
+                                <?= Html::label('¿Realiza ejercicio?', 'p_ejercicio', ['class' => 'custom-control-label']) ?>
+                            </div>
+                        </div>
+                        <div class="col-6 col-sm-6" id="ejercicio-minutos-container">
+                            <?= Html::label('Minutos al día', 'p_minutos_x_dia_ejercicio') ?>
+                            <?= Html::input('number', 'AntecedenteNoPatologico[p_minutos_x_dia_ejercicio]', $antecedenteNoPatologico->p_minutos_x_dia_ejercicio, [
+                                'class' => 'form-control',
+                                'id' => 'p_minutos_x_dia_ejercicio',
+                                'disabled' => !$editable // Deshabilitar si no tiene permiso
+                            ]) ?>
+                        </div>
+                        <div class="w-100"></div>
+                        <br>
+                        <div class="col-6 col-sm-4">
+                            <div class="custom-control custom-checkbox">
+                                <?= Html::checkbox('AntecedenteNoPatologico[p_deporte]', $antecedenteNoPatologico->p_deporte, [
+                                    'class' => 'custom-control-input',
+                                    'id' => 'p_deporte',
+                                    'disabled' => !$editable // Deshabilitar si no tiene permiso
+                                ]) ?>
+                                <?= Html::label('¿Realiza algún deporte?', 'p_deporte', ['class' => 'custom-control-label']) ?>
+                            </div>
+                        </div>
+                        <div class="col-6 col-sm-4" id="deporte-cual-container">
+                            <?= Html::label('¿Cuál deporte?', 'p_a_deporte') ?>
+                            <?= Html::textInput('AntecedenteNoPatologico[p_a_deporte]', $antecedenteNoPatologico->p_a_deporte, [
+                                'class' => 'form-control',
+                                'id' => 'p_a_deporte',
+                                'disabled' => !$editable // Deshabilitar si no tiene permiso
+                            ]) ?>
+                        </div>
+                        <div class="col-6 col-sm-4" id="deporte-frecuencia-container">
+                            <?= Html::label('Frecuencia con la que practica', 'p_frecuencia_deporte') ?>
+                            <?= Html::textInput('AntecedenteNoPatologico[p_frecuencia_deporte]', $antecedenteNoPatologico->p_frecuencia_deporte, [
+                                'class' => 'form-control',
+                                'id' => 'p_frecuencia_deporte',
+                                'disabled' => !$editable // Deshabilitar si no tiene permiso
+                            ]) ?>
+                        </div>
+                        <div class="w-100"></div>
+                        <br>
+                        <div class="col-6 col-sm-4">
+                            <?= Html::label('Horas que duerme por día', 'p_horas_sueño') ?>
+                            <?= Html::input('number', 'AntecedenteNoPatologico[p_horas_sueño]', $antecedenteNoPatologico->p_horas_sueño, [
+                                'class' => 'form-control',
+                                'id' => 'p_horas_sueño',
+                                'disabled' => !$editable // Deshabilitar si no tiene permiso
+                            ]) ?>
+                        </div>
+                        <div class="col-6 col-sm-6">
+                            <div class="custom-control custom-checkbox">
+                                <?= Html::checkbox('AntecedenteNoPatologico[p_dormir_dia]', $antecedenteNoPatologico->p_dormir_dia, [
+                                    'class' => 'custom-control-input',
+                                    'id' => 'p_dormir_dia',
+                                    'disabled' => !$editable // Deshabilitar si no tiene permiso
+                                ]) ?>
+                                <?= Html::label('¿Duerme durante el día?', 'p_dormir_dia', ['class' => 'custom-control-label']) ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Columna derecha con el textarea -->
+                <div class="w-100"></div>
+                <br>
+                
+                    <div class="form-group">
+                        <?= Html::label('Observaciones', 'observacion_actividad_fisica') ?>
+                        <?php
+                        if ($editable) {
+                            echo $form->field($antecedenteNoPatologico, 'observacion_actividad_fisica')->widget(FroalaEditorWidget::className(), [
+                                'options' => [
+                                    'id' => 'content'
+                                ],
+                                'clientOptions' => [
+                                    'toolbarInline' => false,
+                                    'theme' => 'royal', // optional: dark, red, gray, royal
+                                    'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
+                                    'height' => 150,
+                                    'pluginsEnabled' => [
+                                        'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
+                                        'draggable', 'emoticons', 'entities', 'fontFamily',
+                                        'fontSize', 'fullscreen', 'inlineStyle',
+                                        'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
+                                        'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
+                                    ]
+                                ]
+                            ])->label(false);
+                        } else {
+                            // Si no tiene permiso, mostrar el texto plano
+                            $htmlcont= Html::decode($antecedenteNoPatologico->observacion_actividad_fisica);
+                            $limpio = HtmlPurifier::process($htmlcont);
+                            echo Html::textarea('AntecedenteNoPatologico[observacion_actividad_fisica]', $limpio, [
+                                'class' => 'form-control',
+                                'rows' => 6,
+                                'readonly' => true // Hacer el campo de solo lectura
+                            ]);
+                            
+                        }
+                        ?>
+                    </div>
+               
+            </div>
+        </div>
+    </div>
+    <div class="alert alert-white custom-alert" role="alert">
+        <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Peso al nacer, anormalidades perinatales, desarrollo físico y mental, y el esquema básico de vacunación.
+    </div>
+>
 
-
-
-                                                                <?= $form->field($antecedenteNoPatologico, 'observacion_actividad_fisica')->widget(FroalaEditorWidget::className(), [
-                                                                    'options' => [
-                                                                        'id' => 'content'
-                                                                    ],
-                                                                    'clientOptions' => [
-                                                                        'toolbarInline' => false,
-                                                                        'theme' => 'royal', // optional: dark, red, gray, royal
-                                                                        'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
-                                                                        'height' => 150,
-                                                                        'pluginsEnabled' => [
-                                                                            'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
-                                                                            'draggable', 'emoticons', 'entities', 'fontFamily',
-                                                                            'fontSize', 'fullscreen', 'inlineStyle',
-                                                                            'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
-                                                                            'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
-                                                                        ]
-                                                                    ]
-                                                                ]) ?>
-
-                                                            </div>
-
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <?php
-                                                $script = <<< JS
+<?php
+$script = <<< JS
 $(document).ready(function() {
     function toggleEjercicioFields() {
         if ($('#p_ejercicio').is(':checked')) {
@@ -1873,8 +1950,9 @@ $(document).ready(function() {
     });
 });
 JS;
-                                                $this->registerJs($script);
-                                                ?>
+$this->registerJs($script);
+?>
+
 
 
                                                 <div class="card">
@@ -4462,49 +4540,46 @@ JS;
 
                         </div>
                         <!--.col-md-12-->
-                        <?php echo TabsX::widget([
-                            'enableStickyTabs' => true,
-                            'options' => ['class' => 'custom-tabs-2'],
-                            'items' => [
-                                [
-                                    'label' => 'Información',
-                                    'content' => $this->blocks['datos'],
-                                    //   'active' => true,
-                                    'options' => [
-                                        'id' => 'datos',
-                                    ],
+                        <?php
+$tabs = [
+    [
+        'label' => 'Información',
+        'content' => $this->blocks['datos'],
+        'options' => [
+            'id' => 'datos',
+        ],
+    ],
+   
+];
 
+if (Yii::$app->user->can('ver-expediente-medico')) {
+    $tabs[] = [
+        'label' => 'Expediente Medico',
+        'content' => $this->blocks['expediente_medico'],
+        'options' => [
+            'id' => 'expediente_medico',
+        ],
+    ];
+}
+if (Yii::$app->user->can('verDocumentos')) {
+    $tabs[] = [
+        'label' => 'Documentos',
+        'content' => $this->blocks['expediente'],
+        'options' => [
+            'id' => 'documentos',
+        ],
+    ];
+}
 
-                                ],
-                                [
-                                    'label' => 'Documentos',
-                                    'content' => $this->blocks['expediente'],
-                                    'options' => [
-                                        'id' => 'documentos',
-                                    ],
-
-                                ],
-
-                                [
-                                    'label' => 'Expediente Medico',
-                                    'content' => $this->blocks['expediente_medico'],
-                                    'options' => [
-                                        'id' => 'expediente_medico',
-                                    ],
-
-                                ],
-
-
-                            ],
-                            'position' => TabsX::POS_ABOVE,
-                            'align' => TabsX::ALIGN_LEFT,
-                            //   'bordered'=>true,
-                            'encodeLabels' => false
-
-
-                        ]);
-
-                        ?>
+echo TabsX::widget([
+    'enableStickyTabs' => true,
+    'options' => ['class' => 'custom-tabs-2'],
+    'items' => $tabs,
+    'position' => TabsX::POS_ABOVE,
+    'align' => TabsX::ALIGN_LEFT,
+    'encodeLabels' => false,
+]);
+?>
 
                     </div>
                     <!--.row-->

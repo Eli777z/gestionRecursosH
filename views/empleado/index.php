@@ -59,182 +59,162 @@ $this->params['breadcrumbs'][] = $this->title;
                                 ?>
                             </div>
 
-
                             <?php $this->beginBlock('block-empleados'); ?>
-                            <div class="card">
-                                <div class="card-header bg-info text-white">
-                                    <h3>LISTA DE EMPLEADOS</h3>
-                                    <?= Html::a('AÑADIR NUEVO EMPLEADO  <i class="fa fa-user-plus fa-lg"></i>', ['create'], ['class' => 'btn btn-warning float-right fa-lg btn-dark']) ?>
+<div class="card">
+    <div class="card-header bg-info text-white">
+        <h3>LISTA DE EMPLEADOS</h3>
+      
+        <?php if (Yii::$app->user->can('manejo-empleados')): ?>
+            <?= Html::a('AÑADIR NUEVO EMPLEADO  <i class="fa fa-user-plus fa-lg"></i>', ['create'], ['class' => 'btn btn-warning float-right fa-lg btn-dark']) ?>
+        <?php endif; ?>
 
-                                </div>
+      
+    </div>
 
+    <div class="card-body">
+        <?php Pjax::begin(); ?>
 
-                                <div class="card-body">
-                                    <?php Pjax::begin(); ?>
-                                    <?php // echo $this->render('_search', ['model' => $searchModel]); 
-                                    ?>
+        <?= GridView::widget([
+            'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
+            'columns' => [
+                ['class' => 'yii\grid\SerialColumn'],
+                [
+                    'attribute' => 'foto',
+                    'format' => 'html',
+                    'filter' => false,
+                    'value' => function ($model) {
+                        if ($model->foto) {
+                            $urlImagen = Yii::$app->urlManager->createUrl(['empleado/foto-empleado', 'id' => $model->id]);
+                            return Html::img($urlImagen, ['width' => '80px', 'height' => '80px']);
+                        }
+                        return null;
+                    },
+                ],
+                [
+                    'attribute' => 'id',
+                    'label' => 'Empleado',
+                    'value' => function ($model) {
+                        return $model ? $model->apellido . ' ' . $model->nombre : 'N/A';
+                    },
+                    'filter' => Select2::widget([
+                        'model' => $searchModel,
+                        'attribute' => 'id',
+                        'data' => \yii\helpers\ArrayHelper::map(\app\models\Empleado::find()->all(), 'id', function ($model) {
+                            return $model->apellido . ' ' . $model->nombre;
+                        }),
+                        'options' => ['placeholder' => 'Empleado'],
+                        'pluginOptions' => [
+                            'allowClear' => true
+                        ],
+                        'theme' => Select2::THEME_KRAJEE_BS3, 
+                    ]),
+                    'contentOptions' => ['class' => 'small-font'],
+                ],
+                [
+                    'attribute' => 'numero_empleado',
+                    'label' => 'Número de empleado',
+                    'value' => function ($model) {
+                        return $model->numero_empleado;
+                    },
+                    'filter' => Select2::widget([
+                        'model' => $searchModel,
+                        'attribute' => 'numero_empleado',
+                        'data' => \yii\helpers\ArrayHelper::map(\app\models\Empleado::find()->select(['numero_empleado'])->distinct()->all(), 'numero_empleado', 'numero_empleado'),
+                        'options' => ['placeholder' => 'Número Empleado'],
+                        'pluginOptions' => [
+                            'allowClear' => true
+                        ],
+                        'theme' => Select2::THEME_KRAJEE_BS3, 
+                    ]),
+                    'contentOptions' => ['class' => 'small-font'], 
+                ],
+                [
+                    'attribute' => 'cat_departamento_id',
+                    'label' => 'Departamento',
+                    'value' => function ($model) {
+                        return $model->informacionLaboral && $model->informacionLaboral->catDepartamento
+                            ? $model->informacionLaboral->catDepartamento->nombre_departamento
+                            : 'N/A';
+                    },
+                    'filter' => Select2::widget([
+                        'model' => $searchModel,
+                        'attribute' => 'cat_departamento_id',
+                        'data' => ArrayHelper::map(CatDepartamento::find()->all(), 'id', 'nombre_departamento'),
+                        'options' => ['placeholder' => 'Departamento', 'class' => 'small-select2'],
+                        'pluginOptions' => [
+                            'allowClear' => true,
+                        ],
+                        'theme' => Select2::THEME_KRAJEE_BS3, 
+                    ]),
+                    'contentOptions' => ['class' => 'small-font'], 
+                    'headerOptions' => ['class' => 'small-font'], 
+                ],
+                [
+                    'attribute' => 'cat_direccion_id',
+                    'label' => 'Dirección',
+                    'value' => function ($model) {
+                        return $model->informacionLaboral && $model->informacionLaboral->catDireccion
+                            ? $model->informacionLaboral->catDireccion->nombre_direccion
+                            : 'N/A';
+                    },
+                    'filter' => Select2::widget([
+                        'model' => $searchModel,
+                        'attribute' => 'cat_direccion_id',
+                        'data' => ArrayHelper::map(CatDireccion::find()->all(), 'id', 'nombre_direccion'),
+                        'options' => ['placeholder' => 'Dirección'],
+                        'pluginOptions' => [
+                            'allowClear' => true,
+                        ],
+                        'theme' => Select2::THEME_KRAJEE_BS3, 
+                    ]),
+                    'contentOptions' => ['class' => 'small-font'], 
+                ],
+                [
+                    'class' => ActionColumn::class,
+                   // if (Yii::$app->user->can('btn-vista-crear-empleado')): 
 
-                                    <?= GridView::widget([
-                                        'dataProvider' => $dataProvider,
-                                        'filterModel' => $searchModel,
+                    'template' => Yii::$app->user->can('manejo-empleados') ? '{view} {delete} {toggle-activation}' : '{view}',
+                    'buttons' => [
+                        'toggle-activation' => function ($url, $model) {
+                            $isActive = $model->usuario->status == 10;
+                            $icon = $isActive ? 'fas fa-ban' : 'far fa-check-circle';
+                            $title = $isActive ? 'Desactivar Usuario' : 'Activar Usuario';
+                            return Html::a('<i class="' . $icon . '"></i>', ['empleado/toggle-activation', 'id' => $model->id], [
+                                'title' => Yii::t('yii', $title),
+                                'data-confirm' => Yii::t('yii', '¿Estás seguro de que deseas cambiar el estado de este usuario?'),
+                                'data-method' => 'post',
+                                'class' => 'btn btn-xs ' . ($isActive ? 'btn-warning' : 'btn-success'),
+                            ]);
+                        },
+                        'view' => function ($url, $model) {
+                            return Html::a('<i class="far fa-eye"></i>', $url, [
+                                'title' => 'Ver archivo',
+                                'class' => 'btn btn-info btn-xs',
+                                'data-pjax' => "0"
+                            ]);
+                        },
+                        'delete' => function ($url, $model) {
+                            return Html::a('<i class="fas fa-trash"></i>', $url, [
+                                'title' => Yii::t('yii', 'Eliminar'),
+                                'data-confirm' => Yii::t('yii', '¿Estás seguro de que deseas eliminar este elemento?'),
+                                'data-method' => 'post',
+                                'class' => 'btn btn-danger btn-xs',
+                            ]);
+                        },
+                    ],
+                ],
+            ],
+            'summaryOptions' => ['class' => 'summary mb-2'],
+            'pager' => [
+                'class' => 'yii\bootstrap4\LinkPager',
+            ],
+        ]); ?>
+    </div>
+    <?php Pjax::end(); ?>
+</div>
+<?php $this->endBlock(); ?>
 
-
-                                        'columns' => [
-                                            ['class' => 'yii\grid\SerialColumn'],
-                                            [
-                                                'attribute' => 'foto',
-                                                'format' => 'html',
-                                                'filter' => false,
-                                                'value' => function ($model) {
-                                                    if ($model->foto) {
-                                                        $urlImagen = Yii::$app->urlManager->createUrl(['empleado/foto-empleado', 'id' => $model->id]);
-                                                        return Html::img($urlImagen, ['width' => '80px', 'height' => '80px']);
-                                                    }
-                                                    return null;
-                                                },
-                                            ],
-                                            [
-                                                'attribute' => 'id',
-                                                'label' => 'Empleado',
-                                                'value' => function ($model) {
-                                                    return $model ? $model->apellido . ' ' . $model->nombre : 'N/A';
-                                                },
-                                                'filter' => Select2::widget([
-                                                    'model' => $searchModel,
-                                                    'attribute' => 'id',
-                                                    'data' => \yii\helpers\ArrayHelper::map(\app\models\Empleado::find()->all(), 'id', function ($model) {
-                                                        return $model->apellido . ' ' . $model->nombre;
-                                                    }),
-                                                    'options' => ['placeholder' => 'Empleado'],
-                                                    'pluginOptions' => [
-                                                        'allowClear' => true
-                                                    ],
-                                                    'theme' => Select2::THEME_KRAJEE_BS3, 
-                                                    
-                                                ]),
-                                                'contentOptions' => ['class' => 'small-font'],
-
-                                            ],
-                                            [
-                                                'attribute' => 'numero_empleado',
-                                                'label' => 'Número de empleado',
-                                                'value' => function ($model) {
-                                                    return $model->numero_empleado;
-                                                },
-                                                'filter' => Select2::widget([
-                                                    'model' => $searchModel,
-                                                    'attribute' => 'numero_empleado',
-                                                    'data' => \yii\helpers\ArrayHelper::map(\app\models\Empleado::find()->select(['numero_empleado'])->distinct()->all(), 'numero_empleado', 'numero_empleado'), // Asegúrate de que 'nombre_formato' sea el nombre correcto del campo en tu tabla Solicitud
-                                                    'options' => ['placeholder' => 'Número Empleado'],
-                                                    'pluginOptions' => [
-                                                        'allowClear' => true
-
-
-                                                    ],
-                                                    'theme' => Select2::THEME_KRAJEE_BS3, 
-                                                ]),
-                                                'contentOptions' => ['class' => 'small-font'], 
-
-                                            ],
-
-                                            [
-                                                'attribute' => 'cat_departamento_id',
-                                                'label' => 'Departamento',
-                                                'value' => function ($model) {
-                                                    return $model->informacionLaboral && $model->informacionLaboral->catDepartamento
-                                                        ? $model->informacionLaboral->catDepartamento->nombre_departamento
-                                                        : 'N/A';
-                                                },
-                                                'filter' => Select2::widget([
-                                                    'model' => $searchModel,
-                                                    'attribute' => 'cat_departamento_id',
-                                                    'data' => ArrayHelper::map(CatDepartamento::find()->all(), 'id', 'nombre_departamento'),
-                                                    'options' => ['placeholder' => 'Departamento', 'class' => 'small-select2'],
-                                                    'pluginOptions' => [
-                                                        'allowClear' => true,
-                                                    ],
-                                                    'theme' => Select2::THEME_KRAJEE_BS3, 
-                                                ]),
-                                                'contentOptions' => ['class' => 'small-font'], 
-                                                'headerOptions' => ['class' => 'small-font'], 
-                                            ],
-                                            
-                                            [
-                                                'attribute' => 'cat_direccion_id',
-                                                'label' => 'Dirección',
-                                                'value' => function ($model) {
-                                                    return $model->informacionLaboral && $model->informacionLaboral->catDireccion
-                                                        ? $model->informacionLaboral->catDireccion->nombre_direccion
-                                                        : 'N/A';
-                                                },
-                                                'filter' => Select2::widget([
-                                                    'model' => $searchModel,
-                                                    'attribute' => 'cat_direccion_id',
-                                                    'data' => ArrayHelper::map(CatDireccion::find()->all(), 'id', 'nombre_direccion'),
-                                                    'options' => ['placeholder' => 'Dirección'],
-                                                    'pluginOptions' => [
-                                                        'allowClear' => true,
-                                                    ],
-                                                    'theme' => Select2::THEME_KRAJEE_BS3, 
-                                                ]),
-                                                'contentOptions' => ['class' => 'small-font'], 
-
-                                            ],
-
-                                            
-
-                                            [
-                                                'class' => ActionColumn::class,
-                                                'template' => '{view} {delete}  {toggle-activation}',
-                                                'buttons' => [
-                                                    'toggle-activation' => function ($url, $model) {
-
-                                                        $isActive = $model->usuario->status == 10;
-
-                                                        $icon = $isActive ? 'fas fa-ban' : 'far fa-check-circle';
-                                                        $title = $isActive ? 'Desactivar Usuario' : 'Activar Usuario';
-
-                                                        return Html::a('<i class="' . $icon . '"></i>', ['empleado/toggle-activation', 'id' => $model->id], [
-                                                            'title' => Yii::t('yii', $title),
-                                                            'data-confirm' => Yii::t('yii', '¿Estás seguro de que deseas cambiar el estado de este usuario?'),
-                                                            'data-method' => 'post',
-                                                            'class' => 'btn btn-xs ' . ($isActive ? 'btn-warning' : 'btn-success'),
-                                                        ]);
-                                                    },
-                                                    'view' => function ($url, $model) {
-                                                        return Html::a('<i class="far fa-eye"></i>', $url, [
-                                                            // 'target' => '_blank',
-                                                            'title' => 'Ver archivo',
-                                                            'class' => 'btn btn-info btn-xs',
-                                                            'data-pjax' => "0"
-                                                        ]);
-                                                    },
-                                                    'delete' => function ($url, $model) {
-                                                        return Html::a('<i class="fas fa-trash"></i>', $url, [
-                                                            'title' => Yii::t('yii', 'Eliminar'),
-                                                            'data-confirm' => Yii::t('yii', '¿Estás seguro de que deseas eliminar este elemento?'),
-                                                            'data-method' => 'post',
-                                                            'class' => 'btn btn-danger btn-xs',
-                                                        ]);
-                                                    },
-
-
-                                                ],
-
-                                            ],
-
-                                        ],
-                                        'summaryOptions' => ['class' => 'summary mb-2'],
-                                        'pager' => [
-                                            'class' => 'yii\bootstrap4\LinkPager',
-                                        ],
-                                    ]); ?>
-                                </div>
-                                <?php Pjax::end(); ?>
-
-                            </div>
-
-                            <?php $this->endBlock(); ?>
                             <?php $this->beginBlock('block-junta-gobierno'); ?>
                             <?php $this->beginBlock('block-crear-junta-gobierno'); ?>
 
@@ -436,41 +416,37 @@ $this->params['breadcrumbs'][] = $this->title;
                         <!--.col-md-12-->
 
 
-                        <?php echo TabsX::widget([
-                            'enableStickyTabs' => true,
-                            'options' => ['class' => 'custom-tabs-2'],
-                            'items' => [
-                                [
-                                    'label' => 'Empleados',
-                                    'content' => $this->blocks['block-empleados'],
-                                    'active' => true,
-                                    'options' => [
-                                        'id' => 'empleados',
-                                    ],
+                        <?php
+$tabs = [
+    [
+        'label' => 'Empleados',
+        'content' => $this->blocks['block-empleados'],
+        'active' => true,
+        'options' => [
+            'id' => 'empleados',
+        ],
+    ],
+];
 
+if (Yii::$app->user->can('ver-lista-directores-jefes')) {
+    $tabs[] = [
+        'label' => 'Directores y Jefes',
+        'content' => $this->blocks['block-view-junta-gobierno'],
+        'options' => [
+            'id' => 'junta_gobierno',
+        ],
+    ];
+}
 
-
-                                ],
-                                [
-                                    'label' => 'Directores y Jefes',
-                                    'content' => $this->blocks['block-view-junta-gobierno'],
-                                    'options' => [
-                                        'id' => 'junta_gobierno',
-                                    ],
-
-
-                                ],
-
-
-                            ],
-                            'position' => TabsX::POS_ABOVE,
-                            'align' => TabsX::ALIGN_CENTER,
-                            // 'bordered'=>true,
-                            'encodeLabels' => false
-
-                        ]);
-
-                        ?>
+echo TabsX::widget([
+    'enableStickyTabs' => true,
+    'options' => ['class' => 'custom-tabs-2'],
+    'items' => $tabs,
+    'position' => TabsX::POS_ABOVE,
+    'align' => TabsX::ALIGN_CENTER,
+    'encodeLabels' => false,
+]);
+?>
 
                     </div>
                     <!--.row-->

@@ -257,15 +257,14 @@ class EmpleadoController extends Controller
         'expedienteMedico' => $expedienteMedico,
         'antecedentes' => $antecedentes,
         'catAntecedentes' => $catAntecedentes,
-        
-        'antecedenteNoPatologico' => $antecedenteNoPatologico, // Pasar el modelo a la vista
+        'antecedenteNoPatologico' => $antecedenteNoPatologico, 
         'ExploracionFisica' => $exploracionFisica,
         'InterrogatorioMedico' => $interrogatorioMedico,
         'AntecedentePerinatal' => $antecedentePerinatal,
         'AntecedenteGinecologico' => $antecedenteGinecologico,
         'AntecedenteObstrectico' => $antecedenteObstrectico,
         'Alergia' => $alergia,
-        'antecedentePatologico' => $antecedentePatologico, // Pasar el modelo a la vista
+        'antecedentePatologico' => $antecedentePatologico,
 
     ]);
 }
@@ -676,7 +675,7 @@ public function actionAlergia($id)
                     if ($usuario->rol == 1) {
                         $rol = 'empleado';
                     } elseif ($usuario->rol == 2) {
-                        $rol = 'administrador';
+                        $rol = 'gestor-rh';
                     } elseif ($usuario->rol == 3) {
                         $rol = 'medico';
                     } else {
