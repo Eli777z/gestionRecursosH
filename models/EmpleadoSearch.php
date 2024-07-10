@@ -13,6 +13,7 @@ class EmpleadoSearch extends Empleado
 {
     public $cat_departamento_id;
     public $cat_direccion_id;
+
     /**
      * {@inheritdoc}
      */
@@ -42,59 +43,54 @@ class EmpleadoSearch extends Empleado
      * @return ActiveDataProvider
      */
     public function search($params)
-{
-    $query = Empleado::find();
-    $query->alias('e'); // Alias para la tabla empleado
-    $query->joinWith(['informacionLaboral il']); // Alias para la tabla informacion_laboral
-    $query->joinWith(['informacionLaboral.catDepartamento cd']); // Alias para la tabla cat_departamento
-    $query->joinWith(['informacionLaboral.catDireccion cdir']); // Alias para la tabla cat_direccion
+    {
+        $query = Empleado::find();
+        $query->alias('e'); // Alias para la tabla empleado
+        $query->joinWith(['informacionLaboral il']); // Alias para la tabla informacion_laboral
+        $query->joinWith(['informacionLaboral.catDepartamento cd']); // Alias para la tabla cat_departamento
+        $query->joinWith(['informacionLaboral.catDireccion cdir']); // Alias para la tabla cat_direccion
 
-    // add conditions that should always apply here
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
 
-    $dataProvider = new ActiveDataProvider([
-        'query' => $query,
-    ]);
+        $this->load($params);
 
-    $this->load($params);
+        if (!$this->validate()) {
+            return $dataProvider;
+        }
 
-    if (!$this->validate()) {
-        // uncomment the following line if you do not want to return any records when validation fails
-        // $query->where('0=1');
+        // Aplicar filtros según los valores ingresados en el formulario de búsqueda
+        $query->andFilterWhere([
+            'e.id' => $this->id,
+            'e.numero_empleado' => $this->numero_empleado,
+            'e.usuario_id' => $this->usuario_id,
+            'e.informacion_laboral_id' => $this->informacion_laboral_id,
+            'e.cat_nivel_estudio_id' => $this->cat_nivel_estudio_id,
+            'e.parametro_formato_id' => $this->parametro_formato_id,
+            'e.fecha_nacimiento' => $this->fecha_nacimiento,
+            'e.edad' => $this->edad,
+            'e.sexo' => $this->sexo,
+            'e.estado_civil' => $this->estado_civil,
+            'e.numero_casa' => $this->numero_casa,
+            'e.codigo_postal' => $this->codigo_postal,
+            'e.relacion_contacto_emergencia' => $this->relacion_contacto_emergencia,
+            'il.cat_departamento_id' => $this->cat_departamento_id,
+            'il.cat_direccion_id' => $this->cat_direccion_id,
+        ]);
+
+        $query->andFilterWhere(['like', 'e.nombre', $this->nombre])
+            ->andFilterWhere(['like', 'e.apellido', $this->apellido])
+            ->andFilterWhere(['like', 'e.foto', $this->foto])
+            ->andFilterWhere(['like', 'e.telefono', $this->telefono])
+            ->andFilterWhere(['like', 'e.email', $this->email])
+            ->andFilterWhere(['like', 'e.colonia', $this->colonia])
+            ->andFilterWhere(['like', 'e.calle', $this->calle])
+            ->andFilterWhere(['like', 'e.nombre_contacto_emergencia', $this->nombre_contacto_emergencia])
+            ->andFilterWhere(['like', 'e.telefono_contacto_emergencia', $this->telefono_contacto_emergencia])
+            ->andFilterWhere(['like', 'e.institucion_educativa', $this->institucion_educativa])
+            ->andFilterWhere(['like', 'e.titulo_grado', $this->titulo_grado]);
+
         return $dataProvider;
     }
-
-    // grid filtering conditions
-    $query->andFilterWhere([
-        'e.id' => $this->id,
-        'e.numero_empleado' => $this->numero_empleado,
-        'e.usuario_id' => $this->usuario_id,
-        'e.informacion_laboral_id' => $this->informacion_laboral_id,
-        'e.cat_nivel_estudio_id' => $this->cat_nivel_estudio_id,
-        'e.parametro_formato_id' => $this->parametro_formato_id,
-        'e.fecha_nacimiento' => $this->fecha_nacimiento,
-        'e.edad' => $this->edad,
-        'e.sexo' => $this->sexo,
-        'e.estado_civil' => $this->estado_civil,
-        'e.numero_casa' => $this->numero_casa,
-        'e.codigo_postal' => $this->codigo_postal,
-        'e.relacion_contacto_emergencia' => $this->relacion_contacto_emergencia,
-        'il.cat_departamento_id' => $this->cat_departamento_id,
-        'il.cat_direccion_id' => $this->cat_direccion_id,
-    ]);
-
-    $query->andFilterWhere(['like', 'e.nombre', $this->nombre])
-        ->andFilterWhere(['like', 'e.apellido', $this->apellido])
-        ->andFilterWhere(['like', 'e.foto', $this->foto])
-        ->andFilterWhere(['like', 'e.telefono', $this->telefono])
-        ->andFilterWhere(['like', 'e.email', $this->email])
-        ->andFilterWhere(['like', 'e.colonia', $this->colonia])
-        ->andFilterWhere(['like', 'e.calle', $this->calle])
-        ->andFilterWhere(['like', 'e.nombre_contacto_emergencia', $this->nombre_contacto_emergencia])
-        ->andFilterWhere(['like', 'e.telefono_contacto_emergencia', $this->telefono_contacto_emergencia])
-        ->andFilterWhere(['like', 'e.institucion_educativa', $this->institucion_educativa])
-        ->andFilterWhere(['like', 'e.titulo_grado', $this->titulo_grado]);
-
-    return $dataProvider;
-}
-
 }

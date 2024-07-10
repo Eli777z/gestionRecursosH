@@ -61,18 +61,33 @@ class EmpleadoController extends Controller
      * Lists all Empleado models.
      * @return mixed
      */
-    public function actionIndex()
-    {
-        $searchModel = new EmpleadoSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        $juntaGobiernoModel = new JuntaGobierno();
+   
 
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-            'juntaGobiernoModel' => $juntaGobiernoModel
-        ]);
+    public function actionIndex()
+{
+    $searchModel = new EmpleadoSearch();
+    $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+    $juntaGobiernoModel = new JuntaGobierno();
+
+    // Obtener el id del departamento del empleado actual
+    $idDepartamentoEmpleadoActual = Yii::$app->user->identity->empleado->informacionLaboral->cat_departamento_id;
+
+    // Configurar el dataProvider para mostrar empleados del mismo departamento si tiene el permiso correspondiente
+    if (Yii::$app->user->can('ver-empleados-departamento')) {
+        $dataProvider->query->andWhere(['il.cat_departamento_id' => $idDepartamentoEmpleadoActual]);
     }
+
+    return $this->render('index', [
+        'searchModel' => $searchModel,
+        'dataProvider' => $dataProvider,
+        'juntaGobiernoModel' => $juntaGobiernoModel
+
+    ]);
+}
+
+
+
+    
 
     /**
      * Displays a single Empleado model.
@@ -81,7 +96,8 @@ class EmpleadoController extends Controller
      * @param int $informacion_laboral_id Informacion Laboral ID
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
-     */public function actionView($id)
+     */
+    public function actionView($id)
 {
     $modelEmpleado = $this->findModel2($id);
     $documentos = $modelEmpleado->documentos;
@@ -91,6 +107,12 @@ class EmpleadoController extends Controller
     $searchModel = new \app\models\SolicitudSearch();
     $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
     $dataProvider->query->andWhere(['empleado_id' => $id]);
+
+
+    $searchModelConsultas = new \app\models\ConsultaMedicaSearch();
+    $dataProviderConsultas = $searchModelConsultas->search(Yii::$app->request->queryParams);
+    $dataProviderConsultas->query->andWhere(['expediente_medico_id' => $modelEmpleado->expedienteMedico->id]);
+
 
     $expedienteMedico = $modelEmpleado->expedienteMedico;
     $antecedentes = AntecedenteHereditario::find()->where(['expediente_medico_id' => $expedienteMedico->id])->all();
@@ -166,6 +188,9 @@ class EmpleadoController extends Controller
         }
     }
 
+
+   
+
     $antecedenteGinecologico= AntecedenteGinecologico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
     if (!$antecedenteGinecologico) {
         $antecedenteGinecologico = new AntecedenteGinecologico();
@@ -206,7 +231,15 @@ class EmpleadoController extends Controller
         }
     }
 
-
+    $expedienteMedico = $modelEmpleado->expedienteMedico;
+    if ($expedienteMedico && !$expedienteMedico->empleado_id) {
+        $expedienteMedico->empleado_id = $modelEmpleado->id;
+        if ($expedienteMedico->save(false)) {
+            Yii::$app->session->setFlash('success', 'Empleado asignado al expediente médico.');
+        } else {
+            Yii::$app->session->setFlash('error', 'Hubo un error al asignar el empleado al expediente médico.');
+        }
+    }
 
 
 
@@ -252,8 +285,11 @@ class EmpleadoController extends Controller
         'documentos' => $documentos,
         'documentoModel' => $documentoModel,
         'historial' => $historial,
+        'searchModelConsultas' => $searchModelConsultas,
+        'dataProviderConsultas' => $dataProviderConsultas,
         'searchModel' => $searchModel,
         'dataProvider' => $dataProvider,
+        
         'expedienteMedico' => $expedienteMedico,
         'antecedentes' => $antecedentes,
         'catAntecedentes' => $catAntecedentes,
@@ -271,6 +307,11 @@ class EmpleadoController extends Controller
 
 public function actionAntecedentePatologico($id)
 {
+    if (!Yii::$app->user->can('editar-expediente-medico')) {
+        Yii::$app->session->setFlash('error', 'No tiene permitido realizar esta acción.');
+        return $this->redirect(['view', 'id' => $id]);
+    }
+
     $modelEmpleado = $this->findModel2($id);
     $expedienteMedico = $modelEmpleado->expedienteMedico;
 
@@ -299,6 +340,11 @@ public function actionAntecedentePatologico($id)
 
     public function actionNoPatologicos($id)
     {
+        if (!Yii::$app->user->can('editar-expediente-medico')) {
+            Yii::$app->session->setFlash('error', 'No tiene permitido realizar esta acción.');
+            return $this->redirect(['view', 'id' => $id]);
+        }
+    
         $modelEmpleado = $this->findModel2($id);
         $expedienteMedico = $modelEmpleado->expedienteMedico;
     
@@ -357,6 +403,11 @@ public function actionAntecedentePatologico($id)
 
 public function actionExploracionFisica($id)
 {
+    if (!Yii::$app->user->can('editar-expediente-medico')) {
+        Yii::$app->session->setFlash('error', 'No tiene permitido realizar esta acción.');
+        return $this->redirect(['view', 'id' => $id]);
+    }
+
     $modelEmpleado = $this->findModel2($id);
     $expedienteMedico = $modelEmpleado->expedienteMedico;
 
@@ -384,6 +435,11 @@ public function actionExploracionFisica($id)
 
 public function actionAntecedentePerinatal($id)
 {
+    if (!Yii::$app->user->can('editar-expediente-medico')) {
+        Yii::$app->session->setFlash('error', 'No tiene permitido realizar esta acción.');
+        return $this->redirect(['view', 'id' => $id]);
+    }
+
     $modelEmpleado = $this->findModel2($id);
     $expedienteMedico = $modelEmpleado->expedienteMedico;
 
@@ -435,6 +491,11 @@ public function actionAntecedentePerinatal($id)
 
 public function actionAntecedenteGinecologico($id)
 {
+    if (!Yii::$app->user->can('editar-expediente-medico')) {
+        Yii::$app->session->setFlash('error', 'No tiene permitido realizar esta acción.');
+        return $this->redirect(['view', 'id' => $id]);
+    }
+
     $modelEmpleado = $this->findModel2($id);
     $expedienteMedico = $modelEmpleado->expedienteMedico;
 
@@ -494,6 +555,11 @@ public function actionAntecedenteGinecologico($id)
 
 public function actionAntecedenteObstrectico($id)
 {
+    if (!Yii::$app->user->can('editar-expediente-medico')) {
+        Yii::$app->session->setFlash('error', 'No tiene permitido realizar esta acción.');
+        return $this->redirect(['view', 'id' => $id]);
+    }
+
     $modelEmpleado = $this->findModel2($id);
     $expedienteMedico = $modelEmpleado->expedienteMedico;
 
@@ -547,6 +613,12 @@ public function actionAntecedenteObstrectico($id)
 
 public function actionInterrogatorioMedico($id)
 {
+
+    if (!Yii::$app->user->can('editar-expediente-medico')) {
+        Yii::$app->session->setFlash('error', 'No tiene permitido realizar esta acción.');
+        return $this->redirect(['view', 'id' => $id]);
+    }
+
     $modelEmpleado = $this->findModel2($id);
     $expedienteMedico = $modelEmpleado->expedienteMedico;
 
@@ -575,12 +647,18 @@ public function actionInterrogatorioMedico($id)
 
 public function actionAlergia($id)
 {
+    // Verificar si el usuario tiene el permiso
+    if (!Yii::$app->user->can('editar-expediente-medico')) {
+        Yii::$app->session->setFlash('error', 'No tiene permitido realizar esta acción.');
+        return $this->redirect(['view', 'id' => $id]);
+    }
+
     $modelEmpleado = $this->findModel2($id);
     $expedienteMedico = $modelEmpleado->expedienteMedico;
 
     $modelAlergia = Alergia::findOne(['expediente_medico_id' => $expedienteMedico->id]);
     if (!$modelAlergia) {
-        $modelAlergia= new Alergia();
+        $modelAlergia = new Alergia();
         $modelAlergia->expediente_medico_id = $expedienteMedico->id;
     }
 
@@ -596,7 +674,7 @@ public function actionAlergia($id)
     return $this->render('view', [
         'model' => $modelEmpleado,
         'expedienteMedico' => $expedienteMedico,
-        'modelAlergia' => $modelAlergia, // Asegúrate de pasar este modelo
+        'modelAlergia' => $modelAlergia,
     ]);
 }
 

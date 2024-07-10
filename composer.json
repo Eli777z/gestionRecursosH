@@ -44,8 +44,8 @@
         "phpoffice/phpword": "^1.2",
         "box/spout": "^3.3",
         "froala/yii2-froala-editor": "^4.2",
-        "mdmsoft/yii2-admin": "^2.12"
-      
+        "mdmsoft/yii2-admin": "~2.0",
+        "vumanskyi/yii2-seo-breadcrumbs": "^1.0"      
        
         
       

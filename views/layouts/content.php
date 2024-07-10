@@ -20,19 +20,41 @@ use yii\bootstrap5\Breadcrumbs;
                         ?>
                     </h1>
                 </div><!-- /.col -->
+               
                 <div class="col-sm-6">
-                    <?php
-                   echo Breadcrumbs::widget([
+    <?php
+   
+    
+    // Verifica si el usuario tiene el rol 'medico'
+    if (Yii::$app->user->can('medico')) {
+        echo Breadcrumbs::widget([
+            'homeLink' => ['url' => ['/site/portal-medico'], 'label' => 'Inicio'],
+            'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
+            'options' => [
+                'class' => 'breadcrumb float-sm-right'
+            ]
+        ]);
+    } elseif (Yii::$app->user->can('gestor-rh')) { // Verifica si el usuario tiene el rol 'gestor-rh'
+        echo Breadcrumbs::widget([
+            'homeLink' => ['url' => ['/site/portalgestionrh'], 'label' => 'Inicio'],
+            'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
+            'options' => [
+                'class' => 'breadcrumb float-sm-right'
+            ]
+        ]);
+    } else {
+        // Default breadcrumbs if user role is not 'medico' or 'gestor-rh'
+        echo Breadcrumbs::widget([
+            'homeLink' => ['label' => 'Inicio'],
+            'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
+            'options' => [
+                'class' => 'breadcrumb float-sm-right'
+            ]
+        ]);
+    }
+    ?>
+</div><!-- /.col -->
 
-                    'homeLink'=> ['url'=>'../site/portalgestionrh','label'=>'Inicio'], 
-    
-                    'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
-    
-                    'options' => [
-                        'class' => 'breadcrumb float-sm-right'
-                    ]                ])
-                    ?>
-                </div><!-- /.col -->
             </div><!-- /.row -->
         </div><!-- /.container-fluid -->
     </div>

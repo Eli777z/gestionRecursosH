@@ -43,6 +43,8 @@ use Yii;
  * @property ExploracionFisica[] $exploracionFisicas
   * @property AntecedentePerinatal $antecedentePerinatal
  * @property AntecedentePerinatal[] $antecedentePerinatals
+  * @property ConsultaMedica $consultaMedica
+ * @property ConsultaMedica[] $consultaMedicas
  */
 class ExpedienteMedico extends \yii\db\ActiveRecord
 {
@@ -73,6 +75,7 @@ class ExpedienteMedico extends \yii\db\ActiveRecord
             [['antecedente_ginecologico_id'], 'exist', 'skipOnError' => true, 'targetClass' => AntecedenteGinecologico::class, 'targetAttribute' => ['antecedente_ginecologico_id' => 'id']],
             [['antecedente_obstrectico_id'], 'exist', 'skipOnError' => true, 'targetClass' => AntecedenteObstrectico::class, 'targetAttribute' => ['antecedente_obstrectico_id' => 'id']],
             [['alergia_id'], 'exist', 'skipOnError' => true, 'targetClass' => Alergia::class, 'targetAttribute' => ['alergia_id' => 'id']],
+            [['consulta_medica_id'], 'exist', 'skipOnError' => true, 'targetClass' => ConsultaMedica::class, 'targetAttribute' => ['consulta_medica_id' => 'id']],
 
         ];
     }
@@ -271,6 +274,21 @@ class ExpedienteMedico extends \yii\db\ActiveRecord
     public function getAlergias0()
     {
         return $this->hasMany(Alergia::class, ['expediente_medico_id' => 'id']);
+    }
+
+    public function getConsultaMedica()
+    {
+        return $this->hasOne(ConsultaMedica::class, ['id' => 'consulta_medica_id']);
+    }
+
+    /**
+     * Gets query for [[ConsultaMedicas]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getConsultaMedicas()
+    {
+        return $this->hasMany(ConsultaMedica::class, ['expediente_medico_id' => 'id']);
     }
     
 }

@@ -75,7 +75,7 @@ $this->registerJsFile($publishedRes[1].'/control_sidebar.js', ['depends' => '\ha
     
     <?php $this->head() ?>
 </head>
-<body class="hold-transition sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed">
 <?php $this->beginBody() ?>
 <?php //foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
     //echo Alert::widget([
@@ -91,7 +91,7 @@ $this->registerJsFile($publishedRes[1].'/control_sidebar.js', ['depends' => '\ha
     <!-- /.navbar -->
 
     <!-- Main Sidebar Container -->
-    <?= $this->render('sidebarTrabajador', ['assetDir' => $assetDir]) ?>
+    <?= $this->render('sidebar', ['assetDir' => $assetDir]) ?>
     
 
     <!-- Content Wrapper. Contains page content -->

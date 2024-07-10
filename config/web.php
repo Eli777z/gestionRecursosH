@@ -13,26 +13,25 @@ $config = [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
     ],
-    'modules' => [
-        'redactor' => 'yii\redactor\RedactorModule',
-        'jodit' => 'yii2jodit\JoditModule',
 
+
+
+    'modules' => [
 
         'admin' => [
             'class' => 'mdm\admin\Module',
-            'layout' => 'left-menu',
-           // 'mainLayout' => '@app/views/layouts/main-doctor.php',
+            'layout' => 'right-menu', // por defaults es null, cuando no deseas usar el menú 
+            //'mainLayout' => '@app/views/layouts/main.php',
 
-        ],
-
-    
-      
-        
+        ] 
     ],
 
 
     
     'components' => [
+        'authManager' => [
+            'class' => 'yii\rbac\DbManager', // or use 'yii\rbac\DbManager'
+        ],
         
         'mpdf' => [
             'class' => 'Mpdf\Mpdf',
@@ -74,9 +73,7 @@ $config = [
             'encryption' => 'tls',
         ],
     ],
-        'authManager' => [
-            'class' => 'yii\rbac\DbManager',
-        ],
+        
 
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
@@ -122,21 +119,21 @@ $config = [
     'as access' => [
         'class' => 'mdm\admin\components\AccessControl',
         'allowActions' => [
+           // 'site/*',
+           'gii/*',
+            'admin/*',
             'site/login',
             'site/logout',
-            'admin/*',
-            'gii/*',
-            'web/*',
-            'site/*',
-            'empleado/*'
-            //'some-controller/some-action',
+            'some-controller/some-action',
+            'site/get-empleado-foto',
+            'empleado/foto-empleado'
             // The actions listed here will be allowed to everyone including guests.
             // So, 'admin/*' should not appear here in the production, of course.
             // But in the earlier stages of your development, you may probably want to
             // add a lot of actions here until you finally completed setting up rbac,
             // otherwise you may not even take a first step.
         ]
-    ],    
+    ], 
 ];
 
 if (YII_ENV_DEV) {

@@ -1,47 +1,28 @@
 <?php
-
 use app\models\CatDepartamento;
-use marqu3s\summernote\Summernote;
-
-use bizley\quill\Quill;
 use app\models\CatDireccion;
 use app\models\CatDptoCargo;
 use app\models\CatNivelEstudio;
 use app\models\CatPuesto;
 use app\models\CatTipoContrato;
-use hail812\adminlte3\yii\grid\ActionColumn;
 use yii\bootstrap5\Alert;
 use yii\helpers\Html;
-use yii\redactor\widgets\Redactor;
-use dosamigos\tinymce\TinyMce;
 use froala\froalaeditor\FroalaEditorWidget;
 use yii\helpers\HtmlPurifier;
-//use yii\widgets\DetailView;
 use kartik\file\FileInput;
-use dosamigos\ckeditor\CKEditor;
-use yii\helpers\Url;
-use yii\bootstrap5\Tabs;
 use yii\grid\GridView;
-use yii\bootstrap4\Modal;
-use yii\web\YiiAsset;
 use yii\widgets\Pjax;
 use yii\web\View;
-use kartik\detail\DetailView;
-use app\models\ExpedienteSearch;
-//use yii\bootstrap4\ActiveForm;
 use kartik\form\ActiveForm;
 use yii\jui\DatePicker;
 use kartik\daterange\DateRangePicker;
 use yii\helpers\ArrayHelper;
-use app\models\Departamento;
-use app\models\Documento;
 use kartik\tabs\TabsX;
 use app\models\DocumentoSearch;
 use app\models\JuntaGobierno;
 use yii\web\JsExpression;
 use kartik\select2\Select2;
 use app\models\CatTipoDocumento;
-use app\models\ExpedienteMedicoSearch;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Empleado */
@@ -53,10 +34,14 @@ $this->registerCssFile('@web/css/grid-view.css', ['position' => View::POS_HEAD])
 
 $this->registerJsFile('@web/js/municipios.js', ['depends' => [\yii\web\JqueryAsset::class]]);
 $this->registerJsFile('@web/js/select_estados.js', ['depends' => [\yii\web\JqueryAsset::class]]);
+if (Yii::$app->user->can('medico') || Yii::$app->user->can('gestor-rh')): 
 
-$this->title = 'Empleado: ' . $model->numero_empleado;
+
+$this->title = 'Empleado: ' . $model->nombre. ' '. $model->apellido;
 $this->params['breadcrumbs'][] = ['label' => 'Empleados', 'url' => ['index']];
+endif;
 $this->params['breadcrumbs'][] = $this->title;
+
 \yii\web\YiiAsset::register($this);
 $activeTab = Yii::$app->request->get('tab', 'info_p');
 $currentDate = date('Y-m-d');
@@ -150,34 +135,46 @@ if (!$modelAlergia) {
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="card bg-light">
-                <div class="card-header gradient-info text-white">
+            <div class="card-header gradient-info text-white">
+    <div class="d-flex align-items-center position-relative ml-4">
+        <div class="bg-light p-1 rounded-circle custom-shadow" style="width: 140px; height: 140px; position: relative;">
+            <?= Html::img(['empleado/foto-empleado', 'id' => $model->id], [
+                'class' => 'rounded-circle',
+                'style' => 'width: 130px; height: 130px;'
+            ]) ?>
+            <?php if (Yii::$app->user->can('modificar-informacion-empleados')) : ?>
+                <?= Html::button('<i class="fas fa-edit"></i>', [
+                    'class' => 'btn btn-dark position-absolute',
+                    'style' => 'top: 5px; right: 5px; padding: 5px 10px;',
+                    'data-toggle' => 'modal',
+                    'data-target' => '#changePhotoModal'
+                ]) ?>
+            <?php endif; ?>
+        </div>
+        <div class="ml-4">
+            <div class="alert alert-light mb-0" role="alert">
+                
+                <h3 class="mb-0"><?= $model->nombre ?> <?= $model->apellido ?></h3>
+                <h5 class="mb-0">Numero de empleado: <?= $model->numero_empleado ?></h5>
 
-                    <div class="d-flex align-items-center position-relative ml-4">
-                        <div class="bg-light p-1 rounded-circle custom-shadow" style="width: 140px; height: 140px; position: relative;">
-                            <?= Html::img(['empleado/foto-empleado', 'id' => $model->id], [
-                                'class' => 'rounded-circle',
-                                'style' => 'width: 130px; height: 130px;'
-                            ]) ?>
-                                 <?php if (Yii::$app->user->can('modificar-informacion-empleados')): ?>
-                                    
-                            <?= Html::button('<i class="fas fa-edit"></i>', [
-                                'class' => 'btn btn-dark position-absolute',
-                                'style' => 'top: 5px; right: 5px; padding: 5px 10px;',
-                                'data-toggle' => 'modal',
-                                'data-target' => '#changePhotoModal'
-                            ]) ?>
-                             <?php endif; ?>
-                        </div>
-                        <div class="ml-4">
-                            <div class="alert alert-light mb-0" role="alert">
-                                <h3><?= Html::encode($this->title) ?></h3>
-                                <h3 class="mb-0"><?= $model->nombre ?> <?= $model->apellido ?></h3>
+                
+            </div>
+        </div>
+       
+    </div>
+    <?php if (Yii::$app->user->can('crear-consulta-medica')) : ?>
 
+    <?php if ($model->expedienteMedico): ?>
+                    <?= Html::a('Nueva consulta <i class="fa fa-user-md" ></i>', ['consulta-medica/create', 'expediente_medico_id' => $model->expedienteMedico->id], [
+                        'class' => 'btn btn-dark mt-3 float-right fa-lg'
+                    ]) ?>
+                    
 
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <?php endif; ?>
+                
+                <?php endif; ?>
+</div>
+
 
 
 
@@ -270,21 +267,22 @@ if (!$modelAlergia) {
                                         ]); ?>
                                         <div class="card-header bg-info text-white">
                                             <h3>Información personal</h3>
-                                            <?php if (Yii::$app->user->can('modificar-informacion-empleados')): ?>
-                                                
-                                            <button type="button" id="edit-button-personal" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
-                                            <button type="button" id="cancel-button-personal" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
-                                        
-                                            <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right mr-3', 'id' => 'save-button-personal', 'style' => 'display:none;']) ?>
+                                            <?php if (Yii::$app->user->can('modificar-informacion-empleados')) : ?>
+
+                                                <button type="button" id="edit-button-personal" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
+                                                <button type="button" id="cancel-button-personal" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
+
+                                                <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right mr-3', 'id' => 'save-button-personal', 'style' => 'display:none;']) ?>
                                             <?php endif; ?>
                                         </div>
                                         <div class="card-body">
                                             <?= $form->field($model, 'numero_empleado')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
                                             <?= $form->field($model, 'nombre')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
                                             <?= $form->field($model, 'apellido')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
-                                           
 
-<?= $form->field($model, 'fecha_nacimiento')->input('date', ['disabled' => true]) ?>
+                                            <?php //echo Html::label($model->expedienteMedico->antecedenteNoPatologico, 'religion'); ?>
+
+                                            <?= $form->field($model, 'fecha_nacimiento')->input('date', ['disabled' => true]) ?>
 
                                             <?= $form->field($model, 'edad')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
                                             <?= $form->field($model, 'sexo')->widget(Select2::className(), [
@@ -373,6 +371,7 @@ if (!$modelAlergia) {
                                 </script>
 
 
+<?php if (Yii::$app->user->can('ver-informacion-completa-empleados')) : ?>
 
 
                                 <div class="col-md-6">
@@ -384,11 +383,11 @@ if (!$modelAlergia) {
                                         ]); ?>
                                         <div class="card-header gradient-verde  text-white">
                                             <h3>Información Educacional</h3>
-                                            <?php if (Yii::$app->user->can('modificar-informacion-empleados')): ?>
-                                              
-                                            <button type="button" id="edit-button-educational" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
-                                            <button type="button" id="cancel-button-educational" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
-                                            <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right mr-3', 'id' => 'save-button-educational', 'style' => 'display:none;']) ?>
+                                            <?php if (Yii::$app->user->can('modificar-informacion-empleados')) : ?>
+
+                                                <button type="button" id="edit-button-educational" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
+                                                <button type="button" id="cancel-button-educational" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
+                                                <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right mr-3', 'id' => 'save-button-educational', 'style' => 'display:none;']) ?>
                                             <?php endif; ?>
                                         </div>
                                         <div class="card-body">
@@ -427,7 +426,7 @@ if (!$modelAlergia) {
                                         <?php ActiveForm::end(); ?>
                                     </div>
                                 </div>
-
+<?php endif;?>
                             </div>
 
                             <script>
@@ -491,11 +490,11 @@ if (!$modelAlergia) {
                                         ]); ?>
                                         <div class="card-header bg-info text-white">
                                             <h3>Información de contacto</h3>
-                                            <?php if (Yii::$app->user->can('modificar-informacion-empleados')): ?>
-                                               
-                                            <button type="button" id="edit-button-contact" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
-                                            <button type="button" id="cancel-button-contact" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
-                                            <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right mr-3', 'id' => 'save-button-contact', 'style' => 'display:none;']) ?>
+                                            <?php if (Yii::$app->user->can('modificar-informacion-empleados')) : ?>
+
+                                                <button type="button" id="edit-button-contact" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
+                                                <button type="button" id="cancel-button-contact" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
+                                                <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right mr-3', 'id' => 'save-button-contact', 'style' => 'display:none;']) ?>
                                             <?php endif; ?>
                                         </div>
                                         <div class="card-body">
@@ -577,11 +576,11 @@ if (!$modelAlergia) {
                                         ]); ?>
                                         <div class="card-header gradient-verde text-white">
                                             <h3>Información de contacto de emergencia</h3>
-                                            <?php if (Yii::$app->user->can('modificar-informacion-empleados')): ?>
-                                              
-                                            <button type="button" id="edit-button-emergency" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
-                                            <button type="button" id="cancel-button-emergency" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
-                                            <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-info float-right  mr-3', 'id' => 'save-button-emergency', 'style' => 'display:none;']) ?>
+                                            <?php if (Yii::$app->user->can('modificar-informacion-empleados')) : ?>
+
+                                                <button type="button" id="edit-button-emergency" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
+                                                <button type="button" id="cancel-button-emergency" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
+                                                <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-info float-right  mr-3', 'id' => 'save-button-emergency', 'style' => 'display:none;']) ?>
                                             <?php endif; ?>
                                         </div>
                                         <div class="card-body">
@@ -687,11 +686,11 @@ if (!$modelAlergia) {
                                 ]); ?>
                                 <div class="card-header bg-info text-white">
                                     <h3>Información Laboral</h3>
-                                    <?php if (Yii::$app->user->can('modificar-informacion-empleados')): ?>
-                                      
-                                    <button type="button" id="edit-button-laboral" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
-                                    <button type="button" id="cancel-button-laboral" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
-                                    <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right  mr-3', 'id' => 'save-button-laboral', 'style' => 'display:none;']) ?>
+                                    <?php if (Yii::$app->user->can('modificar-informacion-empleados')) : ?>
+
+                                        <button type="button" id="edit-button-laboral" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
+                                        <button type="button" id="cancel-button-laboral" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
+                                        <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right  mr-3', 'id' => 'save-button-laboral', 'style' => 'display:none;']) ?>
                                     <?php endif; ?>
                                 </div>
                                 <div class="card-body">
@@ -735,23 +734,23 @@ if (!$modelAlergia) {
 
 
 
-                                    <?php if (Yii::$app->user->identity->rol == 2): ?>
-                                       
-                                    <?= $form->field($model->informacionLaboral, 'cat_tipo_contrato_id')->widget(Select2::classname(), [
-                                        'data' => ArrayHelper::map(CatTipoContrato::find()->all(), 'id', 'nombre_tipo'),
-                                        'options' => ['placeholder' => 'Seleccionar Tipo de Contrato', 'disabled' => true],
-                                        'pluginOptions' => [
-                                            'allowClear' => true
-                                        ],
-                                        'theme' => Select2::THEME_BOOTSTRAP,
-                                        'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
-                                        ],
-                                        'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
-                                        ],
-                                    ])->label('Tipo de contrato') ?>
-                                     <?php endif; ?>
+                                    <?php if (Yii::$app->user->can('ver-informacion-completa-empleados')) : ?>
+
+                                        <?= $form->field($model->informacionLaboral, 'cat_tipo_contrato_id')->widget(Select2::classname(), [
+                                            'data' => ArrayHelper::map(CatTipoContrato::find()->all(), 'id', 'nombre_tipo'),
+                                            'options' => ['placeholder' => 'Seleccionar Tipo de Contrato', 'disabled' => true],
+                                            'pluginOptions' => [
+                                                'allowClear' => true
+                                            ],
+                                            'theme' => Select2::THEME_BOOTSTRAP,
+                                            'pluginEvents' => [
+                                                'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
+                                            ],
+                                            'pluginEvents' => [
+                                                'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
+                                            ],
+                                        ])->label('Tipo de contrato') ?>
+                                    <?php endif; ?>
                                     <?= $form->field($model->informacionLaboral, 'fecha_ingreso')->input('date', ['disabled' => true]) ?>
 
                                     <?= $form->field($model->informacionLaboral, 'cat_departamento_id')->widget(Select2::classname(), [
@@ -786,19 +785,19 @@ if (!$modelAlergia) {
                                     <?= $form->field($model->informacionLaboral, 'horario_laboral_inicio')->input('time', ['disabled' => true])->label('Hora de entrada')  ?>
 
                                     <?= $form->field($model->informacionLaboral, 'horario_laboral_fin')->input('time', ['disabled' => true])->label('Hora de salida') ?>
-                                    <?php if (Yii::$app->user->identity->rol == 2): ?>
-                                       
-                                    <?= $form->field($model->informacionLaboral, 'numero_cuenta')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
+                                    <?php if (Yii::$app->user->can('ver-informacion-completa-empleados')) : ?>
+
+                                        <?= $form->field($model->informacionLaboral, 'numero_cuenta')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
                                     <?php endif; ?>
-                                    <?php if (Yii::$app->user->identity->rol == 2): ?>
-                                       
-                                   <?= $form->field($model->informacionLaboral, 'salario')->textInput([
-                                        'type' => 'number',
-                                        'step' => '0.01',
-                                        'readonly' => true,
-                                        'class' => 'form-control'
-                                    ]); ?>
- <?php endif; ?>
+                                    <?php if (Yii::$app->user->can('ver-informacion-completa-empleados')) : ?>
+
+                                        <?= $form->field($model->informacionLaboral, 'salario')->textInput([
+                                            'type' => 'number',
+                                            'step' => '0.01',
+                                            'readonly' => true,
+                                            'class' => 'form-control'
+                                        ]); ?>
+                                    <?php endif; ?>
 
 
                                     <?= $form->field($model->informacionLaboral, 'cat_puesto_id')->widget(Select2::classname(), [
@@ -858,84 +857,46 @@ if (!$modelAlergia) {
                                     <?php ActiveForm::end(); ?>
                                 </div>
                             </div>
-                            <script>
-                                document.getElementById('edit-button-laboral').addEventListener('click', function() {
-                                    var fields = document.querySelectorAll('#laboral-info-form input, #laboral-info-form select, #dias-laborales-checkboxes input');
-                                    fields.forEach(function(field) {
-                                        field.readOnly = false;
-                                        field.disabled = false;
-                                    });
-                                    document.getElementById('dias-laborales-display').style.display = 'none';
-                                    document.getElementById('dias-laborales-checkboxes').style.display = 'block';
-                                    document.getElementById('edit-button-laboral').style.display = 'none';
-                                    document.getElementById('save-button-laboral').style.display = 'block';
-                                    document.getElementById('cancel-button-laboral').style.display = 'block';
-                                });
-
-                                document.getElementById('cancel-button-laboral').addEventListener('click', function() {
-                                    var fields = document.querySelectorAll('#laboral-info-form input, #laboral-info-form select, #dias-laborales-checkboxes input');
-                                    fields.forEach(function(field) {
-                                        field.readOnly = true;
-                                        field.disabled = true;
-                                        field.value = field.defaultValue;
-                                    });
-                                    document.getElementById('dias-laborales-display').style.display = 'block';
-                                    document.getElementById('dias-laborales-checkboxes').style.display = 'none';
-                                    document.getElementById('edit-button-laboral').style.display = 'block';
-                                    document.getElementById('save-button-laboral').style.display = 'none';
-                                    document.getElementById('cancel-button-laboral').style.display = 'none';
-                                });
-
-                                /*  function checkEmptyFieldsLaboral() {
-                                      var fields = document.querySelectorAll('#laboral-info-form input, #laboral-info-form select');
-                                      var emptyFields = Array.from(fields).filter(function(field) {
-                                          return field.value.trim() === '' && field.type !== 'hidden';
-                                      });
-
-                                      if (emptyFields.length > 0) {
-                                          showAlert('Falta completar datos laborales', 'Por favor, complete todos los campos.');
-                                      }
-                                  }
-
-                                  document.addEventListener('DOMContentLoaded', function() {
-                                      checkEmptyFieldsLaboral();
-                                  });
-
-                                  $('#pjax-update-info').on('pjax:end', function() {
-                                      checkEmptyFieldsLaboral();
-                                  });*/
-                            </script>
+                            
 
                             <script>
-                                document.getElementById('edit-button-laboral').addEventListener('click', function() {
-                                    var fields = document.querySelectorAll('#laboral-info-form input, #laboral-info-form select, #dias-laborales-checkboxes input');
-                                    fields.forEach(function(field) {
-                                        field.readOnly = false;
-                                        field.disabled = false;
-                                    });
-                                    document.getElementById('dias-laborales-display').style.display = 'none';
-                                    document.getElementById('dias-laborales-checkboxes').style.display = 'block';
-                                    document.getElementById('edit-button-laboral').style.display = 'none';
-                                    document.getElementById('save-button-laboral').style.display = 'block';
-                                    document.getElementById('cancel-button-laboral').style.display = 'block';
-                                });
+        document.addEventListener("DOMContentLoaded", function() {
+            // Al cargar la página, guardar los valores originales de los campos
+            var originalValues = {};
+            var fields = document.querySelectorAll('#laboral-info-form input, #laboral-info-form select');
+            fields.forEach(function(field) {
+                originalValues[field.id] = field.value;
+            });
 
-                                document.getElementById('cancel-button-laboral').addEventListener('click', function() {
-                                    var fields = document.querySelectorAll('#laboral-info-form input, #laboral-info-form select, #dias-laborales-checkboxes input');
-                                    fields.forEach(function(field) {
-                                        field.readOnly = true;
-                                        field.disabled = true;
-                                        field.value = field.defaultValue;
-                                    });
-                                    document.getElementById('dias-laborales-display').style.display = 'block';
-                                    document.getElementById('dias-laborales-checkboxes').style.display = 'none';
-                                    document.getElementById('edit-button-laboral').style.display = 'block';
-                                    document.getElementById('save-button-laboral').style.display = 'none';
-                                    document.getElementById('cancel-button-laboral').style.display = 'none';
-                                });
-                            </script>
+            // Botón Editar
+            document.getElementById('edit-button-laboral').addEventListener('click', function() {
+                fields.forEach(function(field) {
+                    field.readOnly = false;
+                    field.disabled = false;
+                });
+                document.getElementById('dias-laborales-display').style.display = 'none';
+                document.getElementById('dias-laborales-checkboxes').style.display = 'block';
+                document.getElementById('edit-button-laboral').style.display = 'none';
+                document.getElementById('save-button-laboral').style.display = 'block';
+                document.getElementById('cancel-button-laboral').style.display = 'block';
+            });
 
-
+            // Botón Cancelar
+            document.getElementById('cancel-button-laboral').addEventListener('click', function() {
+                fields.forEach(function(field) {
+                    field.readOnly = true;
+                    field.disabled = true;
+                    // Restaurar al valor original
+                    field.value = originalValues[field.id];
+                });
+                document.getElementById('dias-laborales-display').style.display = 'block';
+                document.getElementById('dias-laborales-checkboxes').style.display = 'none';
+                document.getElementById('edit-button-laboral').style.display = 'block';
+                document.getElementById('save-button-laboral').style.display = 'none';
+                document.getElementById('cancel-button-laboral').style.display = 'none';
+            });
+        });
+    </script>
 
 
                             <?php $this->endBlock(); ?>
@@ -973,12 +934,12 @@ if (!$modelAlergia) {
                                                     </div>
                                                     <label>Dias de vacaciones disponibles: <?= $model->informacionLaboral->vacaciones->periodoVacacional->dias_vacaciones_periodo ?></label><br>
                                                     <label>Dias de vacaciones restantes: <span id="dias-disponibles"><?= $model->informacionLaboral->vacaciones->periodoVacacional->dias_disponibles ?></span></label><br>
-                                                    <?php if (Yii::$app->user->can('modificar-informacion-empleados')): ?>
+                                                    <?php if (Yii::$app->user->can('modificar-informacion-empleados')) : ?>
 
-                                                    <button type="button" id="edit-button-first-period" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
-                                                    <button type="button" id="cancel-button-first-period" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
-                                                   
-                                                    <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-dark float-right mr-3', 'id' => 'save-button-first-period', 'style' => 'display:none;']) ?>
+                                                        <button type="button" id="edit-button-first-period" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
+                                                        <button type="button" id="cancel-button-first-period" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
+
+                                                        <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-dark float-right mr-3', 'id' => 'save-button-first-period', 'style' => 'display:none;']) ?>
                                                     <?php endif; ?>
                                                 </div>
                                                 <div class="card-body">
@@ -1088,11 +1049,11 @@ if (!$modelAlergia) {
                                                     </label>
 
                                                     <br>
-                                                    <?php if (Yii::$app->user->can('modificar-informacion-empleados')): ?>
+                                                    <?php if (Yii::$app->user->can('modificar-informacion-empleados')) : ?>
 
-                                                    <button type="button" id="edit-button-period" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
-                                                    <button type="button" id="cancel-button-period" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
-                                                    <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-info float-right  mr-3', 'id' => 'save-button-period', 'style' => 'display:none;']) ?>
+                                                        <button type="button" id="edit-button-period" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
+                                                        <button type="button" id="cancel-button-period" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
+                                                        <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-info float-right  mr-3', 'id' => 'save-button-period', 'style' => 'display:none;']) ?>
                                                     <?php endif; ?>
 
                                                 </div>
@@ -1354,61 +1315,148 @@ if (!$modelAlergia) {
                             <?php $this->endBlock(); ?>
 
 
-
-
+                           
 
 
                             <?php
-$tabs = [
-    [
-        'label' => 'Información personal',
-        'content' => $this->blocks['info_p'],
-        'options' => [
-            'id' => 'informacion_personal',
-        ],
-    ],
-    [
-        'label' => 'Información de contacto',
-        'content' => $this->blocks['info_c'],
-        'options' => [
-            'id' => 'informacion_contacto',
-        ],
-    ],
-    [
-        'label' => 'Información laboral',
-        'content' => $this->blocks['info_l'],
-        'options' => [
-            'id' => 'informacion_laboral',
-        ],
-    ],
-    [
-        'label' => 'Solicitudes',
-        'content' => $this->blocks['info_solicitudes'],
-        'options' => [
-            'id' => 'informacion_solicitudes',
-        ],
-    ],
-];
+                            $tabs = [
+                                [
+                                    'label' => 'Información personal',
+                                    'content' => $this->blocks['info_p'],
+                                    'options' => [
+                                        'id' => 'informacion_personal',
+                                    ],
+                                ],
+                                [
+                                    'label' => 'Información de contacto',
+                                    'content' => $this->blocks['info_c'],
+                                    'options' => [
+                                        'id' => 'informacion_contacto',
+                                    ],
+                                ],
+                                [
+                                    'label' => 'Información laboral',
+                                    'content' => $this->blocks['info_l'],
+                                    'options' => [
+                                        'id' => 'informacion_laboral',
+                                    ],
+                                ],
+                                [
+                                    'label' => 'Solicitudes',
+                                    'content' => $this->blocks['info_solicitudes'],
+                                    'options' => [
+                                        'id' => 'informacion_solicitudes',
+                                    ],
+                                ],
+                               
+                            ];
 
-if (Yii::$app->user->can('ver-informacion-vacacional')) {
-    $tabs[] = [
-        'label' => 'Vacaciones',
-        'content' => $this->blocks['info_vacacional'],
-        'options' => [
-            'id' => 'informacion_vacaciones',
-        ],
-    ];
-}
+                            if (Yii::$app->user->can('ver-informacion-vacacional')) {
+                                $tabs[] = [
+                                    'label' => 'Vacaciones',
+                                    'content' => $this->blocks['info_vacacional'],
+                                    'options' => [
+                                        'id' => 'informacion_vacaciones',
+                                    ],
+                                ];
+                            }
 
-echo TabsX::widget([
-    'enableStickyTabs' => true,
-    'options' => ['class' => 'nav-tabs-custom'],
-    'items' => $tabs,
-    'position' => TabsX::POS_ABOVE,
-    'align' => TabsX::ALIGN_CENTER,
-    'encodeLabels' => false,
-]);
-?>
+                            echo TabsX::widget([
+                                'enableStickyTabs' => true,
+                                'options' => ['class' => 'nav-tabs-custom'],
+                                'items' => $tabs,
+                                'position' => TabsX::POS_ABOVE,
+                                'align' => TabsX::ALIGN_CENTER,
+                                'encodeLabels' => false,
+                            ]);
+                            ?>
+
+
+<?php $this->beginBlock('info_consultas'); ?>
+<div class="card">
+    <div class="card-body">
+        <div class="card-header bg-success text-dark text-center">
+            <h3>HISTORIAL DE CONSULTAS MEDICAS: </h3>
+        </div>
+        <li class="dropdown-divider"></li>
+        <div class="row">
+            <?php Pjax::begin(); ?>
+            <?= GridView::widget([
+                'dataProvider' => $dataProviderConsultas,
+                'filterModel' => $searchModelConsultas,
+                'columns' => [
+                    ['class' => 'yii\grid\SerialColumn'],
+                  
+
+                   
+                    [
+                        'label' => 'Fecha de la consula',
+                        'attribute' => 'created_at',
+                        'format' => 'raw',
+                        'value' => function ($model) {
+                            setlocale(LC_TIME, "es_419.UTF-8");
+                            return strftime('%A, %d de %B de %Y', strtotime($model->created_at));
+                        },
+                        'filter' => DatePicker::widget([
+                            'model' => $searchModelConsultas,
+                            'attribute' => 'created_at',
+                            'language' => 'es',
+                            'dateFormat' => 'php:Y-m-d',
+                            'options' => [
+                                'class' => 'form-control',
+                                'autocomplete' => 'off',
+                            ],
+                            'clientOptions' => [
+                                'changeYear' => true,
+                                'changeMonth' => true,
+                                'yearRange' => '-100:+0',
+                            ],
+                           
+                        ]),
+                    ],
+                    
+                    [
+                        'label' => 'Motivo de la consulta',
+                        'attribute' => 'motivo',
+                        'format' => 'html',
+                        'value' => function ($model) {
+                            return \yii\helpers\Html::decode($model->motivo);
+                        },
+                        'filter' => false,
+                        'options' => ['style' => 'width: 65%;'],
+                    ],
+                    // Otras columnas que desees mostrar...
+                    [
+                        'class' => 'hail812\adminlte3\yii\grid\ActionColumn',
+                        'template' => '{view} {delete}',
+                        'buttons' => [
+                            'view' => function ($url, $model, $key) {
+                                return Html::a('<i class="fa fa-eye"></i>', ['consulta-medica/view', 'id' => $model->id], ['title' => 'Ver', 'class' => 'btn btn-primary btn-xs']);
+                            },
+                            'delete' => function ($url, $model, $key) {
+                                return Html::a('<i class="fa fa-trash"></i>', ['consulta-medica/delete', 'id' => $model->id], [
+                                    'title' => 'Eliminar',
+                                    'class' => 'btn btn-danger btn-xs',
+                                    'data-confirm' => '¿Estás seguro de eliminar este elemento?',
+                                    'data-method' => 'post',
+                                ]);
+                            },
+                        ],
+                    ],
+                ],
+                'summaryOptions' => ['class' => 'summary mb-2'],
+                'pager' => [
+                    'class' => 'yii\bootstrap4\LinkPager',
+                ],
+            ]); ?>
+            <?php Pjax::end(); ?>
+        </div>
+    </div>
+</div>
+<?php $this->endBlock(); ?>
+
+
+
 
                             <?php $this->beginBlock('expediente'); ?>
                             <div class="row">
@@ -1634,145 +1682,145 @@ echo TabsX::widget([
 
                             <!-- Bloque de antecedentes hereditarios -->
                             <?php $this->beginBlock('hereditarios'); ?>
-    <?php $form = ActiveForm::begin(['action' => ['empleado/view', 'id' => $model->id]]); ?>
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header gradient-blue text-white text-center">
-                    <h2>Antecedentes Hereditarios</h2>
-                </div>
-                <div class="card-body bg-light">
-                    <div class="row">
-                        <div class="col-md-8">
-                            <div class="table-responsive">
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>Enfermedad</th>
-                                            <th>Abuelos</th>
-                                            <th>Hermanos</th>
-                                            <th>Madre</th>
-                                            <th>Padre</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($catAntecedentes as $catAntecedente) : ?>
-                                            <tr>
-                                                <td><?= Html::encode($catAntecedente->nombre) ?></td>
-                                                <?php foreach (['Abuelos', 'Hermanos', 'Madre', 'Padre'] as $parentezco) : ?>
-                                                    <td>
-                                                        <?php
-                                                        // Verifica si el usuario tiene permiso para editar
+                            <?php $form = ActiveForm::begin(['action' => ['empleado/view', 'id' => $model->id]]); ?>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="card">
+                                        <div class="card-header gradient-blue text-white text-center">
+                                            <h2>Antecedentes Hereditarios</h2>
+                                        </div>
+                                        <div class="card-body bg-light">
+                                            <div class="row">
+                                                <div class="col-md-8">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-bordered">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Enfermedad</th>
+                                                                    <th>Abuelos</th>
+                                                                    <th>Hermanos</th>
+                                                                    <th>Madre</th>
+                                                                    <th>Padre</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <?php foreach ($catAntecedentes as $catAntecedente) : ?>
+                                                                    <tr>
+                                                                        <td><?= Html::encode($catAntecedente->nombre) ?></td>
+                                                                        <?php foreach (['Abuelos', 'Hermanos', 'Madre', 'Padre'] as $parentezco) : ?>
+                                                                            <td>
+                                                                                <?php
+                                                                                // Verifica si el usuario tiene permiso para editar
 
-                                                        // Si es editable, muestra el checkbox para editar
-                                                        // Si no es editable, muestra solo el estado actual sin checkbox
+                                                                                // Si es editable, muestra el checkbox para editar
+                                                                                // Si no es editable, muestra solo el estado actual sin checkbox
+                                                                                if ($editable) {
+                                                                                    echo Html::checkbox("AntecedenteHereditario[{$catAntecedente->id}][$parentezco]", isset($antecedentesExistentes[$catAntecedente->id][$parentezco]), [
+                                                                                        'value' => 1,
+                                                                                        'label' => '',
+                                                                                    ]);
+                                                                                } else {
+                                                                                    // Muestra solo el estado actual sin checkbox
+                                                                                    $checked = isset($antecedentesExistentes[$catAntecedente->id][$parentezco]) && $antecedentesExistentes[$catAntecedente->id][$parentezco] == 1;
+                                                                                    echo $checked ? 'X' : '';
+                                                                                }
+                                                                                ?>
+                                                                            </td>
+                                                                        <?php endforeach; ?>
+                                                                    </tr>
+                                                                <?php endforeach; ?>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 d-flex flex-column justify-content-between" style="height: 100%;">
+                                                    <div class="form-group text-center">
+                                                        <?= Html::label('Observaciones', 'observacion_general') ?>
+                                                        <?= Html::textarea('observacion_general', $observacionGeneral, [
+                                                            'class' => 'form-control',
+                                                            'rows' => 5,
+                                                            'style' => 'width: 100%;',
+                                                            'readonly' => !$editable, // Hace que el campo sea de solo lectura si no tiene permiso
+                                                        ]) ?>
+                                                    </div>
+                                                    <br>
+                                                    <div class="form-group mt-auto d-flex justify-content-end">
+                                                        <?php
+                                                        // Si tiene permiso, muestra el botón de guardar
                                                         if ($editable) {
-                                                            echo Html::checkbox("AntecedenteHereditario[{$catAntecedente->id}][$parentezco]", isset($antecedentesExistentes[$catAntecedente->id][$parentezco]), [
-                                                                'value' => 1,
-                                                                'label' => '',
-                                                            ]);
-                                                        } else {
-                                                            // Muestra solo el estado actual sin checkbox
-                                                            $checked = isset($antecedentesExistentes[$catAntecedente->id][$parentezco]) && $antecedentesExistentes[$catAntecedente->id][$parentezco] == 1;
-                                                            echo $checked ? 'X' : '';
+                                                            echo Html::submitButton('Guardar &nbsp; &nbsp;  <i class="fa fa-save"></i>', ['class' => 'btn btn-success']);
                                                         }
                                                         ?>
-                                                    </td>
-                                                <?php endforeach; ?>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
+                                                    </div>
+                                                </div>
+                                                <div class="alert alert-white custom-alert" role="alert">
+                                                    <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Causas de muerte, malformaciones congénitas, diabetes, cardiopatías, hipertensión arterial, infartos, ateroesclerosis, accidentes vasculares, neuropatías, tuberculosis, artropatías, hemopatías, sida, sífilis, hemopatías, neoplasias, consanguinidad, alcoholismo, toxicomanías.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-4 d-flex flex-column justify-content-between" style="height: 100%;">
-                            <div class="form-group text-center">
-                                <?= Html::label('Observaciones', 'observacion_general') ?>
-                                <?= Html::textarea('observacion_general', $observacionGeneral, [
-                                    'class' => 'form-control',
-                                    'rows' => 5,
-                                    'style' => 'width: 100%;',
-                                    'readonly' => !$editable, // Hace que el campo sea de solo lectura si no tiene permiso
-                                ]) ?>
-                            </div>
-                            <br>
-                            <div class="form-group mt-auto d-flex justify-content-end">
-                                <?php
-                                // Si tiene permiso, muestra el botón de guardar
-                                if ($editable) {
-                                    echo Html::submitButton('Guardar &nbsp; &nbsp;  <i class="fa fa-save"></i>', ['class' => 'btn btn-success']);
-                                }
-                                ?>
-                            </div>
-                        </div>
-                        <div class="alert alert-white custom-alert" role="alert">
-                            <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Causas de muerte, malformaciones congénitas, diabetes, cardiopatías, hipertensión arterial, infartos, ateroesclerosis, accidentes vasculares, neuropatías, tuberculosis, artropatías, hemopatías, sida, sífilis, hemopatías, neoplasias, consanguinidad, alcoholismo, toxicomanías.
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <?php ActiveForm::end(); ?>
-<?php $this->endBlock(); ?>
+                            <?php ActiveForm::end(); ?>
+                            <?php $this->endBlock(); ?>
 
 
                             <!-- Bloque de antecedentes patológicos -->
                             <?php $this->beginBlock('patologicos'); ?>
-    <?php $form = ActiveForm::begin(['action' => ['empleado/antecedente-patologico', 'id' => $model->id]]); ?>
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header gradient-blue text-white text-center">
-                    <h2>Antecedentes Patológicos</h2>
-                </div>
-                <div class="card-body bg-light">
-                    <?php
-                    // Verifica si el usuario tiene permiso para editar
-                    $editable = Yii::$app->user->can('editar-expediente-medico');
-                    ?>
+                            <?php $form = ActiveForm::begin(['action' => ['empleado/antecedente-patologico', 'id' => $model->id]]); ?>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="card">
+                                        <div class="card-header gradient-blue text-white text-center">
+                                            <h2>Antecedentes Patológicos</h2>
+                                        </div>
+                                        <div class="card-body bg-light">
+                                            <?php
+                                            // Verifica si el usuario tiene permiso para editar
+                                            $editable = Yii::$app->user->can('editar-expediente-medico');
+                                            ?>
 
-                    <?php if ($editable): ?>
-                        <div class="form-group">
-                            <?= $form->field($antecedentePatologico, 'descripcion_antecedentes')->widget(FroalaEditorWidget::className(), [
-                                'clientOptions' => [
-                                    'toolbarInline' => false,
-                                    'theme' => 'royal', // optional: dark, red, gray, royal
-                                    'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
-                                    'height' => 400,
-                                    'pluginsEnabled' => [
-                                        'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
-                                        'draggable', 'emoticons', 'entities', 'fontFamily',
-                                        'fontSize', 'fullscreen', 'inlineStyle',
-                                        'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
-                                        'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
-                                    ],
-                                ]
-                            ])->label(false) ?>
-                        </div>
+                                            <?php if ($editable) : ?>
+                                                <div class="form-group">
+                                                    <?= $form->field($antecedentePatologico, 'descripcion_antecedentes')->widget(FroalaEditorWidget::className(), [
+                                                        'clientOptions' => [
+                                                            'toolbarInline' => false,
+                                                            'theme' => 'royal', // optional: dark, red, gray, royal
+                                                            'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
+                                                            'height' => 400,
+                                                            'pluginsEnabled' => [
+                                                                'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
+                                                                'draggable', 'emoticons', 'entities', 'fontFamily',
+                                                                'fontSize', 'fullscreen', 'inlineStyle',
+                                                                'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
+                                                                'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
+                                                            ],
+                                                        ]
+                                                    ])->label(false) ?>
+                                                </div>
 
-                        <div class="form-group text-right">
-                            <?= Html::submitButton('Guardar &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
-                        </div>
-                    <?php else: ?>
-                        <div class="form-group">
-                            <?= Html::label('Descripción de Antecedentes Patológicos', 'descripcion_antecedentes') ?>
-                            <?php
-                            $contenidoHTML = Html::decode($antecedentePatologico->descripcion_antecedentes);
-                            echo HtmlPurifier::process($contenidoHTML);
-                            ?>
-                        </div>
-                    <?php endif; ?>
+                                                <div class="form-group text-right">
+                                                    <?= Html::submitButton('Guardar &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success fa-lg']) ?>
+                                                </div>
+                                            <?php else : ?>
+                                                <div class="form-group">
+                                                    <?= Html::label('Descripción de Antecedentes Patológicos', 'descripcion_antecedentes') ?>
+                                                    <?php
+                                                    $contenidoHTML = Html::decode($antecedentePatologico->descripcion_antecedentes);
+                                                    echo HtmlPurifier::process($contenidoHTML);
+                                                    ?>
+                                                </div>
+                                            <?php endif; ?>
 
-                    <div class="alert alert-white custom-alert" role="alert">
-                        <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Peso al nacer, anormalidades perinatales, desarrollo físico y mental, y el esquema básico de vacunación.
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <?php ActiveForm::end(); ?>
-<?php $this->endBlock(); ?>
+                                            <div class="alert alert-white custom-alert" role="alert">
+                                                <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Peso al nacer, anormalidades perinatales, desarrollo físico y mental, y el esquema básico de vacunación.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php ActiveForm::end(); ?>
+                            <?php $this->endBlock(); ?>
 
 
                             <?php $this->beginBlock('no_patologicos'); ?>
@@ -1784,139 +1832,138 @@ echo TabsX::widget([
                                     <div class="card">
                                         <div class="card-header gradient-blue text-white text-center">
                                             <h2>Antecedentes No Patológicos</h2>
-                                            <div class="float-submit-btn">
-                                                <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
-                                            </div>
+                                            <?php if (Yii::$app->user->can('editar-expediente-medico')) { ?>
+
+                                                <div class="float-submit-btn">
+                                                    <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                                                </div>
+
+                                            <?php  } ?>
+
                                         </div>
                                         <div class="card-body">
                                             <div class="container">
-                                            <div class="card">
-        <div class="card-header custom-nopato text-white text-left">
-            <h5>ACTIVIDAD FISICA</h5>
-        </div>
-        <div class="card-body bg-light">
-            <div class="row">
-                <!-- Columna izquierda con los campos -->
-                <div class="col-md-8">
-                    <div class="row">
-                        <div class="col-6 col-sm-4">
-                            <div class="custom-control custom-checkbox">
-                                <?= Html::checkbox('AntecedenteNoPatologico[p_ejercicio]', $antecedenteNoPatologico->p_ejercicio, [
-                                    'class' => 'custom-control-input',
-                                    'id' => 'p_ejercicio',
-                                    'disabled' => !$editable // Deshabilitar si no tiene permiso
-                                ]) ?>
-                                <?= Html::label('¿Realiza ejercicio?', 'p_ejercicio', ['class' => 'custom-control-label']) ?>
-                            </div>
-                        </div>
-                        <div class="col-6 col-sm-6" id="ejercicio-minutos-container">
-                            <?= Html::label('Minutos al día', 'p_minutos_x_dia_ejercicio') ?>
-                            <?= Html::input('number', 'AntecedenteNoPatologico[p_minutos_x_dia_ejercicio]', $antecedenteNoPatologico->p_minutos_x_dia_ejercicio, [
-                                'class' => 'form-control',
-                                'id' => 'p_minutos_x_dia_ejercicio',
-                                'disabled' => !$editable // Deshabilitar si no tiene permiso
-                            ]) ?>
-                        </div>
-                        <div class="w-100"></div>
-                        <br>
-                        <div class="col-6 col-sm-4">
-                            <div class="custom-control custom-checkbox">
-                                <?= Html::checkbox('AntecedenteNoPatologico[p_deporte]', $antecedenteNoPatologico->p_deporte, [
-                                    'class' => 'custom-control-input',
-                                    'id' => 'p_deporte',
-                                    'disabled' => !$editable // Deshabilitar si no tiene permiso
-                                ]) ?>
-                                <?= Html::label('¿Realiza algún deporte?', 'p_deporte', ['class' => 'custom-control-label']) ?>
-                            </div>
-                        </div>
-                        <div class="col-6 col-sm-4" id="deporte-cual-container">
-                            <?= Html::label('¿Cuál deporte?', 'p_a_deporte') ?>
-                            <?= Html::textInput('AntecedenteNoPatologico[p_a_deporte]', $antecedenteNoPatologico->p_a_deporte, [
-                                'class' => 'form-control',
-                                'id' => 'p_a_deporte',
-                                'disabled' => !$editable // Deshabilitar si no tiene permiso
-                            ]) ?>
-                        </div>
-                        <div class="col-6 col-sm-4" id="deporte-frecuencia-container">
-                            <?= Html::label('Frecuencia con la que practica', 'p_frecuencia_deporte') ?>
-                            <?= Html::textInput('AntecedenteNoPatologico[p_frecuencia_deporte]', $antecedenteNoPatologico->p_frecuencia_deporte, [
-                                'class' => 'form-control',
-                                'id' => 'p_frecuencia_deporte',
-                                'disabled' => !$editable // Deshabilitar si no tiene permiso
-                            ]) ?>
-                        </div>
-                        <div class="w-100"></div>
-                        <br>
-                        <div class="col-6 col-sm-4">
-                            <?= Html::label('Horas que duerme por día', 'p_horas_sueño') ?>
-                            <?= Html::input('number', 'AntecedenteNoPatologico[p_horas_sueño]', $antecedenteNoPatologico->p_horas_sueño, [
-                                'class' => 'form-control',
-                                'id' => 'p_horas_sueño',
-                                'disabled' => !$editable // Deshabilitar si no tiene permiso
-                            ]) ?>
-                        </div>
-                        <div class="col-6 col-sm-6">
-                            <div class="custom-control custom-checkbox">
-                                <?= Html::checkbox('AntecedenteNoPatologico[p_dormir_dia]', $antecedenteNoPatologico->p_dormir_dia, [
-                                    'class' => 'custom-control-input',
-                                    'id' => 'p_dormir_dia',
-                                    'disabled' => !$editable // Deshabilitar si no tiene permiso
-                                ]) ?>
-                                <?= Html::label('¿Duerme durante el día?', 'p_dormir_dia', ['class' => 'custom-control-label']) ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Columna derecha con el textarea -->
-                <div class="w-100"></div>
-                <br>
-                
-                    <div class="form-group">
-                        <?= Html::label('Observaciones', 'observacion_actividad_fisica') ?>
-                        <?php
-                        if ($editable) {
-                            echo $form->field($antecedenteNoPatologico, 'observacion_actividad_fisica')->widget(FroalaEditorWidget::className(), [
-                                'options' => [
-                                    'id' => 'content'
-                                ],
-                                'clientOptions' => [
-                                    'toolbarInline' => false,
-                                    'theme' => 'royal', // optional: dark, red, gray, royal
-                                    'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
-                                    'height' => 150,
-                                    'pluginsEnabled' => [
-                                        'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
-                                        'draggable', 'emoticons', 'entities', 'fontFamily',
-                                        'fontSize', 'fullscreen', 'inlineStyle',
-                                        'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
-                                        'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
-                                    ]
-                                ]
-                            ])->label(false);
-                        } else {
-                            // Si no tiene permiso, mostrar el texto plano
-                            $htmlcont= Html::decode($antecedenteNoPatologico->observacion_actividad_fisica);
-                            $limpio = HtmlPurifier::process($htmlcont);
-                            echo Html::textarea('AntecedenteNoPatologico[observacion_actividad_fisica]', $limpio, [
-                                'class' => 'form-control',
-                                'rows' => 6,
-                                'readonly' => true // Hacer el campo de solo lectura
-                            ]);
-                            
-                        }
-                        ?>
-                    </div>
-               
-            </div>
-        </div>
-    </div>
-    <div class="alert alert-white custom-alert" role="alert">
-        <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Peso al nacer, anormalidades perinatales, desarrollo físico y mental, y el esquema básico de vacunación.
-    </div>
->
+                                                <div class="card">
+                                                    <div class="card-header custom-nopato text-white text-left">
+                                                        <h5>ACTIVIDAD FISICA</h5>
+                                                    </div>
+                                                    <div class="card-body bg-light">
+                                                        <div class="row">
+                                                            <!-- Columna izquierda con los campos -->
+                                                            <div class="col-md-8">
+                                                                <div class="row">
+                                                                    <div class="col-6 col-sm-4">
+                                                                        <div class="custom-control custom-checkbox">
+                                                                            <?= Html::checkbox('AntecedenteNoPatologico[p_ejercicio]', $antecedenteNoPatologico->p_ejercicio, [
+                                                                                'class' => 'custom-control-input',
+                                                                                'id' => 'p_ejercicio',
+                                                                                'disabled' => !$editable // Deshabilitar si no tiene permiso
+                                                                            ]) ?>
+                                                                            <?= Html::label('¿Realiza ejercicio?', 'p_ejercicio', ['class' => 'custom-control-label']) ?>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-6 col-sm-6" id="ejercicio-minutos-container">
+                                                                        <?= Html::label('Minutos al día', 'p_minutos_x_dia_ejercicio') ?>
+                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_minutos_x_dia_ejercicio]', $antecedenteNoPatologico->p_minutos_x_dia_ejercicio, [
+                                                                            'class' => 'form-control',
+                                                                            'id' => 'p_minutos_x_dia_ejercicio',
+                                                                            'disabled' => !$editable // Deshabilitar si no tiene permiso
+                                                                        ]) ?>
+                                                                    </div>
+                                                                    <div class="w-100"></div>
+                                                                    <br>
+                                                                    <div class="col-6 col-sm-4">
+                                                                        <div class="custom-control custom-checkbox">
+                                                                            <?= Html::checkbox('AntecedenteNoPatologico[p_deporte]', $antecedenteNoPatologico->p_deporte, [
+                                                                                'class' => 'custom-control-input',
+                                                                                'id' => 'p_deporte',
+                                                                                'disabled' => !$editable // Deshabilitar si no tiene permiso
+                                                                            ]) ?>
+                                                                            <?= Html::label('¿Realiza algún deporte?', 'p_deporte', ['class' => 'custom-control-label']) ?>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-6 col-sm-4" id="deporte-cual-container">
+                                                                        <?= Html::label('¿Cuál deporte?', 'p_a_deporte') ?>
+                                                                        <?= Html::textInput('AntecedenteNoPatologico[p_a_deporte]', $antecedenteNoPatologico->p_a_deporte, [
+                                                                            'class' => 'form-control',
+                                                                            'id' => 'p_a_deporte',
+                                                                            'disabled' => !$editable // Deshabilitar si no tiene permiso
+                                                                        ]) ?>
+                                                                    </div>
+                                                                    <div class="col-6 col-sm-4" id="deporte-frecuencia-container">
+                                                                        <?= Html::label('Frecuencia con la que practica', 'p_frecuencia_deporte') ?>
+                                                                        <?= Html::textInput('AntecedenteNoPatologico[p_frecuencia_deporte]', $antecedenteNoPatologico->p_frecuencia_deporte, [
+                                                                            'class' => 'form-control',
+                                                                            'id' => 'p_frecuencia_deporte',
+                                                                            'disabled' => !$editable // Deshabilitar si no tiene permiso
+                                                                        ]) ?>
+                                                                    </div>
+                                                                    <div class="w-100"></div>
+                                                                    <br>
+                                                                    <div class="col-6 col-sm-4">
+                                                                        <?= Html::label('Horas que duerme por día', 'p_horas_sueño') ?>
+                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_horas_sueño]', $antecedenteNoPatologico->p_horas_sueño, [
+                                                                            'class' => 'form-control',
+                                                                            'id' => 'p_horas_sueño',
+                                                                            'disabled' => !$editable // Deshabilitar si no tiene permiso
+                                                                        ]) ?>
+                                                                    </div>
+                                                                    <div class="col-6 col-sm-6">
+                                                                        <div class="custom-control custom-checkbox">
+                                                                            <?= Html::checkbox('AntecedenteNoPatologico[p_dormir_dia]', $antecedenteNoPatologico->p_dormir_dia, [
+                                                                                'class' => 'custom-control-input',
+                                                                                'id' => 'p_dormir_dia',
+                                                                                'disabled' => !$editable // Deshabilitar si no tiene permiso
+                                                                            ]) ?>
+                                                                            <?= Html::label('¿Duerme durante el día?', 'p_dormir_dia', ['class' => 'custom-control-label']) ?>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <!-- Columna derecha con el textarea -->
+                                                            <div class="w-100"></div>
+                                                            <br>
 
-<?php
-$script = <<< JS
+                                                            <div class="form-group">
+                                                                <?= Html::label('Observaciones', 'observacion_actividad_fisica') ?>
+                                                                <?php
+                                                                if ($editable) {
+                                                                    echo $form->field($antecedenteNoPatologico, 'observacion_actividad_fisica')->widget(FroalaEditorWidget::className(), [
+                                                                        'options' => [
+                                                                            'id' => 'content'
+                                                                        ],
+                                                                        'clientOptions' => [
+                                                                            'toolbarInline' => false,
+                                                                            'theme' => 'royal', // optional: dark, red, gray, royal
+                                                                            'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
+                                                                            'height' => 150,
+                                                                            'pluginsEnabled' => [
+                                                                                'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
+                                                                                'draggable', 'emoticons', 'entities', 'fontFamily',
+                                                                                'fontSize', 'fullscreen', 'inlineStyle',
+                                                                                'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
+                                                                                'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
+                                                                            ]
+                                                                        ]
+                                                                    ])->label(false);
+                                                                } else {
+                                                                    // Si no tiene permiso, mostrar el texto plano
+                                                                    $htmlcont = Html::decode($antecedenteNoPatologico->observacion_actividad_fisica);
+                                                                    echo HtmlPurifier::process($htmlcont);
+                                                                }
+                                                                ?>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="alert alert-white custom-alert" role="alert">
+                                                    <i class="fa fa-exclamation-circle" aria-hidden="true"></i> Peso al nacer, anormalidades perinatales, desarrollo físico y mental, y el esquema básico de vacunación.
+                                                </div>
+
+
+                                                <?php
+                                                $script = <<< JS
 $(document).ready(function() {
     function toggleEjercicioFields() {
         if ($('#p_ejercicio').is(':checked')) {
@@ -1950,8 +1997,8 @@ $(document).ready(function() {
     });
 });
 JS;
-$this->registerJs($script);
-?>
+                                                $this->registerJs($script);
+                                                ?>
 
 
 
@@ -1969,7 +2016,10 @@ $this->registerJs($script);
                                                                         <div class="custom-control custom-checkbox">
                                                                             <?= Html::checkbox('AntecedenteNoPatologico[p_desayuno]', $antecedenteNoPatologico->p_desayuno, [
                                                                                 'class' => 'custom-control-input',
-                                                                                'id' => 'p_desayuno'
+                                                                                'id' => 'p_desayuno',
+                                                                                'disabled' => !$editable // Deshabilitar si no tiene permiso
+
+
                                                                             ]) ?>
                                                                             <?= Html::label('¿Desayuna?', 'p_desayuno', ['class' => 'custom-control-label']) ?>
                                                                         </div>
@@ -1978,7 +2028,9 @@ $this->registerJs($script);
                                                                     <div class="col-6 col-sm-6">
 
                                                                         <?= Html::label('Número de comidas al día', 'p_comidas_x_dia') ?>
-                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_comidas_x_dia]', $antecedenteNoPatologico->p_comidas_x_dia, ['class' => 'form-control']) ?>
+                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_comidas_x_dia]', $antecedenteNoPatologico->p_comidas_x_dia, [
+                                                                            'class' => 'form-control', 'disabled' => !$editable // Deshabilitar si no tiene permiso
+                                                                        ]) ?>
 
 
                                                                     </div>
@@ -1991,7 +2043,9 @@ $this->registerJs($script);
                                                                         <div class="custom-control custom-checkbox">
                                                                             <?= Html::checkbox('AntecedenteNoPatologico[p_cafe]', $antecedenteNoPatologico->p_cafe, [
                                                                                 'class' => 'custom-control-input',
-                                                                                'id' => 'p_cafe'
+                                                                                'id' => 'p_cafe',
+                                                                                'disabled' => !$editable // Deshabilitar si no tiene permiso
+
                                                                             ]) ?>
                                                                             <?= Html::label('¿Toma café?', 'p_cafe', ['class' => 'custom-control-label']) ?>
                                                                         </div>
@@ -2002,7 +2056,7 @@ $this->registerJs($script);
 
                                                                     <div class="col-6 col-sm-6" id="cafe-x-dia-container">
                                                                         <?= Html::label('Tazas de café al día', 'p_tazas_x_dia') ?>
-                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_tazas_x_dia]', $antecedenteNoPatologico->p_tazas_x_dia, ['class' => 'form-control']) ?>
+                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_tazas_x_dia]', $antecedenteNoPatologico->p_tazas_x_dia, ['class' => 'form-control', 'disabled' => !$editable]) ?>
                                                                     </div>
 
                                                                     <div class="w-100"></div>
@@ -2013,7 +2067,8 @@ $this->registerJs($script);
                                                                         <div class="custom-control custom-checkbox">
                                                                             <?= Html::checkbox('AntecedenteNoPatologico[p_refresco]', $antecedenteNoPatologico->p_refresco, [
                                                                                 'class' => 'custom-control-input',
-                                                                                'id' => 'p_refresco'
+                                                                                'id' => 'p_refresco',
+                                                                                'disabled' => !$editable
                                                                             ]) ?>
                                                                             <?= Html::label('¿Toma refresco?', 'p_refresco', ['class' => 'custom-control-label']) ?>
                                                                         </div>
@@ -2027,7 +2082,8 @@ $this->registerJs($script);
                                                                         <div class="custom-control custom-checkbox">
                                                                             <?= Html::checkbox('AntecedenteNoPatologico[p_dieta]', $antecedenteNoPatologico->p_dieta, [
                                                                                 'class' => 'custom-control-input',
-                                                                                'id' => 'p_dieta'
+                                                                                'id' => 'p_dieta',
+                                                                                'disabled' => !$editable
                                                                             ]) ?>
                                                                             <?= Html::label('¿Sigue alguna dieta?', 'p_dieta', ['class' => 'custom-control-label']) ?>
                                                                         </div>
@@ -2035,7 +2091,7 @@ $this->registerJs($script);
                                                                     <div class="col-6 col-sm-6" id="info-dieta-container">
                                                                         <div class="form-group">
                                                                             <?= Html::label('Información sobre la dieta', 'p_info_dieta') ?>
-                                                                            <?= Html::textarea('AntecedenteNoPatologico[p_info_dieta]', $antecedenteNoPatologico->p_info_dieta, ['class' => 'form-control', 'rows' => 6]) ?>
+                                                                            <?= Html::textarea('AntecedenteNoPatologico[p_info_dieta]', $antecedenteNoPatologico->p_info_dieta, ['class' => 'form-control', 'rows' => 6,  'disabled' => !$editable]) ?>
                                                                         </div>
                                                                     </div>
 
@@ -2048,17 +2104,26 @@ $this->registerJs($script);
 
                                                             <br>
 
+
                                                             <div class="form-group">
+                                                                <?= Html::label('Observaciones', 'observacion_comida') ?>
 
+                                                                <?php
+                                                                if ($editable) {
+                                                                    echo $form->field($antecedenteNoPatologico, 'observacion_comida')->widget(FroalaEditorWidget::className(), [
+                                                                        'options' => [
+                                                                            'id' => 'content'
+                                                                        ],
 
-                                                                <?= $form->field($antecedenteNoPatologico, 'observacion_comida')->widget(FroalaEditorWidget::className(), [
-                                                                    'options' => [
-                                                                        'id' => 'content'
-                                                                    ],
-
-                                                                ]) ?>
-
+                                                                    ])->label(false);
+                                                                } else {
+                                                                    // Si no tiene permiso, mostrar el texto plano
+                                                                    $htmlcont = Html::decode($antecedenteNoPatologico->observacion_comida);
+                                                                    echo HtmlPurifier::process($htmlcont);
+                                                                }
+                                                                ?>
                                                             </div>
+
 
 
 
@@ -2119,7 +2184,8 @@ JS;
                                                                         <div class="custom-control custom-checkbox">
                                                                             <?= Html::checkbox('AntecedenteNoPatologico[p_alcohol]', $antecedenteNoPatologico->p_alcohol, [
                                                                                 'class' => 'custom-control-input',
-                                                                                'id' => 'p_alcohol'
+                                                                                'id' => 'p_alcohol',
+                                                                                'disabled' => !$editable
                                                                             ]) ?>
                                                                             <?= Html::label('¿Consume alcohol?', 'p_alcohol', ['class' => 'custom-control-label']) ?>
                                                                         </div>
@@ -2134,19 +2200,20 @@ JS;
                                                                                 'Intenso' => 'Intenso',
                                                                             ], [
                                                                                 'class' => 'form-control',
-                                                                                'prompt' => 'Seleccione la frecuencia'
+                                                                                'prompt' => 'Seleccione la frecuencia',
+                                                                                'disabled' => !$editable
                                                                             ]) ?>
                                                                         </div>
 
                                                                         <?= Html::label('Edad a la que comenzó a béber', 'p_edad_alcoholismo') ?>
-                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_alcoholismo]', $antecedenteNoPatologico->p_edad_alcoholismo, ['class' => 'form-control']) ?>
+                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_alcoholismo]', $antecedenteNoPatologico->p_edad_alcoholismo, ['class' => 'form-control',  'disabled' => !$editable]) ?>
 
 
                                                                         <?= Html::label('Copas de licor/vino al día', 'p_copas_x_dia') ?>
-                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_copas_x_dia]', $antecedenteNoPatologico->p_copas_x_dia, ['class' => 'form-control']) ?>
+                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_copas_x_dia]', $antecedenteNoPatologico->p_copas_x_dia, ['class' => 'form-control',  'disabled' => !$editable]) ?>
 
                                                                         <?= Html::label('Número de cervezas al día', 'p_cervezas_x_dia') ?>
-                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_cervezas_x_dia]', $antecedenteNoPatologico->p_cervezas_x_dia, ['class' => 'form-control']) ?>
+                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_cervezas_x_dia]', $antecedenteNoPatologico->p_cervezas_x_dia, ['class' => 'form-control',  'disabled' => !$editable]) ?>
                                                                     </div>
 
 
@@ -2158,14 +2225,15 @@ JS;
                                                                         <div class="custom-control custom-checkbox">
                                                                             <?= Html::checkbox('AntecedenteNoPatologico[p_ex_alcoholico]', $antecedenteNoPatologico->p_ex_alcoholico, [
                                                                                 'class' => 'custom-control-input',
-                                                                                'id' => 'p_ex_alcoholico'
+                                                                                'id' => 'p_ex_alcoholico',
+                                                                                'disabled' => !$editable
                                                                             ]) ?>
                                                                             <?= Html::label('Ex-alcoholico', 'p_ex_alcoholico', ['class' => 'custom-control-label']) ?>
                                                                         </div>
                                                                     </div>
                                                                     <div class="col-6 col-sm-6" id="ex-alcoholico-container">
                                                                         <?= Html::label('Edad en la que dejo de beber', 'p_edad_fin_alcoholismo') ?>
-                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_fin_alcoholismo]', $antecedenteNoPatologico->p_edad_fin_alcoholismo, ['class' => 'form-control']) ?>
+                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_fin_alcoholismo]', $antecedenteNoPatologico->p_edad_fin_alcoholismo, ['class' => 'form-control',  'disabled' => !$editable]) ?>
 
 
 
@@ -2182,17 +2250,28 @@ JS;
                                                             <div class="w-100"></div>
                                                             <br>
 
+
+
+
                                                             <div class="form-group">
+                                                                <?= Html::label('Observaciones', 'observacion_alcoholismo') ?>
 
+                                                                <?php
+                                                                if ($editable) {
+                                                                    echo $form->field($antecedenteNoPatologico, 'observacion_alcoholismo')->widget(FroalaEditorWidget::className(), [
+                                                                        'options' => [
+                                                                            'id' => 'content'
+                                                                        ],
 
-                                                                <?= $form->field($antecedenteNoPatologico, 'observacion_alcoholismo')->widget(FroalaEditorWidget::className(), [
-                                                                    'options' => [
-                                                                        'id' => 'content'
-                                                                    ],
-
-                                                                ]) ?>
-
+                                                                    ])->label(false);
+                                                                } else {
+                                                                    // Si no tiene permiso, mostrar el texto plano
+                                                                    $htmlcont = Html::decode($antecedenteNoPatologico->observacion_alcoholismo);
+                                                                    echo HtmlPurifier::process($htmlcont);
+                                                                }
+                                                                ?>
                                                             </div>
+
 
                                                         </div>
                                                     </div>
@@ -2251,7 +2330,8 @@ JS;
                                                                         <div class="custom-control custom-checkbox">
                                                                             <?= Html::checkbox('AntecedenteNoPatologico[p_fuma]', $antecedenteNoPatologico->p_fuma, [
                                                                                 'class' => 'custom-control-input',
-                                                                                'id' => 'p_fuma'
+                                                                                'id' => 'p_fuma',
+                                                                                'disabled' => !$editable
                                                                             ]) ?>
                                                                             <?= Html::label('¿Fúma?', 'p_fuma', ['class' => 'custom-control-label']) ?>
                                                                         </div>
@@ -2267,15 +2347,16 @@ JS;
                                                                                 'Intenso' => 'Intenso',
                                                                             ], [
                                                                                 'class' => 'form-control',
-                                                                                'prompt' => 'Seleccione la frecuencia'
+                                                                                'prompt' => 'Seleccione la frecuencia',
+                                                                                'disabled' => !$editable
                                                                             ]) ?>
                                                                         </div>
                                                                         <?= Html::label('Edad a la que comenzó a fumar', 'p_edad_tabaquismo') ?>
-                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_tabaquismo]', $antecedenteNoPatologico->p_edad_tabaquismo, ['class' => 'form-control']) ?>
+                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_tabaquismo]', $antecedenteNoPatologico->p_edad_tabaquismo, ['class' => 'form-control', 'disabled' => !$editable]) ?>
 
 
                                                                         <?= Html::label('Número de cigarros al día', 'p_no_cigarros_x_dia') ?>
-                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_no_cigarros_x_dia]', $antecedenteNoPatologico->p_no_cigarros_x_dia, ['class' => 'form-control']) ?>
+                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_no_cigarros_x_dia]', $antecedenteNoPatologico->p_no_cigarros_x_dia, ['class' => 'form-control', 'disabled' => !$editable]) ?>
 
                                                                     </div>
 
@@ -2287,14 +2368,15 @@ JS;
                                                                         <div class="custom-control custom-checkbox">
                                                                             <?= Html::checkbox('AntecedenteNoPatologico[p_ex_fumador]', $antecedenteNoPatologico->p_ex_fumador, [
                                                                                 'class' => 'custom-control-input',
-                                                                                'id' => 'p_ex_fumador'
+                                                                                'id' => 'p_ex_fumador',
+                                                                                'disabled' => !$editable
                                                                             ]) ?>
                                                                             <?= Html::label('Ex-Fumador', 'p_ex_fumador', ['class' => 'custom-control-label']) ?>
                                                                         </div>
                                                                     </div>
                                                                     <div class="col-6 col-sm-6" id="ex-fumador-container">
                                                                         <?= Html::label('Edad en la que dejo de fumar', 'p_edad_fin_tabaquismo') ?>
-                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_fin_tabaquismo]', $antecedenteNoPatologico->p_edad_fin_tabaquismo, ['class' => 'form-control']) ?>
+                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_fin_tabaquismo]', $antecedenteNoPatologico->p_edad_fin_tabaquismo, ['class' => 'form-control', 'disabled' => !$editable]) ?>
 
 
 
@@ -2305,7 +2387,8 @@ JS;
                                                                         <div class="custom-control custom-checkbox">
                                                                             <?= Html::checkbox('AntecedenteNoPatologico[p_fumador_pasivo]', $antecedenteNoPatologico->p_fumador_pasivo, [
                                                                                 'class' => 'custom-control-input',
-                                                                                'id' => 'p_fumador_pasivo'
+                                                                                'id' => 'p_fumador_pasivo',
+                                                                                'disabled' => !$editable
                                                                             ]) ?>
                                                                             <?= Html::label('Fumador Pasivo', 'p_fumador_pasivo', ['class' => 'custom-control-label']) ?>
                                                                         </div>
@@ -2319,18 +2402,28 @@ JS;
 
                                                             <div class="w-100"></div>
                                                             <br>
+
+
+
                                                             <div class="form-group">
+                                                                <?= Html::label('Observaciones', 'observacion_tabaquismo') ?>
 
+                                                                <?php
+                                                                if ($editable) {
+                                                                    echo $form->field($antecedenteNoPatologico, 'observacion_tabaquismo')->widget(FroalaEditorWidget::className(), [
+                                                                        'options' => [
+                                                                            'id' => 'content'
+                                                                        ],
 
-                                                                <?= $form->field($antecedenteNoPatologico, 'observacion_tabaquismo')->widget(FroalaEditorWidget::className(), [
-                                                                    'options' => [
-                                                                        'id' => 'content'
-                                                                    ],
-
-                                                                ]) ?>
-
-
+                                                                    ])->label(false);
+                                                                } else {
+                                                                    // Si no tiene permiso, mostrar el texto plano
+                                                                    $htmlcont = Html::decode($antecedenteNoPatologico->observacion_tabaquismo);
+                                                                    echo HtmlPurifier::process($htmlcont);
+                                                                }
+                                                                ?>
                                                             </div>
+
                                                         </div>
                                                     </div>
                                                 </div>
@@ -2403,13 +2496,14 @@ JS;
                                                                             'Agnóstica' => 'Agnóstica',
                                                                             'Otra' => 'Otra'
                                                                         ], [
-                                                                            'class' => 'form-control',         'prompt' => 'Seleccione la religión'
+                                                                            'class' => 'form-control',         'prompt' => 'Seleccione la religión',
+                                                                            'disabled' => !$editable
                                                                         ]) ?>
                                                                     </div>
 
                                                                     <div class="form-group">
                                                                         <?= Html::label('¿Qué actividades realiza en sus horas libres?', 'p_act_dias_libres') ?>
-                                                                        <?= Html::textarea('AntecedenteNoPatologico[p_act_dias_libres]', $antecedenteNoPatologico->p_act_dias_libres, ['class' => 'form-control', 'rows' => 5]) ?>
+                                                                        <?= Html::textarea('AntecedenteNoPatologico[p_act_dias_libres]', $antecedenteNoPatologico->p_act_dias_libres, ['class' => 'form-control', 'rows' => 5,  'disabled' => !$editable]) ?>
                                                                     </div>
                                                                     <div class="form-group">
                                                                         <?= Html::label('¿Pasa por algunas de estas situaciones?', 'p_situaciones') ?>
@@ -2420,7 +2514,7 @@ JS;
                                                                             'Embarazos' => 'Embarazos',
                                                                             'Divorcio' => 'Divorcio',
                                                                         ], [
-                                                                            'class' => 'form-control',         'prompt' => 'Seleccione una opción'
+                                                                            'class' => 'form-control',         'prompt' => 'Seleccione una opción',  'disabled' => !$editable
                                                                         ]) ?>
                                                                     </div>
                                                                     <div class="form-group">
@@ -2436,7 +2530,7 @@ JS;
                                                                             'AB+' => 'AB+',
                                                                             'AB-' => 'AB-',
                                                                         ], [
-                                                                            'class' => 'form-control',         'prompt' => 'Seleccione el tipo de sangre'
+                                                                            'class' => 'form-control',         'prompt' => 'Seleccione el tipo de sangre',  'disabled' => !$editable
                                                                         ]) ?>
                                                                     </div>
 
@@ -2447,16 +2541,25 @@ JS;
                                                             <!-- Columna derecha con el textarea -->
 
 
+
+
                                                             <div class="form-group">
+                                                                <?= Html::label('Descripción de su vivienda (Tiene mascotas, Recursos del hogar, Etc.)', 'datos_vivienda') ?>
 
+                                                                <?php
+                                                                if ($editable) {
+                                                                    echo $form->field($antecedenteNoPatologico, 'datos_vivienda')->widget(FroalaEditorWidget::className(), [
+                                                                        'options' => [
+                                                                            'id' => 'content'
+                                                                        ],
 
-
-                                                                <?= $form->field($antecedenteNoPatologico, 'datos_vivienda')->widget(FroalaEditorWidget::className(), [
-                                                                    'options' => [
-                                                                        'id' => 'content'
-                                                                    ],
-
-                                                                ])->label('Descripción de su vivienda (Tiene mascotas, Recursos del hogar, Etc.)') ?>
+                                                                    ])->label(false);
+                                                                } else {
+                                                                    // Si no tiene permiso, mostrar el texto plano
+                                                                    $htmlcont = Html::decode($antecedenteNoPatologico->datos_vivienda);
+                                                                    echo HtmlPurifier::process($htmlcont);
+                                                                }
+                                                                ?>
                                                             </div>
 
 
@@ -2480,7 +2583,8 @@ JS;
                                                                         <div class="custom-control custom-checkbox">
                                                                             <?= Html::checkbox('AntecedenteNoPatologico[p_drogas]', $antecedenteNoPatologico->p_drogas, [
                                                                                 'class' => 'custom-control-input',
-                                                                                'id' => 'p_drogas'
+                                                                                'id' => 'p_drogas',
+                                                                                'disabled' => !$editable
                                                                             ]) ?>
                                                                             <?= Html::label('¿Consume algún tipo de droga?', 'p_drogas', ['class' => 'custom-control-label']) ?>
                                                                         </div>
@@ -2498,17 +2602,17 @@ JS;
                                                                                 'Moderado' => 'Moderado',
                                                                                 'Intenso' => 'Intenso',
                                                                             ], [
-                                                                                'class' => 'form-control',         'prompt' => 'Seleccione la frecuencia'
+                                                                                'class' => 'form-control',         'prompt' => 'Seleccione la frecuencia', 'disabled' => !$editable
                                                                             ]) ?>
                                                                         </div>
                                                                         <?= Html::label('¿A qué edad se inicio el consumo?', 'p_edad_droga') ?>
-                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_droga]', $antecedenteNoPatologico->p_edad_droga, ['class' => 'form-control']) ?>
+                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_droga]', $antecedenteNoPatologico->p_edad_droga, ['class' => 'form-control', 'disabled' => !$editable]) ?>
 
 
                                                                         <div class="custom-control custom-checkbox">
                                                                             <?= Html::checkbox('AntecedenteNoPatologico[p_droga_intravenosa]', $antecedenteNoPatologico->p_droga_intravenosa, [
                                                                                 'class' => 'custom-control-input',
-                                                                                'id' => 'p_droga_intravenosa'
+                                                                                'id' => 'p_droga_intravenosa', 'disabled' => !$editable
                                                                             ]) ?>
                                                                             <br>
                                                                             <?= Html::label('¿Usa drogas intravenosa?', 'p_droga_intravenosa', ['class' => 'custom-control-label']) ?>
@@ -2522,14 +2626,15 @@ JS;
                                                                         <div class="custom-control custom-checkbox">
                                                                             <?= Html::checkbox('AntecedenteNoPatologico[p_ex_adicto]', $antecedenteNoPatologico->p_ex_adicto, [
                                                                                 'class' => 'custom-control-input',
-                                                                                'id' => 'p_ex_adicto'
+                                                                                'id' => 'p_ex_adicto',
+                                                                                'disabled' => !$editable
                                                                             ]) ?>
                                                                             <?= Html::label('Ex-Adicto', 'p_ex_adicto', ['class' => 'custom-control-label']) ?>
                                                                         </div>
                                                                     </div>
                                                                     <div class="col-6 col-sm-6" id="ex-adicto-container">
                                                                         <?= Html::label('¿A qué edad dejo de consumir?', 'p_edad_fin_droga') ?>
-                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_fin_droga]', $antecedenteNoPatologico->p_edad_fin_droga, ['class' => 'form-control']) ?>
+                                                                        <?= Html::input('number', 'AntecedenteNoPatologico[p_edad_fin_droga]', $antecedenteNoPatologico->p_edad_fin_droga, ['class' => 'form-control', 'disabled' => !$editable]) ?>
 
 
 
@@ -2543,19 +2648,25 @@ JS;
 
                                                             <div class="w-100"></div>
                                                             <br>
+
+
                                                             <div class="form-group">
+                                                                <?= Html::label('Observaciones', 'observacion_droga') ?>
 
+                                                                <?php
+                                                                if ($editable) {
+                                                                    echo $form->field($antecedenteNoPatologico, 'observacion_droga')->widget(FroalaEditorWidget::className(), [
+                                                                        'options' => [
+                                                                            'id' => 'content'
+                                                                        ],
 
-
-
-                                                                <?= $form->field($antecedenteNoPatologico, 'observacion_droga')->widget(FroalaEditorWidget::className(), [
-                                                                    'options' => [
-                                                                        'id' => 'content'
-                                                                    ],
-
-                                                                ]) ?>
-
-
+                                                                    ])->label(false);
+                                                                } else {
+                                                                    // Si no tiene permiso, mostrar el texto plano
+                                                                    $htmlcont = Html::decode($antecedenteNoPatologico->observacion_droga);
+                                                                    echo HtmlPurifier::process($htmlcont);
+                                                                }
+                                                                ?>
                                                             </div>
 
 
@@ -2613,28 +2724,34 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                            <div class="form-group ">
 
 
+                                                            <div class="form-group">
+                                                                <?= Html::label('Observación General', 'observacion_general') ?>
 
-                                                                <?= $form->field($antecedenteNoPatologico, 'observacion_general')->widget(FroalaEditorWidget::className(), [
-
-                                                                    'clientOptions' => [
-                                                                        'toolbarInline' => false,
-                                                                        'theme' => 'royal', // optional: dark, red, gray, royal
-                                                                        'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
-                                                                        'height' => 300,
-                                                                        'pluginsEnabled' => [
-                                                                            'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
-                                                                            'draggable', 'emoticons', 'entities', 'fontFamily',
-                                                                            'fontSize', 'fullscreen', 'inlineStyle',
-                                                                            'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
-                                                                            'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
+                                                                <?php
+                                                                if ($editable) {
+                                                                    echo $form->field($antecedenteNoPatologico, 'observacion_general')->widget(FroalaEditorWidget::className(), [
+                                                                        'clientOptions' => [
+                                                                            'toolbarInline' => false,
+                                                                            'theme' => 'royal', // optional: dark, red, gray, royal
+                                                                            'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
+                                                                            'height' => 300,
+                                                                            'pluginsEnabled' => [
+                                                                                'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
+                                                                                'draggable', 'emoticons', 'entities', 'fontFamily',
+                                                                                'fontSize', 'fullscreen', 'inlineStyle',
+                                                                                'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
+                                                                                'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
+                                                                            ]
                                                                         ]
-                                                                    ]
-
-                                                                ])->label('Observación General') ?>
-
+                                                                    ])->label(false);
+                                                                } else {
+                                                                    // Si no tiene permiso, mostrar el texto plano
+                                                                    $htmlcont = Html::decode($antecedenteNoPatologico->observacion_general);
+                                                                    echo HtmlPurifier::process($htmlcont);
+                                                                }
+                                                                ?>
                                                             </div>
 
                                                         </div>
@@ -2642,10 +2759,12 @@ JS;
                                                 </div>
 
 
+                                                <?php if (Yii::$app->user->can('editar-expediente-medico')) { ?>
+                                                    <div class="form-group">
 
-                                                <div class="form-group">
-                                                    <?= Html::submitButton('Guardar Todos los Cambios &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
-                                                </div>
+                                                        <?= Html::submitButton('Guardar Todos los Cambios &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                                                    </div>
+                                                <?php } ?>
 
 
 
@@ -2675,9 +2794,12 @@ JS;
                                         <div class="card-header gradient-blue text-white text-center">
                                             <h2>Antecedente Perinatal</h2>
                                             <i class="fa fa-medkit fa-2x"></i>
-                                            <div class="float-submit-btn">
-                                                <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
-                                            </div>
+                                            <?php if (Yii::$app->user->can('editar-expediente-medico')) { ?>
+
+                                                <div class="float-submit-btn">
+                                                    <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                                                </div>
+                                            <?php } ?>
                                         </div>
                                         <div class="card-body bg-light">
                                             <div class="container">
@@ -2691,17 +2813,17 @@ JS;
 
                                                     <div class="col-6 col-sm-2">
                                                         <?= Html::label('Hora de Nacimiento', 'p_hora_nacimiento') ?>
-                                                        <?= Html::input('time', 'AntecedentePerinatal[p_hora_nacimiento]', $AntecedentePerinatal->p_hora_nacimiento, ['class' => 'form-control']) ?>
+                                                        <?= Html::input('time', 'AntecedentePerinatal[p_hora_nacimiento]', $AntecedentePerinatal->p_hora_nacimiento, ['class' => 'form-control', 'disabled' => !$editable]) ?>
                                                     </div>
                                                     <div class="col-6 col-sm-2 ">
                                                         <?= Html::label('No. de Gestación', 'p_no_gestacion') ?>
-                                                        <?= Html::input('number', 'AntecedentePerinatal[p_no_gestacion]', $AntecedentePerinatal->p_no_gestacion, ['class' => 'form-control']) ?>
+                                                        <?= Html::input('number', 'AntecedentePerinatal[p_no_gestacion]', $AntecedentePerinatal->p_no_gestacion, ['class' => 'form-control', 'disabled' => !$editable]) ?>
 
                                                     </div>
 
                                                     <div class="col-6 col-sm-2">
                                                         <?= Html::label('Edad Gestacional', 'p_edad_gestacional') ?>
-                                                        <?= Html::input('number', 'AntecedentePerinatal[p_edad_gestacional]', $AntecedentePerinatal->p_edad_gestacional, ['class' => 'form-control']) ?>
+                                                        <?= Html::input('number', 'AntecedentePerinatal[p_edad_gestacional]', $AntecedentePerinatal->p_edad_gestacional, ['class' => 'form-control', 'disabled' => !$editable]) ?>
 
                                                     </div>
 
@@ -2709,14 +2831,16 @@ JS;
                                                         <div class="custom-control custom-checkbox">
                                                             <?= Html::checkbox('AntecedentePerinatal[p_parto]', $AntecedentePerinatal->p_parto, [
                                                                 'class' => 'custom-control-input',
-                                                                'id' => 'p_parto'
+                                                                'id' => 'p_parto',
+                                                                'disabled' => !$editable
                                                             ]) ?>
                                                             <?= Html::label('Parto', 'p_parto', ['class' => 'custom-control-label']) ?>
                                                         </div>
                                                         <div class="custom-control custom-checkbox">
                                                             <?= Html::checkbox('AntecedentePerinatal[p_cesarea]', $AntecedentePerinatal->p_cesarea, [
                                                                 'class' => 'custom-control-input',
-                                                                'id' => 'p_cesarea'
+                                                                'id' => 'p_cesarea',
+                                                                'disabled' => !$editable
                                                             ]) ?>
                                                             <?= Html::label('Cesarea', 'p_cesarea', ['class' => 'custom-control-label']) ?>
                                                         </div>
@@ -2727,7 +2851,7 @@ JS;
                                                     <br>
                                                     <div class="col-6 col-sm-8">
                                                         <?= Html::label('Sitio de atención del parto', 'p_sitio_parto') ?>
-                                                        <?= Html::textInput('AntecedentePerinatal[p_sitio_parto]', $modelAntecedentePerinatal->p_sitio_parto, ['class' => 'form-control', 'id' => 'p_sitio_parto']) ?>
+                                                        <?= Html::textInput('AntecedentePerinatal[p_sitio_parto]', $modelAntecedentePerinatal->p_sitio_parto, ['class' => 'form-control', 'id' => 'p_sitio_parto', 'disabled' => !$editable]) ?>
                                                     </div>
 
 
@@ -2739,6 +2863,7 @@ JS;
                                                             'class' => 'form-control',
                                                             'id' => 'p_peso_nacer',
                                                             'step' => '0.01', // Define el paso para permitir decimales
+                                                            'disabled' => !$editable
                                                         ]) ?>
                                                     </div>
                                                     <div class="col-6 col-sm-4">
@@ -2747,6 +2872,7 @@ JS;
                                                             'class' => 'form-control',
                                                             'id' => 'p_talla',
                                                             'step' => '0.01', // Define el paso para permitir decimales
+                                                            'disabled' => !$editable
                                                         ]) ?>
                                                     </div>
 
@@ -2764,6 +2890,7 @@ JS;
                                                             'class' => 'form-control',
                                                             'id' => 'p_cefalico',
                                                             'step' => '0.01', // Define el paso para permitir decimales
+                                                            'disabled' => !$editable
                                                         ]) ?>
 
                                                     </div>
@@ -2774,6 +2901,7 @@ JS;
                                                             'class' => 'form-control',
                                                             'id' => 'p_toracico',
                                                             'step' => '0.01', // Define el paso para permitir decimales
+                                                            'disabled' => !$editable
                                                         ]) ?>
                                                     </div>
                                                     <div class="col-6 col-sm-2">
@@ -2782,6 +2910,7 @@ JS;
                                                             'class' => 'form-control',
                                                             'id' => 'p_abdominal',
                                                             'step' => '0.01', // Define el paso para permitir decimales
+                                                            'disabled' => !$editable
                                                         ]) ?>
                                                     </div>
                                                     <div class="w-100"></div>
@@ -2792,7 +2921,8 @@ JS;
                                                         <div class="custom-control custom-checkbox">
                                                             <?= Html::checkbox('AntecedentePerinatal[test]', $AntecedentePerinatal->test, [
                                                                 'class' => 'custom-control-input',
-                                                                'id' => 'test'
+                                                                'id' => 'test',
+                                                                'disabled' => !$editable
                                                             ]) ?>
                                                             <?= Html::label('¿Cuenta con evaluaciones neonatales?', 'test', ['class' => 'custom-control-label']) ?>
                                                         </div>
@@ -2802,23 +2932,23 @@ JS;
                                                     <div class="row" id="test-container">
                                                         <div class="col-6 col-sm-2">
                                                             <?= Html::label('Apgar', 'p_apgar') ?>
-                                                            <?= Html::input('number', 'AntecedentePerinatal[p_apgar]', $AntecedentePerinatal->p_apgar, ['class' => 'form-control']) ?>
+                                                            <?= Html::input('number', 'AntecedentePerinatal[p_apgar]', $AntecedentePerinatal->p_apgar, ['class' => 'form-control', 'disabled' => !$editable]) ?>
 
                                                         </div>
                                                         <div class="col-6 col-sm-2">
                                                             <?= Html::label('Ballard', 'p_ballard') ?>
-                                                            <?= Html::input('number', 'AntecedentePerinatal[p_ballard]', $AntecedentePerinatal->p_ballard, ['class' => 'form-control']) ?>
+                                                            <?= Html::input('number', 'AntecedentePerinatal[p_ballard]', $AntecedentePerinatal->p_ballard, ['class' => 'form-control', 'disabled' => !$editable]) ?>
 
                                                         </div>
 
                                                         <div class="col-6 col-sm-2">
                                                             <?= Html::label('Silverman', 'p_silverman') ?>
-                                                            <?= Html::input('number', 'AntecedentePerinatal[p_silverman]', $AntecedentePerinatal->p_silverman, ['class' => 'form-control']) ?>
+                                                            <?= Html::input('number', 'AntecedentePerinatal[p_silverman]', $AntecedentePerinatal->p_silverman, ['class' => 'form-control', 'disabled' => !$editable]) ?>
 
                                                         </div>
                                                         <div class="col-6 col-sm-2">
                                                             <?= Html::label('Capurro', 'p_capurro') ?>
-                                                            <?= Html::input('number', 'AntecedentePerinatal[p_capurro]', $AntecedentePerinatal->p_capurro, ['class' => 'form-control']) ?>
+                                                            <?= Html::input('number', 'AntecedentePerinatal[p_capurro]', $AntecedentePerinatal->p_capurro, ['class' => 'form-control', 'disabled' => !$editable]) ?>
 
                                                         </div>
 
@@ -2829,7 +2959,7 @@ JS;
                                                     <div class="col-6 col-sm-8">
                                                         <div class="form-group">
                                                             <?= Html::label('Complicaciones', 'p_complicacion') ?>
-                                                            <?= Html::textarea('AntecedentePerinatal[p_complicacion]', $AntecedentePerinatal->p_complicacion, ['class' => 'form-control', 'rows' => 2, 'id' => 'p_complicacion']) ?>
+                                                            <?= Html::textarea('AntecedentePerinatal[p_complicacion]', $AntecedentePerinatal->p_complicacion, ['class' => 'form-control', 'rows' => 2, 'id' => 'p_complicacion', 'disabled' => !$editable]) ?>
                                                         </div>
                                                     </div>
 
@@ -2839,15 +2969,16 @@ JS;
                                                         <div class="custom-control custom-checkbox">
                                                             <?= Html::checkbox('AntecedentePerinatal[p_anestesia]', $AntecedentePerinatal->p_anestesia, [
                                                                 'class' => 'custom-control-input',
-                                                                'id' => 'p_anestesia'
+                                                                'id' => 'p_anestesia',
+                                                                'disabled' => !$editable
                                                             ]) ?>
-                                                            <?= Html::label('Anestesia', 'p_anestesia', ['class' => 'custom-control-label']) ?>
+                                                            <?= Html::label('Anestesia', 'p_anestesia', ['class' => 'custom-control-label', 'disabled' => !$editable]) ?>
                                                         </div>
                                                     </div>
                                                     <div class="col-6 col-sm-8" id="anestesia-container">
                                                         <div class="form-group">
                                                             <?= Html::label('Especifique', 'p_especifique_anestecia') ?>
-                                                            <?= Html::textarea('AntecedentePerinatal[p_especifique_anestecia]', $AntecedentePerinatal->p_especifique_anestecia, ['class' => 'form-control', 'rows' => 2, 'id' => 'p_especifique_anestecia']) ?>
+                                                            <?= Html::textarea('AntecedentePerinatal[p_especifique_anestecia]', $AntecedentePerinatal->p_especifique_anestecia, ['class' => 'form-control', 'rows' => 2, 'id' => 'p_especifique_anestecia', 'disabled' => !$editable]) ?>
                                                         </div>
                                                     </div>
 
@@ -2858,9 +2989,10 @@ JS;
                                                             <div class="custom-control custom-checkbox">
                                                                 <?= Html::checkbox('AntecedentePerinatal[p_apnea_neonatal]', $AntecedentePerinatal->p_apnea_neonatal, [
                                                                     'class' => 'custom-control-input',
-                                                                    'id' => 'p_apnea_neonatal'
+                                                                    'id' => 'p_apnea_neonatal',
+                                                                    'disabled' => !$editable
                                                                 ]) ?>
-                                                                <?= Html::label('Apnea Neonatal', 'p_apnea_neonatal', ['class' => 'custom-control-label']) ?>
+                                                                <?= Html::label('Apnea Neonatal', 'p_apnea_neonatal', ['class' => 'custom-control-label', 'disabled' => !$editable]) ?>
                                                             </div>
 
                                                         </div>
@@ -2868,7 +3000,8 @@ JS;
                                                             <div class="custom-control custom-checkbox">
                                                                 <?= Html::checkbox('AntecedentePerinatal[p_cianosis]', $AntecedentePerinatal->p_cianosis, [
                                                                     'class' => 'custom-control-input',
-                                                                    'id' => 'p_cianosis'
+                                                                    'id' => 'p_cianosis',
+                                                                    'disabled' => !$editable
                                                                 ]) ?>
                                                                 <?= Html::label('Cianosis', 'p_cianosis', ['class' => 'custom-control-label']) ?>
                                                             </div>
@@ -2878,7 +3011,8 @@ JS;
                                                             <div class="custom-control custom-checkbox">
                                                                 <?= Html::checkbox('AntecedentePerinatal[p_hemorragias]', $AntecedentePerinatal->p_hemorragias, [
                                                                     'class' => 'custom-control-input',
-                                                                    'id' => 'p_hemorragias'
+                                                                    'id' => 'p_hemorragias',
+                                                                    'disabled' => !$editable
                                                                 ]) ?>
                                                                 <?= Html::label('Hemorragias', 'p_hemorragias', ['class' => 'custom-control-label']) ?>
                                                             </div>
@@ -2887,7 +3021,8 @@ JS;
                                                             <div class="custom-control custom-checkbox">
                                                                 <?= Html::checkbox('AntecedentePerinatal[p_convulsiones]', $AntecedentePerinatal->p_convulsiones, [
                                                                     'class' => 'custom-control-input',
-                                                                    'id' => 'p_convulsiones'
+                                                                    'id' => 'p_convulsiones',
+                                                                    'disabled' => !$editable
                                                                 ]) ?>
                                                                 <?= Html::label('Convulsiones', 'p_convulsiones', ['class' => 'custom-control-label']) ?>
                                                             </div>
@@ -2897,7 +3032,8 @@ JS;
                                                             <div class="custom-control custom-checkbox">
                                                                 <?= Html::checkbox('AntecedentePerinatal[p_ictericia]', $AntecedentePerinatal->p_ictericia, [
                                                                     'class' => 'custom-control-input',
-                                                                    'id' => 'p_ictericia'
+                                                                    'id' => 'p_ictericia',
+                                                                    'disabled' => !$editable
                                                                 ]) ?>
                                                                 <?= Html::label('Ictericia', 'p_ictericia', ['class' => 'custom-control-label']) ?>
                                                             </div>
@@ -2912,32 +3048,48 @@ JS;
                                                 <br>
 
 
+
+
+
                                                 <div class="form-group">
+                                                    <?= Html::label('Observación General') ?>
 
 
-                                                    <?= $form->field($AntecedentePerinatal, 'observacion')->widget(FroalaEditorWidget::className(), [
+                                                    <?php
 
-                                                        'clientOptions' => [
-                                                            'toolbarInline' => false,
-                                                            'theme' => 'royal', // optional: dark, red, gray, royal
-                                                            'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
-                                                            'height' => 300,
-                                                            'pluginsEnabled' => [
-                                                                'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
-                                                                'draggable', 'emoticons', 'entities', 'fontFamily',
-                                                                'fontSize', 'fullscreen', 'inlineStyle',
-                                                                'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
-                                                                'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
+                                                    if ($editable) {
+                                                        echo $form->field($AntecedentePerinatal, 'observacion')->widget(FroalaEditorWidget::className(), [
+                                                            'clientOptions' => [
+                                                                'toolbarInline' => false,
+                                                                'theme' => 'royal', // optional: dark, red, gray, royal
+                                                                'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
+                                                                'height' => 300,
+                                                                'pluginsEnabled' => [
+                                                                    'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
+                                                                    'draggable', 'emoticons', 'entities', 'fontFamily',
+                                                                    'fontSize', 'fullscreen', 'inlineStyle',
+                                                                    'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
+                                                                    'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
+                                                                ]
                                                             ]
-                                                        ]
-
-                                                    ])->label('Observación General') ?>
-
+                                                        ])->label(false);
+                                                    } else {
+                                                        // Si no tiene permiso, mostrar el texto plano
+                                                        $htmlcont = Html::decode($AntecedentePerinatal->observacion);
+                                                        echo HtmlPurifier::process($htmlcont);
+                                                    }
+                                                    ?>
                                                 </div>
 
-                                                <div class="form-group">
-                                                    <?= Html::submitButton('Guardar Todos los Cambios &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
-                                                </div>
+
+
+                                                <?php if (Yii::$app->user->can('editar-expediente-medico')) { ?>
+
+                                                    <div class="form-group">
+                                                        <?= Html::submitButton('Guardar Todos los Cambios &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                                                    </div>
+
+                                                <?php } ?>
                                             </div>
 
 
@@ -2998,9 +3150,13 @@ JS;
                                         <div class="card-header gradient-blue text-white text-center">
                                             <h2>Antecedente Ginecologico</h2>
                                             <i class="fa fa-medkit fa-2x"></i>
-                                            <div class="float-submit-btn">
-                                                <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
-                                            </div>
+                                            <?php if (Yii::$app->user->can('editar-expediente-medico')) { ?>
+
+                                                <div class="float-submit-btn">
+                                                    <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                                                </div>
+                                            <?php } ?>
+
                                         </div>
                                         <div class="card-body bg-light">
                                             <div class="container">
@@ -3009,25 +3165,25 @@ JS;
                                                 <div class="row">
                                                     <div class="col-6 col-sm-2 ">
                                                         <?= Html::label('Menarca', 'p_menarca') ?>
-                                                        <?= Html::input('number', 'AntecedenteGinecologico[p_menarca]', $AntecedenteGinecologico->p_menarca, ['class' => 'form-control']) ?>
+                                                        <?= Html::input('number', 'AntecedenteGinecologico[p_menarca]', $AntecedenteGinecologico->p_menarca, ['class' => 'form-control', 'disabled' => !$editable]) ?>
 
                                                     </div>
 
                                                     <div class="col-6 col-sm-2">
                                                         <?= Html::label('Menopausia', 'p_menopausia') ?>
-                                                        <?= Html::input('number', 'AntecedenteGinecologico[p_menopausia]', $AntecedenteGinecologico->p_menopausia, ['class' => 'form-control']) ?>
+                                                        <?= Html::input('number', 'AntecedenteGinecologico[p_menopausia]', $AntecedenteGinecologico->p_menopausia, ['class' => 'form-control', 'disabled' => !$editable]) ?>
 
                                                     </div>
 
                                                     <div class="col-6 col-sm-2">
                                                         <?= Html::label('F.U.M', 'p_f_u_m') ?>
-                                                        <?= Html::input('date', 'AntecedenteGinecologico[p_f_u_m]', $AntecedenteGinecologico->p_f_u_m, ['class' => 'form-control']) ?>
+                                                        <?= Html::input('date', 'AntecedenteGinecologico[p_f_u_m]', $AntecedenteGinecologico->p_f_u_m, ['class' => 'form-control', 'disabled' => !$editable]) ?>
 
                                                     </div>
 
                                                     <div class="col-6 col-sm-2">
                                                         <?= Html::label('F.U. Citología', 'p_f_u_m') ?>
-                                                        <?= Html::input('date', 'AntecedenteGinecologico[p_f_u_citologia]', $AntecedenteGinecologico->p_f_u_citologia, ['class' => 'form-control']) ?>
+                                                        <?= Html::input('date', 'AntecedenteGinecologico[p_f_u_citologia]', $AntecedenteGinecologico->p_f_u_citologia, ['class' => 'form-control', 'disabled' => !$editable]) ?>
 
                                                     </div>
 
@@ -3054,7 +3210,7 @@ JS;
                                                                 'Polimenorrea' => 'Polimenorrea',
                                                                 'Oligomenorrea' => 'Oligomenorrea',
                                                             ], [
-                                                                'class' => 'form-control',         'prompt' => 'Seleccione si tiene alguna'
+                                                                'class' => 'form-control',         'prompt' => 'Seleccione si tiene alguna', 'disabled' => !$editable
                                                             ]) ?>
                                                         </div>
 
@@ -3068,7 +3224,7 @@ JS;
                                                                 'Menometrorragia' => 'Menometrorragia',
 
                                                             ], [
-                                                                'class' => 'form-control',         'prompt' => 'Seleccione si tiene alguna'
+                                                                'class' => 'form-control',         'prompt' => 'Seleccione si tiene alguna', 'disabled' => !$editable
                                                             ]) ?>
                                                         </div>
 
@@ -3083,7 +3239,7 @@ JS;
                                                                 'Hipermenorrea' => 'Hipermenorrea',
                                                                 'Hipomenorrea' => 'Hipomenorrea',
                                                             ], [
-                                                                'class' => 'form-control',         'prompt' => 'Seleccione si tiene alguna'
+                                                                'class' => 'form-control',         'prompt' => 'Seleccione si tiene alguna', 'disabled' => !$editable
                                                             ]) ?>
                                                         </div>
 
@@ -3095,12 +3251,12 @@ JS;
 
                                                     <div class="col-6 col-sm-2 ">
                                                         <?= Html::label('Inicio vida sexual', 'p_inicio_vida_s') ?>
-                                                        <?= Html::input('number', 'AntecedenteGinecologico[p_inicio_vida_s]', $AntecedenteGinecologico->p_inicio_vida_s, ['class' => 'form-control']) ?>
+                                                        <?= Html::input('number', 'AntecedenteGinecologico[p_inicio_vida_s]', $AntecedenteGinecologico->p_inicio_vida_s, ['class' => 'form-control', 'disabled' => !$editable]) ?>
 
                                                     </div>
                                                     <div class="col-6 col-sm-2 ">
                                                         <?= Html::label('Número de parejas', 'p_no_parejas') ?>
-                                                        <?= Html::input('number', 'AntecedenteGinecologico[p_no_parejas]', $AntecedenteGinecologico->p_no_parejas, ['class' => 'form-control']) ?>
+                                                        <?= Html::input('number', 'AntecedenteGinecologico[p_no_parejas]', $AntecedenteGinecologico->p_no_parejas, ['class' => 'form-control', 'disabled' => !$editable]) ?>
 
                                                     </div>
 
@@ -3114,16 +3270,18 @@ JS;
                                                                     <div class="custom-control custom-checkbox">
                                                                         <?= Html::checkbox('AntecedenteGinecologico[p_vaginits]', $AntecedenteGinecologico->p_vaginits, [
                                                                             'class' => 'custom-control-input',
-                                                                            'id' => 'p_vaginits'
+                                                                            'id' => 'p_vaginits',
+                                                                            'disabled' => !$editable
                                                                         ]) ?>
-                                                                        <?= Html::label('Vaginitis', 'p_vaginits', ['class' => 'custom-control-label']) ?>
+                                                                        <?= Html::label('Vaginitis', 'p_vaginits', ['class' => 'custom-control-label',]) ?>
                                                                     </div>
                                                                 </li>
                                                                 <li>
                                                                     <div class="custom-control custom-checkbox">
                                                                         <?= Html::checkbox('AntecedenteGinecologico[p_cervicitis_mucopurulenta]', $AntecedenteGinecologico->p_cervicitis_mucopurulenta, [
                                                                             'class' => 'custom-control-input',
-                                                                            'id' => 'p_cervicitis_mucopurulenta'
+                                                                            'id' => 'p_cervicitis_mucopurulenta',
+                                                                            'disabled' => !$editable
                                                                         ]) ?>
                                                                         <?= Html::label('Cervicitis Mucopurulenta', 'p_cervicitis_mucopurulenta', ['class' => 'custom-control-label']) ?>
                                                                     </div>
@@ -3132,7 +3290,8 @@ JS;
                                                                     <div class="custom-control custom-checkbox">
                                                                         <?= Html::checkbox('AntecedenteGinecologico[p_chancroide]', $AntecedenteGinecologico->p_chancroide, [
                                                                             'class' => 'custom-control-input',
-                                                                            'id' => 'p_chancroide'
+                                                                            'id' => 'p_chancroide',
+                                                                            'disabled' => !$editable
                                                                         ]) ?>
                                                                         <?= Html::label('Chancroide', 'p_chancroide', ['class' => 'custom-control-label']) ?>
                                                                     </div>
@@ -3141,7 +3300,8 @@ JS;
                                                                     <div class="custom-control custom-checkbox">
                                                                         <?= Html::checkbox('AntecedenteGinecologico[p_clamidia]', $AntecedenteGinecologico->p_clamidia, [
                                                                             'class' => 'custom-control-input',
-                                                                            'id' => 'p_clamidia'
+                                                                            'id' => 'p_clamidia',
+                                                                            'disabled' => !$editable
                                                                         ]) ?>
                                                                         <?= Html::label('Clamidia', 'p_clamidia', ['class' => 'custom-control-label']) ?>
                                                                     </div>
@@ -3150,7 +3310,8 @@ JS;
                                                                     <div class="custom-control custom-checkbox">
                                                                         <?= Html::checkbox('AntecedenteGinecologico[p_eip]', $AntecedenteGinecologico->p_eip, [
                                                                             'class' => 'custom-control-input',
-                                                                            'id' => 'p_eip'
+                                                                            'id' => 'p_eip',
+                                                                            'disabled' => !$editable
                                                                         ]) ?>
                                                                         <?= Html::label('Enfermedad Inflamatoria Pélvica (E.I.P.)', 'p_eip', ['class' => 'custom-control-label']) ?>
                                                                     </div>
@@ -3159,7 +3320,8 @@ JS;
                                                                     <div class="custom-control custom-checkbox">
                                                                         <?= Html::checkbox('AntecedenteGinecologico[p_gonorrea]', $AntecedenteGinecologico->p_gonorrea, [
                                                                             'class' => 'custom-control-input',
-                                                                            'id' => 'p_gonorrea'
+                                                                            'id' => 'p_gonorrea',
+                                                                            'disabled' => !$editable
                                                                         ]) ?>
                                                                         <?= Html::label('Gonorrea', 'p_gonorrea', ['class' => 'custom-control-label']) ?>
                                                                     </div>
@@ -3168,7 +3330,8 @@ JS;
                                                                     <div class="custom-control custom-checkbox">
                                                                         <?= Html::checkbox('AntecedenteGinecologico[p_hepatitis]', $AntecedenteGinecologico->p_hepatitis, [
                                                                             'class' => 'custom-control-input',
-                                                                            'id' => 'p_hepatitis'
+                                                                            'id' => 'p_hepatitis',
+                                                                            'disabled' => !$editable
                                                                         ]) ?>
                                                                         <?= Html::label('Hepatitis', 'p_hepatitis', ['class' => 'custom-control-label']) ?>
                                                                     </div>
@@ -3177,7 +3340,8 @@ JS;
                                                                     <div class="custom-control custom-checkbox">
                                                                         <?= Html::checkbox('AntecedenteGinecologico[p_herpes]', $AntecedenteGinecologico->p_herpes, [
                                                                             'class' => 'custom-control-input',
-                                                                            'id' => 'p_herpes'
+                                                                            'id' => 'p_herpes',
+                                                                            'disabled' => !$editable
                                                                         ]) ?>
                                                                         <?= Html::label('Herpes', 'p_herpes', ['class' => 'custom-control-label']) ?>
                                                                     </div>
@@ -3186,7 +3350,8 @@ JS;
                                                                     <div class="custom-control custom-checkbox">
                                                                         <?= Html::checkbox('AntecedenteGinecologico[p_lgv]', $AntecedenteGinecologico->p_lgv, [
                                                                             'class' => 'custom-control-input',
-                                                                            'id' => 'p_lgv'
+                                                                            'id' => 'p_lgv',
+                                                                            'disabled' => !$editable
                                                                         ]) ?>
                                                                         <?= Html::label('Linfogranuloma venéreo (LGV)', 'p_lgv', ['class' => 'custom-control-label']) ?>
                                                                     </div>
@@ -3195,7 +3360,8 @@ JS;
                                                                     <div class="custom-control custom-checkbox">
                                                                         <?= Html::checkbox('AntecedenteGinecologico[p_molusco_cont]', $AntecedenteGinecologico->p_molusco_cont, [
                                                                             'class' => 'custom-control-input',
-                                                                            'id' => 'p_molusco_cont'
+                                                                            'id' => 'p_molusco_cont',
+                                                                            'disabled' => !$editable
                                                                         ]) ?>
                                                                         <?= Html::label('Molusco Contagioso', 'p_molusco_cont', ['class' => 'custom-control-label']) ?>
                                                                     </div>
@@ -3204,7 +3370,8 @@ JS;
                                                                     <div class="custom-control custom-checkbox">
                                                                         <?= Html::checkbox('AntecedenteGinecologico[p_ladillas]', $AntecedenteGinecologico->p_ladillas, [
                                                                             'class' => 'custom-control-input',
-                                                                            'id' => 'p_ladillas'
+                                                                            'id' => 'p_ladillas',
+                                                                            'disabled' => !$editable
                                                                         ]) ?>
                                                                         <?= Html::label('Piojos "ladillas" pubicos', 'p_ladillas', ['class' => 'custom-control-label']) ?>
                                                                     </div>
@@ -3213,7 +3380,8 @@ JS;
                                                                     <div class="custom-control custom-checkbox">
                                                                         <?= Html::checkbox('AntecedenteGinecologico[p_sarna]', $AntecedenteGinecologico->p_sarna, [
                                                                             'class' => 'custom-control-input',
-                                                                            'id' => 'p_sarna'
+                                                                            'id' => 'p_sarna',
+                                                                            'disabled' => !$editable
                                                                         ]) ?>
                                                                         <?= Html::label('Sarna', 'p_sarna', ['class' => 'custom-control-label']) ?>
                                                                     </div>
@@ -3223,7 +3391,8 @@ JS;
                                                                     <div class="custom-control custom-checkbox">
                                                                         <?= Html::checkbox('AntecedenteGinecologico[p_sifilis]', $AntecedenteGinecologico->p_sifilis, [
                                                                             'class' => 'custom-control-input',
-                                                                            'id' => 'p_sifilis'
+                                                                            'id' => 'p_sifilis',
+                                                                            'disabled' => !$editable
                                                                         ]) ?>
                                                                         <?= Html::label('Sifilis', 'p_sifilis', ['class' => 'custom-control-label']) ?>
                                                                     </div>
@@ -3233,7 +3402,8 @@ JS;
                                                                     <div class="custom-control custom-checkbox">
                                                                         <?= Html::checkbox('AntecedenteGinecologico[p_tricomoniasis]', $AntecedenteGinecologico->p_tricomoniasis, [
                                                                             'class' => 'custom-control-input',
-                                                                            'id' => 'p_tricomoniasis'
+                                                                            'id' => 'p_tricomoniasis',
+                                                                            'disabled' => !$editable
                                                                         ]) ?>
                                                                         <?= Html::label('Tricomoniasis', 'p_tricomoniasis', ['class' => 'custom-control-label']) ?>
                                                                     </div>
@@ -3242,7 +3412,8 @@ JS;
                                                                     <div class="custom-control custom-checkbox">
                                                                         <?= Html::checkbox('AntecedenteGinecologico[p_vb]', $AntecedenteGinecologico->p_vb, [
                                                                             'class' => 'custom-control-input',
-                                                                            'id' => 'p_vb'
+                                                                            'id' => 'p_vb',
+                                                                            'disabled' => !$editable
                                                                         ]) ?>
                                                                         <?= Html::label('Vaginosis Bacteriana', 'p_vb', ['class' => 'custom-control-label']) ?>
                                                                     </div>
@@ -3252,7 +3423,8 @@ JS;
                                                                     <div class="custom-control custom-checkbox">
                                                                         <?= Html::checkbox('AntecedenteGinecologico[p_vih]', $AntecedenteGinecologico->p_vih, [
                                                                             'class' => 'custom-control-input',
-                                                                            'id' => 'p_vih'
+                                                                            'id' => 'p_vih',
+                                                                            'disabled' => !$editable
                                                                         ]) ?>
                                                                         <?= Html::label('VIH', 'p_vih', ['class' => 'custom-control-label']) ?>
                                                                     </div>
@@ -3261,7 +3433,8 @@ JS;
                                                                     <div class="custom-control custom-checkbox">
                                                                         <?= Html::checkbox('AntecedenteGinecologico[p_vph]', $AntecedenteGinecologico->p_vph, [
                                                                             'class' => 'custom-control-input',
-                                                                            'id' => 'p_vph'
+                                                                            'id' => 'p_vph',
+                                                                            'disabled' => !$editable
                                                                         ]) ?>
                                                                         <?= Html::label('Virus del papiloma humano (VPH)', 'p_vph', ['class' => 'custom-control-label']) ?>
                                                                     </div>
@@ -3278,18 +3451,18 @@ JS;
                                                     <div class="w-100"></div>
                                                     <div class="col-6 col-sm-6">
                                                         <?= Html::label('Tipo', 'p_tipo_anticoncepcion') ?>
-                                                        <?= Html::textInput('AntecedenteGinecologico[p_tipo_anticoncepcion]', $modelAntecedenteGinecologico->p_tipo_anticoncepcion, ['class' => 'form-control', 'id' => 'p_tipo_anticoncepcion']) ?>
+                                                        <?= Html::textInput('AntecedenteGinecologico[p_tipo_anticoncepcion]', $modelAntecedenteGinecologico->p_tipo_anticoncepcion, ['class' => 'form-control', 'id' => 'p_tipo_anticoncepcion', 'disabled' => !$editable]) ?>
                                                     </div>
                                                     <div class="w-100"></div>
 
                                                     <div class="col-6 col-sm-3">
                                                         <?= Html::label('Inicio', 'p_inicio_anticoncepcion') ?>
-                                                        <?= Html::input('date', 'AntecedenteGinecologico[p_inicio_anticoncepcion]', $AntecedenteGinecologico->p_inicio_anticoncepcion, ['class' => 'form-control']) ?>
+                                                        <?= Html::input('date', 'AntecedenteGinecologico[p_inicio_anticoncepcion]', $AntecedenteGinecologico->p_inicio_anticoncepcion, ['class' => 'form-control', 'disabled' => !$editable]) ?>
 
                                                     </div>
                                                     <div class="col-6 col-sm-3">
                                                         <?= Html::label('Suspensión', 'p_suspension_anticoncepcion') ?>
-                                                        <?= Html::input('date', 'AntecedenteGinecologico[p_suspension_anticoncepcion]', $AntecedenteGinecologico->p_suspension_anticoncepcion, ['class' => 'form-control']) ?>
+                                                        <?= Html::input('date', 'AntecedenteGinecologico[p_suspension_anticoncepcion]', $AntecedenteGinecologico->p_suspension_anticoncepcion, ['class' => 'form-control', 'disabled' => !$editable]) ?>
 
                                                     </div>
 
@@ -3303,32 +3476,45 @@ JS;
 
 
 
+
+
                                                 <div class="form-group">
+                                                    <?= Html::label('Observación General') ?>
 
 
-                                                    <?= $form->field($AntecedenteGinecologico, 'observacion')->widget(FroalaEditorWidget::className(), [
+                                                    <?php
 
-                                                        'clientOptions' => [
-                                                            'toolbarInline' => false,
-                                                            'theme' => 'royal', // optional: dark, red, gray, royal
-                                                            'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
-                                                            'height' => 300,
-                                                            'pluginsEnabled' => [
-                                                                'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
-                                                                'draggable', 'emoticons', 'entities', 'fontFamily',
-                                                                'fontSize', 'fullscreen', 'inlineStyle',
-                                                                'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
-                                                                'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
+                                                    if ($editable) {
+                                                        echo $form->field($AntecedenteGinecologico, 'observacion')->widget(FroalaEditorWidget::className(), [
+                                                            'clientOptions' => [
+                                                                'toolbarInline' => false,
+                                                                'theme' => 'royal', // optional: dark, red, gray, royal
+                                                                'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
+                                                                'height' => 300,
+                                                                'pluginsEnabled' => [
+                                                                    'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
+                                                                    'draggable', 'emoticons', 'entities', 'fontFamily',
+                                                                    'fontSize', 'fullscreen', 'inlineStyle',
+                                                                    'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
+                                                                    'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
+                                                                ]
                                                             ]
-                                                        ]
-
-                                                    ])->label('Observación General') ?>
-
+                                                        ])->label(false);
+                                                    } else {
+                                                        // Si no tiene permiso, mostrar el texto plano
+                                                        $htmlcont = Html::decode($AntecedenteGinecologico->observacion);
+                                                        echo HtmlPurifier::process($htmlcont);
+                                                    }
+                                                    ?>
                                                 </div>
-                                                <div class="form-group">
-                                                    <?= Html::submitButton('Guardar Todos los Cambios &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
-                                                </div>
 
+                                                <?php if (Yii::$app->user->can('editar-expediente-medico')) { ?>
+
+
+                                                    <div class="form-group">
+                                                        <?= Html::submitButton('Guardar Todos los Cambios &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                                                    </div>
+                                                <?php } ?>
                                             </div>
 
 
@@ -3350,9 +3536,13 @@ JS;
                                         <div class="card-header gradient-blue text-white text-center">
                                             <h2>Antecedente Obstrectico</h2>
                                             <i class="fa fa-medkit fa-2x"></i>
-                                            <div class="float-submit-btn">
-                                                <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
-                                            </div>
+                                            <?php if (Yii::$app->user->can('editar-expediente-medico')) { ?>
+
+                                                <div class="float-submit-btn">
+                                                    <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                                                </div>
+                                            <?php } ?>
+
                                         </div>
                                         <div class="card-body bg-light">
                                             <div class="container">
@@ -3361,7 +3551,7 @@ JS;
                                                 <div class="row">
                                                     <div class="col-6 col-sm-3 ">
                                                         <?= Html::label('Fecha probable de parto.', 'p_f_p_p') ?>
-                                                        <?= Html::input('date', 'AntecedenteObstrectico[p_f_p_p]', $AntecedenteObstrectico->p_f_p_p, ['class' => 'form-control']) ?>
+                                                        <?= Html::input('date', 'AntecedenteObstrectico[p_f_p_p]', $AntecedenteObstrectico->p_f_p_p, ['class' => 'form-control',  'disabled' => !$editable]) ?>
 
 
 
@@ -3374,25 +3564,25 @@ JS;
 
                                                     <div class="col-6 col-sm-1 ">
                                                         <?= Html::label('Gestación', 'p_gestacion') ?>
-                                                        <?= Html::input('number', 'AntecedenteObstrectico[p_gestacion]', $AntecedenteObstrectico->p_gestacion, ['class' => 'form-control']) ?>
+                                                        <?= Html::input('number', 'AntecedenteObstrectico[p_gestacion]', $AntecedenteObstrectico->p_gestacion, ['class' => 'form-control',  'disabled' => !$editable]) ?>
 
                                                     </div>
 
                                                     <div class="col-6 col-sm-1 ">
                                                         <?= Html::label('Aborto', 'p_aborto') ?>
-                                                        <?= Html::input('number', 'AntecedenteObstrectico[p_aborto]', $AntecedenteObstrectico->p_aborto, ['class' => 'form-control']) ?>
+                                                        <?= Html::input('number', 'AntecedenteObstrectico[p_aborto]', $AntecedenteObstrectico->p_aborto, ['class' => 'form-control',  'disabled' => !$editable]) ?>
 
                                                     </div>
 
                                                     <div class="col-6 col-sm-1 ">
                                                         <?= Html::label('Parto', 'p_parto') ?>
-                                                        <?= Html::input('number', 'AntecedenteObstrectico[p_parto]', $AntecedenteObstrectico->p_parto, ['class' => 'form-control']) ?>
+                                                        <?= Html::input('number', 'AntecedenteObstrectico[p_parto]', $AntecedenteObstrectico->p_parto, ['class' => 'form-control',  'disabled' => !$editable]) ?>
 
                                                     </div>
 
                                                     <div class="col-6 col-sm-1 ">
                                                         <?= Html::label('Cesarea', 'p_cesarea') ?>
-                                                        <?= Html::input('number', 'AntecedenteObstrectico[p_cesarea]', $AntecedenteObstrectico->p_cesarea, ['class' => 'form-control']) ?>
+                                                        <?= Html::input('number', 'AntecedenteObstrectico[p_cesarea]', $AntecedenteObstrectico->p_cesarea, ['class' => 'form-control',  'disabled' => !$editable]) ?>
 
                                                     </div>
 
@@ -3400,12 +3590,12 @@ JS;
                                                     <br>
                                                     <div class="col-6 col-sm-3 ">
                                                         <?= Html::label('Nacidos vivos', 'p_nacidos_vivo') ?>
-                                                        <?= Html::input('number', 'AntecedenteObstrectico[p_nacidos_vivo]', $AntecedenteObstrectico->p_nacidos_vivo, ['class' => 'form-control']) ?>
+                                                        <?= Html::input('number', 'AntecedenteObstrectico[p_nacidos_vivo]', $AntecedenteObstrectico->p_nacidos_vivo, ['class' => 'form-control',  'disabled' => !$editable]) ?>
 
                                                     </div>
                                                     <div class="col-6 col-sm-3 ">
                                                         <?= Html::label('Viven', 'p_viven') ?>
-                                                        <?= Html::input('number', 'AntecedenteObstrectico[p_viven]', $AntecedenteObstrectico->p_viven, ['class' => 'form-control']) ?>
+                                                        <?= Html::input('number', 'AntecedenteObstrectico[p_viven]', $AntecedenteObstrectico->p_viven, ['class' => 'form-control',  'disabled' => !$editable]) ?>
 
                                                     </div>
 
@@ -3413,12 +3603,12 @@ JS;
 
                                                     <div class="col-6 col-sm-3 ">
                                                         <?= Html::label('Nacidos Muertos', 'p_nacidos_muerto') ?>
-                                                        <?= Html::input('number', 'AntecedenteObstrectico[p_nacidos_muerto]', $AntecedenteObstrectico->p_nacidos_muerto, ['class' => 'form-control']) ?>
+                                                        <?= Html::input('number', 'AntecedenteObstrectico[p_nacidos_muerto]', $AntecedenteObstrectico->p_nacidos_muerto, ['class' => 'form-control',  'disabled' => !$editable]) ?>
 
                                                     </div>
                                                     <div class="col-6 col-sm-3 ">
                                                         <?= Html::label('Muerto - 1ra semana', 'p_muerto_primera_semana') ?>
-                                                        <?= Html::input('number', 'AntecedenteObstrectico[p_mmuerto_primera_semana]', $AntecedenteObstrectico->p_muerto_primera_semana, ['class' => 'form-control']) ?>
+                                                        <?= Html::input('number', 'AntecedenteObstrectico[p_mmuerto_primera_semana]', $AntecedenteObstrectico->p_muerto_primera_semana, ['class' => 'form-control',  'disabled' => !$editable]) ?>
 
                                                     </div>
                                                     <div class="w-100"></div>
@@ -3429,7 +3619,7 @@ JS;
 
                                                     <div class="col-6 col-sm-3 ">
                                                         <?= Html::label('Muerto despues - 1ra semana', 'p_muerto_despues_semana') ?>
-                                                        <?= Html::input('number', 'AntecedenteObstrectico[p_mmuerto_despues_semana]', $AntecedenteObstrectico->p_muerto_despues_semana, ['class' => 'form-control']) ?>
+                                                        <?= Html::input('number', 'AntecedenteObstrectico[p_mmuerto_despues_semana]', $AntecedenteObstrectico->p_muerto_despues_semana, ['class' => 'form-control',  'disabled' => !$editable]) ?>
 
                                                     </div>
 
@@ -3445,7 +3635,8 @@ JS;
                                                         <div class="custom-control custom-checkbox">
                                                             <?= Html::checkbox('AntecedenteObstrectico[p_intergenesia]', $AntecedenteObstrectico->p_intergenesia, [
                                                                 'class' => 'custom-control-input',
-                                                                'id' => 'p_intergenesia'
+                                                                'id' => 'p_intergenesia',
+                                                                'disabled' => !$editable
                                                             ]) ?>
                                                             <?= Html::label('Intergenesia', 'p_intergenesia', ['class' => 'custom-control-label']) ?>
                                                         </div>
@@ -3455,7 +3646,8 @@ JS;
                                                         <div class="custom-control custom-checkbox">
                                                             <?= Html::checkbox('AntecedenteObstrectico[p_malformaciones]', $AntecedenteObstrectico->p_malformaciones, [
                                                                 'class' => 'custom-control-input',
-                                                                'id' => 'p_malformaciones'
+                                                                'id' => 'p_malformaciones',
+                                                                'disabled' => !$editable
                                                             ]) ?>
                                                             <?= Html::label('Malformaciones', 'p_malformaciones', ['class' => 'custom-control-label']) ?>
                                                         </div>
@@ -3465,7 +3657,8 @@ JS;
                                                         <div class="custom-control custom-checkbox">
                                                             <?= Html::checkbox('AntecedenteObstrectico[p_atencion_prenatal]', $AntecedenteObstrectico->p_atencion_prenatal, [
                                                                 'class' => 'custom-control-input',
-                                                                'id' => 'p_atencion_prenatal'
+                                                                'id' => 'p_atencion_prenatal',
+                                                                'disabled' => !$editable
                                                             ]) ?>
                                                             <?= Html::label('Atención prenatal', 'p_atencion_prenatal', ['class' => 'custom-control-label']) ?>
                                                         </div>
@@ -3477,7 +3670,8 @@ JS;
                                                         <div class="custom-control custom-checkbox">
                                                             <?= Html::checkbox('AntecedenteObstrectico[p_parto_prematuro]', $AntecedenteObstrectico->p_parto_prematuro, [
                                                                 'class' => 'custom-control-input',
-                                                                'id' => 'p_parto_prematuro'
+                                                                'id' => 'p_parto_prematuro',
+                                                                'disabled' => !$editable
                                                             ]) ?>
                                                             <?= Html::label('Parto prematuro', 'p_parto_prematuro', ['class' => 'custom-control-label']) ?>
                                                         </div>
@@ -3487,7 +3681,8 @@ JS;
                                                         <div class="custom-control custom-checkbox">
                                                             <?= Html::checkbox('AntecedenteObstrectico[p_isoinmunizacion]', $AntecedenteObstrectico->p_isoinmunizacion, [
                                                                 'class' => 'custom-control-input',
-                                                                'id' => 'p_isoinmunizacion'
+                                                                'id' => 'p_isoinmunizacion',
+                                                                'disabled' => !$editable
                                                             ]) ?>
                                                             <?= Html::label('Isoinmunización', 'p_isoinmunizacion', ['class' => 'custom-control-label']) ?>
                                                         </div>
@@ -3500,37 +3695,50 @@ JS;
 
                                                         <div class="form-group">
                                                             <?= Html::label('Medicación Gestacional', 'p_medicacion_gestacional') ?>
-                                                            <?= Html::textarea('AntecedenteObstrectico[p_medicacion_gestacional]', $AntecedenteObstrectico->p_medicacion_gestacional, ['class' => 'form-control', 'rows' => 2, 'id' => 'p_medicacion_gestacional']) ?>
+                                                            <?= Html::textarea('AntecedenteObstrectico[p_medicacion_gestacional]', $AntecedenteObstrectico->p_medicacion_gestacional, ['class' => 'form-control', 'rows' => 2, 'id' => 'p_medicacion_gestacional',  'disabled' => !$editable]) ?>
                                                         </div>
                                                     </div>
                                                 </div>
+
+
                                                 <div class="form-group">
+                                                    <?= Html::label('Observación General') ?>
 
 
-                                                    <?= $form->field($AntecedenteObstrectico, 'observacion')->widget(FroalaEditorWidget::className(), [
+                                                    <?php
 
-                                                        'clientOptions' => [
-                                                            'toolbarInline' => false,
-                                                            'theme' => 'royal', // optional: dark, red, gray, royal
-                                                            'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
-                                                            'height' => 300,
-                                                            'pluginsEnabled' => [
-                                                                'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
-                                                                'draggable', 'emoticons', 'entities', 'fontFamily',
-                                                                'fontSize', 'fullscreen', 'inlineStyle',
-                                                                'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
-                                                                'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
+                                                    if ($editable) {
+                                                        echo $form->field($AntecedenteObstrectico, 'observacion')->widget(FroalaEditorWidget::className(), [
+                                                            'clientOptions' => [
+                                                                'toolbarInline' => false,
+                                                                'theme' => 'royal', // optional: dark, red, gray, royal
+                                                                'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
+                                                                'height' => 300,
+                                                                'pluginsEnabled' => [
+                                                                    'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
+                                                                    'draggable', 'emoticons', 'entities', 'fontFamily',
+                                                                    'fontSize', 'fullscreen', 'inlineStyle',
+                                                                    'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
+                                                                    'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
+                                                                ]
                                                             ]
-                                                        ]
-
-                                                    ])->label('Observación General') ?>
+                                                        ])->label(false);
+                                                    } else {
+                                                        // Si no tiene permiso, mostrar el texto plano
+                                                        $htmlcont = Html::decode($AntecedenteObstrectico->observacion);
+                                                        echo HtmlPurifier::process($htmlcont);
+                                                    }
+                                                    ?>
                                                 </div>
 
 
+                                                <?php if (Yii::$app->user->can('editar-expediente-medico')) { ?>
 
-                                                <div class="form-group">
-                                                    <?= Html::submitButton('Guardar Todos los Cambios &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
-                                                </div>
+                                                    <div class="form-group">
+                                                        <?= Html::submitButton('Guardar Todos los Cambios &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success fa-lg']) ?>
+                                                    </div>
+
+                                                <?php } ?>
 
                                             </div>
 
@@ -3648,9 +3856,12 @@ JS;
                                         <div class="card-header gradient-blue text-white text-center">
                                             <h2>Alergias</h2>
                                             <i class="fa fa-medkit fa-2x"></i>
-                                            <div class="float-submit-btn">
-                                                <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
-                                            </div>
+                                            <?php if (Yii::$app->user->can('editar-expediente-medico')) { ?>
+
+                                                <div class="float-submit-btn">
+                                                    <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                                                </div>
+                                            <?php } ?>
                                         </div>
                                         <div class="card-body bg-light">
                                             <div class="container">
@@ -3659,27 +3870,38 @@ JS;
                                                 <div class="row">
 
 
+
+
                                                     <div class="form-group">
+                                                        <?= Html::label('Observación General') ?>
 
 
-                                                        <?= $form->field($Alergia, 'p_alergia')->widget(FroalaEditorWidget::className(), [
+                                                        <?php
 
-                                                            'clientOptions' => [
-                                                                'toolbarInline' => false,
-                                                                'theme' => 'royal', // optional: dark, red, gray, royal
-                                                                'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
-                                                                'height' => 300,
-                                                                'pluginsEnabled' => [
-                                                                    'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
-                                                                    'draggable', 'emoticons', 'entities', 'fontFamily',
-                                                                    'fontSize', 'fullscreen', 'inlineStyle',
-                                                                    'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
-                                                                    'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
+                                                        if ($editable) {
+                                                            echo $form->field($Alergia, 'p_alergia')->widget(FroalaEditorWidget::className(), [
+                                                                'clientOptions' => [
+                                                                    'toolbarInline' => false,
+                                                                    'theme' => 'royal', // optional: dark, red, gray, royal
+                                                                    'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
+                                                                    'height' => 300,
+                                                                    'pluginsEnabled' => [
+                                                                        'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
+                                                                        'draggable', 'emoticons', 'entities', 'fontFamily',
+                                                                        'fontSize', 'fullscreen', 'inlineStyle',
+                                                                        'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
+                                                                        'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
+                                                                    ]
                                                                 ]
-                                                            ]
-
-                                                        ])->label('Observación General') ?>
+                                                            ])->label(false);
+                                                        } else {
+                                                            // Si no tiene permiso, mostrar el texto plano
+                                                            $htmlcont = Html::decode($Alergia->p_alergia);
+                                                            echo HtmlPurifier::process($htmlcont);
+                                                        }
+                                                        ?>
                                                     </div>
+
 
 
 
@@ -3687,13 +3909,14 @@ JS;
                                                 <div class="alert alert-white custom-alert" role="alert">
                                                     <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i> Escriba NEGADAS o deje en blanco si el paciente no tiene nignuna alergia.
                                                 </div>
+                                                <?php if (Yii::$app->user->can('editar-expediente-medico')) { ?>
 
-                                                <div class="form-group">
-                                                    <?= Html::submitButton('Guardar Todos los Cambios &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
-                                                </div>
-
+                                                    <div class="form-group">
+                                                        <?= Html::submitButton('Guardar Todos los Cambios &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                                                    </div>
+                                                <?php } ?>
                                             </div>
-                                           
+
 
                                         </div>
                                     </div>
@@ -3715,9 +3938,12 @@ JS;
                                     <div class="card">
                                         <div class="card-header gradient-blue text-white text-center">
                                             <h2>Exploracion Fisica</h2>
-                                            <div class="float-submit-btn">
-                                                <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
-                                            </div>
+                                            <?php if (Yii::$app->user->can('editar-expediente-medico')) { ?>
+
+                                                <div class="float-submit-btn">
+                                                    <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                                                </div>
+                                            <?php } ?>
                                         </div>
                                         <div class="card-body">
                                             <div class="container">
@@ -3731,27 +3957,38 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                            <div class="form-group">
 
+                                                            <div class="form-group bg-white">
+                                                                <?= Html::label('Descripción') ?>
+<br>
 
-                                                                <?= $form->field($ExploracionFisica, 'desc_habitus_exterior')->widget(FroalaEditorWidget::className(), [
-                                                                    'options' => [
-                                                                        'id' => 'exp-fisca'
-                                                                    ],
-                                                                    'clientOptions' => [
-                                                                        'toolbarInline' => false,
-                                                                        'theme' => 'royal', // optional: dark, red, gray, royal
-                                                                        'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
-                                                                        'height' => 200,
-                                                                        'pluginsEnabled' => [
-                                                                            'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
-                                                                            'draggable', 'emoticons', 'entities', 'fontFamily',
-                                                                            'fontSize', 'fullscreen', 'inlineStyle',
-                                                                            'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
-                                                                            'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
+                                                                <?php
+
+                                                                if ($editable) {
+                                                                    echo $form->field($ExploracionFisica, 'desc_habitus_exterior')->widget(FroalaEditorWidget::className(), [
+                                                                        'options' => [
+                                                                            'id' => 'exp-fisca'
+                                                                        ],
+                                                                        'clientOptions' => [
+                                                                            'toolbarInline' => false,
+                                                                            'theme' => 'royal', // optional: dark, red, gray, royal
+                                                                            'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
+                                                                            'height' => 200,
+                                                                            'pluginsEnabled' => [
+                                                                                'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
+                                                                                'draggable', 'emoticons', 'entities', 'fontFamily',
+                                                                                'fontSize', 'fullscreen', 'inlineStyle',
+                                                                                'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
+                                                                                'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
+                                                                            ]
                                                                         ]
-                                                                    ]
-                                                                ])->label('Habitus Exterior') ?>
+                                                                    ])->label(false);
+                                                                } else {
+                                                                    // Si no tiene permiso, mostrar el texto plano
+                                                                    $htmlcont = Html::decode($ExploracionFisica->desc_habitus_exterior);
+                                                                    echo HtmlPurifier::process($htmlcont);
+                                                                }
+                                                                ?>
                                                             </div>
 
                                                         </div>
@@ -3773,15 +4010,28 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                            <div class="form-group">
 
-                                                                <?= $form->field($ExploracionFisica, 'desc_cabeza')->widget(FroalaEditorWidget::className(), [
-                                                                    'options' => [
-                                                                        'id' => 'exp-fisca'
-                                                                    ],
 
-                                                                ])->label('Cabeza y Cara') ?>
+                                                            <div class="form-group bg-white">
+                                                            <?= Html::label('Descripción') ?>
+                                                            <br>
 
+
+                                                                <?php
+
+                                                                if ($editable) {
+                                                                    echo $form->field($ExploracionFisica, 'desc_cabeza')->widget(FroalaEditorWidget::className(), [
+                                                                        'options' => [
+                                                                            'id' => 'exp-fisca'
+                                                                        ],
+
+                                                                    ])->label(false);
+                                                                } else {
+                                                                    // Si no tiene permiso, mostrar el texto plano
+                                                                    $htmlcont = Html::decode($ExploracionFisica->desc_cabeza);
+                                                                    echo HtmlPurifier::process($htmlcont);
+                                                                }
+                                                                ?>
                                                             </div>
 
                                                         </div>
@@ -3814,16 +4064,31 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                            <div class="form-group">
+                                                        
 
-                                                                <?= $form->field($ExploracionFisica, 'desc_cuello')->widget(FroalaEditorWidget::className(), [
-                                                                    'options' => [
-                                                                        'id' => 'exp-fisca'
-                                                                    ],
 
-                                                                ])->label('Cuello') ?>
+                                                            <div class="form-group bg-white">
+                                                            <?= Html::label('Descripción') ?>
+                                                            <br>
 
+
+                                                                <?php
+
+                                                                if ($editable) {
+                                                                    echo $form->field($ExploracionFisica, 'desc_cuello')->widget(FroalaEditorWidget::className(), [
+                                                                        'options' => [
+                                                                            'id' => 'exp-fisca'
+                                                                        ],
+
+                                                                    ])->label(false);
+                                                                } else {
+                                                                    // Si no tiene permiso, mostrar el texto plano
+                                                                    $htmlcont = Html::decode($ExploracionFisica->desc_cuello);
+                                                                    echo HtmlPurifier::process($htmlcont);
+                                                                }
+                                                                ?>
                                                             </div>
+
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -3847,15 +4112,31 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                            <div class="form-group">
+                                                            
 
-                                                                <?= $form->field($ExploracionFisica, 'desc_torax')->widget(FroalaEditorWidget::className(), [
-                                                                    'options' => [
+                                                            <div class="form-group bg-white">
+                                                            <?= Html::label('Descripción') ?>
+                                                            <br>
+
+
+                                                            <?php
+                                                            
+                        if ($editable) {
+                            echo $form->field($ExploracionFisica, 'desc_torax')->widget(FroalaEditorWidget::className(), [
+                                'options' => [
                                                                         'id' => 'exp-fisca'
                                                                     ],
-
-                                                                ])->label('Torax') ?>
-                                                            </div>
+                                                                    
+                            ])->label(false);
+                        } else {
+                            // Si no tiene permiso, mostrar el texto plano
+                            $htmlcont= Html::decode($ExploracionFisica->desc_torax);
+                            echo HtmlPurifier::process($htmlcont);
+                           
+                            
+                        }
+                        ?>
+                    </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -3878,16 +4159,31 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                            <div class="form-group">
+                                                        
+
+                                                            <div class="form-group bg-white">
+                                                            <?= Html::label('Descripción') ?>
+                                                            <br>
 
 
-                                                                <?= $form->field($ExploracionFisica, 'desc_abdomen')->widget(FroalaEditorWidget::className(), [
-                                                                    'options' => [
+                                                            <?php
+                                                            
+                        if ($editable) {
+                            echo $form->field($ExploracionFisica, 'desc_abdomen')->widget(FroalaEditorWidget::className(), [
+                                'options' => [
                                                                         'id' => 'exp-fisca'
                                                                     ],
-
-                                                                ])->label('Abdomen') ?>
-                                                            </div>
+                                                                    
+                            ])->label(false);
+                        } else {
+                            // Si no tiene permiso, mostrar el texto plano
+                            $htmlcont= Html::decode($ExploracionFisica->desc_abdomen);
+                            echo HtmlPurifier::process($htmlcont);
+                           
+                            
+                        }
+                        ?>
+                    </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -3910,16 +4206,31 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                            <div class="form-group">
+                                                            
 
-                                                                <?= $form->field($ExploracionFisica, 'desc_exploración_ginecologica')->widget(FroalaEditorWidget::className(), [
-                                                                    'options' => [
+                                                            <div class="form-group bg-white">
+                                                            <?= Html::label('Descripción') ?>
+                                                            <br>
+
+
+                                                            <?php
+                                                            
+                        if ($editable) {
+                            echo $form->field($ExploracionFisica, 'desc_exploración_ginecologica')->widget(FroalaEditorWidget::className(), [
+                                'options' => [
                                                                         'id' => 'exp-fisca'
                                                                     ],
-
-                                                                ])->label('Exploración Ginecologica') ?>
-
-                                                            </div>
+                                                                    
+                            ])->label(false);
+                        } else {
+                            // Si no tiene permiso, mostrar el texto plano
+                            $htmlcont= Html::decode($ExploracionFisica->desc_exploración_ginecologica);
+                            echo HtmlPurifier::process($htmlcont);
+                           
+                            
+                        }
+                        ?>
+                    </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -3942,15 +4253,29 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                            <div class="form-group">
-                                                                <?= $form->field($ExploracionFisica, 'desc_genitales')->widget(FroalaEditorWidget::className(), [
-                                                                    'options' => [
+                                                            <div class="form-group bg-white">
+                                                            <?= Html::label('Descripción') ?>
+                                                            <br>
+
+
+                                                            <?php
+                                                            
+                        if ($editable) {
+                            echo $form->field($ExploracionFisica, 'desc_genitales')->widget(FroalaEditorWidget::className(), [
+                                'options' => [
                                                                         'id' => 'exp-fisca'
                                                                     ],
-
-                                                                ])->label('Exploración Genitales') ?>
-
-                                                            </div>
+                                                                    
+                            ])->label(false);
+                        } else {
+                            // Si no tiene permiso, mostrar el texto plano
+                            $htmlcont= Html::decode($ExploracionFisica->desc_genitales);
+                            echo HtmlPurifier::process($htmlcont);
+                           
+                            
+                        }
+                        ?>
+                    </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -3974,16 +4299,31 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                            <div class="form-group">
+                                                            
 
-                                                                <?= $form->field($ExploracionFisica, 'desc_columna_vertebral')->widget(FroalaEditorWidget::className(), [
-                                                                    'options' => [
+                                                            <div class="form-group bg-white">
+                                                            <?= Html::label('Descripción') ?>
+                                                            <br>
+
+
+                                                            <?php
+                                                            
+                        if ($editable) {
+                            echo $form->field($ExploracionFisica, 'desc_columna_vertebral')->widget(FroalaEditorWidget::className(), [
+                                'options' => [
                                                                         'id' => 'exp-fisca'
                                                                     ],
-
-                                                                ])->label('Columna Vertebral') ?>
-
-                                                            </div>
+                                                                    
+                            ])->label(false);
+                        } else {
+                            // Si no tiene permiso, mostrar el texto plano
+                            $htmlcont= Html::decode($ExploracionFisica->desc_columna_vertebral);
+                            echo HtmlPurifier::process($htmlcont);
+                           
+                            
+                        }
+                        ?>
+                    </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -4004,15 +4344,31 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                            <div class="form-group">
-                                                                <?= $form->field($ExploracionFisica, 'desc_extremidades')->widget(FroalaEditorWidget::className(), [
-                                                                    'options' => [
+                                                            
+
+                                                            <div class="form-group bg-white">
+                                                            <?= Html::label('Descripción') ?>
+                                                            <br>
+
+
+                                                            <?php
+                                                            
+                        if ($editable) {
+                            echo $form->field($ExploracionFisica, 'desc_extremidades')->widget(FroalaEditorWidget::className(), [
+                                'options' => [
                                                                         'id' => 'exp-fisca'
                                                                     ],
-
-                                                                ])->label('Extremidades') ?>
-
-                                                            </div>
+                                                                    
+                            ])->label(false);
+                        } else {
+                            // Si no tiene permiso, mostrar el texto plano
+                            $htmlcont= Html::decode($ExploracionFisica->desc_extremidades);
+                            echo HtmlPurifier::process($htmlcont);
+                           
+                            
+                        }
+                        ?>
+                    </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -4035,15 +4391,31 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                            <div class="form-group">
+                                                           
 
-                                                                <?= $form->field($ExploracionFisica, 'desc_exploracion_neurologica')->widget(FroalaEditorWidget::className(), [
-                                                                    'options' => [
+                                                            <div class="form-group bg-white">
+                                                            <?= Html::label('Descripción') ?>
+                                                            <br>
+
+
+                                                            <?php
+                                                            
+                        if ($editable) {
+                            echo $form->field($ExploracionFisica, 'desc_exploracion_neurologica')->widget(FroalaEditorWidget::className(), [
+                                'options' => [
                                                                         'id' => 'exp-fisca'
                                                                     ],
-
-                                                                ])->label('Exploración Neurologica') ?>
-                                                            </div>
+                                                                    
+                            ])->label(false);
+                        } else {
+                            // Si no tiene permiso, mostrar el texto plano
+                            $htmlcont= Html::decode($ExploracionFisica->desc_exploracion_neurologica);
+                            echo HtmlPurifier::process($htmlcont);
+                           
+                            
+                        }
+                        ?>
+                    </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -4068,13 +4440,16 @@ JS;
 
 
                                                 <br>
+                                                <?php if (Yii::$app->user->can('editar-expediente-medico')) { ?>
 
                                                 <div class="form-group">
                                                     <?= Html::submitButton('Guardar Todos los Cambios &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
                                                 </div>
 
+                                                <?php }?>
+
                                             </div>
-                                           
+
                                         </div>
                                     </div>
                                 </div>
@@ -4094,9 +4469,13 @@ JS;
                                     <div class="card">
                                         <div class="card-header gradient-blue text-white text-center">
                                             <h2>Interrogatorio Medico</h2>
+                                            <?php if (Yii::$app->user->can('editar-expediente-medico')) { ?>
+
                                             <div class="float-submit-btn">
                                                 <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
                                             </div>
+                                            <?php }?>
+
                                         </div>
                                         <div class="card-body">
                                             <div class="container">
@@ -4110,17 +4489,31 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                            <div class="form-group">
-                                                             
-                                                                <?= $form->field($InterrogatorioMedico, 'desc_cardiovascular')->widget(FroalaEditorWidget::className(), [
-                                                                    'options' => [
+                                                            
+
+                                                            <div class="form-group bg-white">
+                                                            <?= Html::label('Descripción') ?>
+                                                            <br>
+
+
+                                                            <?php
+                                                            
+                        if ($editable) {
+                            echo $form->field($InterrogatorioMedico, 'desc_cardiovascular')->widget(FroalaEditorWidget::className(), [
+                                'options' => [
                                                                         'id' => 'exp-fisca'
                                                                     ],
-
-                                                                ])->label('Cardiovascular') ?>
-
-
-                                                            </div>
+                                                                    
+                            ])->label(false);
+                        } else {
+                            // Si no tiene permiso, mostrar el texto plano
+                            $htmlcont= Html::decode($InterrogatorioMedico->desc_cardiovascular);
+                            echo HtmlPurifier::process($htmlcont);
+                           
+                            
+                        }
+                        ?>
+                    </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -4142,16 +4535,31 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                            <div class="form-group">
-                                                         
-                                                                <?= $form->field($InterrogatorioMedico, 'desc_digestivo')->widget(FroalaEditorWidget::className(), [
-                                                                    'options' => [
+                                                          
+
+                                                            <div class="form-group bg-white">
+                                                            <?= Html::label('Descripción') ?>
+                                                            <br>
+
+
+                                                            <?php
+                                                            
+                        if ($editable) {
+                            echo $form->field($InterrogatorioMedico, 'desc_digestivo')->widget(FroalaEditorWidget::className(), [
+                                'options' => [
                                                                         'id' => 'exp-fisca'
                                                                     ],
-
-                                                                ])->label('Digestivo') ?>
-                                                         
-                                                            </div>
+                                                                    
+                            ])->label(false);
+                        } else {
+                            // Si no tiene permiso, mostrar el texto plano
+                            $htmlcont= Html::decode($InterrogatorioMedico->desc_digestivo);
+                            echo HtmlPurifier::process($htmlcont);
+                           
+                            
+                        }
+                        ?>
+                    </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -4169,16 +4577,31 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                            <div class="form-group">
-                                                             
+                                                           
+
+                                                            <div class="form-group bg-white">
+                                                            <?= Html::label('Descripción') ?>
+                                                            <br>
+
+
+                                                            <?php
                                                             
-                                                                <?= $form->field($InterrogatorioMedico, 'desc_endocrino')->widget(FroalaEditorWidget::className(), [
-                                                                    'options' => [
+                        if ($editable) {
+                            echo $form->field($InterrogatorioMedico, 'desc_endocrino')->widget(FroalaEditorWidget::className(), [
+                                'options' => [
                                                                         'id' => 'exp-fisca'
                                                                     ],
-
-                                                                ])->label('Endocrino') ?>
-                                                            </div>
+                                                                    
+                            ])->label(false);
+                        } else {
+                            // Si no tiene permiso, mostrar el texto plano
+                            $htmlcont= Html::decode($InterrogatorioMedico->desc_endocrino);
+                            echo HtmlPurifier::process($htmlcont);
+                           
+                            
+                        }
+                        ?>
+                    </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -4198,16 +4621,30 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                            <div class="form-group">
-                                                              
-                                                          
-                                                                <?= $form->field($InterrogatorioMedico, 'desc_hemolinfatico')->widget(FroalaEditorWidget::className(), [
-                                                                    'options' => [
+                                                        
+                                                            <div class="form-group bg-white">
+                                                            <?= Html::label('Descripción') ?>
+                                                            <br>
+
+
+                                                            <?php
+                                                            
+                        if ($editable) {
+                            echo $form->field($InterrogatorioMedico, 'desc_hemolinfatico')->widget(FroalaEditorWidget::className(), [
+                                'options' => [
                                                                         'id' => 'exp-fisca'
                                                                     ],
-
-                                                                ])->label('Hemolinfatico') ?>
-                                                            </div>
+                                                                    
+                            ])->label(false);
+                        } else {
+                            // Si no tiene permiso, mostrar el texto plano
+                            $htmlcont= Html::decode($InterrogatorioMedico->desc_hemolinfatico);
+                            echo HtmlPurifier::process($htmlcont);
+                           
+                            
+                        }
+                        ?>
+                    </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -4226,15 +4663,31 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                            <div class="form-group">
                                                             
-                                                                <?= $form->field($InterrogatorioMedico, 'desc_mamas')->widget(FroalaEditorWidget::className(), [
-                                                                    'options' => [
+
+                                                            <div class="form-group bg-white">
+                                                            <?= Html::label('Descripción') ?>
+                                                            <br>
+
+
+                                                            <?php
+                                                            
+                        if ($editable) {
+                            echo $form->field($InterrogatorioMedico, 'desc_mamas')->widget(FroalaEditorWidget::className(), [
+                                'options' => [
                                                                         'id' => 'exp-fisca'
                                                                     ],
-
-                                                                ])->label('Mamas') ?>
-                                                            </div>
+                                                                    
+                            ])->label(false);
+                        } else {
+                            // Si no tiene permiso, mostrar el texto plano
+                            $htmlcont= Html::decode($InterrogatorioMedico->desc_mamas);
+                            echo HtmlPurifier::process($htmlcont);
+                           
+                            
+                        }
+                        ?>
+                    </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -4244,33 +4697,7 @@ JS;
 
                                                 </div>
                                                 <!-- aqui -->
-                                                <div class="card">
-                                                    <div class="card-header custom-nopato text-white text-left">
-                                                        <h5>MUSCULO-ESQUELETICO</h5>
-                                                    </div>
-                                                    <div class="card-body bg-light">
-                                                        <div class="row">
-
-                                                            <!-- Columna derecha con el textarea -->
-
-                                                            <div class="form-group">
-                                                           
-                                                                <?= $form->field($InterrogatorioMedico, 'desc_musculo_esqueletico')->widget(FroalaEditorWidget::className(), [
-                                                                    'options' => [
-                                                                        'id' => 'exp-fisca'
-                                                                    ],
-
-                                                                ])->label('Musculo-Esqueletico') ?>
-                                                           
-                                                            </div>
-
-                                                        </div>
-                                                        <div class="alert alert-white custom-alert" role="alert">
-                                                            <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Deformidades oseas, limitacion de movimientos, algias, atrofias.
-                                                        </div>
-                                                    </div>
-
-                                                </div>
+                                               
 
                                                 <div class="card">
                                                     <div class="card-header custom-nopato text-white text-left">
@@ -4281,17 +4708,29 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                            <div class="form-group">
-                                                           
-                                                                <?= $form->field($InterrogatorioMedico, 'desc_piel_anexos')->widget(FroalaEditorWidget::className(), [
-                                                                    'options' => [
+                                                            <div class="form-group bg-white">
+                                                            <?= Html::label('Descripción') ?>
+                                                            <br>
+
+
+                                                            <?php
+                                                            
+                        if ($editable) {
+                            echo $form->field($InterrogatorioMedico, 'desc_piel_anexos')->widget(FroalaEditorWidget::className(), [
+                                'options' => [
                                                                         'id' => 'exp-fisca'
                                                                     ],
-
-                                                                ])->label('Piel y Anexos') ?>
-                                                           
-                                                           
-                                                            </div>
+                                                                    
+                            ])->label(false);
+                        } else {
+                            // Si no tiene permiso, mostrar el texto plano
+                            $htmlcont= Html::decode($InterrogatorioMedico->desc_piel_anexos);
+                            echo HtmlPurifier::process($htmlcont);
+                           
+                            
+                        }
+                        ?>
+                    </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -4310,18 +4749,33 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                            <div class="form-group">
-                                                                <?= Html::label('Reproductor', 'desc_reproductor') ?>
-                                                                <?= Html::textarea('InterrogatorioMedico[desc_reproductor]', $InterrogatorioMedico->desc_reproductor, ['class' => 'form-control', 'rows' => 5]) ?>
-                                                          
-                                                          
-                                                                <?= $form->field($InterrogatorioMedico, 'desc_reproductor')->widget(FroalaEditorWidget::className(), [
-                                                                    'options' => [
+                                                           
+
+                                                            <div class="form-group bg-white">
+                                                            <?= Html::label('Descripción') ?>
+                                                            <br>
+
+
+                                                            <?php
+                                                            
+                        if ($editable) {
+                            echo $form->field($InterrogatorioMedico, 'desc_reproductor')->widget(FroalaEditorWidget::className(), [
+                                'options' => [
                                                                         'id' => 'exp-fisca'
                                                                     ],
+                                                                    
+                            ])->label(false);
+                        } else {
+                            // Si no tiene permiso, mostrar el texto plano
+                            $htmlcont= Html::decode($InterrogatorioMedico->desc_reproductor);
+                            echo HtmlPurifier::process($htmlcont);
+                           
+                            
+                        }
+                        ?>
+                    </div>
 
-                                                                ])->label('Reproductor') ?>
-                                                            </div>
+
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -4341,16 +4795,31 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                            <div class="form-group">
-                                                              
-                                                                <?= $form->field($InterrogatorioMedico, 'desc_respiratorio')->widget(FroalaEditorWidget::className(), [
-                                                                    'options' => [
+                                                            
+
+                                                            <div class="form-group bg-white">
+                                                            <?= Html::label('Descripción') ?>
+                                                            <br>
+
+
+                                                            <?php
+                                                            
+                        if ($editable) {
+                            echo $form->field($InterrogatorioMedico, 'desc_respiratorio')->widget(FroalaEditorWidget::className(), [
+                                'options' => [
                                                                         'id' => 'exp-fisca'
                                                                     ],
-
-                                                                ])->label('Respiratorio') ?>
-                                                          
-                                                            </div>
+                                                                    
+                            ])->label(false);
+                        } else {
+                            // Si no tiene permiso, mostrar el texto plano
+                            $htmlcont= Html::decode($InterrogatorioMedico->desc_respiratorio);
+                            echo HtmlPurifier::process($htmlcont);
+                           
+                            
+                        }
+                        ?>
+                    </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -4369,16 +4838,31 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                            <div class="form-group">
-                                                           
-                                                                <?= $form->field($InterrogatorioMedico, 'desc_sistema_nervioso')->widget(FroalaEditorWidget::className(), [
-                                                                    'options' => [
+                                                          
+
+                                                            <div class="form-group bg-white">
+                                                            <?= Html::label('Descripción') ?>
+                                                            <br>
+
+
+                                                            <?php
+                                                            
+                        if ($editable) {
+                            echo $form->field($InterrogatorioMedico, 'desc_sistema_nervioso')->widget(FroalaEditorWidget::className(), [
+                                'options' => [
                                                                         'id' => 'exp-fisca'
                                                                     ],
-
-                                                                ])->label('Sistema Nervioso') ?>
-                                                           
-                                                            </div>
+                                                                    
+                            ])->label(false);
+                        } else {
+                            // Si no tiene permiso, mostrar el texto plano
+                            $htmlcont= Html::decode($InterrogatorioMedico->desc_sistema_nervioso);
+                            echo HtmlPurifier::process($htmlcont);
+                           
+                            
+                        }
+                        ?>
+                    </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -4397,16 +4881,31 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                            <div class="form-group">
-                                                              
-                                                          
-                                                                <?= $form->field($InterrogatorioMedico, 'desc_sistemas_generales')->widget(FroalaEditorWidget::className(), [
-                                                                    'options' => [
+                                                            
+
+                                                            <div class="form-group bg-white">
+                                                            <?= Html::label('Descripción') ?>
+                                                            <br>
+
+
+                                                            <?php
+                                                            
+                        if ($editable) {
+                            echo $form->field($InterrogatorioMedico, 'desc_sistemas_generales')->widget(FroalaEditorWidget::className(), [
+                                'options' => [
                                                                         'id' => 'exp-fisca'
                                                                     ],
-
-                                                                ])->label('Sistemas Generales') ?>
-                                                            </div>
+                                                                    
+                            ])->label(false);
+                        } else {
+                            // Si no tiene permiso, mostrar el texto plano
+                            $htmlcont= Html::decode($InterrogatorioMedico->desc_sistemas_generales);
+                            echo HtmlPurifier::process($htmlcont);
+                           
+                            
+                        }
+                        ?>
+                    </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -4425,32 +4924,49 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                            <div class="form-group">
-                                                              
-                                                         
-                                                                <?= $form->field($InterrogatorioMedico, 'desc_urinario')->widget(FroalaEditorWidget::className(), [
-                                                                    'options' => [
+                                                           
+                                                            <div class="form-group bg-white">
+                                                            <?= Html::label('Descripción') ?>
+                                                            <br>
+
+
+                                                            <?php
+                                                            
+                        if ($editable) {
+                            echo $form->field($InterrogatorioMedico, 'desc_urinario')->widget(FroalaEditorWidget::className(), [
+                                'options' => [
                                                                         'id' => 'exp-fisca'
                                                                     ],
-
-                                                                ])->label('Urinario') ?>
-                                                            </div>
+                                                                    
+                            ])->label(false);
+                        } else {
+                            // Si no tiene permiso, mostrar el texto plano
+                            $htmlcont= Html::decode($InterrogatorioMedico->desc_urinario);
+                            echo HtmlPurifier::process($htmlcont);
+                           
+                            
+                        }
+                        ?>
+                    </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
                                                             <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Disuria, polaquiuria, tenesmo vesical, hematuria piuria, incontinencia, dolor lumbar, expulsion de calculos, secrecion uretral.
                                                         </div>
                                                     </div>
-                                                    
+
                                                 </div>
+                                                <?php if (Yii::$app->user->can('editar-expediente-medico')) { ?>
 
                                                 <div class="form-group">
                                                     <?= Html::submitButton('Guardar Todos los Cambios &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
                                                 </div>
+
+                                                <?php }?>
                                             </div>
-                                            
-                                               
-                                            
+
+
+
                                         </div>
                                     </div>
                                 </div>
@@ -4541,45 +5057,55 @@ JS;
                         </div>
                         <!--.col-md-12-->
                         <?php
-$tabs = [
-    [
-        'label' => 'Información',
-        'content' => $this->blocks['datos'],
-        'options' => [
-            'id' => 'datos',
-        ],
-    ],
-   
-];
+                        $tabs = [
+                            [
+                                'label' => 'Información',
+                                'content' => $this->blocks['datos'],
+                                'options' => [
+                                    'id' => 'datos',
+                                ],
+                            ],
 
-if (Yii::$app->user->can('ver-expediente-medico')) {
-    $tabs[] = [
-        'label' => 'Expediente Medico',
-        'content' => $this->blocks['expediente_medico'],
-        'options' => [
-            'id' => 'expediente_medico',
-        ],
-    ];
-}
-if (Yii::$app->user->can('verDocumentos')) {
-    $tabs[] = [
-        'label' => 'Documentos',
-        'content' => $this->blocks['expediente'],
-        'options' => [
-            'id' => 'documentos',
-        ],
-    ];
-}
+                        ];
 
-echo TabsX::widget([
-    'enableStickyTabs' => true,
-    'options' => ['class' => 'custom-tabs-2'],
-    'items' => $tabs,
-    'position' => TabsX::POS_ABOVE,
-    'align' => TabsX::ALIGN_LEFT,
-    'encodeLabels' => false,
-]);
-?>
+                        if (Yii::$app->user->can('ver-expediente-medico')) {
+                            $tabs[] = [
+                                'label' => 'Expediente Medico',
+                                'content' => $this->blocks['expediente_medico'],
+                                'options' => [
+                                    'id' => 'expediente_medico',
+                                ],
+                            ];
+                        }
+                        if (Yii::$app->user->can('ver-documentos')) {
+                            $tabs[] = [
+                                'label' => 'Documentos',
+                                'content' => $this->blocks['expediente'],
+                                'options' => [
+                                    'id' => 'documentos',
+                                ],
+                            ];
+                        }
+                        if (Yii::$app->user->can('ver-consultas-medicas')) {
+                            $tabs[] = [
+                            'label' => 'Consultas medicas',
+                            'content' => $this->blocks['info_consultas'],
+                            'options' => [
+                                'id' => 'informacion_consultas',
+                            ],
+                        
+                    ];
+                }
+
+                        echo TabsX::widget([
+                            'enableStickyTabs' => true,
+                            'options' => ['class' => 'custom-tabs-2'],
+                            'items' => $tabs,
+                            'position' => TabsX::POS_ABOVE,
+                            'align' => TabsX::ALIGN_LEFT,
+                            'encodeLabels' => false,
+                        ]);
+                        ?>
 
                     </div>
                     <!--.row-->

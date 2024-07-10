@@ -9,6 +9,21 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use yii\web\NotFoundHttpException;
+use app\models\ExpedienteMedico;
+use app\models\AntecedenteGinecologico;
+use app\models\AntecedenteHereditario;
+use app\models\AntecedenteNoPatologico;
+use app\models\AntecedentePatologico;
+use app\models\AntecedenteObstrectico;
+use app\models\CatAntecedenteHereditario;
+use app\models\ExploracionFisica;
+use app\models\Alergia;
+use app\models\AntecedentePerinatal;
+use app\models\PeriodoVacacional;
+use app\models\InterrogatorioMedico;
+use app\models\Documento;
+use app\models\PeriodoVacacionalHistorial;
 //use app\models\User;
 use app\models\PermisoFueraTrabajo;
 use app\models\Usuario;
@@ -18,6 +33,7 @@ use app\models\CambiarContrasenaForm;
 use yii\helpers\ArrayHelper;
 use app\models\JuntaGobierno;
 class SiteController extends Controller
+
 {
     /**
      * {@inheritdoc}
@@ -287,33 +303,64 @@ class SiteController extends Controller
             throw new \yii\web\NotFoundHttpException("File not found");
         }
     }
-    public function actionPortalempleado() {
-        $usuarioId = Yii::$app->user->identity->id; 
-        $empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();
+    public function actionPortalempleado()
+    {
+        $usuario = Yii::$app->user->identity;
+        $modelEmpleado = $usuario->empleado;
+        
+        if (!$modelEmpleado) {
+            throw new NotFoundHttpException('El empleado no existe.');
+        }
     
-        $juntaDirectorDireccion = JuntaGobierno::find()
-            ->where(['nivel_jerarquico' => 'Director'])
-            ->andWhere(['cat_direccion_id' => $empleado->informacionLaboral->cat_direccion_id])
-            ->one();
+        // Replicamos la lógica de la acción view del controlador empleado
+        $documentos = $modelEmpleado->documentos;
+        $documentoModel = new Documento();
+        $historial = PeriodoVacacionalHistorial::find()->where(['empleado_id' => $modelEmpleado->id])->all();
     
-        $jefesDirectores = ArrayHelper::map(
-            JuntaGobierno::find()
-                ->where(['nivel_jerarquico' => 'Jefe de unidad'])
-                ->orWhere(['nivel_jerarquico' => 'Jefe de departamento'])
-                ->andWhere(['cat_direccion_id' => $empleado->informacionLaboral->cat_direccion_id])
-                ->all(),
-            'id',
-            function ($model) {
-                return $model->empleado->nombre . ' ' . $model->empleado->apellido;
-            }
-        );
+        $searchModel = new \app\models\SolicitudSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider->query->andWhere(['empleado_id' => $modelEmpleado->id]);
+    
+        $searchModelConsultas = new \app\models\ConsultaMedicaSearch();
+        $dataProviderConsultas = $searchModelConsultas->search(Yii::$app->request->queryParams);
+        $dataProviderConsultas->query->andWhere(['expediente_medico_id' => $modelEmpleado->expedienteMedico->id]);
+    
+        $expedienteMedico = $modelEmpleado->expedienteMedico;
+        $antecedentes = AntecedenteHereditario::find()->where(['expediente_medico_id' => $expedienteMedico->id])->all();
+        $catAntecedentes = CatAntecedenteHereditario::find()->all();
+    
+        $antecedentePatologico = AntecedentePatologico::findOne(['expediente_medico_id' => $expedienteMedico->id]) ?: new AntecedentePatologico(['expediente_medico_id' => $expedienteMedico->id]);
+        $antecedenteNoPatologico = AntecedenteNoPatologico::findOne(['expediente_medico_id' => $expedienteMedico->id]) ?: new AntecedenteNoPatologico(['expediente_medico_id' => $expedienteMedico->id]);
+        $ExploracionFisica = ExploracionFisica::findOne(['expediente_medico_id' => $expedienteMedico->id]) ?: new ExploracionFisica(['expediente_medico_id' => $expedienteMedico->id]);
+        $InterrogatorioMedico = InterrogatorioMedico::findOne(['expediente_medico_id' => $expedienteMedico->id]) ?: new InterrogatorioMedico(['expediente_medico_id' => $expedienteMedico->id]);
+        $AntecedentePerinatal = AntecedentePerinatal::findOne(['expediente_medico_id' => $expedienteMedico->id]) ?: new AntecedentePerinatal(['expediente_medico_id' => $expedienteMedico->id]);
+        $AntecedenteGinecologico = AntecedenteGinecologico::findOne(['expediente_medico_id' => $expedienteMedico->id]) ?: new AntecedenteGinecologico(['expediente_medico_id' => $expedienteMedico->id]);
+        $AntecedenteObstrectico = AntecedenteObstrectico::findOne(['expediente_medico_id' => $expedienteMedico->id]) ?: new AntecedenteObstrectico(['expediente_medico_id' => $expedienteMedico->id]);
+        $Alergia = Alergia::findOne(['expediente_medico_id' => $expedienteMedico->id]) ?: new Alergia(['expediente_medico_id' => $expedienteMedico->id]);
     
         return $this->render('portalempleado', [
-            'model' => $empleado,
-            'jefesDirectores' => $jefesDirectores,
-            'juntaDirectorDireccion' => $juntaDirectorDireccion,
+            'model' => $modelEmpleado,
+            'documentos' => $documentos,
+            'documentoModel' => $documentoModel,
+            'historial' => $historial,
+            'searchModelConsultas' => $searchModelConsultas,
+            'dataProviderConsultas' => $dataProviderConsultas,
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'expedienteMedico' => $expedienteMedico,
+            'antecedentes' => $antecedentes,
+            'catAntecedentes' => $catAntecedentes,
+            'antecedenteNoPatologico' => $antecedenteNoPatologico, 
+            'ExploracionFisica' => $ExploracionFisica,
+            'InterrogatorioMedico' => $InterrogatorioMedico,
+            'AntecedentePerinatal' => $AntecedentePerinatal,
+            'AntecedenteGinecologico' => $AntecedenteGinecologico,
+            'AntecedenteObstrectico' => $AntecedenteObstrectico,
+            'Alergia' => $Alergia,
+            'antecedentePatologico' => $antecedentePatologico,
         ]);
     }
+    
     
     
 }

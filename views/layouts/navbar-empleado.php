@@ -18,7 +18,18 @@ use app\models\Notificacion;
             <a href="../site/portalempleado" class="nav-link text-primary"><i class="fas fa-home" style="color: #007bff;"></i> &nbsp;Inicio </a>
         </li>
         
-       <div class="dropdown">
+      
+
+
+
+
+    </ul>
+
+ 
+
+    <!-- Right navbar links -->
+    <ul class="navbar-nav ml-auto">
+    <div class="dropdown">
   <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
     FORMATOS DE INCIDENCIAS
   </button>
@@ -37,16 +48,6 @@ use app\models\Notificacion;
     <a class="dropdown-item" href="#">REPORTE GENERAL DE TIEMPO EXTRA</a>
   </div>
 </div>
-
-
-
-
-    </ul>
-
- 
-
-    <!-- Right navbar links -->
-    <ul class="navbar-nav ml-auto">
         <!-- Navbar Search -->
         <li class="nav-item">
             <a class="nav-link" data-widget="navbar-search" href="#" role="button">
