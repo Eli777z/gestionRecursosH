@@ -17,6 +17,7 @@ use app\models\ComisionEspecial;
 use app\models\Notificacion;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use app\models\CambioPeriodoVacacional;
+use app\models\CitaMedica;
 use app\models\ComisionEspecialSearch;
 use app\models\PeriodoVacacionalHistorial;
 use app\models\PermisoEconomico;
@@ -88,6 +89,8 @@ class SolicitudController extends Controller
         switch ($solicitud->nombre_formato) {
             case 'PERMISO FUERA DEL TRABAJO':
                 return PermisoFueraTrabajo::findOne(['solicitud_id' => $solicitud->id]);
+                case 'CITA MEDICA':
+                    return CitaMedica::findOne(['solicitud_id' => $solicitud->id]);
             case 'COMISION ESPECIAL':
                 return ComisionEspecial::findOne(['solicitud_id' => $solicitud->id]);
             case 'PERMISO ECONOMICO':

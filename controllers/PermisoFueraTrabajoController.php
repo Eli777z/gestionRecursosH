@@ -54,7 +54,7 @@ class PermisoFueraTrabajoController extends Controller
 
         $dataProvider->query->andFilterWhere(['empleado_id' => $empleado->id]);
 
-        $this->layout = "main-trabajador";
+        
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -64,6 +64,27 @@ class PermisoFueraTrabajoController extends Controller
         Yii::$app->session->setFlash('error', 'No se pudo encontrar el empleado asociado al usuario actual.');
         return $this->redirect(['index']); 
     }
+}
+
+public function actionHistorial($empleado_id= null)
+{
+    $empleado = Empleado::findOne($empleado_id);
+
+    if ($empleado === null) {
+        throw new NotFoundHttpException('El empleado seleccionado no existe.');
+    }
+
+    $searchModel = new PermisoFueraTrabajoSearch();
+    $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+    $dataProvider->query->andFilterWhere(['empleado_id' => $empleado->id]);
+
+    $this->layout = "main-trabajador";
+
+    return $this->render('historial', [
+        'searchModel' => $searchModel,
+        'dataProvider' => $dataProvider,
+        'empleado' => $empleado,
+    ]);
 }
 
 
@@ -92,23 +113,27 @@ class PermisoFueraTrabajoController extends Controller
 
  
 
-     public function actionCreate()
+     public function actionCreate($empleado_id = null)
      {
          $this->layout = "main-trabajador";
      
          $model = new PermisoFueraTrabajo();
          $motivoFechaPermisoModel = new MotivoFechaPermiso();
          $solicitudModel = new Solicitud();
-         $motivoFechaPermisoModel->fecha_permiso = date('Y-m-d');
+        // $motivoFechaPermisoModel->fecha_permiso = date('Y-m-d');
          $model->fecha_a_reponer = date('Y-m-d');
          $usuarioId = Yii::$app->user->identity->id;
      
-         $empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();
+         if ($empleado_id) {
+             $empleado = Empleado::findOne($empleado_id);
+         } else {
+             $empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();
+         }
      
          if ($empleado) {
              $model->empleado_id = $empleado->id;
          } else {
-             Yii::$app->session->setFlash('error', 'No se pudo encontrar el empleado asociado al usuario actual.');
+             Yii::$app->session->setFlash('error', 'No se pudo encontrar el empleado.');
              return $this->redirect(['index']);
          }
      
@@ -123,9 +148,9 @@ class PermisoFueraTrabajoController extends Controller
      
                      $solicitudModel->empleado_id = $empleado->id;
                      $solicitudModel->status = 'En Proceso';
-                     $solicitudModel->comentario = ''; 
-                     $solicitudModel->fecha_aprobacion = null; 
-                     $solicitudModel->fecha_creacion = date('Y-m-d H:i:s'); 
+                     $solicitudModel->comentario = '';
+                     $solicitudModel->fecha_aprobacion = null;
+                     $solicitudModel->fecha_creacion = date('Y-m-d H:i:s');
                      $solicitudModel->nombre_formato = 'PERMISO FUERA DEL TRABAJO';
                      if ($solicitudModel->save()) {
                          $model->solicitud_id = $solicitudModel->id;
@@ -136,23 +161,22 @@ class PermisoFueraTrabajoController extends Controller
                          }
      
                          if ($model->save()) {
-                            $transaction->commit();
-                            Yii::$app->session->setFlash('success', 'Su solicitud ha sido generada exitosamente.');
-                        
-                            $notificacion = new Notificacion();
-                            $notificacion->usuario_id = $model->empleado->usuario_id;
-                            $notificacion->mensaje = 'Tienes una nueva solicitud pendiente de revisión.';
-                            $notificacion->created_at = date('Y-m-d H:i:s');
-                            $notificacion->leido = 0; 
-                            if ($notificacion->save()) {
-                                return $this->redirect(['view', 'id' => $model->id]);
-                            } else {
-                                Yii::$app->session->setFlash('error', 'Hubo un error al guardar la notificación.');
-                            }
-                        } else {
-                            Yii::$app->session->setFlash('error', 'Hubo un error al guardar la solicitud.');
-                        }
-                        
+                             $transaction->commit();
+                             Yii::$app->session->setFlash('success', 'Su solicitud ha sido generada exitosamente.');
+     
+                             $notificacion = new Notificacion();
+                             $notificacion->usuario_id = $model->empleado->usuario_id;
+                             $notificacion->mensaje = 'Tienes una nueva solicitud pendiente de revisión.';
+                             $notificacion->created_at = date('Y-m-d H:i:s');
+                             $notificacion->leido = 0;
+                             if ($notificacion->save()) {
+                                 return $this->redirect(['view', 'id' => $model->id]);
+                             } else {
+                                 Yii::$app->session->setFlash('error', 'Hubo un error al guardar la notificación.');
+                             }
+                         } else {
+                             Yii::$app->session->setFlash('error', 'Hubo un error al guardar la solicitud.');
+                         }
                      }
                  }
                  $transaction->rollBack();
@@ -171,7 +195,7 @@ class PermisoFueraTrabajoController extends Controller
              'solicitudModel' => $solicitudModel,
          ]);
      }
-     
+          
      
      
      

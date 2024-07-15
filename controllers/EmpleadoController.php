@@ -72,9 +72,15 @@ class EmpleadoController extends Controller
     // Obtener el id del departamento del empleado actual
     $idDepartamentoEmpleadoActual = Yii::$app->user->identity->empleado->informacionLaboral->cat_departamento_id;
 
+
+    $idDireccionEmpleadoActual = Yii::$app->user->identity->empleado->informacionLaboral->cat_direccion_id;
+
+
     // Configurar el dataProvider para mostrar empleados del mismo departamento si tiene el permiso correspondiente
     if (Yii::$app->user->can('ver-empleados-departamento')) {
         $dataProvider->query->andWhere(['il.cat_departamento_id' => $idDepartamentoEmpleadoActual]);
+    }else if (Yii::$app->user->can('ver-empleados-direccion')) {
+        $dataProvider->query->andWhere(['il.cat_direccion_id' => $idDireccionEmpleadoActual]);
     }
 
     return $this->render('index', [

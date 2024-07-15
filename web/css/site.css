@@ -223,3 +223,32 @@ a.desc:after {
 hr.solid {
   border-top: 3px solid #393D40;
 }
+
+.dropdown-submenu {
+    position: relative;
+}
+
+.dropdown-submenu > .dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-top: -6px;
+    margin-left: -1px;
+    border-radius: 0.25rem;
+}
+
+/* Estilos específicos para el GridView */
+.my-custom-grid-view {
+    margin: 0; /* Elimina el margen exterior */
+    padding: 0; /* Elimina el padding */
+    background-color: transparent; /* Fondo transparente */
+}
+
+/* Estilo para las filas del GridView */
+.my-custom-grid-view table.table tbody tr {
+    background-color: transparent; /* Fondo transparente para las filas */
+}
+
+/* Estilo para las celdas del GridView */
+.my-custom-grid-view table.table tbody td {
+    padding: 0.75rem; /* Ajusta el padding según sea necesario */
+}

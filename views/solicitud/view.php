@@ -28,6 +28,17 @@ $this->params['breadcrumbs'][] = ['label' => 'Solicitud ' . $model->id];
             <div class="card-header gradient-info text-white">
                     <div class="d-flex justify-content-between"> 
                         <h1> CITA MEDICA </h1>
+                        <?php if (Yii::$app->user->can('crear-consulta-medica')) : ?>
+
+<?php if ($model->empleado->expedienteMedico): ?>
+                <?= Html::a('Nueva consulta <i class="fa fa-user-md" ></i>', ['consulta-medica/create', 'expediente_medico_id' => $model->empleado->expedienteMedico->id], [
+                    'class' => 'btn btn-dark mt-3 float-right fa-lg'
+                ]) ?>
+                
+
+            <?php endif; ?>
+            
+            <?php endif; ?>
                     <?php /* ?>
 <div class="form-group mr-2">
     <?= Html::beginForm(['aprobar-solicitud', 'id' => $model->id], 'post', ['class' => 'form-inline']) ?>
@@ -404,7 +415,48 @@ if ($formato) {
                                 // Otros atributos específicos de PermisoEconomico
                             ];
                             break;
-                
+                            case 'CITA MEDICA':
+                                $formatoAttributes = [
+                                    [
+                                        'label' => 'Comentario',
+                                        'value' => function ($formato) {
+                                            return $formato->comentario; 
+                                        },
+                                    ],
+                                   [
+                                   'label' => 'Fecha de Cita medica',
+                                        'value' => function ($formato) {
+                                           
+                                            setlocale(LC_TIME, "es_419.UTF-8");
+                                            
+                                            $fechaPermiso = strtotime($formato->fecha_para_cita);
+                                            
+                                            $fechaFormateada = strftime('%A, %B %d, %Y', $fechaPermiso);
+                                            
+                                            setlocale(LC_TIME, null);
+                                            
+                                           return $fechaFormateada;
+                                        },
+                                    ],
+
+                                    [
+                                        'attribute' => 'horario_inicio',
+                                        'value' => function ($formato) {
+                                            $hora = date("g:i A", strtotime($formato->horario_inicio));
+                                            return $hora;
+                                        },
+                                    ],
+                                    [
+                                        'attribute' => 'horario_finalizacion',
+                                        'value' => function ($formato) {
+                                            $hora = date("g:i A", strtotime($formato->horario_finalizacion));
+                                            return $hora;
+                                        },
+                                    ],
+                                    // Otros atributos específicos de PermisoEconomico
+                                ];
+                                break;
+                    
 
                             case 'CAMBIO DE PERIODO VACACIONAL':
                                 $formatoAttributes = [

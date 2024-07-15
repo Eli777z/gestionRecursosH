@@ -89,7 +89,7 @@ use yii\helpers\Html;
 
                 ],
             ]);
-        }elseif (Yii::$app->user->can('ver-todos-empleados') || Yii::$app->user->can('ver-empleados-departamento')) {
+        }elseif (Yii::$app->user->can('ver-todos-empleados') || Yii::$app->user->can('ver-empleados-departamento') || Yii::$app->user->can('ver-empleados-direccion')) {
             echo \hail812\adminlte\widgets\Menu::widget([
                 'items' => [
                     ['label' => 'Inicio', 'icon' => 'home', 'url' => ['site/portalempleado']],

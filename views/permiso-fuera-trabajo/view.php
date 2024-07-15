@@ -9,8 +9,8 @@ use app\models\JuntaGobierno;
 /* @var $model app\models\PermisoFueraTrabajo */
 
 $this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Permiso Fuera Trabajos', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+//$this->params['breadcrumbs'][] = ['label' => 'Permiso Fuera Trabajos', 'url' => ['index']];
+//$this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
 
@@ -56,6 +56,15 @@ if ($empleado) {
     return $this->redirect(['index']);
 }
 ?>
+<?php if (Yii::$app->user->can('ver-empleados-departamento') || Yii::$app->user->can('ver-empleados-direccion') ) {?>
+<?= Html::a('Volver', ['empleado/index'], ['class' => 'btn btn-info float-right']) ?>
+
+<?php } else{?>
+
+    <?= Html::a('Volver', ['site/portalempleado'], ['class' => 'btn btn-info float-right']) ?>
+    <?php }?>
+
+
                           
                     </p>
 

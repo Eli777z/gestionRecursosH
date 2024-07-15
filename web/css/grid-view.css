@@ -72,3 +72,46 @@
     background: linear-gradient(90deg, rgba(163,248,255,1) 0%, rgba(177,249,255,1) 35%, rgba(230,253,255,1) 100%);
 
 }
+
+
+
+.si-style-gridview table {
+    border-collapse: collapse;
+    width: 100%;
+    background-color: #ffffff;
+   
+}
+
+.si-style-gridview th, .si-style-gridview td {
+   
+    /*margin-top: 5px; /* Línea horizontal inferior */
+ /*
+    margin-bottom: 5px;
+  /*  border-left: 5px solid #72A8EF; /* Línea horizontal inferior */
+    padding: 8px;
+    background-color: #ddf4f9;
+    
+}
+
+.si-style-gridview th {
+    background-color: #6C7A89;
+    color: black;
+    
+}
+
+.si-style-gridview tr {
+    background-color: #490101;
+    /*border-radius: 8%;*/
+}
+
+.si-style-gridview .summary {
+    display: none; /* Ocultar el resumen */
+}
+
+
+/* Estilos personalizados para el botón Volver */
+.bg-volver {
+    background-color: #6D6FF5; /* Color de fondo del botón */
+    color: #ffffff; /* Color del texto en el botón */
+    /* Otros estilos según necesidades */
+}

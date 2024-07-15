@@ -19,8 +19,8 @@ use hail812\adminlte\widgets\Alert;
         <div class="col-md-10">
             <div class="card">
             <?php $form = ActiveForm::begin(); ?>
-                <div class="card-header bg-primary text-white">
-                    <h2>CREAR NUEVA SOLICITUD DE PERMISO FUERA DEL TRABAJO</h2>
+                <div class="card-header bg-info text-white">
+                    <h2>PERMISO FUERA DEL TRABAJO</h2>
                    
                 </div>
 
@@ -47,71 +47,39 @@ use hail812\adminlte\widgets\Alert;
 
 <div class="permiso-fuera-trabajo-form">
 
-                                        <div class="card">
-                                            <div class="card-header bg-info text-white">Ingrese los siguientes datos</div>
+                                        <div class="card bg-light">
+                                           
                                             <div class="card-body">
+                                                <div class="row">
 
 
-<?= $form->field($motivoFechaPermisoModel, 'fecha_permiso')->widget(DateRangePicker::classname(), [
-    'convertFormat' => true,
-    'pluginOptions' => [
-        'singleDatePicker' => true,
-        'showDropdowns' => true,
-        'autoUpdateInput' => true,
-        'locale' => [
-            'format' => 'Y-m-d',
-        ],
-        'opens' => 'right',
-    ],
-    'options' => [
-        'placeholder' => 'Selecciona una fecha...',
-    ],
-    'value' => date('Y-m-d'), 
-])->label('Fecha de permiso') ?>
+                                            <div class="col-6 col-sm-2">
 
+<?= $form->field($motivoFechaPermisoModel, 'fecha_permiso')->input('date')->label('Fecha de permiso') ?>
+                                            </div>
 <?= $form->field($motivoFechaPermisoModel, 'motivo')->textarea(['rows' => 4]) ?>
+<div class="col-6 col-sm-2">
 
-<?= $form->field($model, 'hora_salida')->widget(TimePicker::classname(), [
-    'pluginOptions' => [
-        'showMeridian' => true, 
-        'minuteStep' => 1,
-        'defaultTime' => false,
-    ]
-])->label('Hora de salida') ?>
+<?= $form->field($model, 'hora_salida')->input('time')->label('Hora de salida') ?>
+</div>
+<div class="col-6 col-sm-2">
 
-<?= $form->field($model, 'hora_regreso')->widget(TimePicker::classname(), [
-    'pluginOptions' => [
-        'showMeridian' => true, 
-        'minuteStep' => 1,
-        'defaultTime' => false,
-    ]
-])->label('Hora de regreso') ?>
+<?= $form->field($model, 'hora_regreso')->input('time')->label('Hora de regreso') ?>
+</div>
+<div class="w-100"></div>
+<div class="col-6 col-sm-2">
 
-<?= $form->field($model, 'fecha_a_reponer')->widget(DateRangePicker::classname(), [
-    'convertFormat' => true,
-    'pluginOptions' => [
-        'singleDatePicker' => true,
-        'showDropdowns' => true,
-        'autoUpdateInput' => true,
-        'locale' => [
-            'format' => 'Y-m-d',
-        ],
-        'opens' => 'right',
-    ],
-    'options' => [
-        'placeholder' => 'Selecciona una fecha...',
-    ],
-    'value' => date('Y-m-d'), 
-])->label('Fecha a reponer') ?>
 
-<?= $form->field($model, 'horario_fecha_a_reponer')->widget(TimePicker::classname(), [
-    'pluginOptions' => [
-        'showMeridian' => true, 
-        'minuteStep' => 1,
-        'defaultTime' => false,
-    ]
-])->label('Horario de fecha a reponer') ?>
+
+<?= $form->field($model, 'fecha_a_reponer')->input('date')->label('Fecha a reponer') ?>
+</div>
+<div class="col-6 col-sm-3">
+
+
+<?= $form->field($model, 'horario_fecha_a_reponer')->input('time')->label('Horario de fecha a reponer') ?>
+</div>
 <?php
+
 
 
 
@@ -155,6 +123,9 @@ if ($mostrarCampo && $direccion && in_array($direccion->nombre_direccion, ['2.- 
 
     <?= $form->field($model, 'nombre_jefe_departamento')->hiddenInput()->label(false) ?>
 <?php endif; ?>
+
+</div>
+
 <?= Html::submitButton('Generar <i class="fa fa-check"></i>', [
                         'class' => 'btn btn-success btn-lg float-right', 
                         'id' => 'save-button-personal'

@@ -166,11 +166,24 @@ if (!$modelAlergia) {
 
     <?php if ($model->expedienteMedico): ?>
                     <?= Html::a('Nueva consulta <i class="fa fa-user-md" ></i>', ['consulta-medica/create', 'expediente_medico_id' => $model->expedienteMedico->id], [
-                        'class' => 'btn btn-dark mt-3 float-right fa-lg'
+                        'class' => 'btn btn-dark  float-right fa-lg'
                     ]) ?>
                     
 
                 <?php endif; ?>
+
+              
+
+                <?php if ($model->id): ?>
+
+                <?= Html::a('Nueva cita medica <i class="fa fa-plus-square" ></i>', ['cita-medica/create', 'empleado_id' => $model->id], [
+                    'class' => 'btn btn-light mr-3 float-right fa-lg'
+                ]) ?>
+                
+
+         
+                <?php endif; ?>
+
                 
                 <?php endif; ?>
 </div>
@@ -1182,7 +1195,18 @@ if (!$modelAlergia) {
                             <div class="card">
                                 <div class="card-body">
                                     <div class="card-header bg-success text-dark text-center">
+                                   <?php if (Yii::$app->user->can('ver-solicitudes-formatos')) {?>
+
                                         <h3>HISTORIAL DE SOLICITUDES DE INCIDENCIAS: </h3>
+
+                                       
+
+                                        <?php }elseif(Yii::$app->user->can('ver-solicitudes-medicas')) {?>
+                                            <h3>HISTORIAL DE SOLICITUDES MEDICAS: </h3>
+
+
+
+<?php }?>
                                     </div>
 
                                     <li class="dropdown-divider"></li>
@@ -1225,35 +1249,7 @@ if (!$modelAlergia) {
                                                         ],
                                                     ]),
                                                 ],
-                                                //                          [
-                                                //                            'attribute' => 'status',
-                                                //                          'format' => 'raw',
-                                                //                        'label' => 'Estatus',
-                                                //                      'value' => function ($model) {
-                                                //                        $status = '';
-                                                //                      switch ($model->status) {
-                                                //                        case 'Aprobado':
-                                                //                          $status = '<span class="badge badge-success">' . $model->status . '</span>';
-                                                //                        break;
-                                                //                  case 'En Proceso':
-                                                //                    $status = '<span class="badge badge-warning">' . $model->status . '</span>';
-                                                //                  break;
-                                                //            case 'Rechazado':
-                                                //              $status = '<span class="badge badge-danger">' . $model->status . '</span>';
-                                                //            break;
-                                                //      default:
-                                                //        $status = '<span class="badge badge-secondary">' . $model->status . '</span>';
-                                                //                     break;
-                                                //           }
-                                                //         return $status;
-                                                //   },
-                                                // 'filter' => Html::activeDropDownList($searchModel, 'status', ['Aprobado' => 'Aprobado', 'En Proceso' => 'En Proceso', 'Rechazado' => 'Rechazado'], ['class' => 'form-control', 'prompt' => 'Todos']),
-                                                //     ],
-                                                //     [
-                                                //       'attribute' => 'comentario',
-                                                //     'format' => 'ntext',
-                                                //   'filter' => false,
-                                                //   ],
+                                              
                                                 [
                                                     'attribute' => 'nombre_formato',
                                                     'label' => 'Tipo de solicitud',
@@ -1304,6 +1300,11 @@ if (!$modelAlergia) {
                                         //JS;
 
                                         // $this->registerJs($script);
+
+
+
+
+                                        
                                         ?>
 
 

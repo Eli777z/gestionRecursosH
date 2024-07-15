@@ -268,10 +268,15 @@ class SiteController extends Controller
 
     public function actionPortalMedico()
     {
-
-        $this->layout = "main-doctor";
-
-        return $this->render('portal-medico');
+        $solicitudesRecientes = \app\models\Solicitud::find()
+            ->where(['nombre_formato' => 'CITA MEDICA'])
+            ->orderBy(['fecha_creacion' => SORT_DESC])
+            ->limit(10)
+            ->all();
+    
+        return $this->render('portal-medico', [
+            'solicitudesRecientes' => $solicitudesRecientes,
+        ]);
     }
     
 

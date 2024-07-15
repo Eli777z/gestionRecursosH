@@ -4,13 +4,12 @@ namespace app\models;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Solicitud;
-use Yii;
+use app\models\CitaMedica;
 
 /**
- * SolicitudSearch represents the model behind the search form of `app\models\Solicitud`.
+ * CitaMedicaSearch represents the model behind the search form of `app\models\CitaMedica`.
  */
-class SolicitudSearch extends Solicitud
+class CitaMedicaSearch extends CitaMedica
 {
     /**
      * {@inheritdoc}
@@ -18,8 +17,8 @@ class SolicitudSearch extends Solicitud
     public function rules()
     {
         return [
-            [['id', 'empleado_id'], 'integer'],
-            [['fecha_creacion', 'comentario', 'fecha_aprobacion', 'nombre_aprobante', 'nombre_formato', 'status'], 'safe'],
+            [['id', 'empleado_id', 'solicitud_id'], 'integer'],
+            [['fecha_para_cita', 'comentario', 'horario_inicio', 'horario_finalizacion'], 'safe'],
         ];
     }
 
@@ -41,15 +40,7 @@ class SolicitudSearch extends Solicitud
      */
     public function search($params)
     {
-        if (Yii::$app->user->can('ver-solicitudes-medicas')) {
-
-        $query = Solicitud::find()->where(['nombre_formato' => 'CITA MEDICA']);
-        }elseif (Yii::$app->user->can('ver-solicitudes-formatos')){
-
-            $query = Solicitud::find();
-        }
-
-       // $query = Solicitud::find();
+        $query = CitaMedica::find();
 
         // add conditions that should always apply here
 
@@ -69,16 +60,13 @@ class SolicitudSearch extends Solicitud
         $query->andFilterWhere([
             'id' => $this->id,
             'empleado_id' => $this->empleado_id,
-            'fecha_creacion' => $this->fecha_creacion,
-            'status' => $this->status,
-            'fecha_aprobacion' => $this->fecha_aprobacion,
+            'solicitud_id' => $this->solicitud_id,
+            'fecha_para_cita' => $this->fecha_para_cita,
+            'horario_inicio' => $this->horario_inicio,
+            'horario_finalizacion' => $this->horario_finalizacion,
         ]);
 
-        $query->
-andFilterWhere(['like', 'nombre_aprobante', $this->nombre_aprobante])
-            ->andFilterWhere(['like', 'nombre_formato', $this->nombre_formato])
-
-            ->andFilterWhere(['like', 'status', $this->status]);
+        $query->andFilterWhere(['like', 'comentario', $this->comentario]);
 
         return $dataProvider;
     }
