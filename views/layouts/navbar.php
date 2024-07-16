@@ -275,6 +275,8 @@ use yii\helpers\Url;
     FORMATOS DE INCIDENCIAS
   </button>
   <div class="dropdown-menu">
+  <?= Html::a('CITA MEDICA', Url::to(['cita-medica/index']), ['class' => 'dropdown-item text-primary']) ?>
+
     <?= Html::a('PERMISO FUERA DEL TRABAJO', Url::to(['permiso-fuera-trabajo/index']), ['class' => 'dropdown-item text-primary']) ?>
    
 

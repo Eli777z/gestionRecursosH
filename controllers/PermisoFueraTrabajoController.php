@@ -97,7 +97,7 @@ public function actionHistorial($empleado_id= null)
     public function actionView($id)
     {
         
-        $this->layout = "main-trabajador";
+       
 
         return $this->render('view', [
             'model' => $this->findModel($id),
@@ -256,6 +256,8 @@ public function actionHistorial($empleado_id= null)
         throw new NotFoundHttpException('The requested page does not exist.');
  
     }
+
+    
 
     
     

@@ -10,7 +10,7 @@ use yii\web\View;
 $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
 $this->registerCssFile('@web/css/grid-view.css', ['position' => View::POS_HEAD]);
 
-$this->title = 'Permiso Fuera Trabajos';
+$this->title = 'Historial Cambio de Día Laboral';
 
 ?>
 <div class="container-fluid">
@@ -18,7 +18,7 @@ $this->title = 'Permiso Fuera Trabajos';
         <div class="col-md-12">
             <div class="card">
             <div class="card-header bg-info text-white">
-                    <h3>Historial de Permisos fuera de trabajo</h3>
+                    <h3>Historial de Cambio de Día Laboral</h3>
                     <?php if (Yii::$app->user->can('ver-empleados-departamento') || Yii::$app->user->can('ver-empleados-direccion') ) {?>
                             <?= Html::a('<i class="fa fa-chevron-left"></i> Volver', ['empleado/index'], [
 'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',

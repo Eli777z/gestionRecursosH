@@ -58,6 +58,28 @@ class CitaMedicaController extends Controller
         ]);
     }
 
+    public function actionHistorial($empleado_id= null)
+{
+    $empleado = Empleado::findOne($empleado_id);
+
+    if ($empleado === null) {
+        throw new NotFoundHttpException('El empleado seleccionado no existe.');
+    }
+
+    $searchModel = new CitaMedicaSearch();
+    $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+    $dataProvider->query->andFilterWhere(['empleado_id' => $empleado->id]);
+
+    $this->layout = "main-trabajador";
+
+    return $this->render('historial', [
+        'searchModel' => $searchModel,
+        'dataProvider' => $dataProvider,
+        'empleado' => $empleado,
+    ]);
+}
+
+
     /**
      * Creates a new CitaMedica model.
      * If creation is successful, the browser will be redirected to the 'view' page.

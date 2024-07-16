@@ -18,21 +18,17 @@ $this->title = 'Permiso Fuera Trabajos';
         <div class="col-md-12">
             <div class="card">
             <div class="card-header bg-info text-white">
-                    <h3>Historial de Permisos fuera de trabajo</h3>
-                    <?php if (Yii::$app->user->can('ver-empleados-departamento') || Yii::$app->user->can('ver-empleados-direccion') ) {?>
-                            <?= Html::a('<i class="fa fa-chevron-left"></i> Volver', ['empleado/index'], [
-'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
-
-'encode' => false, // Para que el HTML dentro del enlace no se escape
-]) ?>
-
-<?php } ?>
+                    <h3>Historial de Citas Medicas</h3>
+                  
 
                 </div>
                 <div class="card-body">
                     <div class="row mb-2">
                         <div class="col-md-12">
-                       
+                        <?php if (Yii::$app->user->can('ver-empleados-departamento') || Yii::$app->user->can('ver-empleados-direccion') ) {?>
+<?= Html::a('Volver', ['empleado/index'], ['class' => 'btn btn-info float-right']) ?>
+
+<?php } ?>
 
                         </div>
                     </div>
@@ -49,7 +45,7 @@ $this->title = 'Permiso Fuera Trabajos';
             'attribute' => 'fecha_creacion',
             'label' => 'Fecha de creación',
             'value' => function ($model) {
-                return $model->solicitud->fecha_creacion;
+                return $model->fecha_para_cita;
             },
           //  'options' => ['style' => 'width: 30%;'],
 
@@ -59,7 +55,7 @@ $this->title = 'Permiso Fuera Trabajos';
             'attribute' => 'motivo',
             'label' => 'Motivo',
             'value' => function ($model) {
-                return $model->motivoFechaPermiso->motivo;
+                return $model->comentario;
             },
           //  'options' => ['style' => 'width: 30%;'],
 

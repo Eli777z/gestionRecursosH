@@ -83,28 +83,53 @@ class CambioDiaLaboralController extends Controller
         ]);
     }
 
+    public function actionHistorial($empleado_id= null)
+    {
+        $empleado = Empleado::findOne($empleado_id);
+    
+        if ($empleado === null) {
+            throw new NotFoundHttpException('El empleado seleccionado no existe.');
+        }
+    
+        $searchModel = new CambioDiaLaboralSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider->query->andFilterWhere(['empleado_id' => $empleado->id]);
+    
+        $this->layout = "main-trabajador";
+    
+        return $this->render('historial', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'empleado' => $empleado,
+        ]);
+    }
+
     /**
      * Creates a new CambioDiaLaboral model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
+    public function actionCreate($empleado_id = null)
     {
         $this->layout = "main-trabajador";
     
         $model = new CambioDiaLaboral();
         $motivoFechaPermisoModel = new MotivoFechaPermiso();
         $solicitudModel = new Solicitud();
-        $motivoFechaPermisoModel->fecha_permiso = date('Y-m-d');
-        $model->fecha_a_laborar = date('Y-m-d');
+        //$motivoFechaPermisoModel->fecha_permiso = date('Y-m-d');
+        //$model->fecha_a_laborar = date('Y-m-d');
         $usuarioId = Yii::$app->user->identity->id;
     
-        $empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();
+        if ($empleado_id) {
+            $empleado = Empleado::findOne($empleado_id);
+        } else {
+            $empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();
+        }
     
         if ($empleado) {
             $model->empleado_id = $empleado->id;
         } else {
-            Yii::$app->session->setFlash('error', 'No se pudo encontrar el empleado asociado al usuario actual.');
+            Yii::$app->session->setFlash('error', 'No se pudo encontrar el empleado.');
             return $this->redirect(['index']);
         }
     
@@ -128,7 +153,7 @@ class CambioDiaLaboralController extends Controller
     
                         if ($model->jefe_departamento_id) {
                             $jefeDepartamento = JuntaGobierno::findOne($model->jefe_departamento_id);
-                            $model->nombre_jefe_departamento = $jefeDepartamento ? $jefeDepartamento->profesion . ' ' . $jefeDepartamento->empleado->nombre . ' ' . $jefeDepartamento->empleado->apellido : null;
+                            $model->nombre_jefe_departamento = $jefeDepartamento ? $jefeDepartamento->empleado->profesion . ' ' . $jefeDepartamento->empleado->nombre . ' ' . $jefeDepartamento->empleado->apellido : null;
                         }
     
                         if ($model->save()) {
@@ -299,7 +324,7 @@ $juntaDirectorDireccion = JuntaGobierno::find()
 if ($juntaDirectorDireccion) {
     $nombreDirector = mb_strtoupper($juntaDirectorDireccion->empleado->nombre, 'UTF-8');
     $apellidoDirector = mb_strtoupper($juntaDirectorDireccion->empleado->apellido, 'UTF-8');
-    $profesionDirector = mb_strtoupper($juntaDirectorDireccion->profesion, 'UTF-8');
+    $profesionDirector = mb_strtoupper($juntaDirectorDireccion->empleado->profesion, 'UTF-8');
     $nombreCompletoDirector = $profesionDirector . ' ' . $apellidoDirector . ' ' . $nombreDirector;
 
     $sheet->setCellValue('N24', $nombreCompletoDirector);

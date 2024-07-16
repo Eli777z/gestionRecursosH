@@ -26,14 +26,23 @@ $this->registerCssFile('@web/css/grid-view.css', ['position' => View::POS_HEAD])
     'encode' => false, // Para que el HTML dentro del enlace no se escape
 ]) ?>
 
-<?php }else{ ?>
+<?php }else if (Yii::$app->user->can('crear-formatos-incidencias-empleados')){ ?>
+    <?= Html::a('<i class="fa fa-chevron-left"></i> Volver', ['empleado/index'], [
+    'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
+   
+    'encode' => false, // Para que el HTML dentro del enlace no se escape
+]) ?>
+   
+
+    <?php }else {?>
+
     <?= Html::a('<i class="fa fa-chevron-left"></i> Volver', ['site/portalempleado'], [
     'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
    
     'encode' => false, // Para que el HTML dentro del enlace no se escape
 ]) ?>
 
-    <?php }?>
+<?php }?>
 
 
                 </div>

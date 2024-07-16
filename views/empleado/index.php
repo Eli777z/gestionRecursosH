@@ -211,147 +211,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 'class' => 'yii\bootstrap4\LinkPager',
             ],
         ]); ?>
-        <?php }elseif (Yii::$app->user->can('ver-empleados-departamento')) { ?>
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-            [
-                'attribute' => 'foto',
-                'format' => 'html',
-                'filter' => false,
-                'value' => function ($model) {
-                    if ($model->foto) {
-                        $urlImagen = Yii::$app->urlManager->createUrl(['empleado/foto-empleado', 'id' => $model->id]);
-                        return Html::img($urlImagen, ['width' => '80px', 'height' => '80px']);
-                    }
-                    return null;
-                },
-            ],
-            [
-                'attribute' => 'id',
-                'label' => 'Empleado',
-                'value' => function ($model) {
-                    return $model ? $model->apellido . ' ' . $model->nombre : 'N/A';
-                },
-                'filter' => Select2::widget([
-                    'model' => $searchModel,
-                    'attribute' => 'id',
-                    'data' => \yii\helpers\ArrayHelper::map(\app\models\Empleado::find()->all(), 'id', function ($model) {
-                        return $model->apellido . ' ' . $model->nombre;
-                    }),
-                    'options' => ['placeholder' => 'Empleado'],
-                    'pluginOptions' => [
-                        'allowClear' => true
-                    ],
-                    'theme' => Select2::THEME_KRAJEE_BS3, 
-                ]),
-                'contentOptions' => ['class' => 'small-font'],
-            ],
-            [
-                'attribute' => 'numero_empleado',
-                'label' => 'Número de empleado',
-                'value' => function ($model) {
-                    return $model->numero_empleado;
-                },
-                'filter' => Select2::widget([
-                    'model' => $searchModel,
-                    'attribute' => 'numero_empleado',
-                    'data' => \yii\helpers\ArrayHelper::map(\app\models\Empleado::find()->select(['numero_empleado'])->distinct()->all(), 'numero_empleado', 'numero_empleado'),
-                    'options' => ['placeholder' => 'Número Empleado'],
-                    'pluginOptions' => [
-                        'allowClear' => true
-                    ],
-                    'theme' => Select2::THEME_KRAJEE_BS3, 
-                ]),
-                'contentOptions' => ['class' => 'small-font'], 
-            ],
-            [
-                'attribute' => 'cat_departamento_id',
-                'label' => 'Departamento',
-                'value' => function ($model) {
-                    return $model->informacionLaboral && $model->informacionLaboral->catDepartamento
-                        ? $model->informacionLaboral->catDepartamento->nombre_departamento
-                        : 'N/A';
-                },
-                'filter' => Select2::widget([
-                    'model' => $searchModel,
-                    'attribute' => 'cat_departamento_id',
-                    'data' => ArrayHelper::map(CatDepartamento::find()->all(), 'id', 'nombre_departamento'),
-                    'options' => ['placeholder' => 'Departamento', 'class' => 'small-select2'],
-                    'pluginOptions' => [
-                        'allowClear' => true,
-                    ],
-                    'theme' => Select2::THEME_KRAJEE_BS3, 
-                ]),
-                'contentOptions' => ['class' => 'small-font'], 
-                'headerOptions' => ['class' => 'small-font'], 
-            ],
-            [
-                'class' => 'yii\grid\ActionColumn',
-                
-                'template' => Yii::$app->user->can('manejo-empleados') ? '{view} {delete} {toggle-activation}' : '{view}',
-                'buttons' => [
-                    'toggle-activation' => function ($url, $model) {
-                        $isActive = $model->usuario->status == 10;
-                        $icon = $isActive ? 'fas fa-ban' : 'far fa-check-circle';
-                        $title = $isActive ? 'Desactivar Usuario' : 'Activar Usuario';
-                        return Html::a('<i class="' . $icon . '"></i>', ['empleado/toggle-activation', 'id' => $model->id], [
-                            'title' => Yii::t('yii', $title),
-                            'data-confirm' => Yii::t('yii', '¿Estás seguro de que deseas cambiar el estado de este usuario?'),
-                            'data-method' => 'post',
-                            'class' => 'btn btn-xs ' . ($isActive ? 'btn-warning' : 'btn-success'),
-                        ]);
-                    },
-                    'view' => function ($url, $model) {
-                        return Html::a('<i class="far fa-eye"></i>', $url, [
-                            'title' => 'Ver archivo',
-                            'class' => 'btn btn-info btn-xs',
-                            'data-pjax' => "0"
-                        ]);
-                    },
-                    'delete' => function ($url, $model) {
-                        return Html::a('<i class="fas fa-trash"></i>', $url, [
-                            'title' => Yii::t('yii', 'Eliminar'),
-                            'data-confirm' => Yii::t('yii', '¿Estás seguro de que deseas eliminar este elemento?'),
-                            'data-method' => 'post',
-                            'class' => 'btn btn-danger btn-xs',
-                        ]);
-                    },
-                ],
-            ],
-            [
-                'label' => 'Formatos Incidencias',
-                'format' => 'raw',
-                'value' => function ($model) {
-                    return '
-                    <div class="btn-group dropleft">
-                        <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Crear
-                        </button>
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            ' . Html::a('PERMISO FUERA DEL TRABAJO', Url::to(['permiso-fuera-trabajo/create', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '
-                            ' . Html::a('COMISIÓN ESPECIAL', Url::to(['comision-especial/create', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '
-                            ' . Html::a('CAMBIO DE DÍA LABORAL', Url::to(['cambio-dia-laboral/create', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '
-                            ' . Html::a('CAMBIO DE HORARIO DE TRABAJO', Url::to(['cambio-horario-trabajo/create', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '
-                            ' . Html::a('PERMISO ECONÓMICO', Url::to(['permiso-economico/create', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '
-                            ' . Html::a('PERMISO SIN GOCE DE SUELDO', Url::to(['permiso-sin-sueldo/create', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '
-                            ' . Html::a('CAMBIO PERIODO VACACIONAL', Url::to(['cambio-periodo-vacacional/create', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '
-                        </div>
-                    </div>';
-                },
-                'contentOptions' => ['class' => 'small-font'],
-            ],
-                    ],
-        'summaryOptions' => ['class' => 'summary mb-2'],
-        'pager' => [
-            'class' => 'yii\bootstrap4\LinkPager',
-        ],
-    ]); ?>
+        
 
-
-<?php } elseif (Yii::$app->user->can('ver-empleados-direccion')) { ?>
+<?php } elseif (Yii::$app->user->can('ver-empleados-direccion') || Yii::$app->user->can('ver-empleados-departamento')) { ?>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
@@ -492,32 +354,51 @@ $this->params['breadcrumbs'][] = $this->title;
                         <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Crear
                         </button>
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <div class="dropdown-menu " aria-labelledby="dropdownMenuButton ">
+                        <div class="dropdown-submenu">
+                                <a class="dropdown-item dropdown-toggle" href="#">CITA MEDICA</a>
+                                <ul class="dropdown-menu ">
+                                    <li>' . Html::a('Ver', Url::to(['cita-medica/historial', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '</li>
+                                      <div class="dropdown-divider"></div> 
+                                    
+                                    <li>' .  Html::a('Crear', Url::to(['cita-medica/create', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '</li>
+                              
+                              
+                                    </ul>
+                            </div>
                             <div class="dropdown-submenu">
                                 <a class="dropdown-item dropdown-toggle" href="#">PERMISO FUERA DEL TRABAJO</a>
                                 <ul class="dropdown-menu ">
                                     <li>' . Html::a('Ver', Url::to(['permiso-fuera-trabajo/historial', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '</li>
+                                      <div class="dropdown-divider"></div>
+
                                     <li>' . Html::a('Crear', Url::to(['permiso-fuera-trabajo/create', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '</li>
                                 </ul>
                             </div>
                             <div class="dropdown-submenu">
                                 <a class="dropdown-item dropdown-toggle" href="#">COMISIÓN ESPECIAL</a>
                                 <ul class="dropdown-menu">
-                                    <li>' . Html::a('Ver', Url::to(['comision-especial/view', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '</li>
+                                    <li>' . Html::a('Ver', Url::to(['comision-especial/historial', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '</li>
+                                      <div class="dropdown-divider"></div>
+
                                     <li>' . Html::a('Crear', Url::to(['comision-especial/create', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '</li>
                                 </ul>
                             </div>
                             <div class="dropdown-submenu">
                                 <a class="dropdown-item dropdown-toggle" href="#">CAMBIO DE DÍA LABORAL</a>
                                 <ul class="dropdown-menu">
-                                    <li>' . Html::a('Ver', Url::to(['cambio-dia-laboral/view', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '</li>
+                                    <li>' . Html::a('Ver', Url::to(['cambio-dia-laboral/historial', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '</li>
+                                      <div class="dropdown-divider"></div>
+
                                     <li>' . Html::a('Crear', Url::to(['cambio-dia-laboral/create', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '</li>
                                 </ul>
                             </div>
                             <div class="dropdown-submenu">
                                 <a class="dropdown-item dropdown-toggle" href="#">CAMBIO DE HORARIO DE TRABAJO</a>
                                 <ul class="dropdown-menu">
-                                    <li>' . Html::a('Ver', Url::to(['cambio-horario-trabajo/view', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '</li>
+                                    <li>' . Html::a('Ver', Url::to(['cambio-horario-trabajo/historial', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '</li>
+                                      <div class="dropdown-divider"></div>
+
                                     <li>' . Html::a('Crear', Url::to(['cambio-horario-trabajo/create', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '</li>
                                 </ul>
                             </div>
@@ -525,6 +406,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <a class="dropdown-item dropdown-toggle" href="#">PERMISO ECONÓMICO</a>
                                 <ul class="dropdown-menu">
                                     <li>' . Html::a('Ver', Url::to(['permiso-economico/view', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '</li>
+                                      <div class="dropdown-divider"></div>
+
                                     <li>' . Html::a('Crear', Url::to(['permiso-economico/create', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '</li>
                                 </ul>
                             </div>
@@ -532,6 +415,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <a class="dropdown-item dropdown-toggle" href="#">PERMISO SIN GOCE DE SUELDO</a>
                                 <ul class="dropdown-menu">
                                     <li>' . Html::a('Ver', Url::to(['permiso-sin-sueldo/view', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '</li>
+                                     <div class="dropdown-divider"></div>
+
                                     <li>' . Html::a('Crear', Url::to(['permiso-sin-sueldo/create', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '</li>
                                 </ul>
                             </div>
@@ -539,6 +424,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <a class="dropdown-item dropdown-toggle" href="#">CAMBIO PERIODO VACACIONAL</a>
                                 <ul class="dropdown-menu">
                                     <li>' . Html::a('Ver', Url::to(['cambio-periodo-vacacional/view', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '</li>
+                                      <div class="dropdown-divider"></div>
+
                                     <li>' . Html::a('Crear', Url::to(['cambio-periodo-vacacional/create', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '</li>
                                 </ul>
                             </div>
@@ -562,9 +449,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
     </div>
-    <?php Pjax::end(); ?>
-</div>
-<script> 
+    <script> 
             $(document).ready(function(){
                 $('.dropdown-submenu').on('mouseenter', function() {
                     $(this).children('.dropdown-menu').show();
@@ -574,6 +459,10 @@ $this->params['breadcrumbs'][] = $this->title;
             });
             
 </script>
+    <?php Pjax::end(); ?>
+</div>
+<br>
+<br><br><br> <br>
 <?php $this->endBlock(); ?>
 
                             <?php $this->beginBlock('block-junta-gobierno'); ?>

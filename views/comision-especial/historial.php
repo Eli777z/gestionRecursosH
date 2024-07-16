@@ -18,7 +18,7 @@ $this->title = 'Permiso Fuera Trabajos';
         <div class="col-md-12">
             <div class="card">
             <div class="card-header bg-info text-white">
-                    <h3>Historial de Permisos fuera de trabajo</h3>
+                    <h3>Historial de Comision Especial</h3>
                     <?php if (Yii::$app->user->can('ver-empleados-departamento') || Yii::$app->user->can('ver-empleados-direccion') ) {?>
                             <?= Html::a('<i class="fa fa-chevron-left"></i> Volver', ['empleado/index'], [
 'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',

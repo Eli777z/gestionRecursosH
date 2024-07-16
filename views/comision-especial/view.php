@@ -16,19 +16,31 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <div class="container-fluid">
     <div class="card">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-12">
-                    <p>
-                        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-                        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
-                            'class' => 'btn btn-danger',
-                            'data' => [
-                                'confirm' => 'Are you sure you want to delete this item?',
-                                'method' => 'post',
-                            ],
-                        ]) ?>
+    <div class="card-header bg-info text-white">
+                    <h2>COMISIÓN ESPECIAL</h2>
+                    <?php if (Yii::$app->user->can('crear-formatos-incidencias-empleados')) { ?>
 
+<?= Html::a('<i class="fa fa-chevron-left"></i> Volver', ['empleado/index'], [
+'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
+
+'encode' => false, // Para que el HTML dentro del enlace no se escape
+]) ?>
+
+<?php }
+
+
+else{ ?>
+<?= Html::a('<i class="fa fa-chevron-left"></i> Volver', ['site/portalempleado'], [
+'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
+
+'encode' => false, // Para que el HTML dentro del enlace no se escape
+]) ?>
+
+<?php }?>
+
+                       
+                      
+                         
 <?php
 
 
@@ -46,9 +58,9 @@ if ($empleado) {
 
   
         if ($juntaGobierno && ($juntaGobierno->nivel_jerarquico === 'Jefe de unidad' || $juntaGobierno->nivel_jerarquico === 'Director')){
-            echo Html::a('Exportar Excel', ['export-segundo-caso', 'id' => $model->id], ['class' => 'btn btn-success']);
+            echo Html::a('<i class="fa fa-file-excel" aria-hidden="true"></i> Exportar Excel', ['export-segundo-caso', 'id' => $model->id], ['class' => 'btn btn-success']);
         } else {
-            echo Html::a('Exportar Excel', ['export', 'id' => $model->id], ['class' => 'btn btn-primary']);
+            echo Html::a('<i class="fa fa-file-excel" aria-hidden="true"></i> Exportar Excel', ['export', 'id' => $model->id], ['class' => 'btn btn-success']);
         }
     
 } else {
@@ -59,16 +71,21 @@ if ($empleado) {
 
 
 
-
-
-                    </p>
+                          
+                
+                </div>
+    
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12">
+                    
 
                   
                     <?= DetailView::widget([
                         'model' => $model,
                         'attributes' => [
-                            'id',
-                            'empleado_id',
+                            //'id',
+                           // 'empleado_id',
                             'solicitud_id',
                             [
                                 'label' => 'Motivo',
@@ -77,7 +94,7 @@ if ($empleado) {
                                 },
                             ],
                             [
-                                'label' => 'Fecha de Permiso',
+                                'label' => 'Fecha de Comisión',
                                 'value' => function ($model) {
                                    
                                     setlocale(LC_TIME, "es_419.UTF-8");
@@ -131,18 +148,6 @@ if ($empleado) {
           //                      },
             //                ],
                     
-                            [
-                                'label' => 'Comentario',
-                                'value' => function ($model) {
-                                   
-                        
-                                    
-                                    $aprobante = $model->solicitud->comentario;
-                                    
-                                
-                                    return $aprobante;
-                                },
-                            ],
                         ],
                     ]) ?>
                 </div>

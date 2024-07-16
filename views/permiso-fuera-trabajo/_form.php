@@ -21,7 +21,25 @@ use hail812\adminlte\widgets\Alert;
             <?php $form = ActiveForm::begin(); ?>
                 <div class="card-header bg-info text-white">
                     <h2>PERMISO FUERA DEL TRABAJO</h2>
-                   
+                    <?php if (Yii::$app->user->can('crear-formatos-incidencias-empleados')) { ?>
+
+<?= Html::a('<i class="fa fa-chevron-left"></i> Volver', ['empleado/index'], [
+'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
+
+'encode' => false, // Para que el HTML dentro del enlace no se escape
+]) ?>
+
+<?php }
+
+
+else{ ?>
+<?= Html::a('<i class="fa fa-chevron-left"></i> Volver', ['site/portalempleado'], [
+'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
+
+'encode' => false, // Para que el HTML dentro del enlace no se escape
+]) ?>
+
+<?php }?>
                 </div>
 
                 <div class="card-body">
@@ -78,6 +96,9 @@ use hail812\adminlte\widgets\Alert;
 
 <?= $form->field($model, 'horario_fecha_a_reponer')->input('time')->label('Horario de fecha a reponer') ?>
 </div>
+
+<div class="col-6 col-sm-4">
+
 <?php
 
 
@@ -119,11 +140,13 @@ if ($mostrarCampo && $direccion && in_array($direccion->nombre_direccion, ['2.- 
         'pluginOptions' => [
             'allowClear' => true,
         ],
+        'theme' => Select2::THEME_KRAJEE_BS3, 
+
     ])->label('Jefe de Departamento') ?>
 
     <?= $form->field($model, 'nombre_jefe_departamento')->hiddenInput()->label(false) ?>
 <?php endif; ?>
-
+</div>
 </div>
 
 <?= Html::submitButton('Generar <i class="fa fa-check"></i>', [

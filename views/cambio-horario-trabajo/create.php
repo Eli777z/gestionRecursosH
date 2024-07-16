@@ -6,8 +6,6 @@ use yii\helpers\Html;
 /* @var $model app\models\CambioHorarioTrabajo */
 
 $this->title = 'Create Cambio Horario Trabajo';
-$this->params['breadcrumbs'][] = ['label' => 'Cambio Horario Trabajos', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
 ?>
 
 

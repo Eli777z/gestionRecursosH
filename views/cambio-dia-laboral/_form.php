@@ -19,9 +19,27 @@ use hail812\adminlte\widgets\Alert;
         <div class="col-md-10">
             <div class="card">
             <?php $form = ActiveForm::begin(); ?>
-                <div class="card-header bg-primary text-white">
-                    <h2>CREAR NUEVA SOLICITUD DE CAMBIO DE DIA LABORAL</h2>
-                   
+            <div class="card-header bg-info text-white">
+                    <h2>CAMBIO DE DÍA LABORAL</h2>
+                    <?php if (Yii::$app->user->can('crear-formatos-incidencias-empleados')) { ?>
+
+<?= Html::a('<i class="fa fa-chevron-left"></i> Volver', ['empleado/index'], [
+'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
+
+'encode' => false, // Para que el HTML dentro del enlace no se escape
+]) ?>
+
+<?php }
+
+
+else{ ?>
+<?= Html::a('<i class="fa fa-chevron-left"></i> Volver', ['site/portalempleado'], [
+'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
+
+'encode' => false, // Para que el HTML dentro del enlace no se escape
+]) ?>
+
+<?php }?>
                 </div>
 
                 <div class="card-body">
@@ -47,47 +65,28 @@ use hail812\adminlte\widgets\Alert;
 
 <div class="cambio-dia-laboral-form">
 
-<div class="card">
-                                            <div class="card-header bg-info text-white">Ingrese los siguientes datos</div>
+<div class="card bg-light">
                                             <div class="card-body">
 
+                                            <div class= "row">
 
 
-    <?= $form->field($motivoFechaPermisoModel, 'fecha_permiso')->widget(DateRangePicker::classname(), [
-    'convertFormat' => true,
-    'pluginOptions' => [
-        'singleDatePicker' => true,
-        'showDropdowns' => true,
-        'autoUpdateInput' => true,
-        'locale' => [
-            'format' => 'Y-m-d',
-        ],
-        'opens' => 'right',
-    ],
-    'options' => [
-        'placeholder' => 'Selecciona una fecha...',
-    ],
-    'value' => date('Y-m-d'), 
-])->label('Fecha de permiso') ?>
+                                            <div class="col-6 col-sm-2">
+
+<?= $form->field($motivoFechaPermisoModel, 'fecha_permiso')->input('date')->label('Fecha de permiso') ?>
+                                           
+
+</div>
 <?= $form->field($motivoFechaPermisoModel, 'motivo')->textarea(['rows' => 4]) ?>
 
   
-<?= $form->field($model, 'fecha_a_laborar')->widget(DateRangePicker::classname(), [
-    'convertFormat' => true,
-    'pluginOptions' => [
-        'singleDatePicker' => true,
-        'showDropdowns' => true,
-        'autoUpdateInput' => true,
-        'locale' => [
-            'format' => 'Y-m-d',
-        ],
-        'opens' => 'right',
-    ],
-    'options' => [
-        'placeholder' => 'Selecciona una fecha...',
-    ],
-    'value' => date('Y-m-d'), 
-])->label('Fecha a laborar') ?>
+<div class="col-6 col-sm-2">
+
+<?= $form->field($model, 'fecha_a_laborar')->input('date')->label('Fecha a laborar') ?>
+                                           
+
+</div>
+<div class="col-6 col-sm-4">
 
 <?php
 
@@ -114,6 +113,7 @@ $direccion = $model->empleado->informacionLaboral->catDireccion;
 
 if ($mostrarCampo && $direccion && in_array($direccion->nombre_direccion, ['2.- ADMINISTRACIÓN', '3.- COMERCIAL', '4.- OPERACIONES', '5.- PLANEACION'])) :
     ?>
+
     <?= $form->field($model, 'jefe_departamento_id')->widget(Select2::classname(), [
         'data' => ArrayHelper::map(
             JuntaGobierno::find()
@@ -122,18 +122,22 @@ if ($mostrarCampo && $direccion && in_array($direccion->nombre_direccion, ['2.- 
                 ->all(),
             'id',
             function ($model) {
-                return $model->profesion . ' ' . $model->empleado->nombre . ' ' . $model->empleado->apellido;
+                return $model->empleado->profesion . ' ' . $model->empleado->nombre . ' ' . $model->empleado->apellido;
             }
         ),
         'options' => ['placeholder' => 'Seleccionar Jefe de Departamento'],
         'pluginOptions' => [
             'allowClear' => true,
         ],
+        'theme' => Select2::THEME_KRAJEE_BS3, 
+
     ])->label('Jefe de Departamento') ?>
 
     <?= $form->field($model, 'nombre_jefe_departamento')->hiddenInput()->label(false) ?>
 <?php endif; ?>
+</div>
 
+</div>
 <?= Html::submitButton('Generar <i class="fa fa-check"></i>', [
                         'class' => 'btn btn-success btn-lg float-right', 
                         'id' => 'save-button-personal'

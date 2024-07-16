@@ -7,8 +7,7 @@ use yii\web\View;
 $this->registerCssFile('@web/css/grid-view.css', ['position' => View::POS_HEAD]);
 
 $this->title = 'Create Permiso Fuera Trabajo';
-$this->params['breadcrumbs'][] = ['label' => 'Permiso Fuera Trabajos', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+
 ?>
 
 
