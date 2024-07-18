@@ -43,7 +43,6 @@ endif;
 $this->params['breadcrumbs'][] = $this->title;
 
 \yii\web\YiiAsset::register($this);
-$activeTab = Yii::$app->request->get('tab', 'info_p');
 $currentDate = date('Y-m-d');
 $antecedentesExistentes = [];
 $observacionGeneral = '';
@@ -133,7 +132,7 @@ if (!$modelAlergia) {
 <script src="https://cdn.rawgit.com/davidstutz/bootstrap-multiselect/master/dist/js/bootstrap-multiselect.js"></script>
 <div class="container-fluid">
     <div class="row justify-content-center">
-        <div class="col-md-12">
+        <div class="col-md-10">
             <div class="card bg-light">
             <div class="card-header gradient-info text-white">
     <div class="d-flex align-items-center position-relative ml-4">
@@ -3759,7 +3758,7 @@ JS;
 
 
 
-
+ <!-- TABS EXPEDIENTE MEDICO / ANTECEDENTES SUBTAB -->
 
                             <?php echo TabsX::widget([
                                 'enableStickyTabs' => true,
@@ -3845,12 +3844,12 @@ JS;
 
 
                             <?php $this->endBlock(); ?>
-
-
+                            
 
                             <?php $this->beginBlock('alergias'); ?>
-                            <?php $form = ActiveForm::begin(['action' => ['alergia', 'id' => $model->id]]); ?>
                             <div class="row">
+                            <?php $form = ActiveForm::begin(['action' => ['alergia', 'id' => $model->id]]); ?>
+
                                 <div class="col-md-12">
 
                                     <div class="card">
@@ -4978,22 +4977,21 @@ JS;
 
 
 
-                            <br><br>
+                                                       <!-- TABS PRINCIPAL EXPEDIENTE MEDICO-->
                             <?php echo TabsX::widget([
-
                                 'enableStickyTabs' => true,
                                 'options' => ['class' => 'nav-tabs-custom'],
                                 'items' => [
                                     [
                                         'label' => 'Antecedentes',
                                         'content' => $this->blocks['antecedentes'],
-                                        // 'active' => true,
-                                        'options' => [
+                                         //'active' => true,
+                                       'options' => [
                                             'id' => 'antecedentes',
                                         ],
+//
 
-
-                                    ],
+                                  ],
                                     [
                                         'label' => 'Exploracion Fisica',
                                         'content' => $this->blocks['exploracion_fisica'],
@@ -5057,11 +5055,15 @@ JS;
 
                         </div>
                         <!--.col-md-12-->
+
+
+                        <!-- TABS PRINCIPAL -->
                         <?php
                         $tabs = [
                             [
                                 'label' => 'Información',
                                 'content' => $this->blocks['datos'],
+                                'active' => true,
                                 'options' => [
                                     'id' => 'datos',
                                 ],
@@ -5099,12 +5101,12 @@ JS;
                 }
 
                         echo TabsX::widget([
-                            'enableStickyTabs' => true,
-                            'options' => ['class' => 'custom-tabs-2'],
-                            'items' => $tabs,
-                            'position' => TabsX::POS_ABOVE,
-                            'align' => TabsX::ALIGN_LEFT,
-                            'encodeLabels' => false,
+                           'enableStickyTabs' => true,
+                                'options' => ['class' => 'nav-tabs-custom'],
+                                'items' => $tabs,
+                                'position' => TabsX::POS_ABOVE,
+                                'align' => TabsX::ALIGN_LEFT,
+                                'encodeLabels' => false,
                         ]);
                         ?>
 
@@ -5126,5 +5128,48 @@ JS;
 
     </div>
     <!--.row-->
+    <script>
+   $(document).ready(function() {
+    // Function to activate tabs based on the hash in the URL
+    function activateTabFromHash() {
+        var hash = window.location.hash;
+
+        // Check if the hash exists and it's not empty
+        if (hash) {
+            var tabId = hash.replace('#', '');
+
+            // Find the tab that matches the hash
+            var tabLink = $('a[href="' + hash + '"]');
+
+            // If the tab exists, activate it
+            if (tabLink.length) {
+                tabLink.tab('show');
+
+                // Activate parent tabs if the tab is nested
+                tabLink.parents('.tab-pane').each(function() {
+                    var parentTabId = $(this).attr('id');
+                    $('a[href="#' + parentTabId + '"]').tab('show');
+                });
+            }
+        }
+    }
+
+    // Activate the tab based on the hash in the URL when the page loads
+    activateTabFromHash();
+
+    // Activate the tab based on the hash in the URL when the hash changes
+    $(window).on('hashchange', function() {
+        activateTabFromHash();
+    });
+
+    // Update the URL hash when a tab is clicked
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        window.location.hash = $(e.target).attr('href');
+    });
+});
+
+
+
+    </script>
 </div>
 <!--.container-fluid-->

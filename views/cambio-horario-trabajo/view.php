@@ -14,29 +14,39 @@ $this->title = $model->id;
 ?>
 
 <div class="container-fluid">
+<div class="row justify-content-center">
+<div class="col-md-10">
     <div class="card">
 
     <div class="card-header bg-info text-white">
-                    <h2>PERMISO FUERA TRABAJO</h2>
-                    <?php if (Yii::$app->user->can('crear-formatos-incidencias-empleados')) { ?>
+                    <h2>CAMBIO DE HORARIO DE TRABAJO</h2>
+                    <?php
+// Obtener el ID del usuario actual
+$usuarioActual = Yii::$app->user->identity;
+$empleadoActual = $usuarioActual->empleado;
 
-<?= Html::a('<i class="fa fa-chevron-left"></i> Volver', ['empleado/index'], [
-'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
-
-'encode' => false, // Para que el HTML dentro del enlace no se escape
-]) ?>
-
-<?php }
-
-
-else{ ?>
-<?= Html::a('<i class="fa fa-chevron-left"></i> Volver', ['site/portalempleado'], [
-'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
-
-'encode' => false, // Para que el HTML dentro del enlace no se escape
-]) ?>
-
-<?php }?>
+// Comparar el ID del empleado actual con el ID del empleado para el cual se está creando el registro
+if ($empleadoActual->id === $empleado->id) {
+    // El empleado está creando un registro para sí mismo
+    echo Html::a('<i class="fa fa-home"></i> Inicio', ['site/portalempleado'], [
+        'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
+        'encode' => false,
+    ]);
+} else {
+    // El empleado está creando un registro para otro empleado
+    if (Yii::$app->user->can('crear-formatos-incidencias-empleados')) {
+        echo Html::a('<i class="fa fa-chevron-left"></i> Volver', ['empleado/index'], [
+            'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
+            'encode' => false,
+        ]);
+    } else {
+        echo Html::a('<i class="fa fa-home"></i> Inicio', ['site/portalempleado'], [
+            'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
+            'encode' => false,
+        ]);
+    }
+}
+?>
 
 <?php
 
@@ -202,4 +212,6 @@ if ($empleado) {
         <!--.card-body-->
     </div>
     <!--.card-->
+</div>
+</div>
 </div>

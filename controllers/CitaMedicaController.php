@@ -36,13 +36,26 @@ class CitaMedicaController extends Controller
      */
     public function actionIndex()
     {
+        
+    $usuarioId = Yii::$app->user->identity->id;
+
+    $empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();
+
+    if ($empleado !== null) {
         $searchModel = new CitaMedicaSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        $dataProvider->query->andFilterWhere(['empleado_id' => $empleado->id]);
+
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
+    } else {
+        Yii::$app->session->setFlash('error', 'No se pudo encontrar el empleado asociado al usuario actual.');
+        return $this->redirect(['index']); 
+    }
     }
 
     /**
@@ -53,10 +66,15 @@ class CitaMedicaController extends Controller
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
+        $empleado = Empleado::findOne($model->empleado_id);
+    
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
+            'empleado' => $empleado, // Pasar empleado a la vista
         ]);
     }
+    
 
     public function actionHistorial($empleado_id= null)
 {
@@ -146,6 +164,8 @@ class CitaMedicaController extends Controller
     return $this->render('create', [
         'model' => $model,
         'solicitudModel' => $solicitudModel,
+        'empleado' => $empleado, // Pasar empleado a la vista
+
     ]);
 }
 

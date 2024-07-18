@@ -11,6 +11,8 @@ $this->title = 'Create Cita Medica';
 
 
                     <?=$this->render('_form', [
-                        'model' => $model
+                        'model' => $model,
+                        'empleado' => $empleado, // Pasar empleado a la vista
+
                     ]) ?>
                

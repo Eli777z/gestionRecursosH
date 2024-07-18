@@ -14,6 +14,7 @@ $this->title = 'Create Permiso Fuera Trabajo';
                     <?=$this->render('_form', [
                         'model' => $model,
                         'motivoFechaPermisoModel' => $motivoFechaPermisoModel,
+                        'empleado' => $empleado, // Pasar empleado a la vista
 
                         'solicitudModel' => $solicitudModel,
                     ]) ?>

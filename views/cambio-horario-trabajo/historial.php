@@ -10,12 +10,12 @@ use yii\web\View;
 $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
 $this->registerCssFile('@web/css/grid-view.css', ['position' => View::POS_HEAD]);
 
-$this->title = 'Historial Cambio de Horario de Trabajo';
+$this->title = 'Cambio de Horario de Trabajo';
 
 ?>
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-md-12">
+<div class="row justify-content-center">
+<div class="col-md-10">
             <div class="card">
             <div class="card-header bg-info text-white">
                     <h3>Historial de Cambio de Horario de Trabajo</h3>

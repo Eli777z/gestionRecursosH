@@ -268,7 +268,7 @@ class EmpleadoController extends Controller
             }
 
             Yii::$app->session->setFlash('success', 'Información de antecedentes hereditarios guardada correctamente.');
-            $url = Url::to(['view', 'id' => $id]) . '#expediente_medico';
+            $url = Url::to(['view', 'id' => $id]) . '#hereditarios';
             return $this->redirect($url);
         }
 
@@ -333,7 +333,7 @@ public function actionAntecedentePatologico($id)
         Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información de antecedente patologico');
     }
 
-    $url = Url::to(['view', 'id' => $id]) . '#patologico';
+    $url = Url::to(['view', 'id' => $id]) . '#patologicos';
     return $this->redirect($url);
 
     return $this->render('view', [
@@ -429,7 +429,7 @@ public function actionExploracionFisica($id)
         Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información de antecedentes no patológicos.');
     }
 
-    $url = Url::to(['view', 'id' => $id]) . '#expediente_medico';
+    $url = Url::to(['view', 'id' => $id]) . '#exploracion_fisica';
     return $this->redirect($url);
 
     return $this->render('view', [
@@ -483,7 +483,7 @@ public function actionAntecedentePerinatal($id)
             Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información de antecedentes perinatales.');
         }
 
-        $url = Url::to(['view', 'id' => $id]) . '#perinatal';
+        $url = Url::to(['view', 'id' => $id]) . '#perinatales';
         return $this->redirect($url);
     }
 
@@ -548,7 +548,7 @@ public function actionAntecedenteGinecologico($id)
             Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información de antecedentes ginecologicos.');
         }
 
-        $url = Url::to(['view', 'id' => $id]) . '#ginecologico';
+        $url = Url::to(['view', 'id' => $id]) . '#ginecologicos';
         return $this->redirect($url);
     }
 
@@ -601,7 +601,7 @@ public function actionAntecedenteObstrectico($id)
             Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información de antecedentes obstrecticos.');
         }
 
-        $url = Url::to(['view', 'id' => $id]) . '#obstrectico';
+        $url = Url::to(['view', 'id' => $id]) . '#obstrecticos';
         return $this->redirect($url);
     }
 
@@ -640,7 +640,7 @@ public function actionInterrogatorioMedico($id)
         Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información de interrogatorio medico.');
     }
 
-    $url = Url::to(['view', 'id' => $id]) . '#expediente_medico';
+    $url = Url::to(['view', 'id' => $id]) . '#interrogatorio_medico';
     return $this->redirect($url);
 
     return $this->render('view', [
@@ -674,7 +674,7 @@ public function actionAlergia($id)
         Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información de alergias.');
     }
 
-    $url = Url::to(['view', 'id' => $id]) . '#alergia';
+    $url = Url::to(['view', 'id' => $id]) . '#alergias';
     return $this->redirect($url);
 
     return $this->render('view', [

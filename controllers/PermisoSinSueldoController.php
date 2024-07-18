@@ -73,44 +73,72 @@ class PermisoSinSueldoController extends Controller
      */
     public function actionView($id)
     {
-        $this->layout = "main-trabajador";
+        $model = $this->findModel($id);
+        $empleado = Empleado::findOne($model->empleado_id);
+    
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
+            'empleado' => $empleado, // Pasar empleado a la vista
         ]);
     }
+    
+
+    public function actionHistorial($empleado_id= null)
+    {
+        $empleado = Empleado::findOne($empleado_id);
+    
+        if ($empleado === null) {
+            throw new NotFoundHttpException('El empleado seleccionado no existe.');
+        }
+    
+        $searchModel = new PermisoSinSueldoSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider->query->andFilterWhere(['empleado_id' => $empleado->id]);
+    
+        $this->layout = "main-trabajador";
+    
+        return $this->render('historial', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'empleado' => $empleado,
+        ]);
+    }
+    
 
     /**
      * Creates a new PermisoSinSueldo model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
+    public function actionCreate($empleado_id = null)
 {
     $this->layout = "main-trabajador";
     $model = new PermisoSinSueldo();
     $motivoFechaPermisoModel = new MotivoFechaPermiso();
     $solicitudModel = new Solicitud();
-    $motivoFechaPermisoModel->fecha_permiso = date('Y-m-d');
 
     $usuarioId = Yii::$app->user->identity->id;
-    $empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();
+    if ($empleado_id) {
+        $empleado = Empleado::findOne($empleado_id);
+    } else {
+        $empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();
+    }
 
     if ($empleado) {
         $model->empleado_id = $empleado->id;
     } else {
-        Yii::$app->session->setFlash('error', 'No se pudo encontrar el empleado asociado al usuario actual.');
+        Yii::$app->session->setFlash('error', 'No se pudo encontrar el empleado.');
         return $this->redirect(['index']);
     }
 
     $permisoAnterior = PermisoSinSueldo::find()
         ->joinWith('solicitud')
-        ->where(['permiso_sin_sueldo.empleado_id' => $empleado->id, 'solicitud.status' => 'Aprobado'])
+        ->where(['permiso_sin_sueldo.empleado_id' => $empleado->id])
         ->orderBy(['permiso_sin_sueldo.id' => SORT_DESC])
         ->one();
 
     if ($permisoAnterior) {
         $noPermisoAnterior = $permisoAnterior->no_permiso_anterior + 1;
-
         $fechaPermisoAnterior = $permisoAnterior->motivoFechaPermiso->fecha_permiso;
     } else {
         $noPermisoAnterior = null;
@@ -132,14 +160,14 @@ class PermisoSinSueldoController extends Controller
                 $solicitudModel->comentario = '';
                 $solicitudModel->fecha_aprobacion = null;
                 $solicitudModel->fecha_creacion = date('Y-m-d H:i:s');
-                $solicitudModel->nombre_formato = 'PERMISO SIN GOCE DE SUELDO';
+                $solicitudModel->nombre_formato = 'PERMISO SIN SUELDO';
 
                 if ($solicitudModel->save()) {
                     $model->solicitud_id = $solicitudModel->id;
 
                     if ($model->jefe_departamento_id) {
                         $jefeDepartamento = JuntaGobierno::findOne($model->jefe_departamento_id);
-                        $model->nombre_jefe_departamento = $jefeDepartamento ? $jefeDepartamento->profesion . ' ' . $jefeDepartamento->empleado->nombre . ' ' . $jefeDepartamento->empleado->apellido : null;
+                        $model->nombre_jefe_departamento = $jefeDepartamento ? $jefeDepartamento->empleado->profesion . ' ' . $jefeDepartamento->empleado->nombre . ' ' . $jefeDepartamento->empleado->apellido : null;
                     }
 
                     if ($model->save()) {
@@ -180,10 +208,10 @@ class PermisoSinSueldoController extends Controller
         'solicitudModel' => $solicitudModel,
         'noPermisoAnterior' => $noPermisoAnterior,
         'fechaPermisoAnterior' => $fechaPermisoAnterior,
+        'empleado' => $empleado, // Pasar empleado a la vista
     ]);
 }
-
-    
+ 
 
     
     /**
@@ -284,23 +312,12 @@ $sheet->setCellValue('H11', $nombreTipoContrato);
 $fecha_permiso = strftime('%A, %B %d, %Y', strtotime($model->motivoFechaPermiso->fecha_permiso));
 $sheet->setCellValue('H13', $fecha_permiso);
 
-$permiso = PermisoSinSueldo::findOne($id);
-if (!$permiso) {
-    Yii::$app->session->setFlash('error', 'Permiso no encontrado.');
-    return $this->redirect(['index']);
-}
 
-$empleado = $permiso->empleado;
-if (!$empleado) {
-    Yii::$app->session->setFlash('error', 'Empleado no encontrado.');
-    return $this->redirect(['index']);
-}
 $permisoAnterior = PermisoSinSueldo::find()
-    ->joinWith('solicitud')
-    ->where(['permiso_sin_sueldo.empleado_id' => $empleado->id, 'solicitud.status' => 'Aprobado'])
-    ->andWhere(['<', 'permiso_sin_sueldo.id', $id])
-    ->orderBy(['permiso_sin_sueldo.id' => SORT_DESC])
-    ->one();
+->where(['empleado_id' => $model->empleado->id])
+->andWhere(['<', 'id', $id])
+->orderBy(['id' => SORT_DESC])
+->one();
 
 if ($permisoAnterior) {
     $noPermisoAnterior = $permisoAnterior->no_permiso_anterior + 1;
@@ -353,7 +370,7 @@ $juntaDirectorDireccion = JuntaGobierno::find()
 if ($juntaDirectorDireccion) {
     $nombreDirector = mb_strtoupper($juntaDirectorDireccion->empleado->nombre, 'UTF-8');
     $apellidoDirector = mb_strtoupper($juntaDirectorDireccion->empleado->apellido, 'UTF-8');
-    $profesionDirector = mb_strtoupper($juntaDirectorDireccion->profesion, 'UTF-8');
+    $profesionDirector = mb_strtoupper($juntaDirectorDireccion->empleado->profesion, 'UTF-8');
     $nombreCompletoDirector = $profesionDirector . ' ' . $apellidoDirector . ' ' . $nombreDirector;
 
     $sheet->setCellValue('N22', $nombreCompletoDirector);

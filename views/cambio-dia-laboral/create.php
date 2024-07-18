@@ -13,6 +13,7 @@ $this->title = 'Create Cambio Dia Laboral';
                     <?=$this->render('_form', [
                         'model' => $model,
                         'motivoFechaPermisoModel' => $motivoFechaPermisoModel,
+                        'empleado' => $empleado, // Pasar empleado a la vista
 
                         'solicitudModel' => $solicitudModel,
                     ]) ?>

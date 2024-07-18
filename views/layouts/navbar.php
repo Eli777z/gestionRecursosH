@@ -267,7 +267,7 @@ use yii\helpers\Url;
 </nav>
 
 
-<?php }elseif(Yii::$app->user->can('empleado')) {
+<?php }elseif(Yii::$app->user->can('menu-formatos')) {
 ?>
 <ul class="navbar-nav ml-auto">
     <div class="dropdown">

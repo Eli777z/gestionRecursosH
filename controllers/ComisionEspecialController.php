@@ -64,10 +64,12 @@ class ComisionEspecialController extends Controller
      */
     public function actionView($id)
     {
-        $this->layout = "main-trabajador";
-
+        $model = $this->findModel($id);
+        $empleado = Empleado::findOne($model->empleado_id);
+    
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
+            'empleado' => $empleado, // Pasar empleado a la vista
         ]);
     }
 
@@ -179,6 +181,8 @@ class ComisionEspecialController extends Controller
             'model' => $model,
             'motivoFechaPermisoModel' => $motivoFechaPermisoModel,
             'solicitudModel' => $solicitudModel,
+            'empleado' => $empleado, // Pasar empleado a la vista
+
         ]);
     }
 

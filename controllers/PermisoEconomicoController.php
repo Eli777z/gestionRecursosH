@@ -58,7 +58,6 @@ class PermisoEconomicoController extends Controller
 
         $dataProvider->query->andFilterWhere(['empleado_id' => $empleado->id]);
 
-        $this->layout = "main-trabajador";
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -78,33 +77,62 @@ class PermisoEconomicoController extends Controller
      */
     public function actionView($id)
     {
-        $this->layout = "main-trabajador";
-
+        $model = $this->findModel($id);
+        $empleado = Empleado::findOne($model->empleado_id);
+    
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
+            'empleado' => $empleado, // Pasar empleado a la vista
         ]);
     }
+    
+
+    public function actionHistorial($empleado_id= null)
+{
+    $empleado = Empleado::findOne($empleado_id);
+
+    if ($empleado === null) {
+        throw new NotFoundHttpException('El empleado seleccionado no existe.');
+    }
+
+    $searchModel = new PermisoEconomicoSearch();
+    $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+    $dataProvider->query->andFilterWhere(['empleado_id' => $empleado->id]);
+
+    $this->layout = "main-trabajador";
+
+    return $this->render('historial', [
+        'searchModel' => $searchModel,
+        'dataProvider' => $dataProvider,
+        'empleado' => $empleado,
+    ]);
+}
+
 
     /**
      * Creates a new PermisoEconomico model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
+    public function actionCreate($empleado_id = null)
     {
         $this->layout = "main-trabajador";
         $model = new PermisoEconomico();
         $motivoFechaPermisoModel = new MotivoFechaPermiso();
         $solicitudModel = new Solicitud();
-        $motivoFechaPermisoModel->fecha_permiso = date('Y-m-d');
+        //$motivoFechaPermisoModel->fecha_permiso = date('Y-m-d');
     
         $usuarioId = Yii::$app->user->identity->id;
-        $empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();
+        if ($empleado_id) {
+            $empleado = Empleado::findOne($empleado_id);
+        } else {
+            $empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();
+        }
     
         if ($empleado) {
             $model->empleado_id = $empleado->id;
         } else {
-            Yii::$app->session->setFlash('error', 'No se pudo encontrar el empleado asociado al usuario actual.');
+            Yii::$app->session->setFlash('error', 'No se pudo encontrar el empleado.');
             return $this->redirect(['index']);
         }
     
@@ -144,7 +172,7 @@ class PermisoEconomicoController extends Controller
     
                         if ($model->jefe_departamento_id) {
                             $jefeDepartamento = JuntaGobierno::findOne($model->jefe_departamento_id);
-                            $model->nombre_jefe_departamento = $jefeDepartamento ? $jefeDepartamento->profesion . ' ' . $jefeDepartamento->empleado->nombre . ' ' . $jefeDepartamento->empleado->apellido : null;
+                            $model->nombre_jefe_departamento = $jefeDepartamento ? $jefeDepartamento->empleado->profesion . ' ' . $jefeDepartamento->empleado->nombre . ' ' . $jefeDepartamento->empleado->apellido : null;
                         }
     
                         if ($model->save()) {
@@ -185,6 +213,8 @@ class PermisoEconomicoController extends Controller
             'solicitudModel' => $solicitudModel,
             'noPermisoAnterior' => $noPermisoAnterior,
             'fechaPermisoAnterior' => $fechaPermisoAnterior,
+            'empleado' => $empleado, // Pasar empleado a la vista
+
         ]);
     }
       

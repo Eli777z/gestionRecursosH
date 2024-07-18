@@ -18,11 +18,36 @@ use floor12\summernote\Summernote;
         <div class="col-md-10">
             <div class="card">
             <?php $form = ActiveForm::begin(); ?>
-                <div class="card-header bg-primary text-white">
-                    <h2>CREAR NUEVA SOLICITUD DE PERMISO ECONOMICO</h2>
-                   
-                </div>
+            <div class="card-header bg-info text-white">
+                    <h2>PERMISO ECONOMICO</h2>
+                    <?php
+// Obtener el ID del usuario actual
+$usuarioActual = Yii::$app->user->identity;
+$empleadoActual = $usuarioActual->empleado;
 
+// Comparar el ID del empleado actual con el ID del empleado para el cual se está creando el registro
+if ($empleadoActual->id === $empleado->id) {
+    // El empleado está creando un registro para sí mismo
+    echo Html::a('<i class="fa fa-home"></i> Inicio', ['site/portalempleado'], [
+        'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
+        'encode' => false,
+    ]);
+} else {
+    // El empleado está creando un registro para otro empleado
+    if (Yii::$app->user->can('crear-formatos-incidencias-empleados')) {
+        echo Html::a('<i class="fa fa-chevron-left"></i> Volver', ['empleado/index'], [
+            'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
+            'encode' => false,
+        ]);
+    } else {
+        echo Html::a('<i class="fa fa-home"></i> Inicio', ['site/portalempleado'], [
+            'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
+            'encode' => false,
+        ]);
+    }
+}
+?>
+                </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-12">
@@ -44,9 +69,9 @@ use floor12\summernote\Summernote;
                                 ?>
                             </div>
 <div class="permiso-economico-form">
-<div class="card">
-                                            <div class="card-header bg-info text-white">Ingrese los siguientes datos</div>
+<div class="card bg-light">
                                             <div class="card-body">
+                                            <div class="row">
 
 
 <div class="form-group">
@@ -71,22 +96,10 @@ use floor12\summernote\Summernote;
 
 
 
-    <?= $form->field($motivoFechaPermisoModel, 'fecha_permiso')->widget(DateRangePicker::classname(), [
-        'convertFormat' => true,
-        'pluginOptions' => [
-            'singleDatePicker' => true,
-            'showDropdowns' => true,
-            'autoUpdateInput' => true,
-            'locale' => [
-                'format' => 'Y-m-d',
-            ],
-            'opens' => 'right',
-        ],
-        'options' => [
-            'placeholder' => 'Selecciona una fecha...',
-        ],
-        'value' => date('Y-m-d'), 
-    ])->label('Fecha de permiso') ?>
+<div class="col-6 col-sm-2">
+
+<?= $form->field($motivoFechaPermisoModel, 'fecha_permiso')->input('date')->label('Fecha de permiso') ?>
+                                            </div>
 
 
 
@@ -98,6 +111,7 @@ use floor12\summernote\Summernote;
 
 <?= $form->field($motivoFechaPermisoModel, 'motivo')->textarea(['rows' => 4]) ?>
 
+<div class="col-6 col-sm-4">
 
     <?php
     $usuarioId = Yii::$app->user->identity->id;
@@ -129,18 +143,22 @@ use floor12\summernote\Summernote;
                     ->all(),
                 'id',
                 function ($model) {
-                    return $model->profesion . ' ' . $model->empleado->nombre . ' ' . $model->empleado->apellido;
+                    return $model->empleado->profesion . ' ' . $model->empleado->nombre . ' ' . $model->empleado->apellido;
                 }
             ),
             'options' => ['placeholder' => 'Seleccionar Jefe de Departamento'],
             'pluginOptions' => [
                 'allowClear' => true,
             ],
+            'theme' => Select2::THEME_KRAJEE_BS3, 
+
         ])->label('Jefe de Departamento') ?>
 
         <?= $form->field($model, 'nombre_jefe_departamento')->hiddenInput()->label(false) ?>
     <?php endif; ?>
+    </div>
 
+                                            </div>
     <?= Html::submitButton('Generar <i class="fa fa-check"></i>', [
                         'class' => 'btn btn-success btn-lg float-right', 
                         'id' => 'save-button-personal'

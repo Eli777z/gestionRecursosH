@@ -13,6 +13,7 @@ $this->title = 'Create Comision Especial';
                     <?=$this->render('_form', [
                         'model' => $model,
                         'motivoFechaPermisoModel' => $motivoFechaPermisoModel,
+                        'empleado' => $empleado, // Pasar empleado a la vista
 
                         'solicitudModel' => $solicitudModel,
                     ]) ?>

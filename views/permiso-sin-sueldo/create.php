@@ -6,8 +6,7 @@ use yii\helpers\Html;
 /* @var $model app\models\PermisoSinSueldo */
 
 $this->title = 'Create Permiso Sin Sueldo';
-$this->params['breadcrumbs'][] = ['label' => 'Permiso Sin Sueldos', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+
 ?>
 
 
@@ -17,5 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
                          'solicitudModel' => $solicitudModel,
                          'noPermisoAnterior' => $noPermisoAnterior, 
                          'fechaPermisoAnterior' => $fechaPermisoAnterior,
+                         'empleado' => $empleado, // Pasar empleado a la vista
+
                     ]) ?>
             

@@ -76,12 +76,15 @@ class CambioDiaLaboralController extends Controller
      */
     public function actionView($id)
     {
-        $this->layout = "main-trabajador";
-
+        $model = $this->findModel($id);
+        $empleado = Empleado::findOne($model->empleado_id);
+    
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
+            'empleado' => $empleado, // Pasar empleado a la vista
         ]);
     }
+    
 
     public function actionHistorial($empleado_id= null)
     {
@@ -101,6 +104,7 @@ class CambioDiaLaboralController extends Controller
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'empleado' => $empleado,
+            
         ]);
     }
 
@@ -190,6 +194,8 @@ class CambioDiaLaboralController extends Controller
             'model' => $model,
             'motivoFechaPermisoModel' => $motivoFechaPermisoModel,
             'solicitudModel' => $solicitudModel,
+            'empleado' => $empleado, // Pasar empleado a la vista
+
         ]);
     }
   

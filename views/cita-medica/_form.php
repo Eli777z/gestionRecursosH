@@ -16,33 +16,35 @@ $this->registerCssFile('@web/css/grid-view.css', ['position' => View::POS_HEAD])
         <div class="col-md-10">
             <div class="card">
             <?php $form = ActiveForm::begin(); ?>
-                <div class="card-header bg-primary">
-                    <h2>CREAR NUEVA SOLICITUD DE CITA MEDICA</h2>
-                    <?php if (Yii::$app->user->can('crear-cita-medica')) { ?>
+                <div class="card-header bg-info">
+                    <h2>CITA MEDICA</h2>
+                    <?php
+// Obtener el ID del usuario actual
+$usuarioActual = Yii::$app->user->identity;
+$empleadoActual = $usuarioActual->empleado;
 
-                    <?= Html::a('<i class="fa fa-chevron-left"></i> Volver', ['empleado/view', 'id' => $model->empleado->id], [
-    'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
-   
-    'encode' => false, // Para que el HTML dentro del enlace no se escape
-]) ?>
-
-<?php }else if (Yii::$app->user->can('crear-formatos-incidencias-empleados')){ ?>
-    <?= Html::a('<i class="fa fa-chevron-left"></i> Volver', ['empleado/index'], [
-    'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
-   
-    'encode' => false, // Para que el HTML dentro del enlace no se escape
-]) ?>
-   
-
-    <?php }else {?>
-
-    <?= Html::a('<i class="fa fa-chevron-left"></i> Volver', ['site/portalempleado'], [
-    'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
-   
-    'encode' => false, // Para que el HTML dentro del enlace no se escape
-]) ?>
-
-<?php }?>
+// Comparar el ID del empleado actual con el ID del empleado para el cual se está creando el registro
+if ($empleadoActual->id === $empleado->id) {
+    // El empleado está creando un registro para sí mismo
+    echo Html::a('<i class="fa fa-home"></i> Inicio', ['site/portalempleado'], [
+        'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
+        'encode' => false,
+    ]);
+} else {
+    // El empleado está creando un registro para otro empleado
+    if (Yii::$app->user->can('crear-formatos-incidencias-empleados')) {
+        echo Html::a('<i class="fa fa-chevron-left"></i> Volver', ['empleado/index'], [
+            'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
+            'encode' => false,
+        ]);
+    } else {
+        echo Html::a('<i class="fa fa-home"></i> Inicio', ['site/portalempleado'], [
+            'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
+            'encode' => false,
+        ]);
+    }
+}
+?>
 
 
                 </div>
@@ -69,8 +71,7 @@ $this->registerCssFile('@web/css/grid-view.css', ['position' => View::POS_HEAD])
                             </div>
 <div class="comision-especial-form">
 
-<div class="card">
-                                            <div class="card-header bg-info text-white">Ingrese los siguientes datos</div>
+<div class="card bg-light">
                                             <div class="card-body">
 <div class="row">
 
@@ -94,9 +95,10 @@ $this->registerCssFile('@web/css/grid-view.css', ['position' => View::POS_HEAD])
     
     </div>
 
-    <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
-    </div>
+    <?= Html::submitButton('Generar <i class="fa fa-check"></i>', [
+                        'class' => 'btn btn-success btn-lg float-right', 
+                        'id' => 'save-button-personal'
+                    ]) ?>
 
     </div>
                                         </div>

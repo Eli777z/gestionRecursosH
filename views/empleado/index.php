@@ -26,15 +26,15 @@ $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-md-12">
+<div class="row justify-content-center">
+<div class="col-md-12">
             <div class="card bg-light">
             <div class="card-header gradient-info text-white">
                     <h3><?= Html::encode($this->title) ?></h3>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-12">
+                <div class="row justify-content-center">
+                <div class="col-md-10">
                             <div class="d-flex align-items-center mb-3">
 
 
@@ -190,7 +190,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         },
                         'view' => function ($url, $model) {
                             return Html::a('<i class="far fa-eye"></i>', $url, [
-                                'title' => 'Ver archivo',
+                                'title' => 'Ver información de empleado',
                                 'class' => 'btn btn-info btn-xs',
                                 'data-pjax' => "0"
                             ]);
@@ -329,7 +329,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     },
                     'view' => function ($url, $model) {
                         return Html::a('<i class="far fa-eye"></i>', $url, [
-                            'title' => 'Ver archivo',
+                            'title' => 'Ver información de empleado',
                             'class' => 'btn btn-info btn-xs',
                             'data-pjax' => "0"
                         ]);
@@ -351,7 +351,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => function ($model) {
                     return '
                     <div class="btn-group dropleft">
-                        <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Crear
                         </button>
                         <div class="dropdown-menu " aria-labelledby="dropdownMenuButton ">
@@ -405,7 +405,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             <div class="dropdown-submenu">
                                 <a class="dropdown-item dropdown-toggle" href="#">PERMISO ECONÓMICO</a>
                                 <ul class="dropdown-menu">
-                                    <li>' . Html::a('Ver', Url::to(['permiso-economico/view', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '</li>
+                                    <li>' . Html::a('Ver', Url::to(['permiso-economico/historial', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '</li>
                                       <div class="dropdown-divider"></div>
 
                                     <li>' . Html::a('Crear', Url::to(['permiso-economico/create', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '</li>
@@ -414,7 +414,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             <div class="dropdown-submenu">
                                 <a class="dropdown-item dropdown-toggle" href="#">PERMISO SIN GOCE DE SUELDO</a>
                                 <ul class="dropdown-menu">
-                                    <li>' . Html::a('Ver', Url::to(['permiso-sin-sueldo/view', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '</li>
+                                    <li>' . Html::a('Ver', Url::to(['permiso-sin-sueldo/historial', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '</li>
                                      <div class="dropdown-divider"></div>
 
                                     <li>' . Html::a('Crear', Url::to(['permiso-sin-sueldo/create', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '</li>

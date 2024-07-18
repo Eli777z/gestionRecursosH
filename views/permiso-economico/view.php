@@ -9,25 +9,42 @@ use hail812\adminlte\widgets\Alert;
 /* @var $model app\models\PermisoEconomico */
 
 $this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Permiso Economicos', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
 
 <div class="container-fluid">
+<div class="row justify-content-center">
+<div class="col-md-10">
     <div class="card">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-12">
-                    <p>
-                        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-                        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
-                            'class' => 'btn btn-danger',
-                            'data' => [
-                                'confirm' => 'Are you sure you want to delete this item?',
-                                'method' => 'post',
-                            ],
-                        ]) ?>
+    <div class="card-header bg-info text-white">
+                    <h2>PERMISO ECONOMICO</h2>
+                    <?php
+// Obtener el ID del usuario actual
+$usuarioActual = Yii::$app->user->identity;
+$empleadoActual = $usuarioActual->empleado;
+
+// Comparar el ID del empleado actual con el ID del empleado para el cual se está creando el registro
+if ($empleadoActual->id === $empleado->id) {
+    // El empleado está creando un registro para sí mismo
+    echo Html::a('<i class="fa fa-home"></i> Inicio', ['site/portalempleado'], [
+        'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
+        'encode' => false,
+    ]);
+} else {
+    // El empleado está creando un registro para otro empleado
+    if (Yii::$app->user->can('crear-formatos-incidencias-empleados')) {
+        echo Html::a('<i class="fa fa-chevron-left"></i> Volver', ['empleado/index'], [
+            'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
+            'encode' => false,
+        ]);
+    } else {
+        echo Html::a('<i class="fa fa-home"></i> Inicio', ['site/portalempleado'], [
+            'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
+            'encode' => false,
+        ]);
+    }
+}
+?>
 <?php
 
 $usuarioId = Yii::$app->user->identity->id;
@@ -38,14 +55,14 @@ if ($empleado) {
     $juntaGobierno = JuntaGobierno::find()->where(['empleado_id' => $empleado->id])->one();
 
     if ($juntaGobierno && ($juntaGobierno->nivel_jerarquico === 'Jefe de unidad' || $juntaGobierno->nivel_jerarquico === 'Director')) {
-        echo Html::a('PDF', ['export', 'id' => $model->id], [
-            'class' => 'btn btn-success',
+        echo Html::a('<i class="fa fa-file-pdf"></i> Exportar PDF', ['export', 'id' => $model->id], [
+            'class' => 'btn btn-danger',
             'id' => 'export-button',
             'target' => '_blank'
         ]);
     } else {
-        echo Html::a('PDF', ['export', 'id' => $model->id], [
-            'class' => 'btn btn-primary',
+        echo Html::a('<i class="fa fa-file-pdf"></i> Exportar PDF', ['export', 'id' => $model->id], [
+            'class' => 'btn btn-danger',
             'id' => 'export-button',
             'target' => '_blank'
         ]);
@@ -58,8 +75,12 @@ if ($empleado) {
 
 
 
+</div>
 
-                    </p>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12">
+                  
 
                     <?php 
     foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
@@ -73,7 +94,7 @@ if ($empleado) {
                     <?= DetailView::widget([
                         'model' => $model,
                         'attributes' => [
-                            'id',
+                            'solicitud_id',
                             [
                                 'label' => 'Motivo',
                                 'value' => function ($model) {
@@ -95,59 +116,33 @@ if ($empleado) {
                                     return $fechaFormateada;
                                 },
                             ],
-                    //        [
-                      //          'label' => 'Status',
-                        //        'value' => function ($model) {
-                                   
-                        
-                                    
-                          //          $status = $model->solicitud->status;
-                                    
-                                
-                            //        return $status;
-                              //  },
-                           // ],
-                    
-                    
-               //             [
-                 //               'label' => 'Aprobó',
-                   //             'value' => function ($model) {
-                                   
-                        
-                                    
-                     //               $aprobante = $model->solicitud->nombre_aprobante;
-                                    
-                                
-                       //             return $aprobante;
-                         //       },
-                           // ],
-                    
-                  //          [
-                    //            'label' => 'Se aprobó',
-                      //          'value' => function ($model) {
-                                   
-                        
-                                    
-                        //            $aprobante = $model->solicitud->fecha_aprobacion;
-                                    
-                                
-                          //          return $aprobante;
-                            //    },
-                 //           ],
-                    
                             [
-                                'label' => 'Comentario',
+                                'label' => 'Fecha de Permiso Anterior',
                                 'value' => function ($model) {
                                    
-                        
+                                    setlocale(LC_TIME, "es_419.UTF-8");
                                     
-                                    $aprobante = $model->solicitud->comentario;
+                                    return $model->fecha_permiso_anterior 
+                                    
+                                    ? strftime('%A, %B %d, %Y', strtotime($model->fecha_permiso_anterior))
+                                    : 'No hay anteriores';
+                
+                                    
+                                    
                                     
                                 
-                                    return $aprobante;
                                 },
                             ],
-                           
+                            [
+                                'label' => 'No. de Permiso Anterior',
+                                'value' => function($model){
+                                    return $model->no_permiso_anterior ?: 'No hay anteriores'; 
+
+
+                                },
+
+                            ],
+                    
                         ],
                     ]) ?>
                 </div>
@@ -158,4 +153,6 @@ if ($empleado) {
         <!--.card-body-->
     </div>
     <!--.card-->
+</div>
+</div>
 </div>

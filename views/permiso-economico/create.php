@@ -6,8 +6,7 @@ use yii\helpers\Html;
 /* @var $model app\models\PermisoEconomico */
 
 $this->title = 'Create Permiso Economico';
-$this->params['breadcrumbs'][] = ['label' => 'Permiso Economicos', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+
 ?>
 
 
@@ -17,5 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
                        'solicitudModel' => $solicitudModel,
                        'noPermisoAnterior' => $noPermisoAnterior, 
                        'fechaPermisoAnterior' => $fechaPermisoAnterior, 
+                       'empleado' => $empleado, // Pasar empleado a la vista
+
                     ]) ?>
          
