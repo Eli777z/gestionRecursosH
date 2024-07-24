@@ -91,6 +91,7 @@ $config = [
            // 'showScriptName' => false,
             'rules' => [
                 'documento/download/<id:\d+>' => 'documento/download',
+                'documento-medico/download/<id:\d+>' => 'documento-medico/download',
                 'obtener-formulario' => 'site/obtener-formulario',
                 'delete-formato' => 'empleado/delete-formato',
                 'download-formato' => 'empleado/download-formato',
@@ -126,7 +127,9 @@ $config = [
             'site/logout',
             'some-controller/some-action',
             'site/get-empleado-foto',
-            'empleado/foto-empleado'
+            'empleado/foto-empleado',
+            'debug/*'
+
             // The actions listed here will be allowed to everyone including guests.
             // So, 'admin/*' should not appear here in the production, of course.
             // But in the earlier stages of your development, you may probably want to

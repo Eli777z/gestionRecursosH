@@ -10,14 +10,14 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use app\models\Solicitud;
 use app\models\Empleado;
-use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use yii\web\Response;
 use app\models\JuntaGobierno;
 use app\models\CatDireccion;
 use app\models\Notificacion;
 use app\models\MotivoFechaPermiso;
-
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Writer\Html;
 /**
  * CambioDiaLaboralController implements the CRUD actions for CambioDiaLaboral model.
  */
@@ -265,117 +265,259 @@ class CambioDiaLaboralController extends Controller
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setCellValue('F5', $model->empleado->numero_empleado);
        
-       
         $nombre = mb_strtoupper($model->empleado->nombre, 'UTF-8');
         $apellido = mb_strtoupper($model->empleado->apellido, 'UTF-8');
         $nombreCompleto = $apellido . ' ' . $nombre;
         $sheet->setCellValue('H6', $nombreCompleto);
-
-
+    
         setlocale(LC_TIME, 'es_419.UTF-8'); 
         $fechaHOY = strftime('%A, %B %d, %Y'); 
         $sheet->setCellValue('N5', $fechaHOY);
         
         $nombrePuesto = $model->empleado->informacionLaboral->catPuesto->nombre_puesto;
-$sheet->setCellValue('H7', $nombrePuesto);
-
-$nombreCargo = $model->empleado->informacionLaboral->catDptoCargo->nombre_dpto;
-$sheet->setCellValue('H8', $nombreCargo);
-
-$nombreDireccion = $model->empleado->informacionLaboral->catDireccion->nombre_direccion;
-$sheet->setCellValue('H9', $nombreDireccion);
-
-$nombreDepartamento = $model->empleado->informacionLaboral->catDepartamento->nombre_departamento;
-$sheet->setCellValue('H10', $nombreDepartamento);
-
-$nombreTipoContrato = $model->empleado->informacionLaboral->catTipoContrato->nombre_tipo;
-$sheet->setCellValue('H11', $nombreTipoContrato);
-
-
-
-$fecha_permiso = strftime('%A, %B %d, %Y', strtotime($model->motivoFechaPermiso->fecha_permiso));
-$sheet->setCellValue('H13', $fecha_permiso);
-
-
-
-$sheet->setCellValue('H15', $model->motivoFechaPermiso->motivo);
-$fecha_a_laborar = strftime('%A, %B %d, %Y', strtotime($model->fecha_a_laborar));
-$sheet->setCellValue('H14', $fecha_a_laborar);
-
-
-
-
-$sheet->setCellValue('B24', $nombreCompleto);
-
-
-$sheet->setCellValue('B25', $nombrePuesto);
-
-$direccion = CatDireccion::findOne($model->empleado->informacionLaboral->cat_direccion_id);
-
-if ($direccion && $direccion->nombre_direccion !== '1.- GENERAL' && $model->nombre_jefe_departamento) {
-    $nombreCompletoJefe = mb_strtoupper($model->nombre_jefe_departamento, 'UTF-8');
-    $sheet->setCellValue('H24', $nombreCompletoJefe);
-} else {
-    $sheet->setCellValue('H24', null);
-}
-
-
-
-
-$juntaDirectorDireccion = JuntaGobierno::find()
-    ->where(['cat_direccion_id' => $model->empleado->informacionLaboral->cat_direccion_id])
-    ->andWhere(['or', ['nivel_jerarquico' => 'Director'], ['nivel_jerarquico' => 'Jefe de unidad']])
-    ->one();
-
-if ($juntaDirectorDireccion) {
-    $nombreDirector = mb_strtoupper($juntaDirectorDireccion->empleado->nombre, 'UTF-8');
-    $apellidoDirector = mb_strtoupper($juntaDirectorDireccion->empleado->apellido, 'UTF-8');
-    $profesionDirector = mb_strtoupper($juntaDirectorDireccion->empleado->profesion, 'UTF-8');
-    $nombreCompletoDirector = $profesionDirector . ' ' . $apellidoDirector . ' ' . $nombreDirector;
-
-    $sheet->setCellValue('N24', $nombreCompletoDirector);
-
-    $nombreDireccion = $juntaDirectorDireccion->catDireccion->nombre_direccion;
-    switch ($nombreDireccion) {
-        case '1.- GENERAL':
-            if ($juntaDirectorDireccion->nivel_jerarquico == 'Jefe de unidad') {
-                $tituloDireccion = 'JEFE DE ' . $juntaDirectorDireccion->catDepartamento->nombre_departamento;
-            } else {
-                $tituloDireccion = 'DIRECTOR GENERAL';
+        $sheet->setCellValue('H7', $nombrePuesto);
+    
+        $nombreCargo = $model->empleado->informacionLaboral->catDptoCargo->nombre_dpto;
+        $sheet->setCellValue('H8', $nombreCargo);
+    
+        $nombreDireccion = $model->empleado->informacionLaboral->catDireccion->nombre_direccion;
+        $sheet->setCellValue('H9', $nombreDireccion);
+    
+        $nombreDepartamento = $model->empleado->informacionLaboral->catDepartamento->nombre_departamento;
+        $sheet->setCellValue('H10', $nombreDepartamento);
+    
+        $nombreTipoContrato = $model->empleado->informacionLaboral->catTipoContrato->nombre_tipo;
+        $sheet->setCellValue('H11', $nombreTipoContrato);
+    
+        $fecha_permiso = strftime('%A, %B %d, %Y', strtotime($model->motivoFechaPermiso->fecha_permiso));
+        $sheet->setCellValue('H13', $fecha_permiso);
+    
+        $sheet->setCellValue('H15', $model->motivoFechaPermiso->motivo);
+        $fecha_a_laborar = strftime('%A, %B %d, %Y', strtotime($model->fecha_a_laborar));
+        $sheet->setCellValue('H14', $fecha_a_laborar);
+    
+        $sheet->setCellValue('B24', $nombreCompleto);
+    
+        $sheet->setCellValue('B25', $nombrePuesto);
+    
+        $direccion = CatDireccion::findOne($model->empleado->informacionLaboral->cat_direccion_id);
+    
+        if ($direccion && $direccion->nombre_direccion !== '1.- GENERAL' && $model->nombre_jefe_departamento) {
+            $nombreCompletoJefe = mb_strtoupper($model->nombre_jefe_departamento, 'UTF-8');
+            $sheet->setCellValue('H24', $nombreCompletoJefe);
+        } else {
+            $sheet->setCellValue('H24', null);
+        }
+    
+        $juntaDirectorDireccion = JuntaGobierno::find()
+            ->where(['cat_direccion_id' => $model->empleado->informacionLaboral->cat_direccion_id])
+            ->andWhere(['or', ['nivel_jerarquico' => 'Director'], ['nivel_jerarquico' => 'Jefe de unidad']])
+            ->one();
+    
+        if ($juntaDirectorDireccion) {
+            $nombreDirector = mb_strtoupper($juntaDirectorDireccion->empleado->nombre, 'UTF-8');
+            $apellidoDirector = mb_strtoupper($juntaDirectorDireccion->empleado->apellido, 'UTF-8');
+            $profesionDirector = mb_strtoupper($juntaDirectorDireccion->empleado->profesion, 'UTF-8');
+            $nombreCompletoDirector = $profesionDirector . ' ' . $apellidoDirector . ' ' . $nombreDirector;
+    
+            $sheet->setCellValue('N24', $nombreCompletoDirector);
+    
+            $nombreDireccion = $juntaDirectorDireccion->catDireccion->nombre_direccion;
+            switch ($nombreDireccion) {
+                case '1.- GENERAL':
+                    if ($juntaDirectorDireccion->nivel_jerarquico == 'Jefe de unidad') {
+                        $tituloDireccion = 'JEFE DE ' . $juntaDirectorDireccion->catDepartamento->nombre_departamento;
+                    } else {
+                        $tituloDireccion = 'DIRECTOR GENERAL';
+                    }
+                    break;
+                case '2.- ADMINISTRACIÓN':
+                    $tituloDireccion = 'DIRECTOR DE ADMINISTRACIÓN';
+                    break;
+                case '4.- OPERACIONES':
+                    $tituloDireccion = 'DIRECTOR DE OPERACIONES';
+                    break;
+                case '3.- COMERCIAL':
+                    $tituloDireccion = 'DIRECTOR COMERCIAL';
+                    break;
+                case '5.- PLANEACION':
+                    $tituloDireccion = 'DIRECTOR DE PLANEACION';
+                    break;
+                default:
+                    $tituloDireccion = ''; 
             }
-            break;
-        case '2.- ADMINISTRACIÓN':
-            $tituloDireccion = 'DIRECTOR DE ADMINISTRACIÓN';
-            break;
-        case '4.- OPERACIONES':
-            $tituloDireccion = 'DIRECTOR DE OPERACIONES';
-            break;
-        case '3.- COMERCIAL':
-            $tituloDireccion = 'DIRECTOR COMERCIAL';
-            break;
-        case '5.- PLANEACION':
-            $tituloDireccion = 'DIRECTOR DE PLANEACION';
-            break;
-        default:
-            $tituloDireccion = ''; 
+    
+            $sheet->setCellValue('N25', $tituloDireccion);
+        } else {
+            $sheet->setCellValue('N24', null);
+            $sheet->setCellValue('N25', null);
+        }
+    
+        $tempFileName = Yii::getAlias('@app/runtime/archivos_temporales/cambio_dia_laboral.xlsx');
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save($tempFileName);
+    
+        return $this->redirect(['download', 'filename' => basename($tempFileName)]);
     }
-
-    $sheet->setCellValue('N25', $tituloDireccion);
-} else {
-    $sheet->setCellValue('N24', null);
-    $sheet->setCellValue('N25', null);
-}
-
-$tempFileName = Yii::getAlias('@app/runtime/archivos_temporales/cambio_dia_laboral.xlsx');
-$writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-$writer->save($tempFileName);
-
-return $this->redirect(['download', 'filename' => basename($tempFileName)]);
+    
+    public function actionDownload($filename)
+    {
+        $filePath = Yii::getAlias("@app/runtime/archivos_temporales/$filename");
+        if (file_exists($filePath)) {
+            return Yii::$app->response->sendFile($filePath);
+        } else {
+            throw new NotFoundHttpException('El archivo solicitado no existe.');
+        }
     }
+    
+   
+
+    
+    public function actionExportHtml($id)
+    {
+        $this->layout = false;
+        $model = CambioDiaLaboral::findOne($id);
+    
+        if (!$model) {
+            throw new NotFoundHttpException('El registro no existe.');
+        }
+    
+        $templatePath = Yii::getAlias('@app/templates/cambio_dia_laboral.xlsx');
+        $spreadsheet = IOFactory::load($templatePath);
+    
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->setCellValue('F5', $model->empleado->numero_empleado);
+        $nombre = mb_strtoupper($model->empleado->nombre, 'UTF-8');
+        $apellido = mb_strtoupper($model->empleado->apellido, 'UTF-8');
+        $nombreCompleto = $apellido . ' ' . $nombre;
+        $sheet->setCellValue('H6', $nombreCompleto);
+        setlocale(LC_TIME, 'es_419.UTF-8'); 
+        $fechaHOY = strftime('%A, %B %d, %Y'); 
+        $sheet->setCellValue('N5', $fechaHOY);
+        $nombrePuesto = $model->empleado->informacionLaboral->catPuesto->nombre_puesto;
+        $sheet->setCellValue('H7', $nombrePuesto);
+        $nombreCargo = $model->empleado->informacionLaboral->catDptoCargo->nombre_dpto;
+        $sheet->setCellValue('H8', $nombreCargo);
+        $nombreDireccion = $model->empleado->informacionLaboral->catDireccion->nombre_direccion;
+        $sheet->setCellValue('H9', $nombreDireccion);
+        $nombreDepartamento = $model->empleado->informacionLaboral->catDepartamento->nombre_departamento;
+        $sheet->setCellValue('H10', $nombreDepartamento);
+
+        $nombreTipoContrato = $model->empleado->informacionLaboral->catTipoContrato->nombre_tipo;
+        $sheet->setCellValue('H11', $nombreTipoContrato);
+
+
+        switch ($nombreTipoContrato) {
+            case 'Confianza':
+                $style = $sheet->getStyle('H11');
+    
+                $style->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+        $style->getFill()->getStartColor()->setARGB('FFc7efce'); // Background color #c7efce
+    
+        $style->getFont()->getColor()->setARGB('FF217346'); // Font color #217346
+                break;
+            case 'Sindicalizado':
+                $style = $sheet->getStyle('H11');
+    
+                $style->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+        $style->getFill()->getStartColor()->setARGB('FFfeeb9d'); // Background color #c7efce
+    
+        $style->getFont()->getColor()->setARGB('FFa7720f'); // Font color #217346
+                break;
+          
+        }
 
 
 
-    public function actionExportSegundoCaso($id)
+
+        $fecha_permiso = strftime('%A, %B %d, %Y', strtotime($model->motivoFechaPermiso->fecha_permiso));
+        $sheet->setCellValue('H13', $fecha_permiso);
+
+
+         // Clean and set the motivo text
+    $motivoTextoPlano = strip_tags($model->motivoFechaPermiso->motivo);
+    $motivoTextoPlano = html_entity_decode($motivoTextoPlano, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $sheet->setCellValue('H15', $motivoTextoPlano);
+
+
+
+        $fecha_a_laborar = strftime('%A, %B %d, %Y', strtotime($model->fecha_a_laborar));
+        $sheet->setCellValue('H14', $fecha_a_laborar);
+        $sheet->setCellValue('B24', $nombreCompleto);
+        $sheet->setCellValue('B25', $nombrePuesto);
+        $direccion = CatDireccion::findOne($model->empleado->informacionLaboral->cat_direccion_id);
+    
+        if ($direccion && $direccion->nombre_direccion !== '1.- GENERAL' && $model->nombre_jefe_departamento) {
+            $nombreCompletoJefe = mb_strtoupper($model->nombre_jefe_departamento, 'UTF-8');
+            $sheet->setCellValue('H24', $nombreCompletoJefe);
+        } else {
+            $sheet->setCellValue('H24', null);
+        }
+    
+        $juntaDirectorDireccion = JuntaGobierno::find()
+            ->where(['cat_direccion_id' => $model->empleado->informacionLaboral->cat_direccion_id])
+            ->andWhere(['or', ['nivel_jerarquico' => 'Director'], ['nivel_jerarquico' => 'Jefe de unidad']])
+            ->one();
+    
+        if ($juntaDirectorDireccion) {
+            $nombreDirector = mb_strtoupper($juntaDirectorDireccion->empleado->nombre, 'UTF-8');
+            $apellidoDirector = mb_strtoupper($juntaDirectorDireccion->empleado->apellido, 'UTF-8');
+            $profesionDirector = mb_strtoupper($juntaDirectorDireccion->empleado->profesion, 'UTF-8');
+            $nombreCompletoDirector = $profesionDirector . ' ' . $apellidoDirector . ' ' . $nombreDirector;
+    
+            $sheet->setCellValue('N24', $nombreCompletoDirector);
+    
+            $nombreDireccion = $juntaDirectorDireccion->catDireccion->nombre_direccion;
+            switch ($nombreDireccion) {
+                case '1.- GENERAL':
+                    if ($juntaDirectorDireccion->nivel_jerarquico == 'Jefe de unidad') {
+                        $tituloDireccion = 'JEFE DE ' . $juntaDirectorDireccion->catDepartamento->nombre_departamento;
+                    } else {
+                        $tituloDireccion = 'DIRECTOR GENERAL';
+                    }
+                    break;
+                case '2.- ADMINISTRACIÓN':
+                    $tituloDireccion = 'DIRECTOR DE ADMINISTRACIÓN';
+                    break;
+                case '4.- OPERACIONES':
+                    $tituloDireccion = 'DIRECTOR DE OPERACIONES';
+                    break;
+                case '3.- COMERCIAL':
+                    $tituloDireccion = 'DIRECTOR COMERCIAL';
+                    break;
+                case '5.- PLANEACION':
+                    $tituloDireccion = 'DIRECTOR DE PLANEACION';
+                    break;
+                default:
+                    $tituloDireccion = ''; 
+            }
+    
+            $sheet->setCellValue('N25', $tituloDireccion);
+        } else {
+            $sheet->setCellValue('N24', null);
+            $sheet->setCellValue('N25', null);
+        }
+    
+       
+    
+        $htmlWriter = new Html($spreadsheet);
+        $htmlWriter->setSheetIndex(0); 
+        $htmlWriter->setPreCalculateFormulas(false);
+    
+       
+    
+        $fullHtmlContent = $htmlWriter->generateHtmlAll();
+
+        $fullHtmlContent = str_replace('&nbsp;', ' ', $fullHtmlContent);
+
+    
+        return $this->render('excel-html', ['htmlContent' => $fullHtmlContent, 'model' => $model]);
+    }
+     
+    
+
+    public function actionExportHtmlSegundo($id)
     {
         $model = CambioDiaLaboral::findOne($id);
     
@@ -416,6 +558,25 @@ $sheet->setCellValue('H10', $nombreDepartamento);
 $nombreTipoContrato = $model->empleado->informacionLaboral->catTipoContrato->nombre_tipo;
 $sheet->setCellValue('H11', $nombreTipoContrato);
 
+switch ($nombreTipoContrato) {
+    case 'Confianza':
+        $style = $sheet->getStyle('H11');
+
+        $style->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+$style->getFill()->getStartColor()->setARGB('FFc7efce'); // Background color #c7efce
+
+$style->getFont()->getColor()->setARGB('FF217346'); // Font color #217346
+        break;
+    case 'Sindicalizado':
+        $style = $sheet->getStyle('H11');
+
+        $style->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+$style->getFill()->getStartColor()->setARGB('FFfeeb9d'); // Background color #c7efce
+
+$style->getFont()->getColor()->setARGB('FFa7720f'); // Font color #217346
+        break;
+  
+}
 
 
 // Convertir la fecha del modelo al formato deseado
@@ -424,7 +585,13 @@ $sheet->setCellValue('H13', $fecha_permiso);
 
 
 
-$sheet->setCellValue('H15', $model->motivoFechaPermiso->motivo);
+
+         // Clean and set the motivo text
+         $motivoTextoPlano = strip_tags($model->motivoFechaPermiso->motivo);
+         $motivoTextoPlano = html_entity_decode($motivoTextoPlano, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+         $sheet->setCellValue('H15', $motivoTextoPlano);
+
+
 $fecha_a_laborar = strftime('%A, %B %d, %Y', strtotime($model->fecha_a_laborar));
 $sheet->setCellValue('H14', $fecha_a_laborar);
 
@@ -474,26 +641,24 @@ if ($directorGeneral) {
 
 $sheet->setCellValue('N25', 'DIRECTOR GENERAL');
 
-$tempFileName = Yii::getAlias('@app/runtime/archivos_temporales/cambio_dia_laboral.xlsx');
-$writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-$writer->save($tempFileName);
+$htmlWriter = new Html($spreadsheet);
+$htmlWriter->setSheetIndex(0); 
+$htmlWriter->setPreCalculateFormulas(false);
 
 
-return $this->redirect(['download', 'filename' => basename($tempFileName)]);
+
+$fullHtmlContent = $htmlWriter->generateHtmlAll();
+
+$fullHtmlContent = str_replace('&nbsp;', ' ', $fullHtmlContent);
+
+
+return $this->render('excel-html', ['htmlContent' => $fullHtmlContent, 'model' => $model]);
     }
 
 
 
 
 
-    public function actionDownload($filename)
-    {
-        $filePath = Yii::getAlias("@app/runtime/archivos_temporales/$filename");
-        if (file_exists($filePath)) {
-            return Yii::$app->response->sendFile($filePath);
-        } else {
-            throw new NotFoundHttpException('El archivo solicitado no existe.');
-        }
-    }
+   
 
 }

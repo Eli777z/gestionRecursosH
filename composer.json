@@ -22,7 +22,8 @@
         "hail812/yii2-adminlte3": "~1.1",
         "almasaeed2010/adminlte": "~3.1",
         "hail812/yii2-adminlte-widgets": "~1.0.2",
-       
+        "ktaris/yii2-mexvalidators": "0.0.1",
+
         "kartik-v/yii2-widget-datepicker": "dev-master",
         "yiisoft/yii2-jui": "^2.0",
         "yiisoft/yii2-swiftmailer": "^2.0",

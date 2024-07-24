@@ -9,6 +9,7 @@ use app\models\JuntaGobierno;
 use kartik\select2\Select2;
 use app\models\Empleado;
 use hail812\adminlte\widgets\Alert;
+use froala\froalaeditor\FroalaEditorWidget;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\PermisoFueraTrabajo */
@@ -18,7 +19,7 @@ use hail812\adminlte\widgets\Alert;
     <div class="row justify-content-center">
         <div class="col-md-10">
             <div class="card">
-            <?php $form = ActiveForm::begin(); ?>
+            <?php $form = ActiveForm::begin(['options' => [ 'id' => 'employee-form']]); ?>
                 <div class="card-header bg-info text-white">
                     <h2>PERMISO FUERA DEL TRABAJO</h2>
                     <?php
@@ -48,6 +49,9 @@ if ($empleadoActual->id === $empleado->id) {
     }
 }
 ?>
+    <div id="loading-spinner" style="display: none;">
+        <i class="fa fa-spinner fa-spin fa-2x"></i> Procesando...
+    </div>
                 </div>
 
                 <div class="card-body">
@@ -83,7 +87,24 @@ if ($empleadoActual->id === $empleado->id) {
 
 <?= $form->field($motivoFechaPermisoModel, 'fecha_permiso')->input('date')->label('Fecha de permiso') ?>
                                             </div>
-<?= $form->field($motivoFechaPermisoModel, 'motivo')->textarea(['rows' => 4]) ?>
+                                            <?= $form->field($motivoFechaPermisoModel, 'motivo')->widget(FroalaEditorWidget::className(), [
+                                                                        'options' => [
+                                                                            'id' => 'exp-fisca'
+                                                                        ],
+                                                                        'clientOptions' => [
+                                                                            'toolbarInline' => false,
+                                                                            'theme' => 'royal', // optional: dark, red, gray, royal
+                                                                            'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
+                                                                            'height' => 200,
+                                                                            'pluginsEnabled' => [
+                                                                                'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
+                                                                                'draggable', 'emoticons', 'entities', 'fontFamily',
+                                                                                'fontSize', 'fullscreen', 'inlineStyle',
+                                                                                'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
+                                                                                'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
+                                                                            ]
+                                                                        ]
+                                                                    ])->label('Motivo:');?>
 <div class="col-6 col-sm-2">
 
 <?= $form->field($model, 'hora_salida')->input('time')->label('Hora de salida') ?>
@@ -167,7 +188,20 @@ if ($mostrarCampo && $direccion && in_array($direccion->nombre_direccion, ['2.- 
 
 
 <?php ActiveForm::end(); ?>
+<?php
+$script = <<< JS
+    $('#employee-form').on('beforeSubmit', function() {
+        var button = $('#save-button-personal');
+        var spinner = $('#loading-spinner');
 
+        button.prop('disabled', true); // Deshabilita el botón
+        spinner.show(); // Muestra el spinner
+
+        return true; // Permite que el formulario se envíe
+    });
+JS;
+$this->registerJs($script);
+?>
 
                             </div>
                         </div>

@@ -64,11 +64,15 @@ if ($empleado) {
 
 
         if ($juntaGobierno && ($juntaGobierno->nivel_jerarquico === 'Jefe de unidad' || $juntaGobierno->nivel_jerarquico === 'Director')){
-            echo Html::a('<i class="fa fa-file-excel" aria-hidden="true"></i> Exportar Excel', ['export-segundo-caso', 'id' => $model->id], ['class' => 'btn btn-success ']);
-            echo Html::a('<i class="fa fa-file-pdf"></i> Exportar PDF', ['export-pdf', 'id' => $model->id], ['class' => 'btn btn-danger ml-3']);
+         //   echo Html::a('<i class="fa fa-file-excel" aria-hidden="true"></i> Exportar Excel', ['export-segundo-caso', 'id' => $model->id], ['class' => 'btn btn-success ']);
+           // echo Html::a('<i class="fa fa-file-pdf"></i> Exportar PDF', ['export-pdf', 'id' => $model->id], ['class' => 'btn btn-danger ml-3']);
+           echo Html::a('<i class="fa fa-print" aria-hidden="true"></i> Vista Previa de Impresión', ['export-html', 'id' => $model->id], ['class' => 'btn btn-dark ', 'target' => '_blank']) ;
+
         } else {
-            echo Html::a('<i class="fa fa-file-excel" aria-hidden="true"></i> Exportar Excel', ['export', 'id' => $model->id], ['class' => 'btn btn-success']);
-            echo Html::a('<i class="fa fa-file-pdf"></i> Exportar PDF', ['export-pdf', 'id' => $model->id], ['class' => 'btn btn-danger ml-3']);
+            //echo Html::a('<i class="fa fa-file-excel" aria-hidden="true"></i> Exportar Excel', ['export', 'id' => $model->id], ['class' => 'btn btn-success']);
+            //echo Html::a('<i class="fa fa-file-pdf"></i> Exportar PDF', ['export-pdf', 'id' => $model->id], ['class' => 'btn btn-danger ml-3']);
+            echo Html::a('<i class="fa fa-print" aria-hidden="true"></i> Vista Previa de Impresión', ['export-html', 'id' => $model->id], ['class' => 'btn btn-dark ', 'target' => '_blank']) ;
+
         }
         
 } else {
@@ -112,12 +116,16 @@ if ($empleado) {
        //         return $model->empleado->nombre; 
 //            },
   //      ],
-        [
-            'label' => 'Motivo',
-            'value' => function ($model) {
-                return $model->motivoFechaPermiso->motivo; 
-            },
-        ],
+  [
+    'label' => 'Motivo',
+    'attribute' => 'motivo',
+    'format' => 'html',
+    'value' => function ($model) {
+        return \yii\helpers\Html::decode($model->motivoFechaPermiso->motivo);
+    },
+    'filter' => false,
+    'options' => ['style' => 'width: 65%;'],
+],
         [
             'label' => 'Hora de Salida',
             'attribute' => 'hora_salida',

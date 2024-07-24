@@ -2,12 +2,15 @@
     border-collapse: collapse;
     width: 100%;
     background-color: white;
+    
 }
 
 .no-style-gridview th, .no-style-gridview td {
    
-    border-bottom: 5px solid #ddd; /* Línea horizontal inferior */
-    padding: 8px;
+   border-bottom: 1px solid #ddd; /* Línea horizontal inferior */
+  /* border-right:  1px solid #ddd; /* Línea horizontal inferior */
+
+   padding: 10px;
     background-color: white;
 }
 
@@ -18,6 +21,7 @@
 
 .no-style-gridview tr {
     background-color: white;
+
 }
 
 .no-style-gridview .summary {

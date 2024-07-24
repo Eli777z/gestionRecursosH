@@ -4,7 +4,9 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 use app\models\Empleado;
 use app\models\JuntaGobierno;
-use hail812\adminlte\widgets\Alert;
+use yii\bootstrap5\Alert;
+
+
 /* @var $this yii\web\View */
 /* @var $model app\models\PermisoSinSueldo */
 
@@ -61,12 +63,17 @@ if ($empleado) {
 
  
         if ($juntaGobierno && ($juntaGobierno->nivel_jerarquico === 'Jefe de unidad' || $juntaGobierno->nivel_jerarquico === 'Director')){
-            echo Html::a('<i class="fa fa-file-excel" aria-hidden="true"></i> Exportar Excel', ['export-segundo-caso', 'id' => $model->id], ['class' => 'btn btn-success']);
-            echo Html::a('<i class="fa fa-file-pdf"></i> Exportar PDF', ['export-pdf', 'id' => $model->id], ['class' => 'btn btn-danger ml-3']);
+          //  echo Html::a('<i class="fa fa-file-excel" aria-hidden="true"></i> Exportar Excel', ['export-segundo-caso', 'id' => $model->id], ['class' => 'btn btn-success']);
+            //echo Html::a('<i class="fa fa-file-pdf"></i> Exportar PDF', ['export-pdf', 'id' => $model->id], ['class' => 'btn btn-danger ml-3']);
+            echo Html::a('<i class="fa fa-print" aria-hidden="true"></i> Vista Previa de Impresión', ['export-html', 'id' => $model->id], ['class' => 'btn btn-dark ', 'target' => '_blank']) ;
+
         } else {
-            echo Html::a('<i class="fa fa-file-excel" aria-hidden="true"></i> Exportar Excel', ['export', 'id' => $model->id], ['class' => 'btn btn-success']);
-            echo Html::a('<i class="fa fa-file-pdf"></i> Exportar PDF', ['export-pdf', 'id' => $model->id], ['class' => 'btn btn-danger ml-3']);
+          //echo Html::a('<i class="fa fa-file-excel" aria-hidden="true"></i> Exportar Excel', ['export', 'id' => $model->id], ['class' => 'btn btn-success']);
+           // echo Html::a('<i class="fa fa-file-pdf"></i> Exportar PDF', ['export-pdf', 'id' => $model->id], ['class' => 'btn btn-danger ml-3']);
+           echo Html::a('<i class="fa fa-print" aria-hidden="true"></i> Vista Previa de Impresión', ['export-html', 'id' => $model->id], ['class' => 'btn btn-dark ', 'target' => '_blank']) ;
+
         }
+
     
 } else {
     Yii::$app->session->setFlash('error', 'No se pudo encontrar el empleado asociado al usuario actual.');
@@ -98,9 +105,13 @@ if ($empleado) {
                             'solicitud_id',
                             [
                                 'label' => 'Motivo',
+                                'attribute' => 'motivo',
+                                'format' => 'html',
                                 'value' => function ($model) {
-                                    return $model->motivoFechaPermiso->motivo; 
+                                    return \yii\helpers\Html::decode($model->motivoFechaPermiso->motivo);
                                 },
+                                'filter' => false,
+                                'options' => ['style' => 'width: 65%;'],
                             ],
                             [
                                 'label' => 'Fecha de Permiso',

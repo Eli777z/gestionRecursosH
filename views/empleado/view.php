@@ -1,4 +1,5 @@
 <?php
+
 use app\models\CatDepartamento;
 use app\models\CatDireccion;
 use app\models\CatDptoCargo;
@@ -23,6 +24,7 @@ use app\models\JuntaGobierno;
 use yii\web\JsExpression;
 use kartik\select2\Select2;
 use app\models\CatTipoDocumento;
+use app\models\DocumentoMedicoSearch;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Empleado */
@@ -34,11 +36,11 @@ $this->registerCssFile('@web/css/grid-view.css', ['position' => View::POS_HEAD])
 
 $this->registerJsFile('@web/js/municipios.js', ['depends' => [\yii\web\JqueryAsset::class]]);
 $this->registerJsFile('@web/js/select_estados.js', ['depends' => [\yii\web\JqueryAsset::class]]);
-if (Yii::$app->user->can('medico') || Yii::$app->user->can('gestor-rh')): 
+if (Yii::$app->user->can('medico') || Yii::$app->user->can('gestor-rh')) :
 
 
-$this->title = 'Empleado: ' . $model->nombre. ' '. $model->apellido;
-$this->params['breadcrumbs'][] = ['label' => 'Empleados', 'url' => ['index']];
+    $this->title = 'Empleado: ' . $model->nombre . ' ' . $model->apellido;
+    $this->params['breadcrumbs'][] = ['label' => 'Empleados', 'url' => ['index']];
 endif;
 $this->params['breadcrumbs'][] = $this->title;
 
@@ -134,58 +136,58 @@ if (!$modelAlergia) {
     <div class="row justify-content-center">
         <div class="col-md-10">
             <div class="card bg-light">
-            <div class="card-header gradient-info text-white">
-    <div class="d-flex align-items-center position-relative ml-4">
-        <div class="bg-light p-1 rounded-circle custom-shadow" style="width: 140px; height: 140px; position: relative;">
-            <?= Html::img(['empleado/foto-empleado', 'id' => $model->id], [
-                'class' => 'rounded-circle',
-                'style' => 'width: 130px; height: 130px;'
-            ]) ?>
-            <?php if (Yii::$app->user->can('modificar-informacion-empleados')) : ?>
-                <?= Html::button('<i class="fas fa-edit"></i>', [
-                    'class' => 'btn btn-dark position-absolute',
-                    'style' => 'top: 5px; right: 5px; padding: 5px 10px;',
-                    'data-toggle' => 'modal',
-                    'data-target' => '#changePhotoModal'
-                ]) ?>
-            <?php endif; ?>
-        </div>
-        <div class="ml-4">
-            <div class="alert alert-light mb-0" role="alert">
-                
-                <h3 class="mb-0"><?= $model->nombre ?> <?= $model->apellido ?></h3>
-                <h5 class="mb-0">Numero de empleado: <?= $model->numero_empleado ?></h5>
+                <div class="card-header gradient-info text-white">
+                    <div class="d-flex align-items-center position-relative ml-4">
+                        <div class="bg-light p-1 rounded-circle custom-shadow" style="width: 140px; height: 140px; position: relative;">
+                            <?= Html::img(['empleado/foto-empleado', 'id' => $model->id], [
+                                'class' => 'rounded-circle',
+                                'style' => 'width: 130px; height: 130px;'
+                            ]) ?>
+                            <?php if (Yii::$app->user->can('modificar-informacion-empleados')) : ?>
+                                <?= Html::button('<i class="fas fa-edit"></i>', [
+                                    'class' => 'btn btn-dark position-absolute',
+                                    'style' => 'top: 5px; right: 5px; padding: 5px 10px;',
+                                    'data-toggle' => 'modal',
+                                    'data-target' => '#changePhotoModal'
+                                ]) ?>
+                            <?php endif; ?>
+                        </div>
+                        <div class="ml-4">
+                            <div class="alert alert-light mb-0" role="alert">
 
-                
-            </div>
-        </div>
-       
-    </div>
-    <?php if (Yii::$app->user->can('crear-consulta-medica')) : ?>
+                                <h3 class="mb-0"><?= $model->nombre ?> <?= $model->apellido ?></h3>
+                                <h5 class="mb-0">Numero de empleado: <?= $model->numero_empleado ?></h5>
 
-    <?php if ($model->expedienteMedico): ?>
-                    <?= Html::a('Nueva consulta <i class="fa fa-user-md" ></i>', ['consulta-medica/create', 'expediente_medico_id' => $model->expedienteMedico->id], [
-                        'class' => 'btn btn-dark  float-right fa-lg'
-                    ]) ?>
-                    
 
-                <?php endif; ?>
+                            </div>
+                        </div>
 
-              
+                    </div>
+                    <?php if (Yii::$app->user->can('crear-consulta-medica')) : ?>
 
-                <?php if ($model->id): ?>
+                        <?php if ($model->expedienteMedico) : ?>
+                            <?= Html::a('Nueva consulta <i class="fa fa-user-md" ></i>', ['consulta-medica/create', 'expediente_medico_id' => $model->expedienteMedico->id], [
+                                'class' => 'btn btn-dark  float-right fa-lg'
+                            ]) ?>
 
-                <?= Html::a('Nueva cita medica <i class="fa fa-plus-square" ></i>', ['cita-medica/create', 'empleado_id' => $model->id], [
-                    'class' => 'btn btn-light mr-3 float-right fa-lg'
-                ]) ?>
-                
 
-         
-                <?php endif; ?>
+                        <?php endif; ?>
 
-                
-                <?php endif; ?>
-</div>
+
+
+                        <?php if ($model->id) : ?>
+
+                            <?= Html::a('Nueva cita medica <i class="fa fa-plus-square" ></i>', ['cita-medica/create', 'empleado_id' => $model->id], [
+                                'class' => 'btn btn-light mr-3 float-right fa-lg'
+                            ]) ?>
+
+
+
+                        <?php endif; ?>
+
+
+                    <?php endif; ?>
+                </div>
 
 
 
@@ -236,7 +238,7 @@ if (!$modelAlergia) {
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-12">
-                            <div class="d-flex align-items-center mb-3">
+                            <div class="d-flex align-items-center mb-3 float-right">
 
 
 
@@ -285,18 +287,26 @@ if (!$modelAlergia) {
                                                 <button type="button" id="cancel-button-personal" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
 
                                                 <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right mr-3', 'id' => 'save-button-personal', 'style' => 'display:none;']) ?>
+                                                <div id="loading-spinner" style="display: none;">
+                                                    <i class="fa fa-spinner fa-spin fa-2x"></i> Procesando...
+                                                </div>
                                             <?php endif; ?>
                                         </div>
                                         <div class="card-body">
-                                            <?= $form->field($model, 'numero_empleado')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
+                                            <?= $form->field($model, 'numero_empleado')->input('number', ['readonly' => true, 'class' => 'form-control']); ?>
                                             <?= $form->field($model, 'nombre')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
                                             <?= $form->field($model, 'apellido')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
 
-                                            <?php //echo Html::label($model->expedienteMedico->antecedenteNoPatologico, 'religion'); ?>
-
+                                            <?php //echo Html::label($model->expedienteMedico->antecedenteNoPatologico, 'religion'); 
+                                            ?>
                                             <?= $form->field($model, 'fecha_nacimiento')->input('date', ['disabled' => true]) ?>
+                                            <?= $form->field($model, 'edad')->hiddenInput()->label(false); ?>
 
-                                            <?= $form->field($model, 'edad')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
+                                            <div class="form-group">
+                                                <label class="control-label">Edad:</label>
+                                                <p id="edad-label"><?= Html::encode($model->edad); ?></p>
+                                            </div>
+
                                             <?= $form->field($model, 'sexo')->widget(Select2::className(), [
                                                 'data' => [
                                                     'Masculino' => 'Masculino',
@@ -329,11 +339,38 @@ if (!$modelAlergia) {
                                                 ],
                                                 'theme' => Select2::THEME_BOOTSTRAP,
                                             ]); ?>
-                                            <?= $form->field($model, 'curp')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
-                                            <?= $form->field($model, 'nss')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
-                                            <?= $form->field($model, 'rfc')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
+                                            <?= $form->field($model, 'curp')->textInput(['readonly' => true, 'maxlength' => 18, 'class' => 'form-control'])->label('CURP:') ?>
+
+                                            <?= $form->field($model, 'nss')->input('number', [
+                                                'maxlength' => 11,
+                                                'class' => 'form-control',
+                                                'id' => 'nss-input',
+                                                'readonly' => true,
+                                            ])->label('NSS:') ?>
+
+
+
+
+
+                                            <?= $form->field($model, 'rfc')->textInput(['readonly' => true, 'maxlength' => 13, 'class' => 'form-control'])->label('RFC:') ?>
+
+
                                         </div>
                                         <?php ActiveForm::end(); ?>
+                                        <?php
+                                        $script = <<< JS
+    $('#personal-info-form').on('beforeSubmit', function() {
+        var button = $('#save-button-personal');
+        var spinner = $('#loading-spinner');
+
+        button.prop('disabled', true); // Deshabilita el botón
+        spinner.show(); // Muestra el spinner
+
+        return true; // Permite que el formulario se envíe
+    });
+JS;
+                                        $this->registerJs($script);
+                                        ?>
                                     </div>
 
                                 </div>
@@ -383,62 +420,79 @@ if (!$modelAlergia) {
                                 </script>
 
 
-<?php if (Yii::$app->user->can('ver-informacion-completa-empleados')) : ?>
+                                <?php if (Yii::$app->user->can('ver-informacion-completa-empleados')) : ?>
 
 
-                                <div class="col-md-6">
+                                    <div class="col-md-6">
 
-                                    <div class="card">
-                                        <?php $form = ActiveForm::begin([
-                                            'action' => ['actualizar-informacion', 'id' => $model->id],
-                                            'options' => ['id' => 'educational-info-form']
-                                        ]); ?>
-                                        <div class="card-header gradient-verde  text-white">
-                                            <h3>Información Educacional</h3>
-                                            <?php if (Yii::$app->user->can('modificar-informacion-empleados')) : ?>
-
-                                                <button type="button" id="edit-button-educational" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
-                                                <button type="button" id="cancel-button-educational" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
-                                                <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right mr-3', 'id' => 'save-button-educational', 'style' => 'display:none;']) ?>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="card-body">
-                                            <?= $form->field($model, 'cat_nivel_estudio_id')->widget(Select2::classname(), [
-                                                'data' => ArrayHelper::map(CatNivelEstudio::find()->all(), 'id', 'nivel_estudio'),
-                                                'options' => ['placeholder' => 'Seleccionar Nivel de Estudio', 'disabled' => true],
-                                                'pluginOptions' => [
-                                                    'allowClear' => true
-                                                ],
-                                                'theme' => Select2::THEME_BOOTSTRAP,
-                                                'pluginEvents' => [
-                                                    'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
-                                                    'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
-                                                ],
-                                            ])->label('Nivel de estudios') ?>
-                                            <?= $form->field($model, 'institucion_educativa')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
-                                            <?= $form->field($model, 'profesion')->widget(Select2::className(), [
-                                                'data' => [
-                                                    'No tiene' => 'No tiene',
-                                                    'ING.' => 'ING.',
-                                                    'LIC.' => 'LIC.',
-                                                    'PROF.' => 'PROF.',
-                                                    'ARQ.' => 'ARQ.',
-                                                    'C.' => 'C.',
-                                                    'DR.' => 'DR.',
-                                                    'DRA.' => 'DRA.',
-                                                    'TEC.' => 'TEC.',
-                                                ],
-                                                'options' => ['prompt' => 'Seleccionar Profesión', 'disabled' => true],
-                                                'pluginOptions' => [
-                                                    'allowClear' => true
-                                                ],
-                                                'theme' => Select2::THEME_BOOTSTRAP,
+                                        <div class="card">
+                                            <?php $form = ActiveForm::begin([
+                                                'action' => ['actualizar-informacion', 'id' => $model->id],
+                                                'options' => ['id' => 'educational-info-form']
                                             ]); ?>
+                                            <div class="card-header gradient-verde  text-white">
+                                                <h3>Información Educacional</h3>
+                                                <?php if (Yii::$app->user->can('modificar-informacion-empleados')) : ?>
+
+                                                    <button type="button" id="edit-button-educational" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
+                                                    <button type="button" id="cancel-button-educational" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
+                                                    <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right mr-3', 'id' => 'save-button-educational', 'style' => 'display:none;']) ?>
+                                                    <div id="loading-spinner-educacion" style="display: none;">
+                                                        <i class="fa fa-spinner fa-spin fa-2x"></i> Procesando...
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
+                                            <div class="card-body">
+                                                <?= $form->field($model, 'cat_nivel_estudio_id')->widget(Select2::classname(), [
+                                                    'data' => ArrayHelper::map(CatNivelEstudio::find()->all(), 'id', 'nivel_estudio'),
+                                                    'options' => ['placeholder' => 'Seleccionar Nivel de Estudio', 'disabled' => true],
+                                                    'pluginOptions' => [
+                                                        'allowClear' => true
+                                                    ],
+                                                    'theme' => Select2::THEME_BOOTSTRAP,
+                                                    'pluginEvents' => [
+                                                        'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
+                                                        'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
+                                                    ],
+                                                ])->label('Nivel de estudios') ?>
+                                                <?= $form->field($model, 'institucion_educativa')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
+                                                <?= $form->field($model, 'profesion')->widget(Select2::className(), [
+                                                    'data' => [
+                                                        'No tiene' => 'No tiene',
+                                                        'ING.' => 'ING.',
+                                                        'LIC.' => 'LIC.',
+                                                        'PROF.' => 'PROF.',
+                                                        'ARQ.' => 'ARQ.',
+                                                        'C.' => 'C.',
+                                                        'DR.' => 'DR.',
+                                                        'DRA.' => 'DRA.',
+                                                        'TEC.' => 'TEC.',
+                                                    ],
+                                                    'options' => ['prompt' => 'Seleccionar Profesión', 'disabled' => true],
+                                                    'pluginOptions' => [
+                                                        'allowClear' => true
+                                                    ],
+                                                    'theme' => Select2::THEME_BOOTSTRAP,
+                                                ]); ?>
+                                            </div>
+                                            <?php ActiveForm::end(); ?>
+                                            <?php
+                                            $script = <<< JS
+    $('#educational-info-form').on('beforeSubmit', function() {
+        var button = $('#save-button-educational');
+        var spinner = $('#loading-spinner-educacion');
+
+        button.prop('disabled', true); // Deshabilita el botón
+        spinner.show(); // Muestra el spinner
+
+        return true; // Permite que el formulario se envíe
+    });
+JS;
+                                            $this->registerJs($script);
+                                            ?>
                                         </div>
-                                        <?php ActiveForm::end(); ?>
                                     </div>
-                                </div>
-<?php endif;?>
+                                <?php endif; ?>
                             </div>
 
                             <script>
@@ -507,15 +561,24 @@ if (!$modelAlergia) {
                                                 <button type="button" id="edit-button-contact" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
                                                 <button type="button" id="cancel-button-contact" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
                                                 <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right mr-3', 'id' => 'save-button-contact', 'style' => 'display:none;']) ?>
-                                            <?php endif; ?>
+                                                <div id="loading-spinner-contacto" style="display: none;">
+        <i class="fa fa-spinner fa-spin fa-2x"></i> Procesando...
+    </div>
+                                            
+                                                <?php endif; ?>
                                         </div>
                                         <div class="card-body">
                                             <?= $form->field($model, 'email')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
-                                            <?= $form->field($model, 'telefono')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
+                                            <?= $form->field($model, 'telefono')->textInput(['maxlength' => 15, 'readonly' => true, 'class' => 'form-control']); ?>
                                             <?= $form->field($model, 'colonia')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
                                             <?= $form->field($model, 'calle')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
                                             <?= $form->field($model, 'numero_casa')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
-                                            <?= $form->field($model, 'codigo_postal')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
+                                            <?= $form->field($model, 'codigo_postal')->input('number', [
+                                                'maxlength' => 6,
+                                                'class' => 'form-control',
+                                                'id' => 'nss-input',
+                                                'readonly' => true,
+                                            ])->label('Codigo Postal:') ?>
                                             <?= $form->field($model, 'estado')->widget(Select2::classname(), [
                                                 'data' => [], // Inicialmente vacío, se llenará con JS
                                                 'options' => ['placeholder' => 'Selecciona un estado', 'id' => 'estado-dropdown', 'disabled' => true],
@@ -523,7 +586,7 @@ if (!$modelAlergia) {
                                                     'allowClear' => true
                                                 ],
                                                 'theme' => Select2::THEME_BOOTSTRAP,
-                                            ])->label('Estado'); ?>
+                                            ])->label('Estado:'); ?>
                                             <?= $form->field($model, 'municipio')->widget(Select2::classname(), [
                                                 'data' => [], // Inicialmente vacío
                                                 'options' => ['placeholder' => 'Selecciona un municipio', 'id' => 'municipio-dropdown', 'disabled' => true],
@@ -531,9 +594,23 @@ if (!$modelAlergia) {
                                                     'allowClear' => true
                                                 ],
                                                 'theme' => Select2::THEME_BOOTSTRAP,
-                                            ])->label('Municipio'); ?>
+                                            ])->label('Municipio:'); ?>
                                         </div>
                                         <?php ActiveForm::end(); ?>
+                                        <?php
+                                            $script = <<< JS
+    $('#contact-info-form').on('beforeSubmit', function() {
+        var button = $('#save-button-contact');
+        var spinner = $('#loading-spinner-contacto');
+
+        button.prop('disabled', true); // Deshabilita el botón
+        spinner.show(); // Muestra el spinner
+
+        return true; // Permite que el formulario se envíe
+    });
+JS;
+                                            $this->registerJs($script);
+                                            ?>
                                     </div>
 
                                     <script>
@@ -592,8 +669,12 @@ if (!$modelAlergia) {
 
                                                 <button type="button" id="edit-button-emergency" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
                                                 <button type="button" id="cancel-button-emergency" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
-                                                <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-info float-right  mr-3', 'id' => 'save-button-emergency', 'style' => 'display:none;']) ?>
-                                            <?php endif; ?>
+                                                <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right  mr-3', 'id' => 'save-button-emergency', 'style' => 'display:none;']) ?>
+                                                <div id="loading-spinner-contacto-emergencia" style="display: none;">
+        <i class="fa fa-spinner fa-spin fa-2x"></i> Procesando...
+    </div>
+                                            
+                                                <?php endif; ?>
                                         </div>
                                         <div class="card-body">
                                             <?= $form->field($model, 'nombre_contacto_emergencia')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
@@ -616,6 +697,20 @@ if (!$modelAlergia) {
                                             <?= $form->field($model, 'telefono_contacto_emergencia')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
                                         </div>
                                         <?php ActiveForm::end(); ?>
+                                        <?php
+                                            $script = <<< JS
+    $('#emergency-contact-form').on('beforeSubmit', function() {
+        var button = $('#save-button-emergency');
+        var spinner = $('#loading-spinner-contacto-emergencia');
+
+        button.prop('disabled', true); // Deshabilita el botón
+        spinner.show(); // Muestra el spinner
+
+        return true; // Permite que el formulario se envíe
+    });
+JS;
+                                            $this->registerJs($script);
+                                            ?>
                                     </div>
 
                                     <script>
@@ -869,46 +964,46 @@ if (!$modelAlergia) {
                                     <?php ActiveForm::end(); ?>
                                 </div>
                             </div>
-                            
+
 
                             <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Al cargar la página, guardar los valores originales de los campos
-            var originalValues = {};
-            var fields = document.querySelectorAll('#laboral-info-form input, #laboral-info-form select');
-            fields.forEach(function(field) {
-                originalValues[field.id] = field.value;
-            });
+                                document.addEventListener("DOMContentLoaded", function() {
+                                    // Al cargar la página, guardar los valores originales de los campos
+                                    var originalValues = {};
+                                    var fields = document.querySelectorAll('#laboral-info-form input, #laboral-info-form select');
+                                    fields.forEach(function(field) {
+                                        originalValues[field.id] = field.value;
+                                    });
 
-            // Botón Editar
-            document.getElementById('edit-button-laboral').addEventListener('click', function() {
-                fields.forEach(function(field) {
-                    field.readOnly = false;
-                    field.disabled = false;
-                });
-                document.getElementById('dias-laborales-display').style.display = 'none';
-                document.getElementById('dias-laborales-checkboxes').style.display = 'block';
-                document.getElementById('edit-button-laboral').style.display = 'none';
-                document.getElementById('save-button-laboral').style.display = 'block';
-                document.getElementById('cancel-button-laboral').style.display = 'block';
-            });
+                                    // Botón Editar
+                                    document.getElementById('edit-button-laboral').addEventListener('click', function() {
+                                        fields.forEach(function(field) {
+                                            field.readOnly = false;
+                                            field.disabled = false;
+                                        });
+                                        document.getElementById('dias-laborales-display').style.display = 'none';
+                                        document.getElementById('dias-laborales-checkboxes').style.display = 'block';
+                                        document.getElementById('edit-button-laboral').style.display = 'none';
+                                        document.getElementById('save-button-laboral').style.display = 'block';
+                                        document.getElementById('cancel-button-laboral').style.display = 'block';
+                                    });
 
-            // Botón Cancelar
-            document.getElementById('cancel-button-laboral').addEventListener('click', function() {
-                fields.forEach(function(field) {
-                    field.readOnly = true;
-                    field.disabled = true;
-                    // Restaurar al valor original
-                    field.value = originalValues[field.id];
-                });
-                document.getElementById('dias-laborales-display').style.display = 'block';
-                document.getElementById('dias-laborales-checkboxes').style.display = 'none';
-                document.getElementById('edit-button-laboral').style.display = 'block';
-                document.getElementById('save-button-laboral').style.display = 'none';
-                document.getElementById('cancel-button-laboral').style.display = 'none';
-            });
-        });
-    </script>
+                                    // Botón Cancelar
+                                    document.getElementById('cancel-button-laboral').addEventListener('click', function() {
+                                        fields.forEach(function(field) {
+                                            field.readOnly = true;
+                                            field.disabled = true;
+                                            // Restaurar al valor original
+                                            field.value = originalValues[field.id];
+                                        });
+                                        document.getElementById('dias-laborales-display').style.display = 'block';
+                                        document.getElementById('dias-laborales-checkboxes').style.display = 'none';
+                                        document.getElementById('edit-button-laboral').style.display = 'block';
+                                        document.getElementById('save-button-laboral').style.display = 'none';
+                                        document.getElementById('cancel-button-laboral').style.display = 'none';
+                                    });
+                                });
+                            </script>
 
 
                             <?php $this->endBlock(); ?>
@@ -1194,18 +1289,18 @@ if (!$modelAlergia) {
                             <div class="card">
                                 <div class="card-body">
                                     <div class="card-header bg-success text-dark text-center">
-                                   <?php if (Yii::$app->user->can('ver-solicitudes-formatos')) {?>
+                                        <?php if (Yii::$app->user->can('ver-solicitudes-formatos')) { ?>
 
-                                        <h3>HISTORIAL DE SOLICITUDES DE INCIDENCIAS: </h3>
+                                            <h3>HISTORIAL DE SOLICITUDES DE INCIDENCIAS: </h3>
 
-                                       
 
-                                        <?php }elseif(Yii::$app->user->can('ver-solicitudes-medicas')) {?>
+
+                                        <?php } elseif (Yii::$app->user->can('ver-solicitudes-medicas')) { ?>
                                             <h3>HISTORIAL DE SOLICITUDES MEDICAS: </h3>
 
 
 
-<?php }?>
+                                        <?php } ?>
                                     </div>
 
                                     <li class="dropdown-divider"></li>
@@ -1248,7 +1343,7 @@ if (!$modelAlergia) {
                                                         ],
                                                     ]),
                                                 ],
-                                              
+
                                                 [
                                                     'attribute' => 'nombre_formato',
                                                     'label' => 'Tipo de solicitud',
@@ -1303,7 +1398,7 @@ if (!$modelAlergia) {
 
 
 
-                                        
+
                                         ?>
 
 
@@ -1315,7 +1410,7 @@ if (!$modelAlergia) {
                             <?php $this->endBlock(); ?>
 
 
-                           
+
 
 
                             <?php
@@ -1348,7 +1443,7 @@ if (!$modelAlergia) {
                                         'id' => 'informacion_solicitudes',
                                     ],
                                 ],
-                               
+
                             ];
 
                             if (Yii::$app->user->can('ver-informacion-vacacional')) {
@@ -1372,88 +1467,88 @@ if (!$modelAlergia) {
                             ?>
 
 
-<?php $this->beginBlock('info_consultas'); ?>
-<div class="card">
-    <div class="card-body">
-        <div class="card-header bg-success text-dark text-center">
-            <h3>HISTORIAL DE CONSULTAS MEDICAS: </h3>
-        </div>
-        <li class="dropdown-divider"></li>
-        <div class="row">
-            <?php Pjax::begin(); ?>
-            <?= GridView::widget([
-                'dataProvider' => $dataProviderConsultas,
-                'filterModel' => $searchModelConsultas,
-                'columns' => [
-                    ['class' => 'yii\grid\SerialColumn'],
-                  
+                            <?php $this->beginBlock('info_consultas'); ?>
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="card-header bg-success text-dark text-center">
+                                        <h3>HISTORIAL DE CONSULTAS MEDICAS: </h3>
+                                    </div>
+                                    <li class="dropdown-divider"></li>
+                                    <div class="row">
+                                        <?php Pjax::begin(); ?>
+                                        <?= GridView::widget([
+                                            'dataProvider' => $dataProviderConsultas,
+                                            'filterModel' => $searchModelConsultas,
+                                            'columns' => [
+                                                ['class' => 'yii\grid\SerialColumn'],
 
-                   
-                    [
-                        'label' => 'Fecha de la consula',
-                        'attribute' => 'created_at',
-                        'format' => 'raw',
-                        'value' => function ($model) {
-                            setlocale(LC_TIME, "es_419.UTF-8");
-                            return strftime('%A, %d de %B de %Y', strtotime($model->created_at));
-                        },
-                        'filter' => DatePicker::widget([
-                            'model' => $searchModelConsultas,
-                            'attribute' => 'created_at',
-                            'language' => 'es',
-                            'dateFormat' => 'php:Y-m-d',
-                            'options' => [
-                                'class' => 'form-control',
-                                'autocomplete' => 'off',
-                            ],
-                            'clientOptions' => [
-                                'changeYear' => true,
-                                'changeMonth' => true,
-                                'yearRange' => '-100:+0',
-                            ],
-                           
-                        ]),
-                    ],
-                    
-                    [
-                        'label' => 'Motivo de la consulta',
-                        'attribute' => 'motivo',
-                        'format' => 'html',
-                        'value' => function ($model) {
-                            return \yii\helpers\Html::decode($model->motivo);
-                        },
-                        'filter' => false,
-                        'options' => ['style' => 'width: 65%;'],
-                    ],
-                    // Otras columnas que desees mostrar...
-                    [
-                        'class' => 'hail812\adminlte3\yii\grid\ActionColumn',
-                        'template' => '{view} {delete}',
-                        'buttons' => [
-                            'view' => function ($url, $model, $key) {
-                                return Html::a('<i class="fa fa-eye"></i>', ['consulta-medica/view', 'id' => $model->id], ['title' => 'Ver', 'class' => 'btn btn-primary btn-xs']);
-                            },
-                            'delete' => function ($url, $model, $key) {
-                                return Html::a('<i class="fa fa-trash"></i>', ['consulta-medica/delete', 'id' => $model->id], [
-                                    'title' => 'Eliminar',
-                                    'class' => 'btn btn-danger btn-xs',
-                                    'data-confirm' => '¿Estás seguro de eliminar este elemento?',
-                                    'data-method' => 'post',
-                                ]);
-                            },
-                        ],
-                    ],
-                ],
-                'summaryOptions' => ['class' => 'summary mb-2'],
-                'pager' => [
-                    'class' => 'yii\bootstrap4\LinkPager',
-                ],
-            ]); ?>
-            <?php Pjax::end(); ?>
-        </div>
-    </div>
-</div>
-<?php $this->endBlock(); ?>
+
+
+                                                [
+                                                    'label' => 'Fecha de la consula',
+                                                    'attribute' => 'created_at',
+                                                    'format' => 'raw',
+                                                    'value' => function ($model) {
+                                                        setlocale(LC_TIME, "es_419.UTF-8");
+                                                        return strftime('%A, %d de %B de %Y', strtotime($model->created_at));
+                                                    },
+                                                    'filter' => DatePicker::widget([
+                                                        'model' => $searchModelConsultas,
+                                                        'attribute' => 'created_at',
+                                                        'language' => 'es',
+                                                        'dateFormat' => 'php:Y-m-d',
+                                                        'options' => [
+                                                            'class' => 'form-control',
+                                                            'autocomplete' => 'off',
+                                                        ],
+                                                        'clientOptions' => [
+                                                            'changeYear' => true,
+                                                            'changeMonth' => true,
+                                                            'yearRange' => '-100:+0',
+                                                        ],
+
+                                                    ]),
+                                                ],
+
+                                                [
+                                                    'label' => 'Motivo de la consulta',
+                                                    'attribute' => 'motivo',
+                                                    'format' => 'html',
+                                                    'value' => function ($model) {
+                                                        return \yii\helpers\Html::decode($model->motivo);
+                                                    },
+                                                    'filter' => false,
+                                                    'options' => ['style' => 'width: 65%;'],
+                                                ],
+                                                // Otras columnas que desees mostrar...
+                                                [
+                                                    'class' => 'hail812\adminlte3\yii\grid\ActionColumn',
+                                                    'template' => '{view} {delete}',
+                                                    'buttons' => [
+                                                        'view' => function ($url, $model, $key) {
+                                                            return Html::a('<i class="fa fa-eye"></i>', ['consulta-medica/view', 'id' => $model->id], ['title' => 'Ver', 'class' => 'btn btn-primary btn-xs']);
+                                                        },
+                                                        'delete' => function ($url, $model, $key) {
+                                                            return Html::a('<i class="fa fa-trash"></i>', ['consulta-medica/delete', 'id' => $model->id], [
+                                                                'title' => 'Eliminar',
+                                                                'class' => 'btn btn-danger btn-xs',
+                                                                'data-confirm' => '¿Estás seguro de eliminar este elemento?',
+                                                                'data-method' => 'post',
+                                                            ]);
+                                                        },
+                                                    ],
+                                                ],
+                                            ],
+                                            'summaryOptions' => ['class' => 'summary mb-2'],
+                                            'pager' => [
+                                                'class' => 'yii\bootstrap4\LinkPager',
+                                            ],
+                                        ]); ?>
+                                        <?php Pjax::end(); ?>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php $this->endBlock(); ?>
 
 
 
@@ -1596,8 +1691,28 @@ if (!$modelAlergia) {
                                                     ],
                                                     [
                                                         'attribute' => 'fecha_subida',
-                                                        'filter' => false,
+                                                        'format' => 'raw',
+                                                        'value' => function ($model) {
+                                                            setlocale(LC_TIME, "es_419.UTF-8");
+                                                            return strftime('%A, %d de %B de %Y', strtotime($model->fecha_subida));
+                                                        },
+                                                        'filter' => DatePicker::widget([
+                                                            'model' => $searchModel,
+                                                            'attribute' => 'fecha_subida',
+                                                            'language' => 'es',
+                                                            'dateFormat' => 'php:Y-m-d',
+                                                            'options' => [
+                                                                'class' => 'form-control',
+                                                                'autocomplete' => 'off',
+                                                            ],
+                                                            'clientOptions' => [
+                                                                'changeYear' => true,
+                                                                'changeMonth' => true,
+                                                                'yearRange' => '-100:+0',
+                                                            ],
+                                                        ]),
                                                         'options' => ['style' => 'width: 30%;'],
+
                                                     ],
                                                     [
                                                         'attribute' => 'observacion',
@@ -1678,6 +1793,207 @@ if (!$modelAlergia) {
 
                             <?php $this->endBlock(); ?>
                             <?php $this->beginBlock('expediente_medico'); ?>
+
+                            <?php $this->beginBlock('documento-medico'); ?>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="card">
+                                        <div class="card-header bg-info text-white">
+                                            <h3>Documentos médicos del empleado</h3>
+                                            <?php if (Yii::$app->user->can('acciones-documentos-medicos')) { ?>
+
+                                                <button type="button" id="toggle-expediente-medico-button" class="btn btn-dark float-right">
+                                                    <i class="fa fa-upload"></i>&nbsp; &nbsp; Agregar nuevo archivo
+                                                </button>
+
+                                            <?php } ?>
+                                        </div>
+
+                                        <script>
+                                            document.getElementById('toggle-expediente-medico-button').addEventListener('click', function() {
+                                                var expedienteMedicoContent = document.getElementById('expediente-medico-content');
+                                                if (expedienteMedicoContent.style.display === 'none') {
+                                                    expedienteMedicoContent.style.display = 'block';
+                                                    this.innerHTML = '<i class="fa fa-ban"></i> &nbsp; Cancelar';
+                                                } else {
+                                                    expedienteMedicoContent.style.display = 'none';
+                                                    this.innerHTML = '<i class="fa fa-upload"></i> &nbsp; &nbsp; Agregar nuevo archivo';
+                                                }
+                                            });
+                                        </script>
+
+                                        <div class="card-body" id="expediente-medico-content" style="display: none;">
+                                            <?php $form = ActiveForm::begin([
+                                                'action' => ['documento-medico/create', 'empleado_id' => $model->id],
+                                                'options' => ['enctype' => 'multipart/form-data', 'class' => 'narrow-form']
+                                            ]); ?>
+
+                                            <div class="form-group">
+                                                <?= $form->field($documentoMedicoModel, 'nombre')->textInput([
+                                                    'maxlength' => true,
+                                                    'placeholder' => 'Ingrese el nombre del documento'
+                                                ])->label('Nombre del documento') ?>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <?= $form->field($documentoMedicoModel, 'observacion')->widget(FroalaEditorWidget::className(), [
+                                                    'clientOptions' => [
+                                                        'toolbarInline' => false,
+                                                        'theme' => 'royal',
+                                                        'language' => 'es',
+                                                        'height' => 150,
+                                                        'pluginsEnabled' => [
+                                                            'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
+                                                            'draggable', 'entities', 'fontFamily',
+                                                            'fontSize', 'fullscreen', 'inlineStyle',
+                                                            'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
+                                                            'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
+                                                        ]
+                                                    ]
+                                                ]) ?>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <?= $form->field($documentoMedicoModel, 'ruta')->widget(FileInput::classname(), [
+                                                    //'options' => ['accept' => 'pdf'],
+                                                    'pluginOptions' => [
+                                                        'showUpload' => false,
+                                                        'showCancel' => false,
+                                                        'allowedFileExtensions' => ['pdf', 'jpg', 'xlsx'],
+
+                                                    ],
+                                                ])->label('Archivo') ?>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <?= Html::submitButton('Subir archivo <i class="fa fa-upload"></i>', ['class' => 'btn btn-warning float-right']) ?>
+                                            </div>
+
+                                            <?php ActiveForm::end(); ?>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row justify-content-center">
+
+                                    <div class="col-md-12 mt-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <?php
+                                                $searchModel = new DocumentoMedicoSearch();
+                                                $params = Yii::$app->request->queryParams;
+                                                $params[$searchModel->formName()]['empleado_id'] = $model->id;
+                                                $dataProvider = $searchModel->search($params);
+                                                ?>
+
+                                                <?php Pjax::begin(); ?>
+
+                                                <?= GridView::widget([
+                                                    'dataProvider' => $dataProvider,
+                                                    'filterModel' => $searchModel,
+                                                    'columns' => [
+                                                        ['class' => 'yii\grid\SerialColumn'],
+                                                        [
+                                                            'attribute' => 'nombre',
+                                                            'value' => 'nombre',
+                                                            'filter' => false,
+                                                            'options' => ['style' => 'width: 20%;'],
+                                                        ],
+
+                                                        [
+                                                            'attribute' => 'fecha_subida',
+                                                            'format' => 'raw',
+                                                            'value' => function ($model) {
+                                                                setlocale(LC_TIME, "es_419.UTF-8");
+                                                                return strftime('%A, %d de %B de %Y', strtotime($model->fecha_subida));
+                                                            },
+                                                            'filter' => DatePicker::widget([
+                                                                'model' => $searchModel,
+                                                                'attribute' => 'fecha_subida',
+                                                                'language' => 'es',
+                                                                'dateFormat' => 'php:Y-m-d',
+                                                                'options' => [
+                                                                    'class' => 'form-control',
+                                                                    'autocomplete' => 'off',
+                                                                ],
+                                                                'clientOptions' => [
+                                                                    'changeYear' => true,
+                                                                    'changeMonth' => true,
+                                                                    'yearRange' => '-100:+0',
+                                                                ],
+                                                            ]),
+                                                        ],
+                                                        [
+                                                            'attribute' => 'observacion',
+                                                            'format' => 'html',
+                                                            'value' => function ($model) {
+                                                                return \yii\helpers\Html::decode($model->observacion);
+                                                            },
+                                                            'filter' => false,
+                                                            'options' => ['style' => 'width: 51%;'],
+                                                        ],
+                                                        [
+                                                            'class' => 'hail812\adminlte3\yii\grid\ActionColumn',
+                                                            //'template' => '{view} {delete} {download}',
+                                                            'template' => Yii::$app->user->can('acciones-documentos-medicos') ? '{view} {delete} {download}' : '{view} {download}',
+
+                                                            'buttons' => [
+                                                                'view' => function ($url, $model) {
+                                                                    // Verificar si el archivo es PDF o imagen
+                                                                    $extensionsToShowEye = ['pdf', 'jpg', 'jpeg', 'png', 'gif'];
+                                                                    $fileExtension = pathinfo($model->ruta, PATHINFO_EXTENSION);
+
+                                                                    if (in_array(strtolower($fileExtension), $extensionsToShowEye)) {
+                                                                        return Html::a('<i class="far fa-eye"></i>', ['documento-medico/open', 'id' => $model->id], [
+                                                                            'target' => '_blank',
+                                                                            'title' => 'Ver archivo',
+                                                                            'class' => 'btn btn-info btn-xs',
+                                                                            'data-pjax' => "0"
+                                                                        ]);
+                                                                    } else {
+                                                                        // Si no es un archivo con extensión permitida, no mostrar el ícono del ojo
+                                                                        return '';
+                                                                    }
+                                                                },
+                                                                'delete' => function ($url, $model) {
+                                                                    return Html::a('<i class="fas fa-trash"></i>', ['documento-medico/delete', 'id' => $model->id, 'empleado_id' => $model->empleado_id], [
+                                                                        'title' => Yii::t('yii', 'Eliminar'),
+                                                                        'data-confirm' => Yii::t('yii', '¿Estás seguro de que deseas eliminar este elemento?'),
+                                                                        'data-method' => 'post',
+                                                                        'class' => 'btn btn-danger btn-xs',
+                                                                    ]);
+                                                                },
+                                                                'download' => function ($url, $model) {
+                                                                    return Html::a('<i class="fas fa-download"></i>', ['documento-medico/download', 'id' => $model->id], [
+                                                                        'title' => 'Descargar archivo',
+                                                                        'class' => 'btn btn-success btn-xs',
+                                                                        'data-pjax' => "0"
+                                                                    ]);
+                                                                },
+                                                            ],
+
+                                                        ],
+                                                    ],
+                                                    'summaryOptions' => ['class' => 'summary mb-2'],
+                                                    'pager' => [
+                                                        'class' => 'yii\bootstrap4\LinkPager',
+                                                    ],
+                                                    'tableOptions' => ['class' => 'no-style-gridview'],
+                                                    'rowOptions' => function ($model, $key, $index, $grid) {
+                                                        return ['class' => 'no-style-gridview'];
+                                                    },
+                                                ]); ?>
+
+                                                <?php Pjax::end(); ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php $this->endBlock(); ?>
+
+
+
+
                             <?php $this->beginBlock('antecedentes'); ?>
 
                             <!-- Bloque de antecedentes hereditarios -->
@@ -3758,7 +4074,7 @@ JS;
 
 
 
- <!-- TABS EXPEDIENTE MEDICO / ANTECEDENTES SUBTAB -->
+                            <!-- TABS EXPEDIENTE MEDICO / ANTECEDENTES SUBTAB -->
 
                             <?php echo TabsX::widget([
                                 'enableStickyTabs' => true,
@@ -3844,11 +4160,11 @@ JS;
 
 
                             <?php $this->endBlock(); ?>
-                            
+
 
                             <?php $this->beginBlock('alergias'); ?>
                             <div class="row">
-                            <?php $form = ActiveForm::begin(['action' => ['alergia', 'id' => $model->id]]); ?>
+                                <?php $form = ActiveForm::begin(['action' => ['alergia', 'id' => $model->id]]); ?>
 
                                 <div class="col-md-12">
 
@@ -3960,7 +4276,7 @@ JS;
 
                                                             <div class="form-group bg-white">
                                                                 <?= Html::label('Descripción') ?>
-<br>
+                                                                <br>
 
                                                                 <?php
 
@@ -4013,8 +4329,8 @@ JS;
 
 
                                                             <div class="form-group bg-white">
-                                                            <?= Html::label('Descripción') ?>
-                                                            <br>
+                                                                <?= Html::label('Descripción') ?>
+                                                                <br>
 
 
                                                                 <?php
@@ -4064,12 +4380,12 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                        
+
 
 
                                                             <div class="form-group bg-white">
-                                                            <?= Html::label('Descripción') ?>
-                                                            <br>
+                                                                <?= Html::label('Descripción') ?>
+                                                                <br>
 
 
                                                                 <?php
@@ -4112,31 +4428,29 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                            
+
 
                                                             <div class="form-group bg-white">
-                                                            <?= Html::label('Descripción') ?>
-                                                            <br>
+                                                                <?= Html::label('Descripción') ?>
+                                                                <br>
 
 
-                                                            <?php
-                                                            
-                        if ($editable) {
-                            echo $form->field($ExploracionFisica, 'desc_torax')->widget(FroalaEditorWidget::className(), [
-                                'options' => [
-                                                                        'id' => 'exp-fisca'
-                                                                    ],
-                                                                    
-                            ])->label(false);
-                        } else {
-                            // Si no tiene permiso, mostrar el texto plano
-                            $htmlcont= Html::decode($ExploracionFisica->desc_torax);
-                            echo HtmlPurifier::process($htmlcont);
-                           
-                            
-                        }
-                        ?>
-                    </div>
+                                                                <?php
+
+                                                                if ($editable) {
+                                                                    echo $form->field($ExploracionFisica, 'desc_torax')->widget(FroalaEditorWidget::className(), [
+                                                                        'options' => [
+                                                                            'id' => 'exp-fisca'
+                                                                        ],
+
+                                                                    ])->label(false);
+                                                                } else {
+                                                                    // Si no tiene permiso, mostrar el texto plano
+                                                                    $htmlcont = Html::decode($ExploracionFisica->desc_torax);
+                                                                    echo HtmlPurifier::process($htmlcont);
+                                                                }
+                                                                ?>
+                                                            </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -4159,31 +4473,29 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                        
+
 
                                                             <div class="form-group bg-white">
-                                                            <?= Html::label('Descripción') ?>
-                                                            <br>
+                                                                <?= Html::label('Descripción') ?>
+                                                                <br>
 
 
-                                                            <?php
-                                                            
-                        if ($editable) {
-                            echo $form->field($ExploracionFisica, 'desc_abdomen')->widget(FroalaEditorWidget::className(), [
-                                'options' => [
-                                                                        'id' => 'exp-fisca'
-                                                                    ],
-                                                                    
-                            ])->label(false);
-                        } else {
-                            // Si no tiene permiso, mostrar el texto plano
-                            $htmlcont= Html::decode($ExploracionFisica->desc_abdomen);
-                            echo HtmlPurifier::process($htmlcont);
-                           
-                            
-                        }
-                        ?>
-                    </div>
+                                                                <?php
+
+                                                                if ($editable) {
+                                                                    echo $form->field($ExploracionFisica, 'desc_abdomen')->widget(FroalaEditorWidget::className(), [
+                                                                        'options' => [
+                                                                            'id' => 'exp-fisca'
+                                                                        ],
+
+                                                                    ])->label(false);
+                                                                } else {
+                                                                    // Si no tiene permiso, mostrar el texto plano
+                                                                    $htmlcont = Html::decode($ExploracionFisica->desc_abdomen);
+                                                                    echo HtmlPurifier::process($htmlcont);
+                                                                }
+                                                                ?>
+                                                            </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -4206,31 +4518,29 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                            
+
 
                                                             <div class="form-group bg-white">
-                                                            <?= Html::label('Descripción') ?>
-                                                            <br>
+                                                                <?= Html::label('Descripción') ?>
+                                                                <br>
 
 
-                                                            <?php
-                                                            
-                        if ($editable) {
-                            echo $form->field($ExploracionFisica, 'desc_exploración_ginecologica')->widget(FroalaEditorWidget::className(), [
-                                'options' => [
-                                                                        'id' => 'exp-fisca'
-                                                                    ],
-                                                                    
-                            ])->label(false);
-                        } else {
-                            // Si no tiene permiso, mostrar el texto plano
-                            $htmlcont= Html::decode($ExploracionFisica->desc_exploración_ginecologica);
-                            echo HtmlPurifier::process($htmlcont);
-                           
-                            
-                        }
-                        ?>
-                    </div>
+                                                                <?php
+
+                                                                if ($editable) {
+                                                                    echo $form->field($ExploracionFisica, 'desc_exploración_ginecologica')->widget(FroalaEditorWidget::className(), [
+                                                                        'options' => [
+                                                                            'id' => 'exp-fisca'
+                                                                        ],
+
+                                                                    ])->label(false);
+                                                                } else {
+                                                                    // Si no tiene permiso, mostrar el texto plano
+                                                                    $htmlcont = Html::decode($ExploracionFisica->desc_exploración_ginecologica);
+                                                                    echo HtmlPurifier::process($htmlcont);
+                                                                }
+                                                                ?>
+                                                            </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -4254,28 +4564,26 @@ JS;
                                                             <!-- Columna derecha con el textarea -->
 
                                                             <div class="form-group bg-white">
-                                                            <?= Html::label('Descripción') ?>
-                                                            <br>
+                                                                <?= Html::label('Descripción') ?>
+                                                                <br>
 
 
-                                                            <?php
-                                                            
-                        if ($editable) {
-                            echo $form->field($ExploracionFisica, 'desc_genitales')->widget(FroalaEditorWidget::className(), [
-                                'options' => [
-                                                                        'id' => 'exp-fisca'
-                                                                    ],
-                                                                    
-                            ])->label(false);
-                        } else {
-                            // Si no tiene permiso, mostrar el texto plano
-                            $htmlcont= Html::decode($ExploracionFisica->desc_genitales);
-                            echo HtmlPurifier::process($htmlcont);
-                           
-                            
-                        }
-                        ?>
-                    </div>
+                                                                <?php
+
+                                                                if ($editable) {
+                                                                    echo $form->field($ExploracionFisica, 'desc_genitales')->widget(FroalaEditorWidget::className(), [
+                                                                        'options' => [
+                                                                            'id' => 'exp-fisca'
+                                                                        ],
+
+                                                                    ])->label(false);
+                                                                } else {
+                                                                    // Si no tiene permiso, mostrar el texto plano
+                                                                    $htmlcont = Html::decode($ExploracionFisica->desc_genitales);
+                                                                    echo HtmlPurifier::process($htmlcont);
+                                                                }
+                                                                ?>
+                                                            </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -4299,31 +4607,29 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                            
+
 
                                                             <div class="form-group bg-white">
-                                                            <?= Html::label('Descripción') ?>
-                                                            <br>
+                                                                <?= Html::label('Descripción') ?>
+                                                                <br>
 
 
-                                                            <?php
-                                                            
-                        if ($editable) {
-                            echo $form->field($ExploracionFisica, 'desc_columna_vertebral')->widget(FroalaEditorWidget::className(), [
-                                'options' => [
-                                                                        'id' => 'exp-fisca'
-                                                                    ],
-                                                                    
-                            ])->label(false);
-                        } else {
-                            // Si no tiene permiso, mostrar el texto plano
-                            $htmlcont= Html::decode($ExploracionFisica->desc_columna_vertebral);
-                            echo HtmlPurifier::process($htmlcont);
-                           
-                            
-                        }
-                        ?>
-                    </div>
+                                                                <?php
+
+                                                                if ($editable) {
+                                                                    echo $form->field($ExploracionFisica, 'desc_columna_vertebral')->widget(FroalaEditorWidget::className(), [
+                                                                        'options' => [
+                                                                            'id' => 'exp-fisca'
+                                                                        ],
+
+                                                                    ])->label(false);
+                                                                } else {
+                                                                    // Si no tiene permiso, mostrar el texto plano
+                                                                    $htmlcont = Html::decode($ExploracionFisica->desc_columna_vertebral);
+                                                                    echo HtmlPurifier::process($htmlcont);
+                                                                }
+                                                                ?>
+                                                            </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -4344,31 +4650,29 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                            
+
 
                                                             <div class="form-group bg-white">
-                                                            <?= Html::label('Descripción') ?>
-                                                            <br>
+                                                                <?= Html::label('Descripción') ?>
+                                                                <br>
 
 
-                                                            <?php
-                                                            
-                        if ($editable) {
-                            echo $form->field($ExploracionFisica, 'desc_extremidades')->widget(FroalaEditorWidget::className(), [
-                                'options' => [
-                                                                        'id' => 'exp-fisca'
-                                                                    ],
-                                                                    
-                            ])->label(false);
-                        } else {
-                            // Si no tiene permiso, mostrar el texto plano
-                            $htmlcont= Html::decode($ExploracionFisica->desc_extremidades);
-                            echo HtmlPurifier::process($htmlcont);
-                           
-                            
-                        }
-                        ?>
-                    </div>
+                                                                <?php
+
+                                                                if ($editable) {
+                                                                    echo $form->field($ExploracionFisica, 'desc_extremidades')->widget(FroalaEditorWidget::className(), [
+                                                                        'options' => [
+                                                                            'id' => 'exp-fisca'
+                                                                        ],
+
+                                                                    ])->label(false);
+                                                                } else {
+                                                                    // Si no tiene permiso, mostrar el texto plano
+                                                                    $htmlcont = Html::decode($ExploracionFisica->desc_extremidades);
+                                                                    echo HtmlPurifier::process($htmlcont);
+                                                                }
+                                                                ?>
+                                                            </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -4391,31 +4695,29 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                           
+
 
                                                             <div class="form-group bg-white">
-                                                            <?= Html::label('Descripción') ?>
-                                                            <br>
+                                                                <?= Html::label('Descripción') ?>
+                                                                <br>
 
 
-                                                            <?php
-                                                            
-                        if ($editable) {
-                            echo $form->field($ExploracionFisica, 'desc_exploracion_neurologica')->widget(FroalaEditorWidget::className(), [
-                                'options' => [
-                                                                        'id' => 'exp-fisca'
-                                                                    ],
-                                                                    
-                            ])->label(false);
-                        } else {
-                            // Si no tiene permiso, mostrar el texto plano
-                            $htmlcont= Html::decode($ExploracionFisica->desc_exploracion_neurologica);
-                            echo HtmlPurifier::process($htmlcont);
-                           
-                            
-                        }
-                        ?>
-                    </div>
+                                                                <?php
+
+                                                                if ($editable) {
+                                                                    echo $form->field($ExploracionFisica, 'desc_exploracion_neurologica')->widget(FroalaEditorWidget::className(), [
+                                                                        'options' => [
+                                                                            'id' => 'exp-fisca'
+                                                                        ],
+
+                                                                    ])->label(false);
+                                                                } else {
+                                                                    // Si no tiene permiso, mostrar el texto plano
+                                                                    $htmlcont = Html::decode($ExploracionFisica->desc_exploracion_neurologica);
+                                                                    echo HtmlPurifier::process($htmlcont);
+                                                                }
+                                                                ?>
+                                                            </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -4442,11 +4744,11 @@ JS;
                                                 <br>
                                                 <?php if (Yii::$app->user->can('editar-expediente-medico')) { ?>
 
-                                                <div class="form-group">
-                                                    <?= Html::submitButton('Guardar Todos los Cambios &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
-                                                </div>
+                                                    <div class="form-group">
+                                                        <?= Html::submitButton('Guardar Todos los Cambios &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                                                    </div>
 
-                                                <?php }?>
+                                                <?php } ?>
 
                                             </div>
 
@@ -4471,10 +4773,10 @@ JS;
                                             <h2>Interrogatorio Medico</h2>
                                             <?php if (Yii::$app->user->can('editar-expediente-medico')) { ?>
 
-                                            <div class="float-submit-btn">
-                                                <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
-                                            </div>
-                                            <?php }?>
+                                                <div class="float-submit-btn">
+                                                    <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                                                </div>
+                                            <?php } ?>
 
                                         </div>
                                         <div class="card-body">
@@ -4489,31 +4791,29 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                            
+
 
                                                             <div class="form-group bg-white">
-                                                            <?= Html::label('Descripción') ?>
-                                                            <br>
+                                                                <?= Html::label('Descripción') ?>
+                                                                <br>
 
 
-                                                            <?php
-                                                            
-                        if ($editable) {
-                            echo $form->field($InterrogatorioMedico, 'desc_cardiovascular')->widget(FroalaEditorWidget::className(), [
-                                'options' => [
-                                                                        'id' => 'exp-fisca'
-                                                                    ],
-                                                                    
-                            ])->label(false);
-                        } else {
-                            // Si no tiene permiso, mostrar el texto plano
-                            $htmlcont= Html::decode($InterrogatorioMedico->desc_cardiovascular);
-                            echo HtmlPurifier::process($htmlcont);
-                           
-                            
-                        }
-                        ?>
-                    </div>
+                                                                <?php
+
+                                                                if ($editable) {
+                                                                    echo $form->field($InterrogatorioMedico, 'desc_cardiovascular')->widget(FroalaEditorWidget::className(), [
+                                                                        'options' => [
+                                                                            'id' => 'exp-fisca'
+                                                                        ],
+
+                                                                    ])->label(false);
+                                                                } else {
+                                                                    // Si no tiene permiso, mostrar el texto plano
+                                                                    $htmlcont = Html::decode($InterrogatorioMedico->desc_cardiovascular);
+                                                                    echo HtmlPurifier::process($htmlcont);
+                                                                }
+                                                                ?>
+                                                            </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -4535,31 +4835,29 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                          
+
 
                                                             <div class="form-group bg-white">
-                                                            <?= Html::label('Descripción') ?>
-                                                            <br>
+                                                                <?= Html::label('Descripción') ?>
+                                                                <br>
 
 
-                                                            <?php
-                                                            
-                        if ($editable) {
-                            echo $form->field($InterrogatorioMedico, 'desc_digestivo')->widget(FroalaEditorWidget::className(), [
-                                'options' => [
-                                                                        'id' => 'exp-fisca'
-                                                                    ],
-                                                                    
-                            ])->label(false);
-                        } else {
-                            // Si no tiene permiso, mostrar el texto plano
-                            $htmlcont= Html::decode($InterrogatorioMedico->desc_digestivo);
-                            echo HtmlPurifier::process($htmlcont);
-                           
-                            
-                        }
-                        ?>
-                    </div>
+                                                                <?php
+
+                                                                if ($editable) {
+                                                                    echo $form->field($InterrogatorioMedico, 'desc_digestivo')->widget(FroalaEditorWidget::className(), [
+                                                                        'options' => [
+                                                                            'id' => 'exp-fisca'
+                                                                        ],
+
+                                                                    ])->label(false);
+                                                                } else {
+                                                                    // Si no tiene permiso, mostrar el texto plano
+                                                                    $htmlcont = Html::decode($InterrogatorioMedico->desc_digestivo);
+                                                                    echo HtmlPurifier::process($htmlcont);
+                                                                }
+                                                                ?>
+                                                            </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -4577,31 +4875,29 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                           
+
 
                                                             <div class="form-group bg-white">
-                                                            <?= Html::label('Descripción') ?>
-                                                            <br>
+                                                                <?= Html::label('Descripción') ?>
+                                                                <br>
 
 
-                                                            <?php
-                                                            
-                        if ($editable) {
-                            echo $form->field($InterrogatorioMedico, 'desc_endocrino')->widget(FroalaEditorWidget::className(), [
-                                'options' => [
-                                                                        'id' => 'exp-fisca'
-                                                                    ],
-                                                                    
-                            ])->label(false);
-                        } else {
-                            // Si no tiene permiso, mostrar el texto plano
-                            $htmlcont= Html::decode($InterrogatorioMedico->desc_endocrino);
-                            echo HtmlPurifier::process($htmlcont);
-                           
-                            
-                        }
-                        ?>
-                    </div>
+                                                                <?php
+
+                                                                if ($editable) {
+                                                                    echo $form->field($InterrogatorioMedico, 'desc_endocrino')->widget(FroalaEditorWidget::className(), [
+                                                                        'options' => [
+                                                                            'id' => 'exp-fisca'
+                                                                        ],
+
+                                                                    ])->label(false);
+                                                                } else {
+                                                                    // Si no tiene permiso, mostrar el texto plano
+                                                                    $htmlcont = Html::decode($InterrogatorioMedico->desc_endocrino);
+                                                                    echo HtmlPurifier::process($htmlcont);
+                                                                }
+                                                                ?>
+                                                            </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -4621,30 +4917,28 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                        
+
                                                             <div class="form-group bg-white">
-                                                            <?= Html::label('Descripción') ?>
-                                                            <br>
+                                                                <?= Html::label('Descripción') ?>
+                                                                <br>
 
 
-                                                            <?php
-                                                            
-                        if ($editable) {
-                            echo $form->field($InterrogatorioMedico, 'desc_hemolinfatico')->widget(FroalaEditorWidget::className(), [
-                                'options' => [
-                                                                        'id' => 'exp-fisca'
-                                                                    ],
-                                                                    
-                            ])->label(false);
-                        } else {
-                            // Si no tiene permiso, mostrar el texto plano
-                            $htmlcont= Html::decode($InterrogatorioMedico->desc_hemolinfatico);
-                            echo HtmlPurifier::process($htmlcont);
-                           
-                            
-                        }
-                        ?>
-                    </div>
+                                                                <?php
+
+                                                                if ($editable) {
+                                                                    echo $form->field($InterrogatorioMedico, 'desc_hemolinfatico')->widget(FroalaEditorWidget::className(), [
+                                                                        'options' => [
+                                                                            'id' => 'exp-fisca'
+                                                                        ],
+
+                                                                    ])->label(false);
+                                                                } else {
+                                                                    // Si no tiene permiso, mostrar el texto plano
+                                                                    $htmlcont = Html::decode($InterrogatorioMedico->desc_hemolinfatico);
+                                                                    echo HtmlPurifier::process($htmlcont);
+                                                                }
+                                                                ?>
+                                                            </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -4663,31 +4957,29 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                            
+
 
                                                             <div class="form-group bg-white">
-                                                            <?= Html::label('Descripción') ?>
-                                                            <br>
+                                                                <?= Html::label('Descripción') ?>
+                                                                <br>
 
 
-                                                            <?php
-                                                            
-                        if ($editable) {
-                            echo $form->field($InterrogatorioMedico, 'desc_mamas')->widget(FroalaEditorWidget::className(), [
-                                'options' => [
-                                                                        'id' => 'exp-fisca'
-                                                                    ],
-                                                                    
-                            ])->label(false);
-                        } else {
-                            // Si no tiene permiso, mostrar el texto plano
-                            $htmlcont= Html::decode($InterrogatorioMedico->desc_mamas);
-                            echo HtmlPurifier::process($htmlcont);
-                           
-                            
-                        }
-                        ?>
-                    </div>
+                                                                <?php
+
+                                                                if ($editable) {
+                                                                    echo $form->field($InterrogatorioMedico, 'desc_mamas')->widget(FroalaEditorWidget::className(), [
+                                                                        'options' => [
+                                                                            'id' => 'exp-fisca'
+                                                                        ],
+
+                                                                    ])->label(false);
+                                                                } else {
+                                                                    // Si no tiene permiso, mostrar el texto plano
+                                                                    $htmlcont = Html::decode($InterrogatorioMedico->desc_mamas);
+                                                                    echo HtmlPurifier::process($htmlcont);
+                                                                }
+                                                                ?>
+                                                            </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -4697,7 +4989,7 @@ JS;
 
                                                 </div>
                                                 <!-- aqui -->
-                                               
+
 
                                                 <div class="card">
                                                     <div class="card-header custom-nopato text-white text-left">
@@ -4709,28 +5001,26 @@ JS;
                                                             <!-- Columna derecha con el textarea -->
 
                                                             <div class="form-group bg-white">
-                                                            <?= Html::label('Descripción') ?>
-                                                            <br>
+                                                                <?= Html::label('Descripción') ?>
+                                                                <br>
 
 
-                                                            <?php
-                                                            
-                        if ($editable) {
-                            echo $form->field($InterrogatorioMedico, 'desc_piel_anexos')->widget(FroalaEditorWidget::className(), [
-                                'options' => [
-                                                                        'id' => 'exp-fisca'
-                                                                    ],
-                                                                    
-                            ])->label(false);
-                        } else {
-                            // Si no tiene permiso, mostrar el texto plano
-                            $htmlcont= Html::decode($InterrogatorioMedico->desc_piel_anexos);
-                            echo HtmlPurifier::process($htmlcont);
-                           
-                            
-                        }
-                        ?>
-                    </div>
+                                                                <?php
+
+                                                                if ($editable) {
+                                                                    echo $form->field($InterrogatorioMedico, 'desc_piel_anexos')->widget(FroalaEditorWidget::className(), [
+                                                                        'options' => [
+                                                                            'id' => 'exp-fisca'
+                                                                        ],
+
+                                                                    ])->label(false);
+                                                                } else {
+                                                                    // Si no tiene permiso, mostrar el texto plano
+                                                                    $htmlcont = Html::decode($InterrogatorioMedico->desc_piel_anexos);
+                                                                    echo HtmlPurifier::process($htmlcont);
+                                                                }
+                                                                ?>
+                                                            </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -4749,31 +5039,29 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                           
+
 
                                                             <div class="form-group bg-white">
-                                                            <?= Html::label('Descripción') ?>
-                                                            <br>
+                                                                <?= Html::label('Descripción') ?>
+                                                                <br>
 
 
-                                                            <?php
-                                                            
-                        if ($editable) {
-                            echo $form->field($InterrogatorioMedico, 'desc_reproductor')->widget(FroalaEditorWidget::className(), [
-                                'options' => [
-                                                                        'id' => 'exp-fisca'
-                                                                    ],
-                                                                    
-                            ])->label(false);
-                        } else {
-                            // Si no tiene permiso, mostrar el texto plano
-                            $htmlcont= Html::decode($InterrogatorioMedico->desc_reproductor);
-                            echo HtmlPurifier::process($htmlcont);
-                           
-                            
-                        }
-                        ?>
-                    </div>
+                                                                <?php
+
+                                                                if ($editable) {
+                                                                    echo $form->field($InterrogatorioMedico, 'desc_reproductor')->widget(FroalaEditorWidget::className(), [
+                                                                        'options' => [
+                                                                            'id' => 'exp-fisca'
+                                                                        ],
+
+                                                                    ])->label(false);
+                                                                } else {
+                                                                    // Si no tiene permiso, mostrar el texto plano
+                                                                    $htmlcont = Html::decode($InterrogatorioMedico->desc_reproductor);
+                                                                    echo HtmlPurifier::process($htmlcont);
+                                                                }
+                                                                ?>
+                                                            </div>
 
 
 
@@ -4795,31 +5083,29 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                            
+
 
                                                             <div class="form-group bg-white">
-                                                            <?= Html::label('Descripción') ?>
-                                                            <br>
+                                                                <?= Html::label('Descripción') ?>
+                                                                <br>
 
 
-                                                            <?php
-                                                            
-                        if ($editable) {
-                            echo $form->field($InterrogatorioMedico, 'desc_respiratorio')->widget(FroalaEditorWidget::className(), [
-                                'options' => [
-                                                                        'id' => 'exp-fisca'
-                                                                    ],
-                                                                    
-                            ])->label(false);
-                        } else {
-                            // Si no tiene permiso, mostrar el texto plano
-                            $htmlcont= Html::decode($InterrogatorioMedico->desc_respiratorio);
-                            echo HtmlPurifier::process($htmlcont);
-                           
-                            
-                        }
-                        ?>
-                    </div>
+                                                                <?php
+
+                                                                if ($editable) {
+                                                                    echo $form->field($InterrogatorioMedico, 'desc_respiratorio')->widget(FroalaEditorWidget::className(), [
+                                                                        'options' => [
+                                                                            'id' => 'exp-fisca'
+                                                                        ],
+
+                                                                    ])->label(false);
+                                                                } else {
+                                                                    // Si no tiene permiso, mostrar el texto plano
+                                                                    $htmlcont = Html::decode($InterrogatorioMedico->desc_respiratorio);
+                                                                    echo HtmlPurifier::process($htmlcont);
+                                                                }
+                                                                ?>
+                                                            </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -4838,31 +5124,29 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                          
+
 
                                                             <div class="form-group bg-white">
-                                                            <?= Html::label('Descripción') ?>
-                                                            <br>
+                                                                <?= Html::label('Descripción') ?>
+                                                                <br>
 
 
-                                                            <?php
-                                                            
-                        if ($editable) {
-                            echo $form->field($InterrogatorioMedico, 'desc_sistema_nervioso')->widget(FroalaEditorWidget::className(), [
-                                'options' => [
-                                                                        'id' => 'exp-fisca'
-                                                                    ],
-                                                                    
-                            ])->label(false);
-                        } else {
-                            // Si no tiene permiso, mostrar el texto plano
-                            $htmlcont= Html::decode($InterrogatorioMedico->desc_sistema_nervioso);
-                            echo HtmlPurifier::process($htmlcont);
-                           
-                            
-                        }
-                        ?>
-                    </div>
+                                                                <?php
+
+                                                                if ($editable) {
+                                                                    echo $form->field($InterrogatorioMedico, 'desc_sistema_nervioso')->widget(FroalaEditorWidget::className(), [
+                                                                        'options' => [
+                                                                            'id' => 'exp-fisca'
+                                                                        ],
+
+                                                                    ])->label(false);
+                                                                } else {
+                                                                    // Si no tiene permiso, mostrar el texto plano
+                                                                    $htmlcont = Html::decode($InterrogatorioMedico->desc_sistema_nervioso);
+                                                                    echo HtmlPurifier::process($htmlcont);
+                                                                }
+                                                                ?>
+                                                            </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -4881,31 +5165,29 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                            
+
 
                                                             <div class="form-group bg-white">
-                                                            <?= Html::label('Descripción') ?>
-                                                            <br>
+                                                                <?= Html::label('Descripción') ?>
+                                                                <br>
 
 
-                                                            <?php
-                                                            
-                        if ($editable) {
-                            echo $form->field($InterrogatorioMedico, 'desc_sistemas_generales')->widget(FroalaEditorWidget::className(), [
-                                'options' => [
-                                                                        'id' => 'exp-fisca'
-                                                                    ],
-                                                                    
-                            ])->label(false);
-                        } else {
-                            // Si no tiene permiso, mostrar el texto plano
-                            $htmlcont= Html::decode($InterrogatorioMedico->desc_sistemas_generales);
-                            echo HtmlPurifier::process($htmlcont);
-                           
-                            
-                        }
-                        ?>
-                    </div>
+                                                                <?php
+
+                                                                if ($editable) {
+                                                                    echo $form->field($InterrogatorioMedico, 'desc_sistemas_generales')->widget(FroalaEditorWidget::className(), [
+                                                                        'options' => [
+                                                                            'id' => 'exp-fisca'
+                                                                        ],
+
+                                                                    ])->label(false);
+                                                                } else {
+                                                                    // Si no tiene permiso, mostrar el texto plano
+                                                                    $htmlcont = Html::decode($InterrogatorioMedico->desc_sistemas_generales);
+                                                                    echo HtmlPurifier::process($htmlcont);
+                                                                }
+                                                                ?>
+                                                            </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -4924,30 +5206,28 @@ JS;
 
                                                             <!-- Columna derecha con el textarea -->
 
-                                                           
+
                                                             <div class="form-group bg-white">
-                                                            <?= Html::label('Descripción') ?>
-                                                            <br>
+                                                                <?= Html::label('Descripción') ?>
+                                                                <br>
 
 
-                                                            <?php
-                                                            
-                        if ($editable) {
-                            echo $form->field($InterrogatorioMedico, 'desc_urinario')->widget(FroalaEditorWidget::className(), [
-                                'options' => [
-                                                                        'id' => 'exp-fisca'
-                                                                    ],
-                                                                    
-                            ])->label(false);
-                        } else {
-                            // Si no tiene permiso, mostrar el texto plano
-                            $htmlcont= Html::decode($InterrogatorioMedico->desc_urinario);
-                            echo HtmlPurifier::process($htmlcont);
-                           
-                            
-                        }
-                        ?>
-                    </div>
+                                                                <?php
+
+                                                                if ($editable) {
+                                                                    echo $form->field($InterrogatorioMedico, 'desc_urinario')->widget(FroalaEditorWidget::className(), [
+                                                                        'options' => [
+                                                                            'id' => 'exp-fisca'
+                                                                        ],
+
+                                                                    ])->label(false);
+                                                                } else {
+                                                                    // Si no tiene permiso, mostrar el texto plano
+                                                                    $htmlcont = Html::decode($InterrogatorioMedico->desc_urinario);
+                                                                    echo HtmlPurifier::process($htmlcont);
+                                                                }
+                                                                ?>
+                                                            </div>
 
                                                         </div>
                                                         <div class="alert alert-white custom-alert" role="alert">
@@ -4958,11 +5238,11 @@ JS;
                                                 </div>
                                                 <?php if (Yii::$app->user->can('editar-expediente-medico')) { ?>
 
-                                                <div class="form-group">
-                                                    <?= Html::submitButton('Guardar Todos los Cambios &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
-                                                </div>
+                                                    <div class="form-group">
+                                                        <?= Html::submitButton('Guardar Todos los Cambios &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success']) ?>
+                                                    </div>
 
-                                                <?php }?>
+                                                <?php } ?>
                                             </div>
 
 
@@ -4977,69 +5257,52 @@ JS;
 
 
 
-                                                       <!-- TABS PRINCIPAL EXPEDIENTE MEDICO-->
-                            <?php echo TabsX::widget([
+                            <!-- TABS PRINCIPAL EXPEDIENTE MEDICO-->
+                            <?php
+
+                            // Construir las pestañas
+                            $items = [
+                                [
+                                    'label' => 'Antecedentes',
+                                    'content' => $this->blocks['antecedentes'],
+                                    'options' => ['id' => 'antecedentes'],
+                                ],
+                                [
+                                    'label' => 'Exploración Física',
+                                    'content' => $this->blocks['exploracion_fisica'],
+                                    'options' => ['id' => 'exploracion_fisica'],
+                                ],
+                                [
+                                    'label' => 'Interrogatorio Médico',
+                                    'content' => $this->blocks['interrogatorio_medico'],
+                                    'options' => ['id' => 'interrogatorio_medico'],
+                                ],
+                                [
+                                    'label' => 'Alergias',
+                                    'content' => $this->blocks['alergias'],
+                                    'options' => ['id' => 'alergias'],
+                                ],
+                            ];
+
+                            // Agregar la pestaña de Documentos Médicos si el usuario tiene el permiso
+                            if (Yii::$app->user->can('ver-documentos-medicos')) {
+                                $items[] = [
+                                    'label' => 'Documentos Médicos',
+                                    'content' => $this->blocks['documento-medico'],
+                                    'options' => ['id' => 'documentos-medicos'],
+                                ];
+                            }
+
+                            // Mostrar el widget de TabsX
+                            echo TabsX::widget([
                                 'enableStickyTabs' => true,
                                 'options' => ['class' => 'nav-tabs-custom'],
-                                'items' => [
-                                    [
-                                        'label' => 'Antecedentes',
-                                        'content' => $this->blocks['antecedentes'],
-                                         //'active' => true,
-                                       'options' => [
-                                            'id' => 'antecedentes',
-                                        ],
-//
-
-                                  ],
-                                    [
-                                        'label' => 'Exploracion Fisica',
-                                        'content' => $this->blocks['exploracion_fisica'],
-                                        // 'active' => true,
-                                        'options' => [
-                                            'id' => 'exploracion_fisica',
-                                        ],
-
-
-                                    ],
-                                    [
-                                        'label' => 'Interrogatorio Medico',
-                                        'content' => $this->blocks['interrogatorio_medico'],
-                                        // 'active' => true,
-                                        'options' => [
-                                            'id' => 'interrogatorio_medico',
-                                        ],
-
-
-                                    ],
-
-                                    [
-                                        'label' => 'Alergias',
-                                        'content' => $this->blocks['alergias'],
-                                        // 'active' => true,
-                                        'options' => [
-                                            'id' => 'alergias',
-                                        ],
-
-
-                                    ],
-
-
-
-
-
-                                ],
+                                'items' => $items,
                                 'position' => TabsX::POS_ABOVE,
                                 'align' => TabsX::ALIGN_LEFT,
-                                //     'bordered'=>true,
-                                'encodeLabels' => false
-
-
+                                'encodeLabels' => false,
                             ]);
-
                             ?>
-
-
 
                             <?php $this->endBlock(); ?>
 
@@ -5091,22 +5354,22 @@ JS;
                         }
                         if (Yii::$app->user->can('ver-consultas-medicas')) {
                             $tabs[] = [
-                            'label' => 'Consultas medicas',
-                            'content' => $this->blocks['info_consultas'],
-                            'options' => [
-                                'id' => 'informacion_consultas',
-                            ],
-                        
-                    ];
-                }
+                                'label' => 'Consultas medicas',
+                                'content' => $this->blocks['info_consultas'],
+                                'options' => [
+                                    'id' => 'informacion_consultas',
+                                ],
+
+                            ];
+                        }
 
                         echo TabsX::widget([
-                           'enableStickyTabs' => true,
-                                'options' => ['class' => 'nav-tabs-custom'],
-                                'items' => $tabs,
-                                'position' => TabsX::POS_ABOVE,
-                                'align' => TabsX::ALIGN_LEFT,
-                                'encodeLabels' => false,
+                            'enableStickyTabs' => true,
+                            'options' => ['class' => 'nav-tabs-custom'],
+                            'items' => $tabs,
+                            'position' => TabsX::POS_ABOVE,
+                            'align' => TabsX::ALIGN_LEFT,
+                            'encodeLabels' => false,
                         ]);
                         ?>
 
@@ -5129,47 +5392,44 @@ JS;
     </div>
     <!--.row-->
     <script>
-   $(document).ready(function() {
-    // Function to activate tabs based on the hash in the URL
-    function activateTabFromHash() {
-        var hash = window.location.hash;
+        $(document).ready(function() {
+            // Function to activate tabs based on the hash in the URL
+            function activateTabFromHash() {
+                var hash = window.location.hash;
 
-        // Check if the hash exists and it's not empty
-        if (hash) {
-            var tabId = hash.replace('#', '');
+                // Check if the hash exists and it's not empty
+                if (hash) {
+                    var tabId = hash.replace('#', '');
 
-            // Find the tab that matches the hash
-            var tabLink = $('a[href="' + hash + '"]');
+                    // Find the tab that matches the hash
+                    var tabLink = $('a[href="' + hash + '"]');
 
-            // If the tab exists, activate it
-            if (tabLink.length) {
-                tabLink.tab('show');
+                    // If the tab exists, activate it
+                    if (tabLink.length) {
+                        tabLink.tab('show');
 
-                // Activate parent tabs if the tab is nested
-                tabLink.parents('.tab-pane').each(function() {
-                    var parentTabId = $(this).attr('id');
-                    $('a[href="#' + parentTabId + '"]').tab('show');
-                });
+                        // Activate parent tabs if the tab is nested
+                        tabLink.parents('.tab-pane').each(function() {
+                            var parentTabId = $(this).attr('id');
+                            $('a[href="#' + parentTabId + '"]').tab('show');
+                        });
+                    }
+                }
             }
-        }
-    }
 
-    // Activate the tab based on the hash in the URL when the page loads
-    activateTabFromHash();
+            // Activate the tab based on the hash in the URL when the page loads
+            activateTabFromHash();
 
-    // Activate the tab based on the hash in the URL when the hash changes
-    $(window).on('hashchange', function() {
-        activateTabFromHash();
-    });
+            // Activate the tab based on the hash in the URL when the hash changes
+            $(window).on('hashchange', function() {
+                activateTabFromHash();
+            });
 
-    // Update the URL hash when a tab is clicked
-    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-        window.location.hash = $(e.target).attr('href');
-    });
-});
-
-
-
+            // Update the URL hash when a tab is clicked
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+                window.location.hash = $(e.target).attr('href');
+            });
+        });
     </script>
 </div>
 <!--.container-fluid-->

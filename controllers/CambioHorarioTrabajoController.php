@@ -18,6 +18,8 @@ use app\models\CambioDiaLaboral;
 use app\models\CambioDiaLaboralSearch;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use DateTime;
+use PhpOffice\PhpSpreadsheet\Writer\Html;
+
 /**
  * CambioHorarioTrabajoController implements the CRUD actions for CambioHorarioTrabajo model.
  */
@@ -248,176 +250,6 @@ class CambioHorarioTrabajoController extends Controller
 
 
 
-    public function actionExport($id)
-    {
-        $model = CambioHorarioTrabajo::findOne($id);
-
-        if (!$model) {
-            throw new NotFoundHttpException('El registro no existe.');
-        }
-
-        $templatePath = Yii::getAlias('@app/templates/cambio_horario_trabajo.xlsx');
-
-        $spreadsheet = IOFactory::load($templatePath);
-
-        $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setCellValue('F6', $model->empleado->numero_empleado);
-
-
-        $nombre = mb_strtoupper($model->empleado->nombre, 'UTF-8');
-        $apellido = mb_strtoupper($model->empleado->apellido, 'UTF-8');
-        $nombreCompleto = $apellido . ' ' . $nombre;
-        $sheet->setCellValue('H7', $nombreCompleto);
-
-
-        setlocale(LC_TIME, 'es_419.UTF-8');
-        $fechaHOY = strftime('%A, %B %d, %Y');
-        $sheet->setCellValue('N6', $fechaHOY);
-
-        $nombrePuesto = $model->empleado->informacionLaboral->catPuesto->nombre_puesto;
-        $sheet->setCellValue('H8', $nombrePuesto);
-
-        $nombreCargo = $model->empleado->informacionLaboral->catDptoCargo->nombre_dpto;
-        $sheet->setCellValue('H9', $nombreCargo);
-
-        $nombreDireccion = $model->empleado->informacionLaboral->catDireccion->nombre_direccion;
-        $sheet->setCellValue('H10', $nombreDireccion);
-
-        $nombreDepartamento = $model->empleado->informacionLaboral->catDepartamento->nombre_departamento;
-        $sheet->setCellValue('H11', $nombreDepartamento);
-
-        $nombreTipoContrato = $model->empleado->informacionLaboral->catTipoContrato->nombre_tipo;
-        $sheet->setCellValue('H12', $nombreTipoContrato);
-
-
-
-       
-if ($model->turno === 'MATUTINO') {
-    $sheet->setCellValue('N14', 'X');
-    $sheet->setCellValue('Q14', '');
-} elseif ($model->turno === 'VESPERTINO') {
-    $sheet->setCellValue('N14', '');
-    $sheet->setCellValue('Q14', 'X');
-} 
-$horarioInicio = DateTime::createFromFormat('H:i:s', $model->horario_inicio)->format('g:i A');
-$horarioFin = DateTime::createFromFormat('H:i:s', $model->horario_fin)->format('g:i A');
-
-$horarioCompleto = "DE $horarioInicio A $horarioFin";
-
-$sheet->setCellValue('M17', $horarioCompleto);
-
-setlocale(LC_TIME, 'es_419.UTF-8');
-
-
-$fechaInicio = DateTime::createFromFormat('Y-m-d', $model->fecha_inicio);
-$fechaTermino = DateTime::createFromFormat('Y-m-d', $model->fecha_termino);
-
-$formatoFecha = '%A, %B %d, %Y'; 
-$fechaInicioFormateada = strftime($formatoFecha, $fechaInicio->getTimestamp());
-$fechaTerminoFormateada = strftime($formatoFecha, $fechaTermino->getTimestamp());
-
-if ($fechaInicio == $fechaTermino) {
-    $mensaje = "SOLAMENTE ESE DÍA";
-} else {
-    $mensaje = "Del $fechaInicioFormateada al $fechaTerminoFormateada";
-}
-
-$sheet->setCellValue('M18', $mensaje);
-
-
-        $fecha_permiso = strftime('%A, %B %d, %Y', strtotime($model->motivoFechaPermiso->fecha_permiso));
-        $sheet->setCellValue('M16', $fecha_permiso);
-
-
-
-
-
-        $sheet->setCellValue('M19', $model->motivoFechaPermiso->motivo);
-
-
-
-
-
-
-        $sheet->setCellValue('B25', $nombreCompleto);
-
-
-        $sheet->setCellValue('B26', $nombrePuesto);
-
-        $direccion = CatDireccion::findOne($model->empleado->informacionLaboral->cat_direccion_id);
-
-        if ($direccion && $direccion->nombre_direccion !== '1.- GENERAL' && $model->nombre_jefe_departamento) {
-            $nombreCompletoJefe = mb_strtoupper($model->nombre_jefe_departamento, 'UTF-8');
-            $sheet->setCellValue('I25', $nombreCompletoJefe);
-        } else {
-            $sheet->setCellValue('I25', null);
-        }
-
-
-
-
-        $juntaDirectorDireccion = JuntaGobierno::find()
-            ->where(['cat_direccion_id' => $model->empleado->informacionLaboral->cat_direccion_id])
-            ->andWhere(['or', ['nivel_jerarquico' => 'Director'], ['nivel_jerarquico' => 'Jefe de unidad']])
-            ->one();
-
-        if ($juntaDirectorDireccion) {
-            $nombreDirector = mb_strtoupper($juntaDirectorDireccion->empleado->nombre, 'UTF-8');
-            $apellidoDirector = mb_strtoupper($juntaDirectorDireccion->empleado->apellido, 'UTF-8');
-            $profesionDirector = mb_strtoupper($juntaDirectorDireccion->empleado->profesion, 'UTF-8');
-            $nombreCompletoDirector = $profesionDirector . ' ' . $apellidoDirector . ' ' . $nombreDirector;
-
-            $sheet->setCellValue('P25', $nombreCompletoDirector);
-
-            $nombreDireccion = $juntaDirectorDireccion->catDireccion->nombre_direccion;
-            switch ($nombreDireccion) {
-                case '1.- GENERAL':
-                    if ($juntaDirectorDireccion->nivel_jerarquico == 'Jefe de unidad') {
-                        $tituloDireccion = 'JEFE DE ' . $juntaDirectorDireccion->catDepartamento->nombre_departamento;
-                    } else {
-                        $tituloDireccion = 'DIRECTOR GENERAL';
-                    }
-                    break;
-                case '2.- ADMINISTRACIÓN':
-                    $tituloDireccion = 'DIRECTOR DE ADMINISTRACIÓN';
-                    break;
-                case '4.- OPERACIONES':
-                    $tituloDireccion = 'DIRECTOR DE OPERACIONES';
-                    break;
-                case '3.- COMERCIAL':
-                    $tituloDireccion = 'DIRECTOR COMERCIAL';
-                    break;
-                case '5.- PLANEACION':
-                    $tituloDireccion = 'DIRECTOR DE PLANEACION';
-                    break;
-                default:
-                    $tituloDireccion = ''; 
-            }
-
-            $sheet->setCellValue('P26', $tituloDireccion);
-        } else {
-            $sheet->setCellValue('P25', null);
-            $sheet->setCellValue('P26', null);
-        }
-
-        $tempFileName = Yii::getAlias('@app/runtime/archivos_temporales/cambio_horario_trabajo.xlsx');
-        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-        $writer->save($tempFileName);
-
-        return $this->redirect(['download', 'filename' => basename($tempFileName)]);
-    }
-
-
-    public function actionDownload($filename)
-    {
-        $filePath = Yii::getAlias("@app/runtime/archivos_temporales/$filename");
-        if (file_exists($filePath)) {
-            return Yii::$app->response->sendFile($filePath);
-        } else {
-            throw new NotFoundHttpException('El archivo solicitado no existe.');
-        }
-    }
-
 
 
     public function actionExportSegundoCaso($id)
@@ -559,4 +391,181 @@ $sheet->setCellValue('P26', 'DIRECTOR GENERAL');
        
         return $this->redirect(['download', 'filename' => basename($tempFileName)]);
     }
+
+
+
+
+
+    public function actionExportHtml($id)
+    {
+        $this->layout = false;
+
+        $model = CambioHorarioTrabajo::findOne($id);
+
+        if (!$model) {
+            throw new NotFoundHttpException('El registro no existe.');
+        }
+
+        $templatePath = Yii::getAlias('@app/templates/cambio_horario_trabajo.xlsx');
+
+        $spreadsheet = IOFactory::load($templatePath);
+
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setCellValue('F6', $model->empleado->numero_empleado);
+
+
+        $nombre = mb_strtoupper($model->empleado->nombre, 'UTF-8');
+        $apellido = mb_strtoupper($model->empleado->apellido, 'UTF-8');
+        $nombreCompleto = $apellido . ' ' . $nombre;
+        $sheet->setCellValue('H7', $nombreCompleto);
+
+
+        setlocale(LC_TIME, 'es_419.UTF-8');
+        $fechaHOY = strftime('%A, %B %d, %Y');
+        $sheet->setCellValue('N6', $fechaHOY);
+
+        $nombrePuesto = $model->empleado->informacionLaboral->catPuesto->nombre_puesto;
+        $sheet->setCellValue('H8', $nombrePuesto);
+
+        $nombreCargo = $model->empleado->informacionLaboral->catDptoCargo->nombre_dpto;
+        $sheet->setCellValue('H9', $nombreCargo);
+
+        $nombreDireccion = $model->empleado->informacionLaboral->catDireccion->nombre_direccion;
+        $sheet->setCellValue('H10', $nombreDireccion);
+
+        $nombreDepartamento = $model->empleado->informacionLaboral->catDepartamento->nombre_departamento;
+        $sheet->setCellValue('H11', $nombreDepartamento);
+
+        $nombreTipoContrato = $model->empleado->informacionLaboral->catTipoContrato->nombre_tipo;
+        $sheet->setCellValue('H12', $nombreTipoContrato);
+
+
+
+       
+if ($model->turno === 'MATUTINO') {
+    $sheet->setCellValue('N14', 'X');
+    $sheet->setCellValue('Q14', '');
+} elseif ($model->turno === 'VESPERTINO') {
+    $sheet->setCellValue('N14', '');
+    $sheet->setCellValue('Q14', 'X');
+} 
+$horarioInicio = DateTime::createFromFormat('H:i:s', $model->horario_inicio)->format('g:i A');
+$horarioFin = DateTime::createFromFormat('H:i:s', $model->horario_fin)->format('g:i A');
+
+$horarioCompleto = "DE $horarioInicio A $horarioFin";
+
+$sheet->setCellValue('M17', $horarioCompleto);
+
+setlocale(LC_TIME, 'es_419.UTF-8');
+
+
+$fechaInicio = DateTime::createFromFormat('Y-m-d', $model->fecha_inicio);
+$fechaTermino = DateTime::createFromFormat('Y-m-d', $model->fecha_termino);
+
+$formatoFecha = '%A, %B %d, %Y'; 
+$fechaInicioFormateada = strftime($formatoFecha, $fechaInicio->getTimestamp());
+$fechaTerminoFormateada = strftime($formatoFecha, $fechaTermino->getTimestamp());
+
+if ($fechaInicio == $fechaTermino) {
+    $mensaje = "SOLAMENTE ESE DÍA";
+} else {
+    $mensaje = "Del $fechaInicioFormateada al $fechaTerminoFormateada";
+}
+
+$sheet->setCellValue('M18', $mensaje);
+
+
+        $fecha_permiso = strftime('%A, %B %d, %Y', strtotime($model->motivoFechaPermiso->fecha_permiso));
+        $sheet->setCellValue('M16', $fecha_permiso);
+
+
+
+
+
+
+        $motivoTextoPlano = strip_tags($model->motivoFechaPermiso->motivo);
+        $motivoTextoPlano = html_entity_decode($motivoTextoPlano, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $sheet->setCellValue('M19', $motivoTextoPlano);
+
+
+
+
+
+
+        $sheet->setCellValue('B25', $nombreCompleto);
+
+
+        $sheet->setCellValue('B26', $nombrePuesto);
+
+        $direccion = CatDireccion::findOne($model->empleado->informacionLaboral->cat_direccion_id);
+
+        if ($direccion && $direccion->nombre_direccion !== '1.- GENERAL' && $model->nombre_jefe_departamento) {
+            $nombreCompletoJefe = mb_strtoupper($model->nombre_jefe_departamento, 'UTF-8');
+            $sheet->setCellValue('I25', $nombreCompletoJefe);
+        } else {
+            $sheet->setCellValue('I25', null);
+        }
+
+
+
+
+        $juntaDirectorDireccion = JuntaGobierno::find()
+            ->where(['cat_direccion_id' => $model->empleado->informacionLaboral->cat_direccion_id])
+            ->andWhere(['or', ['nivel_jerarquico' => 'Director'], ['nivel_jerarquico' => 'Jefe de unidad']])
+            ->one();
+
+        if ($juntaDirectorDireccion) {
+            $nombreDirector = mb_strtoupper($juntaDirectorDireccion->empleado->nombre, 'UTF-8');
+            $apellidoDirector = mb_strtoupper($juntaDirectorDireccion->empleado->apellido, 'UTF-8');
+            $profesionDirector = mb_strtoupper($juntaDirectorDireccion->empleado->profesion, 'UTF-8');
+            $nombreCompletoDirector = $profesionDirector . ' ' . $apellidoDirector . ' ' . $nombreDirector;
+
+            $sheet->setCellValue('P25', $nombreCompletoDirector);
+
+            $nombreDireccion = $juntaDirectorDireccion->catDireccion->nombre_direccion;
+            switch ($nombreDireccion) {
+                case '1.- GENERAL':
+                    if ($juntaDirectorDireccion->nivel_jerarquico == 'Jefe de unidad') {
+                        $tituloDireccion = 'JEFE DE ' . $juntaDirectorDireccion->catDepartamento->nombre_departamento;
+                    } else {
+                        $tituloDireccion = 'DIRECTOR GENERAL';
+                    }
+                    break;
+                case '2.- ADMINISTRACIÓN':
+                    $tituloDireccion = 'DIRECTOR DE ADMINISTRACIÓN';
+                    break;
+                case '4.- OPERACIONES':
+                    $tituloDireccion = 'DIRECTOR DE OPERACIONES';
+                    break;
+                case '3.- COMERCIAL':
+                    $tituloDireccion = 'DIRECTOR COMERCIAL';
+                    break;
+                case '5.- PLANEACION':
+                    $tituloDireccion = 'DIRECTOR DE PLANEACION';
+                    break;
+                default:
+                    $tituloDireccion = ''; 
+            }
+
+            $sheet->setCellValue('P26', $tituloDireccion);
+        } else {
+            $sheet->setCellValue('P25', null);
+            $sheet->setCellValue('P26', null);
+        }
+
+        $htmlWriter = new Html($spreadsheet);
+        $htmlWriter->setSheetIndex(0); 
+        $htmlWriter->setPreCalculateFormulas(false);
+    
+        $fullHtmlContent = $htmlWriter->generateHtmlAll();
+    
+        $fullHtmlContent = str_replace('&nbsp;', ' ', $fullHtmlContent);
+
+
+        return $this->render('excel-html', ['htmlContent' => $fullHtmlContent, 'model' => $model]);
+     }
+
+
+
+
 }

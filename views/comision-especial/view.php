@@ -68,9 +68,13 @@ if ($empleado) {
 
   
         if ($juntaGobierno && ($juntaGobierno->nivel_jerarquico === 'Jefe de unidad' || $juntaGobierno->nivel_jerarquico === 'Director')){
-            echo Html::a('<i class="fa fa-file-excel" aria-hidden="true"></i> Exportar Excel', ['export-segundo-caso', 'id' => $model->id], ['class' => 'btn btn-success']);
+          //  echo Html::a('<i class="fa fa-file-excel" aria-hidden="true"></i> Exportar Excel', ['export-segundo-caso', 'id' => $model->id], ['class' => 'btn btn-success']);
+            echo Html::a('<i class="fa fa-print" aria-hidden="true"></i> Vista Previa de Impresión', ['export-html', 'id' => $model->id], ['class' => 'btn btn-dark ', 'target' => '_blank']) ;
+
         } else {
-            echo Html::a('<i class="fa fa-file-excel" aria-hidden="true"></i> Exportar Excel', ['export', 'id' => $model->id], ['class' => 'btn btn-success']);
+            //echo Html::a('<i class="fa fa-file-excel" aria-hidden="true"></i> Exportar Excel', ['export', 'id' => $model->id], ['class' => 'btn btn-success']);
+            echo Html::a('<i class="fa fa-print" aria-hidden="true"></i> Vista Previa de Impresión', ['export-html', 'id' => $model->id], ['class' => 'btn btn-dark ', 'target' => '_blank']) ;
+
         }
     
 } else {
@@ -89,20 +93,37 @@ if ($empleado) {
             <div class="row">
                 <div class="col-md-12">
                     
-
-                  
+                <?php 
+    foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
+        echo Alert::widget([
+            'options' => ['class' => 'alert-' . $type],
+            'body' => $message,
+        ]);
+    }
+    ?>
                     <?= DetailView::widget([
                         'model' => $model,
                         'attributes' => [
                             //'id',
                            // 'empleado_id',
-                            'solicitud_id',
+                           // 'solicitud_id',
                             [
-                                'label' => 'Motivo',
+                                'label' => 'ID de Solicitud',
                                 'value' => function ($model) {
-                                    return $model->motivoFechaPermiso->motivo; // Reemplaza "nombre_del_atributo_del_motivo" con el nombre del atributo que deseas mostrar
+                                    return $model->solicitud_id; // Reemplaza "nombre_del_atributo_del_motivo" con el nombre del atributo que deseas mostrar
                                 },
                             ],
+                            [
+                                'label' => 'Motivo',
+                                'attribute' => 'motivo',
+                                'format' => 'html',
+                                'value' => function ($model) {
+                                    return \yii\helpers\Html::decode($model->motivoFechaPermiso->motivo);
+                                },
+                                'filter' => false,
+                                'options' => ['style' => 'width: 65%;'],
+                            ],
+                    
                             [
                                 'label' => 'Fecha de Comisión',
                                 'value' => function ($model) {

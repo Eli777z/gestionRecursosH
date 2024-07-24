@@ -56,15 +56,15 @@ $this->title = 'Cambio de Horario de Trabajo';
         ],
 
         [
-            'attribute' => 'motivo',
             'label' => 'Motivo',
+            'attribute' => 'motivo',
+            'format' => 'html',
             'value' => function ($model) {
-                return $model->motivoFechaPermiso->motivo;
+                return \yii\helpers\Html::decode($model->motivoFechaPermiso->motivo);
             },
-          //  'options' => ['style' => 'width: 30%;'],
-
+            'filter' => false,
+            'options' => ['style' => 'width: 65%;'],
         ],
-
         ['class' => 'hail812\adminlte3\yii\grid\ActionColumn',
 
     

@@ -55,14 +55,24 @@ $this->title = 'Permiso Economico';
 
         ],
 
-        [
-            'attribute' => 'motivo',
-            'label' => 'Motivo',
-            'value' => function ($model) {
-                return $model->motivoFechaPermiso->motivo;
-            },
+       // [
+         //   'attribute' => 'motivo',
+           // 'label' => 'Motivo',
+         //   'value' => function ($model) {
+           //     return $model->motivoFechaPermiso->motivo;
+           // },
           //  'options' => ['style' => 'width: 30%;'],
 
+      //  ],
+        [
+            'label' => 'Motivo',
+            'attribute' => 'motivo',
+            'format' => 'html',
+            'value' => function ($model) {
+                return \yii\helpers\Html::decode($model->motivoFechaPermiso->motivo);
+            },
+            'filter' => false,
+            'options' => ['style' => 'width: 65%;'],
         ],
 
         ['class' => 'hail812\adminlte3\yii\grid\ActionColumn',

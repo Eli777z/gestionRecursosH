@@ -116,6 +116,7 @@ if (!$modelAlergia) {
                                 'AntecedenteObstrectico' => $AntecedenteObstrectico,
                                 'Alergia' => $Alergia,
                                 'antecedentePatologico' => $antecedentePatologico,
+                                'documentoMedicoModel' => $documentoMedicoModel
                             ]) ?>
                         
     </div>

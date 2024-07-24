@@ -14,6 +14,9 @@ use app\models\Empleado;
 use app\models\MotivoFechaPermiso;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Mpdf\Mpdf;
+use PhpOffice\PhpSpreadsheet\Chart\Layout;
+use PhpOffice\PhpSpreadsheet\Writer\Html;
+
 /**
  * ComisionEspecialController implements the CRUD actions for ComisionEspecial model.
  */
@@ -237,8 +240,9 @@ class ComisionEspecialController extends Controller
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 
-    public function actionExport($id)
+    public function actionExportHtml($id)
 {
+    $this->layout = false;
     $model = ComisionEspecial::findOne($id);
 
     if (!$model) {
@@ -247,10 +251,10 @@ class ComisionEspecialController extends Controller
 
     $templatePath = Yii::getAlias('@app/templates/comision_especial.xlsx');
     $spreadsheet = IOFactory::load($templatePath);
-
     $sheet = $spreadsheet->getActiveSheet();
-    $sheet->setCellValue('F6', $model->empleado->numero_empleado);
 
+    // Set cell values
+    $sheet->setCellValue('F6', $model->empleado->numero_empleado);
     $nombre = mb_strtoupper($model->empleado->nombre, 'UTF-8');
     $apellido = mb_strtoupper($model->empleado->apellido, 'UTF-8');
     $nombreCompleto = $apellido . ' ' . $nombre;
@@ -275,9 +279,32 @@ class ComisionEspecialController extends Controller
     $nombreTipoContrato = $model->empleado->informacionLaboral->catTipoContrato->nombre_tipo;
     $sheet->setCellValue('H12', $nombreTipoContrato);
 
+    // Define styles for different contract types
+ 
+    // Apply conditional formatting based on the contract type
+    switch ($nombreTipoContrato) {
+        case 'Confianza':
+            $style = $sheet->getStyle('H12');
+            $style->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+            $style->getFill()->getStartColor()->setARGB('FFc7efce'); // Background color #c7efce
+            $style->getFont()->getColor()->setARGB('FF217346'); // Font color #217346
+            break;
+        case 'Sindicalizado':
+            $style = $sheet->getStyle('H12');
+            $style->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+            $style->getFill()->getStartColor()->setARGB('FFfeeb9d'); // Background color #c7efce
+            $style->getFont()->getColor()->setARGB('FFa7720f'); // Font color #217346
+            break;
+    }
+
     $fecha_permiso = strftime('%A, %B %d, %Y', strtotime($model->motivoFechaPermiso->fecha_permiso));
     $sheet->setCellValue('H14', $fecha_permiso);
-    $sheet->setCellValue('H15', $model->motivoFechaPermiso->motivo);
+
+    // Clean and set the motivo text
+    $motivoTextoPlano = strip_tags($model->motivoFechaPermiso->motivo);
+    $motivoTextoPlano = html_entity_decode($motivoTextoPlano, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $sheet->setCellValue('H15', $motivoTextoPlano);
+
     $sheet->setCellValue('A23', $nombreCompleto);
     $sheet->setCellValue('A24', $nombrePuesto);
 
@@ -335,34 +362,16 @@ class ComisionEspecialController extends Controller
     }
 
     // Establecer el área de impresión
-    $spreadsheet->getActiveSheet()->getPageSetup()->setPrintArea('A1:U24'); // Ajusta esto según el área de impresión requerida
+    $htmlWriter = new Html($spreadsheet);
+    $htmlWriter->setSheetIndex(0); 
+    $htmlWriter->setPreCalculateFormulas(false);
 
-    // Guardar el archivo temporal de Excel
-    $tempFileName = Yii::getAlias('@app/runtime/archivos_temporales/comision_especial.xlsx');
-    $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-    $writer->save($tempFileName);
+    $fullHtmlContent = $htmlWriter->generateHtmlAll();
 
-    // Convertir el archivo Excel a HTML
-    $spreadsheet = IOFactory::load($tempFileName);
-    $writer = IOFactory::createWriter($spreadsheet, 'Html');
-    ob_start();
-    $writer->save('php://output');
-    $html = ob_get_clean();
+    // Clean up HTML content to ensure no &nbsp; and other unwanted characters
+    $fullHtmlContent = str_replace('&nbsp;', ' ', $fullHtmlContent);
 
-    // Generar el PDF usando mPDF
-    $mpdf = new Mpdf();
-
-    // Establecer configuraciones de mPDF, como el tamaño de página y margenes si es necesario
-    $mpdf->SetDefaultFontSize('8'); // Ejemplo de establecer tamaño de letra
-
-    $mpdf->WriteHTML($html);
-    $pdfFilePath = Yii::getAlias('@app/runtime/archivos_temporales/comision_especial.pdf');
-    $mpdf->Output($pdfFilePath, \Mpdf\Output\Destination::FILE);
-
-    // Eliminar el archivo Excel temporal
-    unlink($tempFileName);
-
-    return $this->redirect(['download', 'filename' => basename($pdfFilePath)]);
+    return $this->render('excel-html', ['htmlContent' => $fullHtmlContent, 'model' => $model]);
 }
 
 
@@ -490,130 +499,7 @@ class ComisionEspecialController extends Controller
 
 
 
-    public function actionExportPdf($id)
-    {
-        $model = ComisionEspecial::findOne($id);
-
-        if (!$model) {
-            throw new NotFoundHttpException('El registro no existe.');
-        }
-
-        $templatePath = Yii::getAlias('@app/templates/comision_especial.xlsx');
-
-
-        $spreadsheet = IOFactory::load($templatePath);
-
-        $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setCellValue('F6', $model->empleado->numero_empleado);
-
-
-        $nombre = mb_strtoupper($model->empleado->nombre, 'UTF-8');
-        $apellido = mb_strtoupper($model->empleado->apellido, 'UTF-8');
-        $nombreCompleto = $apellido . ' ' . $nombre;
-        $sheet->setCellValue('H7', $nombreCompleto);
-
-
-        setlocale(LC_TIME, 'es_419.UTF-8');
-        $fechaHOY = strftime('%A, %B %d, %Y');
-        $sheet->setCellValue('N6', $fechaHOY);
-
-        $nombrePuesto = $model->empleado->informacionLaboral->catPuesto->nombre_puesto;
-        $sheet->setCellValue('H8', $nombrePuesto);
-
-        $nombreCargo = $model->empleado->informacionLaboral->catDptoCargo->nombre_dpto;
-        $sheet->setCellValue('H9', $nombreCargo);
-
-        $nombreDireccion = $model->empleado->informacionLaboral->catDireccion->nombre_direccion;
-        $sheet->setCellValue('H10', $nombreDireccion);
-
-        $nombreDepartamento = $model->empleado->informacionLaboral->catDepartamento->nombre_departamento;
-        $sheet->setCellValue('H11', $nombreDepartamento);
-
-        $nombreTipoContrato = $model->empleado->informacionLaboral->catTipoContrato->nombre_tipo;
-        $sheet->setCellValue('H12', $nombreTipoContrato);
-
-        $fecha_permiso = strftime('%A, %B %d, %Y', strtotime($model->motivoFechaPermiso->fecha_permiso));
-        $sheet->setCellValue('H14', $fecha_permiso);
-        $sheet->setCellValue('H15', $model->motivoFechaPermiso->motivo);
-        $sheet->setCellValue('A23', $nombreCompleto);
-        $sheet->setCellValue('A24', $nombrePuesto);
-
-        $direccion = CatDireccion::findOne($model->empleado->informacionLaboral->cat_direccion_id);
-
-        if ($direccion && $direccion->nombre_direccion !== '1.- GENERAL' && $model->nombre_jefe_departamento) {
-            $nombreCompletoJefe = mb_strtoupper($model->nombre_jefe_departamento, 'UTF-8');
-            $sheet->setCellValue('H23', $nombreCompletoJefe);
-        } else {
-            $sheet->setCellValue('H23', null);
-        }
-
-        $juntaDirectorDireccion = JuntaGobierno::find()
-            ->where(['cat_direccion_id' => $model->empleado->informacionLaboral->cat_direccion_id])
-            ->andWhere(['or', ['nivel_jerarquico' => 'Director'], ['nivel_jerarquico' => 'Jefe de unidad']])
-            ->one();
-
-        if ($juntaDirectorDireccion) {
-            $nombreDirector = mb_strtoupper($juntaDirectorDireccion->empleado->nombre, 'UTF-8');
-            $apellidoDirector = mb_strtoupper($juntaDirectorDireccion->empleado->apellido, 'UTF-8');
-            $profesionDirector = mb_strtoupper($juntaDirectorDireccion->profesion, 'UTF-8');
-            $nombreCompletoDirector = $profesionDirector . ' ' . $apellidoDirector . ' ' . $nombreDirector;
-
-            $sheet->setCellValue('N23', $nombreCompletoDirector);
-
-            $nombreDireccion = $juntaDirectorDireccion->catDireccion->nombre_direccion;
-            switch ($nombreDireccion) {
-                case '1.- GENERAL':
-                    if ($juntaDirectorDireccion->nivel_jerarquico == 'Jefe de unidad') {
-                        $tituloDireccion = 'JEFE DE ' . $juntaDirectorDireccion->catDepartamento->nombre_departamento;
-                    } else {
-                        $tituloDireccion = 'DIRECTOR GENERAL';
-                    }
-                    break;
-                case '2.- ADMINISTRACIÓN':
-                    $tituloDireccion = 'DIRECTOR DE ADMINISTRACIÓN';
-                    break;
-                case '4.- OPERACIONES':
-                    $tituloDireccion = 'DIRECTOR DE OPERACIONES';
-                    break;
-                case '3.- COMERCIAL':
-                    $tituloDireccion = 'DIRECTOR COMERCIAL';
-                    break;
-                case '5.- PLANEACION':
-                    $tituloDireccion = 'DIRECTOR DE PLANEACION';
-                    break;
-                default:
-                    $tituloDireccion = ''; // Otra dirección no especificada
-            }
-
-            $sheet->setCellValue('N24', $tituloDireccion);
-        } else {
-            $sheet->setCellValue('N24', null);
-            $sheet->setCellValue('N24', null);
-        }
-
-       
-        $mpdf = new Mpdf(['mode' => 'utf-8','format' => [215.9, 279.4]]);
-
-       
-        ob_start();
-        $writer = IOFactory::createWriter($spreadsheet, 'Html');
-        $writer->save('php://output');
-        $htmlContent = ob_get_clean();
-        
-       
-        $mpdf->WriteHTML($htmlContent);
-        
-     
-        $tempPdfFileName = Yii::getAlias('@app/runtime/archivos_temporales/comision_especial.pdf');
-        $mpdf->Output($tempPdfFileName, 'F'); 
-        
-       
-        return $this->redirect(['download', 'filename' => basename($tempPdfFileName)]);
- 
- 
- 
-    }
-
+   
 
 
     

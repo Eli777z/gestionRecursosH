@@ -1,6 +1,6 @@
 <?php
 
-use hail812\adminlte\widgets\Alert;
+use yii\bootstrap5\Alert;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use app\models\Empleado;
@@ -62,11 +62,13 @@ if ($empleado) {
 
     
         if ($juntaGobierno && ($juntaGobierno->nivel_jerarquico === 'Jefe de unidad' || $juntaGobierno->nivel_jerarquico === 'Director')){
-            echo Html::a('<i class="fa fa-file-excel" aria-hidden="true"></i> Exportar Excel', ['export-segundo-caso', 'id' => $model->id], ['class' => 'btn btn-success']);
-            echo Html::a('<i class="fa fa-file-pdf"></i> Exportar PDF', ['export-pdf', 'id' => $model->id], ['class' => 'btn btn-danger ml-3']);
+           // echo Html::a('<i class="fa fa-file-excel" aria-hidden="true"></i> Exportar Excel', ['export-segundo-caso', 'id' => $model->id], ['class' => 'btn btn-success']);
+            //echo Html::a('<i class="fa fa-file-pdf"></i> Exportar PDF', ['export-pdf', 'id' => $model->id], ['class' => 'btn btn-danger ml-3']);
+            echo Html::a('<i class="fa fa-print" aria-hidden="true"></i> Vista Previa de Impresión', ['export-html-segundo', 'id' => $model->id], ['class' => 'btn btn-dark ', 'target' => '_blank']) ;
         } else {
-            echo Html::a('<i class="fa fa-file-excel" aria-hidden="true"></i> Exportar Excel', ['export', 'id' => $model->id], ['class' => 'btn btn-success']);
-            echo Html::a('<i class="fa fa-file-pdf"></i> Exportar PDF', ['export-pdf', 'id' => $model->id], ['class' => 'btn btn-danger ml-3']);
+           // echo Html::a('<i class="fa fa-file-excel" aria-hidden="true"></i> Exportar Excel', ['export', 'id' => $model->id], ['class' => 'btn btn-success']);
+            //echo Html::a('<i class="fa fa-file-pdf"></i> Exportar PDF', ['export-pdf', 'id' => $model->id], ['class' => 'btn btn-danger ml-3']);
+            echo Html::a('<i class="fa fa-print" aria-hidden="true"></i> Vista Previa de Impresión', ['export-html', 'id' => $model->id], ['class' => 'btn btn-dark ', 'target' => '_blank']) ;
         }
     
 } else {
@@ -80,7 +82,6 @@ if ($empleado) {
             <div class="row">
                 <div class="col-md-12">
                     
-
                     <?php 
     foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
         echo Alert::widget([
@@ -97,10 +98,15 @@ if ($empleado) {
                             'solicitud_id',
                             [
                                 'label' => 'Motivo',
+                                'attribute' => 'motivo',
+                                'format' => 'html',
                                 'value' => function ($model) {
-                                    return $model->motivoFechaPermiso->motivo; 
+                                    return \yii\helpers\Html::decode($model->motivoFechaPermiso->motivo);
                                 },
+                                'filter' => false,
+                                'options' => ['style' => 'width: 65%;'],
                             ],
+                    
                             [
                                 'attribute' => 'Día que laborará',
                                 'value' => function ($model) {

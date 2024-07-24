@@ -4,7 +4,9 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 use app\models\Empleado;
 use app\models\JuntaGobierno;
-use hail812\adminlte\widgets\Alert;
+use yii\bootstrap5\Alert;
+
+
 /* @var $this yii\web\View */
 /* @var $model app\models\PermisoEconomico */
 
@@ -55,17 +57,11 @@ if ($empleado) {
     $juntaGobierno = JuntaGobierno::find()->where(['empleado_id' => $empleado->id])->one();
 
     if ($juntaGobierno && ($juntaGobierno->nivel_jerarquico === 'Jefe de unidad' || $juntaGobierno->nivel_jerarquico === 'Director')) {
-        echo Html::a('<i class="fa fa-file-pdf"></i> Exportar PDF', ['export', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'id' => 'export-button',
-            'target' => '_blank'
-        ]);
+        echo Html::a('<i class="fa fa-print" aria-hidden="true"></i> Vista Previa de Impresión', ['export-html', 'id' => $model->id], ['class' => 'btn btn-dark ', 'target' => '_blank']) ;
+
     } else {
-        echo Html::a('<i class="fa fa-file-pdf"></i> Exportar PDF', ['export', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'id' => 'export-button',
-            'target' => '_blank'
-        ]);
+        echo Html::a('<i class="fa fa-print" aria-hidden="true"></i> Vista Previa de Impresión', ['export-html', 'id' => $model->id], ['class' => 'btn btn-dark ', 'target' => '_blank']) ;
+
     }
 } else {
     Yii::$app->session->setFlash('error', 'No se pudo encontrar el empleado asociado al usuario actual.');
@@ -95,11 +91,22 @@ if ($empleado) {
                         'model' => $model,
                         'attributes' => [
                             'solicitud_id',
+                           // [
+                             //   'label' => 'Motivo',
+                               // 'value' => function ($model) {
+                           //         return $model->motivoFechaPermiso->motivo; 
+                             //   },
+                            //],
+
                             [
                                 'label' => 'Motivo',
+                                'attribute' => 'motivo',
+                                'format' => 'html',
                                 'value' => function ($model) {
-                                    return $model->motivoFechaPermiso->motivo; 
+                                    return \yii\helpers\Html::decode($model->motivoFechaPermiso->motivo);
                                 },
+                                'filter' => false,
+                                'options' => ['style' => 'width: 65%;'],
                             ],
                             [
                                 'label' => 'Fecha de Permiso',

@@ -30,6 +30,7 @@ use app\models\Usuario;
 use app\models\Notificacion;
 use app\models\Empleado;
 use app\models\CambiarContrasenaForm;
+use app\models\DocumentoMedico;
 use yii\helpers\ArrayHelper;
 use app\models\JuntaGobierno;
 class SiteController extends Controller
@@ -320,6 +321,7 @@ class SiteController extends Controller
         // Replicamos la lógica de la acción view del controlador empleado
         $documentos = $modelEmpleado->documentos;
         $documentoModel = new Documento();
+        $documentoMedicoModel = new DocumentoMedico();
         $historial = PeriodoVacacionalHistorial::find()->where(['empleado_id' => $modelEmpleado->id])->all();
     
         $searchModel = new \app\models\SolicitudSearch();
@@ -351,6 +353,7 @@ class SiteController extends Controller
             'searchModelConsultas' => $searchModelConsultas,
             'dataProviderConsultas' => $dataProviderConsultas,
             'searchModel' => $searchModel,
+            'documentoMedicoModel' => $documentoMedicoModel,
             'dataProvider' => $dataProvider,
             'expedienteMedico' => $expedienteMedico,
             'antecedentes' => $antecedentes,

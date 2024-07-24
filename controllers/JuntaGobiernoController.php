@@ -121,9 +121,9 @@ class JuntaGobiernoController extends Controller
         InformacionLaboral::updateAll(['junta_gobierno_id' => null], ['junta_gobierno_id' => $id]);
     
         if ($model->delete()) {
-            Yii::$app->session->setFlash('success', 'Empleado eliminado de junta gobierno.');
+            Yii::$app->session->setFlash('warning', '<i class="fa fa-bell" aria-hidden="true"></i> Empleado eliminado de lista de directores, jefes de unidad y de departamento.');
         } else {
-            Yii::$app->session->setFlash('error', 'Hubo un error al eliminar el registro.');
+            Yii::$app->session->setFlash('error', '<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Hubo un error al eliminar el empleado de la lista.');
         }
     
         $url = Url::to(['empleado/index']) . '#junta_gobierno';

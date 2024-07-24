@@ -14,7 +14,7 @@ use app\models\CatDepartamento;
 use app\models\Empleado;
 use yii\helpers\Url;
 use app\models\JuntaGobiernoSearch;
-use hail812\adminlte\widgets\Alert;
+use yii\bootstrap5\Alert;
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\EmpleadoSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -35,7 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="card-body">
                 <div class="row justify-content-center">
                 <div class="col-md-10">
-                            <div class="d-flex align-items-center mb-3">
+                            <div class="d-flex align-items-center mb-3 float-right">
 
 
 

@@ -15,6 +15,8 @@ use app\models\Notificacion;
 use app\models\MotivoFechaPermiso;
 use app\models\Solicitud;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Writer\Html;
+
 
 /**
  * PermisoSinSueldoController implements the CRUD actions for PermisoSinSueldo model.
@@ -266,164 +268,7 @@ class PermisoSinSueldoController extends Controller
 
 
 
-    public function actionExport($id)
-    {
-        $model = PermisoSinSueldo::findOne($id);
-    
-        if (!$model) {
-            throw new NotFoundHttpException('El registro no existe.');
-        }
-    
-        $templatePath = Yii::getAlias('@app/templates/permiso_sin_goce_de_sueldo.xlsx');
-    
-        $spreadsheet = IOFactory::load($templatePath);
-    
-        $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setCellValue('F5', $model->empleado->numero_empleado);
-       
-       
-        $nombre = mb_strtoupper($model->empleado->nombre, 'UTF-8');
-        $apellido = mb_strtoupper($model->empleado->apellido, 'UTF-8');
-        $nombreCompleto = $apellido . ' ' . $nombre;
-        $sheet->setCellValue('H6', $nombreCompleto);
-
-
-        setlocale(LC_TIME, 'es_419.UTF-8'); 
-        $fechaHOY = strftime('%A, %B %d, %Y'); 
-        $sheet->setCellValue('N5', $fechaHOY);
-        
-        $nombrePuesto = $model->empleado->informacionLaboral->catPuesto->nombre_puesto;
-$sheet->setCellValue('H7', $nombrePuesto);
-
-$nombreCargo = $model->empleado->informacionLaboral->catDptoCargo->nombre_dpto;
-$sheet->setCellValue('H8', $nombreCargo);
-
-$nombreDireccion = $model->empleado->informacionLaboral->catDireccion->nombre_direccion;
-$sheet->setCellValue('H9', $nombreDireccion);
-
-$nombreDepartamento = $model->empleado->informacionLaboral->catDepartamento->nombre_departamento;
-$sheet->setCellValue('H10', $nombreDepartamento);
-
-$nombreTipoContrato = $model->empleado->informacionLaboral->catTipoContrato->nombre_tipo;
-$sheet->setCellValue('H11', $nombreTipoContrato);
-
-
-
-$fecha_permiso = strftime('%A, %B %d, %Y', strtotime($model->motivoFechaPermiso->fecha_permiso));
-$sheet->setCellValue('H13', $fecha_permiso);
-
-
-$permisoAnterior = PermisoSinSueldo::find()
-->where(['empleado_id' => $model->empleado->id])
-->andWhere(['<', 'id', $id])
-->orderBy(['id' => SORT_DESC])
-->one();
-
-if ($permisoAnterior) {
-    $noPermisoAnterior = $permisoAnterior->no_permiso_anterior + 1;
-    $fechaPermisoAnterior = $permisoAnterior->motivoFechaPermiso->fecha_permiso;
-} else {
-    $noPermisoAnterior = null;
-    $fechaPermisoAnterior = null;
-}
-
-if ($fechaPermisoAnterior === null && $noPermisoAnterior === null) {
-    $sheet->setCellValue('H14', 'AUN NO TIENE PERMISOS ANTERIORES');
-    $sheet->setCellValue('H15', 'AUN NO TIENE PERMISOS ANTERIORES');
-} else {
-    $fecha_permiso_anterior = strftime('%A, %B %d, %Y', strtotime($fechaPermisoAnterior));
-    $sheet->setCellValue('H14', $fecha_permiso_anterior);
-    $sheet->setCellValue('H15', $noPermisoAnterior);
-}
-
-
-
-
-$sheet->setCellValue('H16', $model->motivoFechaPermiso->motivo);
-
-
-
-
-
-$sheet->setCellValue('A22', $nombreCompleto);
-
-
-$sheet->setCellValue('A23', $nombrePuesto);
-
-$direccion = CatDireccion::findOne($model->empleado->informacionLaboral->cat_direccion_id);
-
-if ($direccion && $direccion->nombre_direccion !== '1.- GENERAL' && $model->nombre_jefe_departamento) {
-    $nombreCompletoJefe = mb_strtoupper($model->nombre_jefe_departamento, 'UTF-8');
-    $sheet->setCellValue('H22', $nombreCompletoJefe);
-} else {
-    $sheet->setCellValue('H22', null);
-}
-
-
-
-
-$juntaDirectorDireccion = JuntaGobierno::find()
-    ->where(['cat_direccion_id' => $model->empleado->informacionLaboral->cat_direccion_id])
-    ->andWhere(['or', ['nivel_jerarquico' => 'Director'], ['nivel_jerarquico' => 'Jefe de unidad']])
-    ->one();
-
-if ($juntaDirectorDireccion) {
-    $nombreDirector = mb_strtoupper($juntaDirectorDireccion->empleado->nombre, 'UTF-8');
-    $apellidoDirector = mb_strtoupper($juntaDirectorDireccion->empleado->apellido, 'UTF-8');
-    $profesionDirector = mb_strtoupper($juntaDirectorDireccion->empleado->profesion, 'UTF-8');
-    $nombreCompletoDirector = $profesionDirector . ' ' . $apellidoDirector . ' ' . $nombreDirector;
-
-    $sheet->setCellValue('N22', $nombreCompletoDirector);
-
-    $nombreDireccion = $juntaDirectorDireccion->catDireccion->nombre_direccion;
-    switch ($nombreDireccion) {
-        case '1.- GENERAL':
-            if ($juntaDirectorDireccion->nivel_jerarquico == 'Jefe de unidad') {
-                $tituloDireccion = 'JEFE DE ' . $juntaDirectorDireccion->catDepartamento->nombre_departamento;
-            } else {
-                $tituloDireccion = 'DIRECTOR GENERAL';
-            }
-            break;
-        case '2.- ADMINISTRACIÓN':
-            $tituloDireccion = 'DIRECTOR DE ADMINISTRACIÓN';
-            break;
-        case '4.- OPERACIONES':
-            $tituloDireccion = 'DIRECTOR DE OPERACIONES';
-            break;
-        case '3.- COMERCIAL':
-            $tituloDireccion = 'DIRECTOR COMERCIAL';
-            break;
-        case '5.- PLANEACION':
-            $tituloDireccion = 'DIRECTOR DE PLANEACION';
-            break;
-        default:
-            $tituloDireccion = ''; 
-    }
-
-    $sheet->setCellValue('N23', $tituloDireccion);
-} else {
-    $sheet->setCellValue('N22', null);
-    $sheet->setCellValue('N23', null);
-}
-
-$tempFileName = Yii::getAlias('@app/runtime/archivos_temporales/permiso_sin_goce_de_sueldo.xlsx');
-$writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-$writer->save($tempFileName);
-
-
-return $this->redirect(['download', 'filename' => basename($tempFileName)]);
-    }
-
-    public function actionDownload($filename)
-    {
-        $filePath = Yii::getAlias("@app/runtime/archivos_temporales/$filename");
-        if (file_exists($filePath)) {
-            return Yii::$app->response->sendFile($filePath);
-        } else {
-            throw new NotFoundHttpException('El archivo solicitado no existe.');
-        }
-    }
-
+   
 
     public function actionExportSegundoCaso($id)
     {
@@ -564,5 +409,183 @@ return $this->redirect(['download', 'filename' => basename($tempFileName)]);
 
     
 
+
+
+
+    public function actionExportHtml($id)
+    {
+        $this->layout = false;
+
+        $model = PermisoSinSueldo::findOne($id);
+    
+        if (!$model) {
+            throw new NotFoundHttpException('El registro no existe.');
+        }
+    
+        $templatePath = Yii::getAlias('@app/templates/permiso_sin_goce_de_sueldo.xlsx');
+    
+        $spreadsheet = IOFactory::load($templatePath);
+    
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setCellValue('F5', $model->empleado->numero_empleado);
+       
+       
+        $nombre = mb_strtoupper($model->empleado->nombre, 'UTF-8');
+        $apellido = mb_strtoupper($model->empleado->apellido, 'UTF-8');
+        $nombreCompleto = $apellido . ' ' . $nombre;
+        $sheet->setCellValue('H6', $nombreCompleto);
+
+
+        setlocale(LC_TIME, 'es_419.UTF-8'); 
+        $fechaHOY = strftime('%A, %B %d, %Y'); 
+        $sheet->setCellValue('N5', $fechaHOY);
+        
+        $nombrePuesto = $model->empleado->informacionLaboral->catPuesto->nombre_puesto;
+$sheet->setCellValue('H7', $nombrePuesto);
+
+$nombreCargo = $model->empleado->informacionLaboral->catDptoCargo->nombre_dpto;
+$sheet->setCellValue('H8', $nombreCargo);
+
+$nombreDireccion = $model->empleado->informacionLaboral->catDireccion->nombre_direccion;
+$sheet->setCellValue('H9', $nombreDireccion);
+
+$nombreDepartamento = $model->empleado->informacionLaboral->catDepartamento->nombre_departamento;
+$sheet->setCellValue('H10', $nombreDepartamento);
+
+$nombreTipoContrato = $model->empleado->informacionLaboral->catTipoContrato->nombre_tipo;
+$sheet->setCellValue('H11', $nombreTipoContrato);
+
+
+switch ($nombreTipoContrato) {
+    case 'Confianza':
+        $style = $sheet->getStyle('H11');
+
+        $style->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+$style->getFill()->getStartColor()->setARGB('FFc7efce'); // Background color #c7efce
+
+$style->getFont()->getColor()->setARGB('FF217346'); // Font color #217346
+        break;
+    case 'Sindicalizado':
+        $style = $sheet->getStyle('H11');
+
+        $style->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+$style->getFill()->getStartColor()->setARGB('FFfeeb9d'); // Background color #c7efce
+
+$style->getFont()->getColor()->setARGB('FFa7720f'); // Font color #217346
+        break;
+  
+}
+
+
+
+$fecha_permiso = strftime('%A, %B %d, %Y', strtotime($model->motivoFechaPermiso->fecha_permiso));
+$sheet->setCellValue('H13', $fecha_permiso);
+
+
+$permisoAnterior = PermisoSinSueldo::find()
+->where(['empleado_id' => $model->empleado->id])
+->andWhere(['<', 'id', $id])
+->orderBy(['id' => SORT_DESC])
+->one();
+
+if ($permisoAnterior) {
+    $noPermisoAnterior = $permisoAnterior->no_permiso_anterior + 1;
+    $fechaPermisoAnterior = $permisoAnterior->motivoFechaPermiso->fecha_permiso;
+} else {
+    $noPermisoAnterior = null;
+    $fechaPermisoAnterior = null;
+}
+
+if ($fechaPermisoAnterior === null && $noPermisoAnterior === null) {
+    $sheet->setCellValue('H14', 'AUN NO TIENE PERMISOS ANTERIORES');
+    $sheet->setCellValue('H15', 'AUN NO TIENE PERMISOS ANTERIORES');
+} else {
+    $fecha_permiso_anterior = strftime('%A, %B %d, %Y', strtotime($fechaPermisoAnterior));
+    $sheet->setCellValue('H14', $fecha_permiso_anterior);
+    $sheet->setCellValue('H15', $noPermisoAnterior);
+}
+
+
+
+
+$motivoTextoPlano = strip_tags($model->motivoFechaPermiso->motivo);
+    $motivoTextoPlano = html_entity_decode($motivoTextoPlano, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $sheet->setCellValue('H16', $motivoTextoPlano);
+
+
+
+
+$sheet->setCellValue('A22', $nombreCompleto);
+
+
+$sheet->setCellValue('A23', $nombrePuesto);
+
+$direccion = CatDireccion::findOne($model->empleado->informacionLaboral->cat_direccion_id);
+
+if ($direccion && $direccion->nombre_direccion !== '1.- GENERAL' && $model->nombre_jefe_departamento) {
+    $nombreCompletoJefe = mb_strtoupper($model->nombre_jefe_departamento, 'UTF-8');
+    $sheet->setCellValue('H22', $nombreCompletoJefe);
+} else {
+    $sheet->setCellValue('H22', null);
+}
+
+
+
+
+$juntaDirectorDireccion = JuntaGobierno::find()
+    ->where(['cat_direccion_id' => $model->empleado->informacionLaboral->cat_direccion_id])
+    ->andWhere(['or', ['nivel_jerarquico' => 'Director'], ['nivel_jerarquico' => 'Jefe de unidad']])
+    ->one();
+
+if ($juntaDirectorDireccion) {
+    $nombreDirector = mb_strtoupper($juntaDirectorDireccion->empleado->nombre, 'UTF-8');
+    $apellidoDirector = mb_strtoupper($juntaDirectorDireccion->empleado->apellido, 'UTF-8');
+    $profesionDirector = mb_strtoupper($juntaDirectorDireccion->empleado->profesion, 'UTF-8');
+    $nombreCompletoDirector = $profesionDirector . ' ' . $apellidoDirector . ' ' . $nombreDirector;
+
+    $sheet->setCellValue('N22', $nombreCompletoDirector);
+
+    $nombreDireccion = $juntaDirectorDireccion->catDireccion->nombre_direccion;
+    switch ($nombreDireccion) {
+        case '1.- GENERAL':
+            if ($juntaDirectorDireccion->nivel_jerarquico == 'Jefe de unidad') {
+                $tituloDireccion = 'JEFE DE ' . $juntaDirectorDireccion->catDepartamento->nombre_departamento;
+            } else {
+                $tituloDireccion = 'DIRECTOR GENERAL';
+            }
+            break;
+        case '2.- ADMINISTRACIÓN':
+            $tituloDireccion = 'DIRECTOR DE ADMINISTRACIÓN';
+            break;
+        case '4.- OPERACIONES':
+            $tituloDireccion = 'DIRECTOR DE OPERACIONES';
+            break;
+        case '3.- COMERCIAL':
+            $tituloDireccion = 'DIRECTOR COMERCIAL';
+            break;
+        case '5.- PLANEACION':
+            $tituloDireccion = 'DIRECTOR DE PLANEACION';
+            break;
+        default:
+            $tituloDireccion = ''; 
+    }
+
+    $sheet->setCellValue('N23', $tituloDireccion);
+} else {
+    $sheet->setCellValue('N22', null);
+    $sheet->setCellValue('N23', null);
+}
+
+$htmlWriter = new Html($spreadsheet);
+$htmlWriter->setSheetIndex(0); 
+$htmlWriter->setPreCalculateFormulas(false);
+
+$fullHtmlContent = $htmlWriter->generateHtmlAll();
+
+$fullHtmlContent = str_replace('&nbsp;', ' ', $fullHtmlContent);
+
+
+return $this->render('excel-html', ['htmlContent' => $fullHtmlContent, 'model' => $model]);
+}
 
 }
