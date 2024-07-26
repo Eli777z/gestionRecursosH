@@ -33,7 +33,7 @@ class JuntaGobierno extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['cat_direccion_id', 'cat_departamento_id', 'empleado_id'], 'required'],
+            [['cat_direccion_id', 'cat_departamento_id', 'empleado_id', 'nivel_jerarquico'], 'required'],
             [['cat_direccion_id', 'cat_departamento_id', 'empleado_id'], 'integer'],
             [['nivel_jerarquico'], 'string', 'max' => 45],
         
@@ -50,10 +50,10 @@ class JuntaGobierno extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'cat_direccion_id' => 'Cat Direccion ID',
-            'cat_departamento_id' => 'Cat Departamento ID',
+            'cat_direccion_id' => 'Dirección',
+            'cat_departamento_id' => 'Departamento',
             'empleado_id' => 'Empleado ID',
-            'nivel_jerarquico' => 'Nivel Jerarquico',
+            'nivel_jerarquico' => 'Tipo de empleado',
             //'profesion' => 'Profesión',
         ];
     }

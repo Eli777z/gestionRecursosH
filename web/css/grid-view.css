@@ -71,6 +71,50 @@
     font-size: 24px;
 }
 
+
+.float-submit-btn2 {
+    position: fixed;
+    bottom: 150px;
+    right: 120px;
+    z-index: 1000;
+    background-color: #f8f9fa;
+    color: #fff;
+    border-radius: 50%;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+}
+
+.float-submit-btn2 i {
+    font-size: 24px;
+}
+
+.float-submit-btn3 {
+    position: fixed;
+    bottom: 150px;
+    right: 250px;
+    z-index: 1000;
+    background-color: #28a745;
+    color: #fff;
+    border-radius: 50%;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+}
+
+.float-submit-btn3 i {
+    font-size: 24px;
+}
+
+
 .bg-azulin{
     background: rgb(163,248,255);
     background: linear-gradient(90deg, rgba(163,248,255,1) 0%, rgba(177,249,255,1) 35%, rgba(230,253,255,1) 100%);

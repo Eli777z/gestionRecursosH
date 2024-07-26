@@ -375,19 +375,12 @@ class ComisionEspecialController extends Controller
 }
 
 
-    public function actionDownload($filename)
-    {
-        $filePath = Yii::getAlias("@app/runtime/archivos_temporales/$filename");
-        if (file_exists($filePath)) {
-            return Yii::$app->response->sendFile($filePath);
-        } else {
-            throw new NotFoundHttpException('El archivo solicitado no existe.');
-        }
-    }
+   
 
 
-    public function actionExportSegundoCaso($id)
+    public function actionExportHtmlSegundo($id)
     {
+        $this->layout = false;
 
         $model = ComisionEspecial::findOne($id);
 
@@ -429,9 +422,31 @@ class ComisionEspecialController extends Controller
         $nombreTipoContrato = $model->empleado->informacionLaboral->catTipoContrato->nombre_tipo;
         $sheet->setCellValue('H12', $nombreTipoContrato);
 
+        switch ($nombreTipoContrato) {
+            case 'Confianza':
+                $style = $sheet->getStyle('H12');
+                $style->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+                $style->getFill()->getStartColor()->setARGB('FFc7efce'); // Background color #c7efce
+                $style->getFont()->getColor()->setARGB('FF217346'); // Font color #217346
+                break;
+            case 'Sindicalizado':
+                $style = $sheet->getStyle('H12');
+                $style->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+                $style->getFill()->getStartColor()->setARGB('FFfeeb9d'); // Background color #c7efce
+                $style->getFont()->getColor()->setARGB('FFa7720f'); // Font color #217346
+                break;
+        }
+
         $fecha_permiso = strftime('%A, %B %d, %Y', strtotime($model->motivoFechaPermiso->fecha_permiso));
         $sheet->setCellValue('H14', $fecha_permiso);
-        $sheet->setCellValue('H15', $model->motivoFechaPermiso->motivo);
+
+
+         // Clean and set the motivo text
+    $motivoTextoPlano = strip_tags($model->motivoFechaPermiso->motivo);
+    $motivoTextoPlano = html_entity_decode($motivoTextoPlano, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $sheet->setCellValue('H15', $motivoTextoPlano);
+
+
         $sheet->setCellValue('A23', $nombreCompleto);
         $sheet->setCellValue('A24', $nombrePuesto);
 
@@ -479,11 +494,16 @@ class ComisionEspecialController extends Controller
         
         
 
-        $tempFileName = Yii::getAlias('@app/runtime/archivos_temporales/comision_especial.xlsx');
-        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-        $writer->save($tempFileName);
-    
-        return $this->redirect(['download', 'filename' => basename($tempFileName)]);
+        $htmlWriter = new Html($spreadsheet);
+    $htmlWriter->setSheetIndex(0); 
+    $htmlWriter->setPreCalculateFormulas(false);
+
+    $fullHtmlContent = $htmlWriter->generateHtmlAll();
+
+    // Clean up HTML content to ensure no &nbsp; and other unwanted characters
+    $fullHtmlContent = str_replace('&nbsp;', ' ', $fullHtmlContent);
+
+    return $this->render('excel-html', ['htmlContent' => $fullHtmlContent, 'model' => $model]);
     }
    
 

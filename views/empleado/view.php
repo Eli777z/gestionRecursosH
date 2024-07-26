@@ -25,7 +25,7 @@ use yii\web\JsExpression;
 use kartik\select2\Select2;
 use app\models\CatTipoDocumento;
 use app\models\DocumentoMedicoSearch;
-
+use jlorente\remainingcharacters\RemainingCharacters;
 /* @var $this yii\web\View */
 /* @var $model app\models\Empleado */
 
@@ -134,7 +134,7 @@ if (!$modelAlergia) {
 <script src="https://cdn.rawgit.com/davidstutz/bootstrap-multiselect/master/dist/js/bootstrap-multiselect.js"></script>
 <div class="container-fluid">
     <div class="row justify-content-center">
-        <div class="col-md-10">
+        <div class="col-md-11">
             <div class="card bg-light">
                 <div class="card-header gradient-info text-white">
                     <div class="d-flex align-items-center position-relative ml-4">
@@ -270,95 +270,410 @@ if (!$modelAlergia) {
                                 'id' => 'pjax-update-info',
                                 'options' => ['pushState' => false],
                             ]); ?>
-                            <div class="row">
 
-                                <div class="col-md-6">
 
-                                    <div class="card">
-                                        <?php $form = ActiveForm::begin([
-                                            'action' => ['actualizar-informacion', 'id' => $model->id],
-                                            'options' => ['id' => 'personal-info-form']
-                                        ]); ?>
-                                        <div class="card-header bg-info text-white">
-                                            <h3>Información personal</h3>
-                                            <?php if (Yii::$app->user->can('modificar-informacion-empleados')) : ?>
 
-                                                <button type="button" id="edit-button-personal" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
-                                                <button type="button" id="cancel-button-personal" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
+                            <?php $form = ActiveForm::begin([
+                                'action' => ['actualizar-informacion', 'id' => $model->id],
+                                'options' => ['id' => 'personal-info-form']
+                            ]); ?>
 
-                                                <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right mr-3', 'id' => 'save-button-personal', 'style' => 'display:none;']) ?>
-                                                <div id="loading-spinner" style="display: none;">
-                                                    <i class="fa fa-spinner fa-spin fa-2x"></i> Procesando...
-                                                </div>
-                                            <?php endif; ?>
+<div id="loading-spinner" style="color: #000000;">
+    <i class="fa fa-spinner fa-spin fa-2x" style="color: #000000;"></i> Procesando...
+</div>
+<?php if (Yii::$app->user->can('modificar-informacion-empleados')) : ?>
+    <div id="floating-buttons">
+        <button type="button" id="edit-button-personal" class="btn btn-warning"><i class="fa fa-edit"></i></button>
+        <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success', 'id' => 'save-button-personal', 'style' => 'display:none;']) ?>
+        <button type="button" id="cancel-button-personal" class="btn btn-danger" style="display:none;"><i class="fa fa-times"></i></button>
+
+       
+    </div>
+<?php endif; ?>
+
+                            
+
+                            <div class="card bg-light">
+                                <div class="card-header bg-info text-white">
+                                    <h6>Personal</h6>
+                                   
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-6 col-sm-2">
+                                            <?= $form->field($model, 'numero_empleado')->input('number', [
+                                                'readonly' => true,
+                                                'maxlength' => 4,
+                                                'class' => 'form-control',
+                                                'autocomplete'=>"off",
+                                                'title' => $model->numero_empleado
+                                            ])->label('No. Empleado:', [
+                                                'title' => $model->numero_empleado
+                                            ]) ?>
                                         </div>
-                                        <div class="card-body">
-                                            <?= $form->field($model, 'numero_empleado')->input('number', ['readonly' => true, 'class' => 'form-control']); ?>
-                                            <?= $form->field($model, 'nombre')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
-                                            <?= $form->field($model, 'apellido')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
 
-                                            <?php //echo Html::label($model->expedienteMedico->antecedenteNoPatologico, 'religion'); 
-                                            ?>
-                                            <?= $form->field($model, 'fecha_nacimiento')->input('date', ['disabled' => true]) ?>
-                                            <?= $form->field($model, 'edad')->hiddenInput()->label(false); ?>
+                                        <div class="col-6 col-sm-4">
+                                            <?= $form->field($model, 'nombre')->textInput([
+                                                'readonly' => true,
+                                                'class' => 'form-control',
+                                                'title' => $model->nombre,
+                                                'autocomplete'=>"off"
+                                            ])->label('Nombre', [
+                                                'title' => $model->nombre
+                                            ]) ?>
+
+                                            <?= $form->field($model, 'apellido')->textInput([
+                                                'readonly' => true,
+                                                'class' => 'form-control',
+                                                'title' => $model->apellido,
+                                                'autocomplete'=>"off"
+                                            ])->label('Apellido', [
+                                                'title' => $model->apellido
+                                            ]) ?>
+                                        </div>
+
+
+                                        <?php //echo Html::label($model->expedienteMedico->antecedenteNoPatologico, 'religion'); 
+                                        ?>
+                                        <div class="col-6 col-sm-2">
+                                            <?= $form->field($model, 'fecha_nacimiento')->input('date', [
+                                                'disabled' => true,
+                                                'title' => $model->fecha_nacimiento
+                                            ])->label('Fecha Nacimiento', [
+                                                'title' => $model->fecha_nacimiento
+                                            ]) ?>
+
+                                            <?= $form->field($model, 'edad')->hiddenInput([
+                                                'title' => $model->edad
+                                            ])->label(false); ?>
 
                                             <div class="form-group">
-                                                <label class="control-label">Edad:</label>
-                                                <p id="edad-label"><?= Html::encode($model->edad); ?></p>
+                                                <label class="control-label" title="<?= Html::encode($model->edad); ?>">Edad:</label>
+                                                <p id="edad-label" title="<?= Html::encode($model->edad); ?>"><?= Html::encode($model->edad); ?></p>
                                             </div>
+                                        </div>
 
-                                            <?= $form->field($model, 'sexo')->widget(Select2::className(), [
-                                                'data' => [
-                                                    'Masculino' => 'Masculino',
-                                                    'Femenino' => 'Femenino',
-                                                ],
-                                                'options' => ['prompt' => 'Seleccionar Sexo', 'disabled' => true],
-                                                'pluginOptions' => [
-                                                    'allowClear' => true
-                                                ],
-                                                'theme' => Select2::THEME_BOOTSTRAP,
-                                            ]); ?>
-                                            <?= $form->field($model, 'estado_civil')->widget(Select2::className(), [
-                                                'data' => [
-                                                    'Masculino' => [
-                                                        'Soltero' => 'Soltero',
-                                                        'Casado' => 'Casado',
-                                                        'Separado' => 'Separado',
-                                                        'Viudo' => 'Viudo',
-                                                    ],
-                                                    'Femenino' => [
-                                                        'Soltera' => 'Soltera',
-                                                        'Casada' => 'Casada',
-                                                        'Separada' => 'Separada',
-                                                        'Viuda' => 'Viuda',
-                                                    ],
-                                                ],
-                                                'options' => ['prompt' => 'Seleccionar Estado Civil', 'disabled' => true],
-                                                'pluginOptions' => [
-                                                    'allowClear' => true
-                                                ],
-                                                'theme' => Select2::THEME_BOOTSTRAP,
-                                            ]); ?>
-                                            <?= $form->field($model, 'curp')->textInput(['readonly' => true, 'maxlength' => 18, 'class' => 'form-control'])->label('CURP:') ?>
+                                        <div class="col-6 col-sm-3">
+                                            <?= $form->field($model, 'sexo')->dropDownList([
+                                                'Masculino' => 'Masculino',
+                                                'Femenino' => 'Femenino',
+                                            ], [
+                                                'prompt' => 'Seleccionar sexo',
+                                                'disabled' => true,
+                                                'class' => 'form-control',
+                                                'title' => $model->sexo
+                                            ])->label('Sexo', [
+                                                'title' => $model->sexo
+                                            ]) ?>
 
+                                            <?= $form->field($model, 'estado_civil')->dropDownList([
+                                                'Soltero/a' => 'Soltero/a',
+                                                'Casado/a' => 'Casado/a',
+                                                'Separado/a' => 'Separado/a',
+                                                'Viudo/a' => 'Viudo/a',
+                                            ], [
+                                                'prompt' => 'Seleccionar estado civil',
+                                                'disabled' => true,
+                                                'class' => 'form-control',
+                                                'title' => $model->estado_civil
+                                            ])->label('Estado civil', [
+                                                'title' => $model->estado_civil
+                                            ]) ?>
+                                        </div>
+
+                                        <div class="w-100"></div>
+                                        <div class="col-6 col-sm-3">
+                                            <?= $form->field($model, 'curp')->textInput([
+                                                'readonly' => true,
+                                                'maxlength' => 18,
+                                                'class' => 'form-control',
+                                                'title' => $model->curp,
+                                                'autocomplete'=>"off"
+                                            ])->label('CURP:', [
+                                                'title' => $model->curp
+                                            ]) ?>
+                                        </div>
+
+                                        <div class="col-6 col-sm-3">
                                             <?= $form->field($model, 'nss')->input('number', [
                                                 'maxlength' => 11,
                                                 'class' => 'form-control',
                                                 'id' => 'nss-input',
                                                 'readonly' => true,
-                                            ])->label('NSS:') ?>
-
-
-
-
-
-                                            <?= $form->field($model, 'rfc')->textInput(['readonly' => true, 'maxlength' => 13, 'class' => 'form-control'])->label('RFC:') ?>
-
-
+                                                'title' => $model->nss,
+                                                'autocomplete'=>"off"
+                                            ])->label('NSS:', [
+                                                'title' => $model->nss
+                                            ]) ?>
                                         </div>
-                                        <?php ActiveForm::end(); ?>
-                                        <?php
-                                        $script = <<< JS
+
+                                        <div class="col-6 col-sm-3">
+                                            <?= $form->field($model, 'rfc')->textInput([
+                                                'readonly' => true,
+                                                'maxlength' => 13,
+                                                'class' => 'form-control',
+                                                'title' => $model->rfc,
+                                                'autocomplete'=>"off"
+                                            ])->label('RFC:', [
+                                                'title' => $model->rfc
+                                            ]) ?>
+                                        </div>
+
+                                        <div class="w-100"></div>
+                                        <div class="col-6 col-sm-4">
+    <?= $form->field($model, 'cat_nivel_estudio_id')->widget(Select2::classname(), [
+        'data' => ArrayHelper::map(CatNivelEstudio::find()->all(), 'id', 'nivel_estudio'),
+        'options' => [
+            'placeholder' => 'Seleccionar Nivel de Estudio', 
+            'disabled' => true,
+            'title' => $model->cat_nivel_estudio_id ? 
+                CatNivelEstudio::findOne($model->cat_nivel_estudio_id)->nivel_estudio : ''
+        ],
+        'pluginOptions' => [
+            'allowClear' => true
+        ],
+        'theme' => Select2::THEME_BOOTSTRAP,
+        'pluginEvents' => [
+            'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
+            'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
+        ],
+    ])->label('Nivel de estudios', [
+        'title' => $model->cat_nivel_estudio_id ? 
+            CatNivelEstudio::findOne($model->cat_nivel_estudio_id)->nivel_estudio : ''
+    ]) ?>
+</div>
+
+<div class="col-6 col-sm-4">
+    <?= $form->field($model, 'institucion_educativa')->textInput([
+        'readonly' => true, 
+        'class' => 'form-control',
+        'title' => $model->institucion_educativa,
+        'autocomplete'=>"off"
+    ])->label('Institución Educativa', [
+        'title' => $model->institucion_educativa
+    ]) ?>
+</div>
+
+<div class="col-6 col-sm-2">
+    <?= $form->field($model, 'profesion')->widget(Select2::classname(), [
+        'data' => [
+            'No tiene' => 'No tiene',
+            'ING.' => 'ING.',
+            'LIC.' => 'LIC.',
+            'PROF.' => 'PROF.',
+            'ARQ.' => 'ARQ.',
+            'C.' => 'C.',
+            'DR.' => 'DR.',
+            'DRA.' => 'DRA.',
+            'TEC.' => 'TEC.',
+        ],
+        'options' => [
+            'prompt' => 'Seleccionar Profesión', 
+            'disabled' => true,
+            'title' => $model->profesion
+        ],
+        'pluginOptions' => [
+            'allowClear' => true
+        ],
+        'theme' => Select2::THEME_BOOTSTRAP,
+    ])->label('Profesión', [
+        'title' => $model->profesion
+    ]) ?>
+</div>
+
+                                    </div>
+                                </div>
+
+
+
+                            </div>
+
+
+                            <div class="card bg-light">
+                                <div class="card-header bg-success text-white">
+                                    <h6>Contacto</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                    <div class="col-6 col-sm-3">
+    <?= $form->field($model, 'email')->textInput([
+        'maxlength' => true, 
+        'readonly' => true, 
+        'class' => 'form-control',
+        'title' => $model->email,
+         'autocomplete'=>"off"
+    ])->label('Email', [
+        'title' => $model->email
+    ]) ?>
+</div>
+
+<div class="col-6 col-sm-2">
+    <?= $form->field($model, 'telefono')->textInput([
+        'maxlength' => 15, 
+        'readonly' => true, 
+        'class' => 'form-control',
+        'title' => $model->telefono,
+         'autocomplete'=>"off"
+
+    ])->label('Teléfono', [
+        'title' => $model->telefono
+    ]) ?>
+</div>
+
+<div class="col-6 col-sm-3">
+    <?= $form->field($model, 'colonia')->textInput([
+        'maxlength' => true, 
+        'readonly' => true, 
+        'class' => 'form-control',
+        'title' => $model->colonia,
+         'autocomplete'=>"off"
+    ])->label('Colonia', [
+        'title' => $model->colonia
+    ]) ?>
+</div>
+
+<div class="col-6 col-sm-3">
+    <?= $form->field($model, 'calle')->textInput([
+        'maxlength' => true, 
+        'readonly' => true, 
+        'class' => 'form-control',
+        'title' => $model->calle,
+         'autocomplete'=>"off"
+    ])->label('Calle', [
+        'title' => $model->calle
+    ]) ?>
+</div>
+
+<div class="w-100"></div>
+
+<div class="col-6 col-sm-2">
+    <?= $form->field($model, 'numero_casa')->textInput([
+        'maxlength' => true, 
+        'readonly' => true, 
+        'class' => 'form-control',
+        'title' => $model->numero_casa,
+         'autocomplete'=>"off"
+    ])->label('No. Casa:', [
+        'title' => $model->numero_casa
+    ]) ?>
+</div>
+
+<div class="col-6 col-sm-2">
+    <?= $form->field($model, 'codigo_postal')->input('number', [
+        'maxlength' => 6,
+        'class' => 'form-control',
+        'readonly' => true,
+        'title' => $model->codigo_postal,
+         'autocomplete'=>"off"
+    ])->label('Código Postal:', [
+        'title' => $model->codigo_postal
+    ]) ?>
+</div>
+<div class="col-6 col-sm-4">
+    <?= $form->field($model, 'estado')->widget(Select2::classname(), [
+        'data' => [], // Inicialmente vacío, se llenará con JS
+        'options' => [
+            'placeholder' => 'Selecciona un estado', 
+            'id' => 'estado-dropdown', 
+            'disabled' => true,
+            'title' => $model->estado ? $model->estado : 'No seleccionado'
+        ],
+        'pluginOptions' => [
+            'allowClear' => true
+        ],
+        'theme' => Select2::THEME_BOOTSTRAP,
+    ])->label('Estado:', [
+        'title' => $model->estado ? $model->estado : 'No seleccionado'
+    ]) ?>
+</div>
+
+<div class="col-6 col-sm-4">
+    <?= $form->field($model, 'municipio')->widget(Select2::classname(), [
+        'data' => [], // Inicialmente vacío
+        'options' => [
+            'placeholder' => 'Selecciona un municipio', 
+            'id' => 'municipio-dropdown', 
+            'disabled' => true,
+            'title' => $model->municipio ? $model->municipio : 'No seleccionado'
+        ],
+        'pluginOptions' => [
+            'allowClear' => true
+        ],
+        'theme' => Select2::THEME_BOOTSTRAP,
+    ])->label('Municipio:', [
+        'title' => $model->municipio ? $model->municipio : 'No seleccionado'
+    ]) ?>
+</div>
+
+
+                                        <h5 class="card-title">Información de Contacto de Emergencia</h5>
+                                        <br><br>
+                                        <div class="col-6 col-sm-4">
+    <?= $form->field($model, 'nombre_contacto_emergencia')->textInput([
+        'maxlength' => true, 
+        'readonly' => true, 
+        'class' => 'form-control',
+        'title' => $model->nombre_contacto_emergencia ? $model->nombre_contacto_emergencia : 'No disponible',
+         'autocomplete'=>"off"
+    ])->label('Nombre:', [
+        'title' => $model->nombre_contacto_emergencia ? $model->nombre_contacto_emergencia : 'No disponible'
+    ]) ?>
+</div>
+
+<div class="col-6 col-sm-4">
+    <?= $form->field($model, 'relacion_contacto_emergencia')->widget(Select2::className(), [
+        'data' => [
+            'Padre' => 'Padre',
+            'Madre' => 'Madre',
+            'Esposo/a' => 'Esposo/a',
+            'Hijo/a' => 'Hijo/a',
+            'Hermano/a' => 'Hermano/a',
+            'Compañero/a de trabajo' => 'Compañero/a de trabajo',
+            'Tio/a' => 'Tio/a'
+        ],
+        'options' => [
+            'prompt' => 'Seleccionar Parentesco', 
+            'disabled' => true,
+            'title' => $model->relacion_contacto_emergencia ? $model->relacion_contacto_emergencia : 'No disponible'
+        ],
+        'pluginOptions' => [
+            'allowClear' => true
+        ],
+        'theme' => Select2::THEME_BOOTSTRAP,
+    ])->label('Relación:', [
+        'title' => $model->relacion_contacto_emergencia ? $model->relacion_contacto_emergencia : 'No disponible'
+    ]) ?>
+</div>
+
+<div class="col-6 col-sm-3">
+    <?= $form->field($model, 'telefono_contacto_emergencia')->textInput([
+        'maxlength' => true, 
+        'readonly' => true, 
+        'class' => 'form-control',
+        'title' => $model->telefono_contacto_emergencia ? $model->telefono_contacto_emergencia : 'No disponible',
+         'autocomplete'=>"off"
+    ])->label('Teléfono:', [
+        'title' => $model->telefono_contacto_emergencia ? $model->telefono_contacto_emergencia : 'No disponible'
+    ]) ?>
+</div>
+
+                                    </div>
+                                </div>
+
+
+
+                            </div>
+
+
+
+
+
+
+                            <!--- principales--->
+
+                            <?php ActiveForm::end(); ?>
+                            <?php
+                            $script = <<< JS
     $('#personal-info-form').on('beforeSubmit', function() {
         var button = $('#save-button-personal');
         var spinner = $('#loading-spinner');
@@ -369,175 +684,60 @@ if (!$modelAlergia) {
         return true; // Permite que el formulario se envíe
     });
 JS;
-                                        $this->registerJs($script);
-                                        ?>
-                                    </div>
-
-                                </div>
-
-                                <script>
-                                    document.getElementById('edit-button-personal').addEventListener('click', function() {
-                                        var fields = document.querySelectorAll('#personal-info-form .form-control');
-                                        fields.forEach(function(field) {
-                                            field.readOnly = false;
-                                            field.disabled = false;
-                                        });
-                                        document.getElementById('edit-button-personal').style.display = 'none';
-                                        document.getElementById('save-button-personal').style.display = 'block';
-                                        document.getElementById('cancel-button-personal').style.display = 'block';
-                                    });
-
-                                    document.getElementById('cancel-button-personal').addEventListener('click', function() {
-                                        var fields = document.querySelectorAll('#personal-info-form .form-control');
-                                        fields.forEach(function(field) {
-                                            field.readOnly = true;
-                                            field.disabled = true;
-                                            field.value = field.defaultValue;
-                                        });
-                                        document.getElementById('edit-button-personal').style.display = 'block';
-                                        document.getElementById('save-button-personal').style.display = 'none';
-                                        document.getElementById('cancel-button-personal').style.display = 'none';
-                                    });
-
-                                    /*function checkEmptyFieldsPersonal() {
-                                        var fields = document.querySelectorAll('#personal-info-form .form-control');
-                                        var emptyFields = Array.from(fields).filter(function(field) {
-                                            return field.value.trim() === '';
-                                        });
-
-                                        if (emptyFields.length > 0) {
-                                            showAlert('Falta completar datos del empleado', 'Por favor, complete todos los campos.');
-                                        }
-                                    }
-
-                                    document.addEventListener('DOMContentLoaded', function() {
-                                        checkEmptyFieldsPersonal();
-                                    });
-
-                                    $('#pjax-update-info').on('pjax:end', function() {
-                                        checkEmptyFieldsPersonal();
-                                    });*/
-                                </script>
-
-
-                                <?php if (Yii::$app->user->can('ver-informacion-completa-empleados')) : ?>
-
-
-                                    <div class="col-md-6">
-
-                                        <div class="card">
-                                            <?php $form = ActiveForm::begin([
-                                                'action' => ['actualizar-informacion', 'id' => $model->id],
-                                                'options' => ['id' => 'educational-info-form']
-                                            ]); ?>
-                                            <div class="card-header gradient-verde  text-white">
-                                                <h3>Información Educacional</h3>
-                                                <?php if (Yii::$app->user->can('modificar-informacion-empleados')) : ?>
-
-                                                    <button type="button" id="edit-button-educational" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
-                                                    <button type="button" id="cancel-button-educational" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
-                                                    <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right mr-3', 'id' => 'save-button-educational', 'style' => 'display:none;']) ?>
-                                                    <div id="loading-spinner-educacion" style="display: none;">
-                                                        <i class="fa fa-spinner fa-spin fa-2x"></i> Procesando...
-                                                    </div>
-                                                <?php endif; ?>
-                                            </div>
-                                            <div class="card-body">
-                                                <?= $form->field($model, 'cat_nivel_estudio_id')->widget(Select2::classname(), [
-                                                    'data' => ArrayHelper::map(CatNivelEstudio::find()->all(), 'id', 'nivel_estudio'),
-                                                    'options' => ['placeholder' => 'Seleccionar Nivel de Estudio', 'disabled' => true],
-                                                    'pluginOptions' => [
-                                                        'allowClear' => true
-                                                    ],
-                                                    'theme' => Select2::THEME_BOOTSTRAP,
-                                                    'pluginEvents' => [
-                                                        'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
-                                                        'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
-                                                    ],
-                                                ])->label('Nivel de estudios') ?>
-                                                <?= $form->field($model, 'institucion_educativa')->textInput(['readonly' => true, 'class' => 'form-control']); ?>
-                                                <?= $form->field($model, 'profesion')->widget(Select2::className(), [
-                                                    'data' => [
-                                                        'No tiene' => 'No tiene',
-                                                        'ING.' => 'ING.',
-                                                        'LIC.' => 'LIC.',
-                                                        'PROF.' => 'PROF.',
-                                                        'ARQ.' => 'ARQ.',
-                                                        'C.' => 'C.',
-                                                        'DR.' => 'DR.',
-                                                        'DRA.' => 'DRA.',
-                                                        'TEC.' => 'TEC.',
-                                                    ],
-                                                    'options' => ['prompt' => 'Seleccionar Profesión', 'disabled' => true],
-                                                    'pluginOptions' => [
-                                                        'allowClear' => true
-                                                    ],
-                                                    'theme' => Select2::THEME_BOOTSTRAP,
-                                                ]); ?>
-                                            </div>
-                                            <?php ActiveForm::end(); ?>
-                                            <?php
-                                            $script = <<< JS
-    $('#educational-info-form').on('beforeSubmit', function() {
-        var button = $('#save-button-educational');
-        var spinner = $('#loading-spinner-educacion');
-
-        button.prop('disabled', true); // Deshabilita el botón
-        spinner.show(); // Muestra el spinner
-
-        return true; // Permite que el formulario se envíe
-    });
-JS;
-                                            $this->registerJs($script);
-                                            ?>
-                                        </div>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
+                            $this->registerJs($script);
+                            ?>
 
                             <script>
-                                document.getElementById('edit-button-educational').addEventListener('click', function() {
-                                    var fields = document.querySelectorAll('#educational-info-form .form-control');
+                                // Objeto para almacenar los valores originales de los campos
+                                var originalValues = {};
+
+                                // Función para almacenar los valores originales de los campos
+                                function storeOriginalValues() {
+                                    var fields = document.querySelectorAll('#personal-info-form .form-control');
+                                    fields.forEach(function(field) {
+                                        originalValues[field.id] = field.value;
+                                    });
+                                }
+
+                                // Función para restaurar los valores originales de los campos
+                                function restoreOriginalValues() {
+                                    var fields = document.querySelectorAll('#personal-info-form .form-control');
+                                    fields.forEach(function(field) {
+                                        if (originalValues.hasOwnProperty(field.id)) {
+                                            field.value = originalValues[field.id];
+                                        }
+                                    });
+                                }
+
+                                document.getElementById('edit-button-personal').addEventListener('click', function() {
+                                    storeOriginalValues(); // Almacenar los valores originales al iniciar la edición
+                                    var fields = document.querySelectorAll('#personal-info-form .form-control');
                                     fields.forEach(function(field) {
                                         field.readOnly = false;
                                         field.disabled = false;
                                     });
-                                    document.getElementById('edit-button-educational').style.display = 'none';
-                                    document.getElementById('save-button-educational').style.display = 'block';
-                                    document.getElementById('cancel-button-educational').style.display = 'block';
+                                    document.getElementById('edit-button-personal').style.display = 'none';
+                                    document.getElementById('save-button-personal').style.display = 'block';
+                                    document.getElementById('cancel-button-personal').style.display = 'block';
                                 });
 
-                                document.getElementById('cancel-button-educational').addEventListener('click', function() {
-                                    var fields = document.querySelectorAll('#educational-info-form .form-control');
+                                document.getElementById('cancel-button-personal').addEventListener('click', function() {
+                                    restoreOriginalValues(); // Restaurar los valores originales al cancelar la edición
+                                    var fields = document.querySelectorAll('#personal-info-form .form-control');
                                     fields.forEach(function(field) {
                                         field.readOnly = true;
                                         field.disabled = true;
-                                        field.value = field.defaultValue;
                                     });
-                                    document.getElementById('edit-button-educational').style.display = 'block';
-                                    document.getElementById('save-button-educational').style.display = 'none';
-                                    document.getElementById('cancel-button-educational').style.display = 'none';
+                                    document.getElementById('edit-button-personal').style.display = 'block';
+                                    document.getElementById('save-button-personal').style.display = 'none';
+                                    document.getElementById('cancel-button-personal').style.display = 'none';
                                 });
-
-                                /*function checkEmptyFieldsPersonal() {
-                                    var fields = document.querySelectorAll('#educational-info-form .form-control');
-                                    var emptyFields = Array.from(fields).filter(function(field) {
-                                        return field.value.trim() === '';
-                                    });
-
-                                    if (emptyFields.length > 0) {
-                                        showAlert('Falta completar datos del empleado', 'Por favor, complete todos los campos.');
-                                    }
-                                }
-
-                                document.addEventListener('DOMContentLoaded', function() {
-                                    checkEmptyFieldsPersonal();
-                                });
-
-                                $('#pjax-update-info').on('pjax:end', function() {
-                                    checkEmptyFieldsPersonal();
-                                });*/
                             </script>
+
+
+
+
+
 
 
                             <?php Pjax::end(); ?>
@@ -562,13 +762,15 @@ JS;
                                                 <button type="button" id="cancel-button-contact" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
                                                 <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right mr-3', 'id' => 'save-button-contact', 'style' => 'display:none;']) ?>
                                                 <div id="loading-spinner-contacto" style="display: none;">
-        <i class="fa fa-spinner fa-spin fa-2x"></i> Procesando...
-    </div>
-                                            
-                                                <?php endif; ?>
+                                                    <i class="fa fa-spinner fa-spin fa-2x"></i> Procesando...
+                                                </div>
+
+                                            <?php endif; ?>
                                         </div>
                                         <div class="card-body">
+
                                             <?= $form->field($model, 'email')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
+
                                             <?= $form->field($model, 'telefono')->textInput(['maxlength' => 15, 'readonly' => true, 'class' => 'form-control']); ?>
                                             <?= $form->field($model, 'colonia')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
                                             <?= $form->field($model, 'calle')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
@@ -598,7 +800,7 @@ JS;
                                         </div>
                                         <?php ActiveForm::end(); ?>
                                         <?php
-                                            $script = <<< JS
+                                        $script = <<< JS
     $('#contact-info-form').on('beforeSubmit', function() {
         var button = $('#save-button-contact');
         var spinner = $('#loading-spinner-contacto');
@@ -609,8 +811,8 @@ JS;
         return true; // Permite que el formulario se envíe
     });
 JS;
-                                            $this->registerJs($script);
-                                            ?>
+                                        $this->registerJs($script);
+                                        ?>
                                     </div>
 
                                     <script>
@@ -671,10 +873,10 @@ JS;
                                                 <button type="button" id="cancel-button-emergency" class="btn btn-danger float-right" style="display:none;"><i class="fa fa-times"></i></button>
                                                 <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success float-right  mr-3', 'id' => 'save-button-emergency', 'style' => 'display:none;']) ?>
                                                 <div id="loading-spinner-contacto-emergencia" style="display: none;">
-        <i class="fa fa-spinner fa-spin fa-2x"></i> Procesando...
-    </div>
-                                            
-                                                <?php endif; ?>
+                                                    <i class="fa fa-spinner fa-spin fa-2x"></i> Procesando...
+                                                </div>
+
+                                            <?php endif; ?>
                                         </div>
                                         <div class="card-body">
                                             <?= $form->field($model, 'nombre_contacto_emergencia')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
@@ -698,7 +900,7 @@ JS;
                                         </div>
                                         <?php ActiveForm::end(); ?>
                                         <?php
-                                            $script = <<< JS
+                                        $script = <<< JS
     $('#emergency-contact-form').on('beforeSubmit', function() {
         var button = $('#save-button-emergency');
         var spinner = $('#loading-spinner-contacto-emergencia');
@@ -709,8 +911,8 @@ JS;
         return true; // Permite que el formulario se envíe
     });
 JS;
-                                            $this->registerJs($script);
-                                            ?>
+                                        $this->registerJs($script);
+                                        ?>
                                     </div>
 
                                     <script>
@@ -791,6 +993,10 @@ JS;
                                     'action' => ['actualizar-informacion-laboral', 'id' => $model->id],
                                     'options' => ['id' => 'laboral-info-form']
                                 ]); ?>
+                             <div id="loading-spinner-laboral" style="display: none;">
+    <i class="fa fa-spinner fa-spin fa-2x" style="color: #000000;"></i> Procesando...
+</div>
+                              
                                 <div class="card-header bg-info text-white">
                                     <h3>Información Laboral</h3>
                                     <?php if (Yii::$app->user->can('modificar-informacion-empleados')) : ?>
@@ -801,167 +1007,257 @@ JS;
                                     <?php endif; ?>
                                 </div>
                                 <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-6 col-sm-6">
 
-                                    <div class="form-group">
-                                        <label class="font-weight-bold">Días Laborales</label><br>
-                                        <div id="dias-laborales-display" class="alert alert-warning">
-                                            <p><strong>Días laborales actuales:</strong> <?= Html::encode(implode(', ', explode(', ', $model->informacionLaboral->dias_laborales))) ?></p>
+                                            <div class="form-group">
+
+                                                <label class="font-weight-bold">Días Laborales</label><br>
+                                                <div id="dias-laborales-display" class="alert alert-warning">
+                                                    <p><strong>Días laborales actuales:</strong> <?= Html::encode(implode(', ', explode(', ', $model->informacionLaboral->dias_laborales))) ?></p>
+                                                </div>
+                                                <div id="dias-laborales-checkboxes" style="display: none;">
+                                                    <div class="form-check form-check-inline">
+                                                        <?= Html::checkbox('InformacionLaboral[dias_laborales][]', in_array('Lunes', explode(', ', $model->informacionLaboral->dias_laborales)), ['value' => 'Lunes', 'class' => 'form-check-input', 'id' => 'lunes']) ?>
+                                                        <?= Html::label('Lunes', 'lunes', ['class' => 'form-check-label']) ?>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <?= Html::checkbox('InformacionLaboral[dias_laborales][]', in_array('Martes', explode(', ', $model->informacionLaboral->dias_laborales)), ['value' => 'Martes', 'class' => 'form-check-input', 'id' => 'martes']) ?>
+                                                        <?= Html::label('Martes', 'martes', ['class' => 'form-check-label']) ?>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <?= Html::checkbox('InformacionLaboral[dias_laborales][]', in_array('Miércoles', explode(', ', $model->informacionLaboral->dias_laborales)), ['value' => 'Miércoles', 'class' => 'form-check-input', 'id' => 'miercoles']) ?>
+                                                        <?= Html::label('Miércoles', 'miercoles', ['class' => 'form-check-label']) ?>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <?= Html::checkbox('InformacionLaboral[dias_laborales][]', in_array('Jueves', explode(', ', $model->informacionLaboral->dias_laborales)), ['value' => 'Jueves', 'class' => 'form-check-input', 'id' => 'jueves']) ?>
+                                                        <?= Html::label('Jueves', 'jueves', ['class' => 'form-check-label']) ?>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <?= Html::checkbox('InformacionLaboral[dias_laborales][]', in_array('Viernes', explode(', ', $model->informacionLaboral->dias_laborales)), ['value' => 'Viernes', 'class' => 'form-check-input', 'id' => 'viernes']) ?>
+                                                        <?= Html::label('Viernes', 'viernes', ['class' => 'form-check-label']) ?>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <?= Html::checkbox('InformacionLaboral[dias_laborales][]', in_array('Sábado', explode(', ', $model->informacionLaboral->dias_laborales)), ['value' => 'Sábado', 'class' => 'form-check-input', 'id' => 'sabado']) ?>
+                                                        <?= Html::label('Sábado', 'sabado', ['class' => 'form-check-label']) ?>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <?= Html::checkbox('InformacionLaboral[dias_laborales][]', in_array('Domingo', explode(', ', $model->informacionLaboral->dias_laborales)), ['value' => 'Domingo', 'class' => 'form-check-input', 'id' => 'domingo']) ?>
+                                                        <?= Html::label('Domingo', 'domingo', ['class' => 'form-check-label']) ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                         </div>
-                                        <div id="dias-laborales-checkboxes" style="display: none;">
-                                            <div class="form-check form-check-inline">
-                                                <?= Html::checkbox('InformacionLaboral[dias_laborales][]', in_array('Lunes', explode(', ', $model->informacionLaboral->dias_laborales)), ['value' => 'Lunes', 'class' => 'form-check-input', 'id' => 'lunes']) ?>
-                                                <?= Html::label('Lunes', 'lunes', ['class' => 'form-check-label']) ?>
+                                        <div class="col-6 col-sm-2">
+                                            <?= $form->field($model->informacionLaboral, 'horario_laboral_inicio')->input('time', [
+                                                'disabled' => true,
+                                                'title' => $model->informacionLaboral->horario_laboral_inicio,
+                                            ])->label('Hora de entrada', [
+                                                'title' => $model->informacionLaboral->horario_laboral_inicio,
+                                            ]) ?>
+                                        </div>
+
+                                        <div class="col-6 col-sm-2">
+                                            <?= $form->field($model->informacionLaboral, 'horario_laboral_fin')->input('time', [
+                                                'disabled' => true,
+                                                'title' => $model->informacionLaboral->horario_laboral_fin,
+                                            ])->label('Hora de salida', [
+                                                'title' => $model->informacionLaboral->horario_laboral_fin,
+                                            ]) ?>
+                                        </div>
+
+                                        <div class="w-100"></div>
+
+                                        <?php if (Yii::$app->user->can('ver-informacion-completa-empleados')) : ?>
+                                            <div class="col-6 col-sm-2">
+                                                <?= $form->field($model->informacionLaboral, 'cat_tipo_contrato_id')->widget(Select2::classname(), [
+                                                    'data' => ArrayHelper::map(CatTipoContrato::find()->all(), 'id', 'nombre_tipo'),
+                                                    'options' => [
+                                                        'placeholder' => 'Seleccionar Tipo de Contrato',
+                                                        'disabled' => true,
+                                                        'title' => $model->informacionLaboral->cat_tipo_contrato_id ?
+                                                            CatTipoContrato::findOne($model->informacionLaboral->cat_tipo_contrato_id)->nombre_tipo : '',
+                                                    ],
+                                                    'pluginOptions' => [
+                                                        'allowClear' => true
+                                                    ],
+                                                    'theme' => Select2::THEME_BOOTSTRAP,
+                                                    'pluginEvents' => [
+                                                        'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
+                                                        'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
+                                                    ],
+                                                ])->label('Tipo de contrato', [
+                                                    'title' => $model->informacionLaboral->cat_tipo_contrato_id ?
+                                                        CatTipoContrato::findOne($model->informacionLaboral->cat_tipo_contrato_id)->nombre_tipo : ''
+                                                ]) ?>
                                             </div>
-                                            <div class="form-check form-check-inline">
-                                                <?= Html::checkbox('InformacionLaboral[dias_laborales][]', in_array('Martes', explode(', ', $model->informacionLaboral->dias_laborales)), ['value' => 'Martes', 'class' => 'form-check-input', 'id' => 'martes']) ?>
-                                                <?= Html::label('Martes', 'martes', ['class' => 'form-check-label']) ?>
-                                            </div>
-                                            <div class="form-check form-check-inline">
-                                                <?= Html::checkbox('InformacionLaboral[dias_laborales][]', in_array('Miércoles', explode(', ', $model->informacionLaboral->dias_laborales)), ['value' => 'Miércoles', 'class' => 'form-check-input', 'id' => 'miercoles']) ?>
-                                                <?= Html::label('Miércoles', 'miercoles', ['class' => 'form-check-label']) ?>
-                                            </div>
-                                            <div class="form-check form-check-inline">
-                                                <?= Html::checkbox('InformacionLaboral[dias_laborales][]', in_array('Jueves', explode(', ', $model->informacionLaboral->dias_laborales)), ['value' => 'Jueves', 'class' => 'form-check-input', 'id' => 'jueves']) ?>
-                                                <?= Html::label('Jueves', 'jueves', ['class' => 'form-check-label']) ?>
-                                            </div>
-                                            <div class="form-check form-check-inline">
-                                                <?= Html::checkbox('InformacionLaboral[dias_laborales][]', in_array('Viernes', explode(', ', $model->informacionLaboral->dias_laborales)), ['value' => 'Viernes', 'class' => 'form-check-input', 'id' => 'viernes']) ?>
-                                                <?= Html::label('Viernes', 'viernes', ['class' => 'form-check-label']) ?>
-                                            </div>
-                                            <div class="form-check form-check-inline">
-                                                <?= Html::checkbox('InformacionLaboral[dias_laborales][]', in_array('Sábado', explode(', ', $model->informacionLaboral->dias_laborales)), ['value' => 'Sábado', 'class' => 'form-check-input', 'id' => 'sabado']) ?>
-                                                <?= Html::label('Sábado', 'sabado', ['class' => 'form-check-label']) ?>
-                                            </div>
-                                            <div class="form-check form-check-inline">
-                                                <?= Html::checkbox('InformacionLaboral[dias_laborales][]', in_array('Domingo', explode(', ', $model->informacionLaboral->dias_laborales)), ['value' => 'Domingo', 'class' => 'form-check-input', 'id' => 'domingo']) ?>
-                                                <?= Html::label('Domingo', 'domingo', ['class' => 'form-check-label']) ?>
+                                        <?php endif; ?>
+                                        <div class="col-6 col-sm-2">
+                                            <?= $form->field($model->informacionLaboral, 'fecha_ingreso')->input('date', [
+                                                'disabled' => true,
+                                                'title' => $model->informacionLaboral->fecha_ingreso,
+                                            ])->label('Fecha de ingreso', [
+                                                'title' => $model->informacionLaboral->fecha_ingreso,
+                                            ]) ?>
+                                        </div>
+
+
+
+                                        <div class="col-6 col-sm-4">
+                                            <?= $form->field($model->informacionLaboral, 'cat_departamento_id')->widget(Select2::classname(), [
+                                                'data' => ArrayHelper::map(CatDepartamento::find()->all(), 'id', 'nombre_departamento'),
+                                                'options' => [
+                                                    'placeholder' => 'Seleccionar Departamento',
+                                                    'disabled' => true,
+                                                    'title' => $model->informacionLaboral->cat_departamento_id ?
+                                                        CatDepartamento::findOne($model->informacionLaboral->cat_departamento_id)->nombre_departamento : '',
+                                                ],
+                                                'pluginOptions' => [
+                                                    'allowClear' => true
+                                                ],
+                                                'theme' => Select2::THEME_BOOTSTRAP,
+                                                'pluginEvents' => [
+                                                    'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
+                                                ],
+                                            ])->label('Departamento', ['title' => $model->informacionLaboral->cat_departamento_id ?
+                                                CatDepartamento::findOne($model->informacionLaboral->cat_departamento_id)->nombre_departamento : '']) ?>
+                                        </div>
+
+
+
+                                        <div class="col-6 col-sm-2">
+                                            <div class="form-group">
+                                                <label class="control-label" title="<?= Html::encode($model->informacionLaboral->catDireccion->nombre_direccion); ?>">Dirección:</label>
+                                                <p id="edad-label" title="<?= Html::encode($model->informacionLaboral->catDireccion->nombre_direccion); ?>"><?= Html::encode($model->informacionLaboral->catDireccion->nombre_direccion); ?></p>
                                             </div>
                                         </div>
+
+                                        <div class="col-6 col-sm-2">
+                                            <div class="form-group">
+                                                <label class="control-label" title="<?= Html::encode($model->informacionLaboral->catDptoCargo->nombre_dpto); ?>">DPTO:</label>
+                                                <p id="edad-label" title="<?= Html::encode($model->informacionLaboral->catDptoCargo->nombre_dpto); ?>"><?= Html::encode($model->informacionLaboral->catDptoCargo->nombre_dpto); ?></p>
+                                            </div>
+                                        </div>
+
+                                        <div class="w-100"></div>
+
+                                        <div class="col-6 col-sm-3">
+                                            <?= $form->field($model->informacionLaboral, 'junta_gobierno_id')->widget(Select2::classname(), [
+                                                'data' => $jefesDirectores,
+                                                'options' => [
+                                                    'placeholder' => 'Seleccionar Jefe o director a cargo',
+                                                    'disabled' => true,
+                                                    'title' => $model->informacionLaboral->junta_gobierno_id ?
+                                                        $jefesDirectores[$model->informacionLaboral->junta_gobierno_id] : '',
+                                                ],
+                                                'pluginOptions' => [
+                                                    'allowClear' => true
+                                                ],
+                                                'theme' => Select2::THEME_BOOTSTRAP,
+                                                'pluginEvents' => [
+                                                    'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
+                                                    'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
+                                                ],
+                                            ])->label('Jefe inmediato', ['title' => $model->informacionLaboral->junta_gobierno_id ?
+                                                $jefesDirectores[$model->informacionLaboral->junta_gobierno_id] : '']) ?>
+                                        </div>
+
+                                        <div class="col-6 col-sm-3">
+                                            
+
+                                            <div class="form-group">
+                                                <label class="control-label" title="<?= $juntaDirectorDireccion ? Html::encode($juntaDirectorDireccion->empleado->nombre . ' ' . $juntaDirectorDireccion->empleado->apellido) : 'No Asignado' ?>">Director de dirección</label>
+                                                <p id="director-label" title="<?= $juntaDirectorDireccion ? Html::encode($juntaDirectorDireccion->empleado->nombre . ' ' . $juntaDirectorDireccion->empleado->apellido) : 'No asignado'?>"><?= $juntaDirectorDireccion ? Html::encode($juntaDirectorDireccion->empleado->nombre . ' ' . $juntaDirectorDireccion->empleado->apellido) : 'No asignado'?></p>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-6 col-sm-4">
+                                            <?= $form->field($model->informacionLaboral, 'cat_puesto_id')->widget(Select2::classname(), [
+                                                'data' => ArrayHelper::map(CatPuesto::find()->all(), 'id', 'nombre_puesto'),
+                                                'options' => [
+                                                    'placeholder' => 'Seleccionar Puesto',
+                                                    'disabled' => true,
+                                                    'title' => $model->informacionLaboral->cat_puesto_id ?
+                                                        CatPuesto::findOne($model->informacionLaboral->cat_puesto_id)->nombre_puesto : '',
+                                                ],
+                                                'pluginOptions' => [
+                                                    'allowClear' => true
+                                                ],
+                                                'theme' => Select2::THEME_BOOTSTRAP,
+                                                'pluginEvents' => [
+                                                    'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
+                                                    'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
+                                                ],
+                                            ])->label('Nombramiento', [
+                                                'title' => $model->informacionLaboral->cat_puesto_id ?
+                                                    CatPuesto::findOne($model->informacionLaboral->cat_puesto_id)->nombre_puesto : ''
+                                            ]) ?>
+                                        </div>
+
+
+                                        <?php if (Yii::$app->user->can('ver-informacion-completa-empleados')) : ?>
+                                            <div class="col-6 col-sm-4">
+    <?= $form->field($model->informacionLaboral, 'numero_cuenta')->input('number', [
+        'maxlength' => 18,
+        'readonly' => true,
+        'class' => 'form-control no-spinner',
+        'title' => $model->informacionLaboral->numero_cuenta,
+    ])->label('Número de cuenta', [
+        'title' => $model->informacionLaboral->numero_cuenta
+    ]) ?>
+</div>
+
+
+                                        <?php endif; ?>
+                                        <?php if (Yii::$app->user->can('ver-informacion-completa-empleados')) : ?>
+
+                                            <div class="col-6 col-sm-3">
+                                                <?= $form->field($model->informacionLaboral, 'salario')->textInput([
+                                                    'type' => 'number',
+                                                    'step' => '0.01',
+                                                    'readonly' => true,
+                                                    'class' => 'form-control',
+                                                    'title' => $model->informacionLaboral->salario
+                                                ])->label('Salario', [
+                                                    'title' => $model->informacionLaboral->salario
+                                                ]) ?>
+                                            </div>
+
+
+                                        <?php endif; ?>
+
+
+
+
+
+
+
+
+
+
+
+
+                                        <?php ActiveForm::end(); ?>
+                                        <?php
+$script = <<< JS
+$(document).ready(function() {
+    $('#laboral-info-form').on('beforeSubmit', function() {
+        var button = $('#save-button-laboral');
+        var spinner = $('#loading-spinner-laboral');
+
+        button.prop('disabled', true); // Deshabilita el botón
+        spinner.show(); // Muestra el spinner
+
+        return true; // Permite que el formulario se envíe
+    });
+});
+JS;
+$this->registerJs($script);
+?>
+
+
                                     </div>
-
-
-
-                                    <?php if (Yii::$app->user->can('ver-informacion-completa-empleados')) : ?>
-
-                                        <?= $form->field($model->informacionLaboral, 'cat_tipo_contrato_id')->widget(Select2::classname(), [
-                                            'data' => ArrayHelper::map(CatTipoContrato::find()->all(), 'id', 'nombre_tipo'),
-                                            'options' => ['placeholder' => 'Seleccionar Tipo de Contrato', 'disabled' => true],
-                                            'pluginOptions' => [
-                                                'allowClear' => true
-                                            ],
-                                            'theme' => Select2::THEME_BOOTSTRAP,
-                                            'pluginEvents' => [
-                                                'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
-                                            ],
-                                            'pluginEvents' => [
-                                                'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
-                                            ],
-                                        ])->label('Tipo de contrato') ?>
-                                    <?php endif; ?>
-                                    <?= $form->field($model->informacionLaboral, 'fecha_ingreso')->input('date', ['disabled' => true]) ?>
-
-                                    <?= $form->field($model->informacionLaboral, 'cat_departamento_id')->widget(Select2::classname(), [
-                                        'data' => ArrayHelper::map(CatDepartamento::find()->all(), 'id', 'nombre_departamento'),
-                                        'options' => ['placeholder' => 'Seleccionar Departamento', 'disabled' => true],
-                                        'pluginOptions' => [
-                                            'allowClear' => true
-                                        ],
-                                        'theme' => Select2::THEME_BOOTSTRAP,
-                                        'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
-                                        ],
-                                        'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
-                                        ],
-                                    ])->label('Departamento')  ?>
-
-                                    <?= $form->field($model->informacionLaboral, 'cat_dpto_cargo_id')->widget(Select2::classname(), [
-                                        'data' => ArrayHelper::map(CatDptoCargo::find()->all(), 'id', 'nombre_dpto'),
-                                        'options' => ['placeholder' => 'Selecciona el DPTO', 'disabled' => true],
-                                        'pluginOptions' => [
-                                            'allowClear' => true
-                                        ],
-                                        'theme' => Select2::THEME_BOOTSTRAP,
-                                        'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
-                                        ],
-                                        'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
-                                        ],
-                                    ])->label('Cargo')  ?>
-                                    <?= $form->field($model->informacionLaboral, 'horario_laboral_inicio')->input('time', ['disabled' => true])->label('Hora de entrada')  ?>
-
-                                    <?= $form->field($model->informacionLaboral, 'horario_laboral_fin')->input('time', ['disabled' => true])->label('Hora de salida') ?>
-                                    <?php if (Yii::$app->user->can('ver-informacion-completa-empleados')) : ?>
-
-                                        <?= $form->field($model->informacionLaboral, 'numero_cuenta')->textInput(['maxlength' => true, 'readonly' => true, 'class' => 'form-control']); ?>
-                                    <?php endif; ?>
-                                    <?php if (Yii::$app->user->can('ver-informacion-completa-empleados')) : ?>
-
-                                        <?= $form->field($model->informacionLaboral, 'salario')->textInput([
-                                            'type' => 'number',
-                                            'step' => '0.01',
-                                            'readonly' => true,
-                                            'class' => 'form-control'
-                                        ]); ?>
-                                    <?php endif; ?>
-
-
-                                    <?= $form->field($model->informacionLaboral, 'cat_puesto_id')->widget(Select2::classname(), [
-                                        'data' => ArrayHelper::map(CatPuesto::find()->all(), 'id', 'nombre_puesto'),
-                                        'options' => ['placeholder' => 'Seleccionar Puesto', 'disabled' => true],
-                                        'pluginOptions' => [
-                                            'allowClear' => true
-                                        ],
-                                        'theme' => Select2::THEME_BOOTSTRAP,
-                                        'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
-                                        ],
-                                        'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
-                                        ],
-                                    ])->label('Nombramiento')  ?>
-
-
-
-                                    <?= $form->field($model->informacionLaboral, 'cat_direccion_id')->widget(Select2::classname(), [
-                                        'data' => ArrayHelper::map(CatDireccion::find()->all(), 'id', 'nombre_direccion'),
-                                        'options' => ['placeholder' => 'Seleccionar Dirección', 'disabled' => true],
-                                        'pluginOptions' => [
-                                            'allowClear' => true
-                                        ],
-                                        'theme' => Select2::THEME_BOOTSTRAP,
-                                        'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
-                                        ],
-                                        'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
-                                        ],
-                                    ])->label('Dirección') ?>
-
-                                    <?= $form->field($model->informacionLaboral, 'junta_gobierno_id')->widget(Select2::classname(), [
-                                        'data' => $jefesDirectores,
-                                        'options' => ['placeholder' => 'Seleccionar Jefe o director a cargo', 'disabled' => true],
-                                        'pluginOptions' => [
-                                            'allowClear' => true
-                                        ],
-                                        'theme' => Select2::THEME_BOOTSTRAP,
-                                        'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
-                                        ],
-                                        'pluginEvents' => [
-                                            'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
-                                        ],
-                                    ])->label('Jefe inmediato') ?>
-
-                                    <div class="form-group">
-                                        <label class="control-label">Director de dirección</label>
-                                        <input type="text" class="form-control" readonly value="<?= $juntaDirectorDireccion ?  $juntaDirectorDireccion->empleado->nombre . ' ' . $juntaDirectorDireccion->empleado->apellido : 'No Asignado' ?>">
-                                    </div>
-
-
-
-                                    <?php ActiveForm::end(); ?>
                                 </div>
                             </div>
 
@@ -1422,13 +1718,13 @@ JS;
                                         'id' => 'informacion_personal',
                                     ],
                                 ],
-                                [
-                                    'label' => 'Información de contacto',
-                                    'content' => $this->blocks['info_c'],
-                                    'options' => [
-                                        'id' => 'informacion_contacto',
-                                    ],
-                                ],
+                                //          [
+                                //          'label' => 'Información de contacto',
+                                //            'content' => $this->blocks['info_c'],
+                                //        'options' => [
+                                //          'id' => 'informacion_contacto',
+                                //    ],
+                                // ],
                                 [
                                     'label' => 'Información laboral',
                                     'content' => $this->blocks['info_l'],

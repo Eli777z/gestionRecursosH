@@ -262,3 +262,69 @@ hr.solid {
 #nss-input[type=number] {
     -moz-appearance: textfield;
 }
+
+
+/* Ocultar botones de incremento y decremento solo para campos con la clase no-spinner */
+.no-spinner::-webkit-inner-spin-button,
+.no-spinner::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.no-spinner {
+    -moz-appearance: textfield;
+}
+
+
+    #floating-buttons {
+
+        position: fixed;
+        bottom: 15%;
+        right: 8%;
+        z-index: 1000; /* Asegúrate de que los botones estén por encima de otros elementos */
+    }
+
+    #floating-buttons .btn {
+        border-radius: 50%;
+        height: 60px;
+        width: 60px;
+        margin: 0 5px; /* Espacio entre botones */
+        margin-top: 10px;
+    }
+
+  
+    #loading-spinner {
+        position: fixed;
+        top: 35%;
+        right: 5%;
+        background-color: #ffc107; /* Fondo blanco para resaltar sobre otros elementos */
+        border: 2px solid #ffc107 ; /* Borde gris claro */
+        border-radius: 5px; /* Bordes redondeados */
+        padding: 10px 20px; /* Espaciado interno */
+        box-shadow: 0 15px 15px rgba(0, 0, 0, 0.5); /* Sombra ligera para efecto de profundidad */
+        z-index: 1000; /* Asegúrate de que el aviso esté por encima de otros elementos */
+        display: none; /* Ocultarlo por defecto */
+        font-size: 16px; /* Tamaño de fuente */
+    }
+
+    #loading-spinner i {
+        margin-right: 10px; /* Espacio entre el icono y el texto */
+    }
+
+    #loading-spinner-laboral {
+        position: fixed;
+        top: 35%;
+        right: 5%;
+        background-color: #ffc107; /* Fondo blanco para resaltar sobre otros elementos */
+        border: 2px solid #ffc107 ; /* Borde gris claro */
+        border-radius: 5px; /* Bordes redondeados */
+        padding: 10px 20px; /* Espaciado interno */
+        box-shadow: 0 15px 15px rgba(0, 0, 0, 0.5); /* Sombra ligera para efecto de profundidad */
+        z-index: 1000; /* Asegúrate de que el aviso esté por encima de otros elementos */
+        display: none; /* Ocultarlo por defecto */
+        font-size: 16px; /* Tamaño de fuente */
+    }
+
+    #loading-spinner-laboral i {
+        margin-right: 10px; /* Espacio entre el icono y el texto */
+    }

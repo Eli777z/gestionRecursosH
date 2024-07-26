@@ -107,6 +107,9 @@ class EmpleadoController extends Controller
     public function actionView($id)
     {
         $modelEmpleado = $this->findModel2($id);
+        $modelEmpleado->scenario = Empleado::SCENARIO_UPDATE;
+        
+
         $documentos = $modelEmpleado->documentos;
         $documentoModel = new Documento();
         $documentoMedicoModel = new DocumentoMedico();
@@ -713,6 +716,8 @@ class EmpleadoController extends Controller
     $antecedenteHereditario = new AntecedenteHereditario();
 
     $usuario->scenario = Usuario::SCENARIO_CREATE;
+    $model->scenario = Empleado::SCENARIO_CREATE;
+
 
     if ($model->load(Yii::$app->request->post()) && $usuario->load(Yii::$app->request->post()) && $informacion_laboral->load(Yii::$app->request->post()) && $juntaGobiernoModel->load(Yii::$app->request->post())) { 
         $transaction = Yii::$app->db->beginTransaction();
@@ -1297,27 +1302,43 @@ class EmpleadoController extends Controller
     {
         $model = $this->findModel2($id);
         $informacion_laboral = InformacionLaboral::findOne($model->informacion_laboral_id);
-
-        if ($informacion_laboral->load(Yii::$app->request->post()) && $informacion_laboral->save()) {
-            $vacaciones = Vacaciones::findOne($informacion_laboral->vacaciones_id);
-            $totalDiasVacaciones = $this->calcularDiasVacaciones($informacion_laboral->fecha_ingreso, $informacion_laboral->cat_tipo_contrato_id);
-            $vacaciones->total_dias_vacaciones = $totalDiasVacaciones;
-
-            if ($vacaciones->save()) {
-                Yii::$app->session->setFlash('success', 'Los cambios de la información laboral han sido actualizados correctamente.');
-            } else {
-                Yii::$app->session->setFlash('error', 'Hubo un error al actualizar los días de vacaciones.');
+    
+        if ($informacion_laboral->load(Yii::$app->request->post())) {
+            // Obtener el nuevo departamento
+            $departamento = CatDepartamento::findOne($informacion_laboral->cat_departamento_id);
+    
+            if ($departamento) {
+                // Asignar la dirección y el departamento correspondientes al departamento seleccionado
+                $informacion_laboral->cat_direccion_id = $departamento->cat_direccion_id;
+                $informacion_laboral->cat_dpto_cargo_id = $departamento->cat_dpto_id;
             }
-
-            $url = Url::to(['view', 'id' => $model->id]) . '#informacion_laboral';
-            return $this->redirect($url);
+    
+            if ($informacion_laboral->save()) {
+                // Actualizar los días de vacaciones
+                $vacaciones = Vacaciones::findOne($informacion_laboral->vacaciones_id);
+                $totalDiasVacaciones = $this->calcularDiasVacaciones($informacion_laboral->fecha_ingreso, $informacion_laboral->cat_tipo_contrato_id);
+                $vacaciones->total_dias_vacaciones = $totalDiasVacaciones;
+    
+                if ($vacaciones->save()) {
+                    Yii::$app->session->setFlash('success', 'Los cambios de la información laboral han sido actualizados correctamente.');
+                } else {
+                    Yii::$app->session->setFlash('error', 'Hubo un error al actualizar los días de vacaciones.');
+                }
+    
+                $url = Url::to(['view', 'id' => $model->id]) . '#informacion_laboral';
+                return $this->redirect($url);
+            } else {
+                Yii::$app->session->setFlash('error', 'Hubo un error al actualizar la información laboral del trabajador.');
+                $url = Url::to(['view', 'id' => $model->id]) . '#informacion_laboral';
+                return $this->redirect($url);
+            }
         } else {
-            Yii::$app->session->setFlash('error', 'Hubo un error al actualizar la información laboral del trabajador.');
+            Yii::$app->session->setFlash('error', 'Hubo un error al cargar los datos de la solicitud.');
             $url = Url::to(['view', 'id' => $model->id]) . '#informacion_laboral';
             return $this->redirect($url);
         }
     }
-
+    
 
 
 

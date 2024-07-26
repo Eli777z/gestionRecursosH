@@ -29,6 +29,7 @@ use Yii;
  */
 class InformacionLaboral extends \yii\db\ActiveRecord
 {
+    const SCENARIO_UPDATE = 'update';
     /**
      * {@inheritdoc}
      */
@@ -44,12 +45,20 @@ class InformacionLaboral extends \yii\db\ActiveRecord
     {
         return [
             [['cat_tipo_contrato_id', 'cat_puesto_id', 'cat_departamento_id', 'vacaciones_id', 'cat_direccion_id', 'junta_gobierno_id'], 'integer'],
-            [[ 'fecha_ingreso'], 'required'],
+            [[ 'fecha_ingreso',
+            'cat_departamento_id',
+            'cat_puesto_id',
+            'cat_tipo_contrato_id'
+        
+        
+        ], 'required'],
             [['fecha_ingreso', 'horario_laboral_inicio', 'horario_laboral_fin'], 'safe'],
             [['horario_dias_trabajo'], 'string', 'max' => 150],
             ['dias_laborales', 'safe'], // Asegúrate de que safe permite array
             [['numero_cuenta'], 'string', 'max' => 25],
             [['salario'], 'number'],
+           
+            [['numero_cuenta'], 'match', 'pattern' => '/^\d{18}$/', 'message' => 'El número de cuenta debe contener exactamente 18 dígitos.'],
 
             [['cat_tipo_contrato_id'], 'exist', 'skipOnError' => true, 'targetClass' => CatTipoContrato::class, 'targetAttribute' => ['cat_tipo_contrato_id' => 'id']],
             [['cat_departamento_id'], 'exist', 'skipOnError' => true, 'targetClass' => CatDepartamento::class, 'targetAttribute' => ['cat_departamento_id' => 'id']],
@@ -60,9 +69,18 @@ class InformacionLaboral extends \yii\db\ActiveRecord
             [['junta_gobierno_id'], 'exist', 'skipOnError' => true, 'targetClass' => JuntaGobierno::class, 'targetAttribute' => ['junta_gobierno_id' => 'id']],
 
             [['vacaciones_id'], 'exist', 'skipOnError' => true, 'targetClass' => Vacaciones::class, 'targetAttribute' => ['vacaciones_id' => 'id']],
-
+          //  [['horario_laboral_inicio', 'horario_laboral_fin', 'salario','numero_cuenta'], 'required', 'on' => self::SCENARIO_UPDATE],
         ];
     }
+
+//    public function scenarios()
+  //  {
+    //    $scenarios = parent::scenarios();
+     //   $scenarios[self::SCENARIO_CREATE] = ['numero_empleado', 'usuario_id', 'nombre', 'apellido', 'email', 'profesion'];
+      //  $scenarios[self::SCENARIO_UPDATE] = ['horario_laboral_inicio', 'horario_laboral_fin', 'salario','numero_cuenta'];
+       // $scenarios[self:: SCENARIO_UPDATE_INFO_EDU] = ['cat_nivel_estudio_id', 'institucion_educativa'];
+      //  return $scenarios;
+   // }
 
     /**
      * {@inheritdoc}
@@ -71,10 +89,10 @@ class InformacionLaboral extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'cat_tipo_contrato_id' => 'Cat Tipo Contrato ID',
+            'cat_tipo_contrato_id' => 'Contrato',
             'cat_dpto_cargo_id' => 'Cat Dpto Cargo ID',
-            'cat_puesto_id' => 'Cat Puesto ID',
-            'cat_departamento_id' => 'Cat Departamento ID',
+            'cat_puesto_id' => 'Puesto',
+            'cat_departamento_id' => 'Departamento',
             'vacaciones_id' => 'Vacaciones ID',
             'cat_direccion_id' => 'Cat Direccion ID',
             'junta_gobierno_id' => 'Junta Gobierno ID',
