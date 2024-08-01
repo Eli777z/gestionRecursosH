@@ -24,16 +24,24 @@ $this->title = $model->id;
 // Obtener el ID del usuario actual
 $usuarioActual = Yii::$app->user->identity;
 $empleadoActual = $usuarioActual->empleado;
+$juntaGobierno = JuntaGobierno::find()->where(['empleado_id' => $model->empleado_id])->one();
 
-// Comparar el ID del empleado actual con el ID del empleado para el cual se está creando el registro
+// Comparar el ID del empleado actual con el ID del empleado para el cual se está creando o viendo el registro
 if ($empleadoActual->id === $empleado->id) {
-    // El empleado está creando un registro para sí mismo
+    // El empleado está viendo su propio registro
     echo Html::a('<i class="fa fa-home"></i> Inicio', ['site/portalempleado'], [
         'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
         'encode' => false,
     ]);
+
+    // Verificar el nivel jerárquico del empleado para sus propios registros
+    if ($juntaGobierno && ($juntaGobierno->nivel_jerarquico === 'Jefe de unidad' || $juntaGobierno->nivel_jerarquico === 'Director')) {
+        echo Html::a('<i class="fa fa-print" aria-hidden="true"></i> Vista Previa de Impresión', ['export-html-segundo-caso', 'id' => $model->id], ['class' => 'btn btn-success', 'target' => '_blank']);
+    } else {
+        echo Html::a('<i class="fa fa-print" aria-hidden="true"></i> Vista Previa de Impresión', ['export-html', 'id' => $model->id], ['class' => 'btn btn-dark', 'target' => '_blank']);
+    }
 } else {
-    // El empleado está creando un registro para otro empleado
+    // El empleado está creando o viendo un registro para otro empleado
     if (Yii::$app->user->can('crear-formatos-incidencias-empleados')) {
         echo Html::a('<i class="fa fa-chevron-left"></i> Volver', ['empleado/index'], [
             'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
@@ -45,37 +53,42 @@ if ($empleadoActual->id === $empleado->id) {
             'encode' => false,
         ]);
     }
+
+    // Verificar el nivel jerárquico del empleado para el cual se está creando el registro
+    if ($juntaGobierno && ($juntaGobierno->nivel_jerarquico === 'Jefe de unidad' || $juntaGobierno->nivel_jerarquico === 'Director')) {
+        echo Html::a('<i class="fa fa-print" aria-hidden="true"></i> Vista Previa de Impresión', ['export-html-segundo-caso', 'id' => $model->id], ['class' => 'btn btn-success', 'target' => '_blank']);
+    } else {
+        echo Html::a('<i class="fa fa-print" aria-hidden="true"></i> Vista Previa de Impresión', ['export-html', 'id' => $model->id], ['class' => 'btn btn-dark', 'target' => '_blank']);
+    }
 }
-?>
 
-<?php
-
-
+// Obtener el ID del usuario actual
 $usuarioId = Yii::$app->user->identity->id;
 
+// Obtener el empleado actual asociado al usuario
 $empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();
 
 if ($empleado) {
+    // Asignar el ID del empleado al modelo
     $model->empleado_id = $empleado->id;
 
-    $juntaGobierno = JuntaGobierno::find()->where(['empleado_id' => $empleado->id])->one();
+    // Obtener la Junta de Gobierno del empleado para el cual se está creando el registro
 
-    
-        if ($juntaGobierno && ($juntaGobierno->nivel_jerarquico === 'Jefe de unidad' || $juntaGobierno->nivel_jerarquico === 'Director')){
-           // echo Html::a('<i class="fa fa-file-excel" aria-hidden="true"></i> Exportar Excel', ['export-segundo-caso', 'id' => $model->id], ['class' => 'btn btn-success']);
-            //echo Html::a('<i class="fa fa-file-pdf"></i> Exportar PDF', ['export-pdf', 'id' => $model->id], ['class' => 'btn btn-danger ml-3']);
-            echo Html::a('<i class="fa fa-print" aria-hidden="true"></i> Vista Previa de Impresión', ['export-html-segundo', 'id' => $model->id], ['class' => 'btn btn-dark ', 'target' => '_blank']) ;
-        } else {
-           // echo Html::a('<i class="fa fa-file-excel" aria-hidden="true"></i> Exportar Excel', ['export', 'id' => $model->id], ['class' => 'btn btn-success']);
-            //echo Html::a('<i class="fa fa-file-pdf"></i> Exportar PDF', ['export-pdf', 'id' => $model->id], ['class' => 'btn btn-danger ml-3']);
-            echo Html::a('<i class="fa fa-print" aria-hidden="true"></i> Vista Previa de Impresión', ['export-html', 'id' => $model->id], ['class' => 'btn btn-dark ', 'target' => '_blank']) ;
-        }
-    
+    // Verificar el nivel jerárquico del empleado para el cual se está creando el registro
+    if ($juntaGobierno && ($juntaGobierno->nivel_jerarquico === 'Jefe de unidad' || $juntaGobierno->nivel_jerarquico === 'Director')) {
+      //  echo Html::a('<i class="fa fa-print" aria-hidden="true"></i> Vista Previa de Impresión', ['export-html-segundo-caso', 'id' => $model->id], ['class' => 'btn btn-success ', 'target' => '_blank']);
+    } else {
+        //echo Html::a('<i class="fa fa-print" aria-hidden="true"></i> Vista Previa de Impresión', ['export-html', 'id' => $model->id], ['class' => 'btn btn-dark ', 'target' => '_blank']);
+    }
 } else {
     Yii::$app->session->setFlash('error', 'No se pudo encontrar el empleado asociado al usuario actual.');
     return $this->redirect(['index']);
 }
+
 ?>
+
+
+
 
     </div>
         <div class="card-body">

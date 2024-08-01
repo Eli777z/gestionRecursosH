@@ -26,6 +26,7 @@ class CambioHorarioTrabajo extends \yii\db\ActiveRecord
 {
     public $jefe_departamento_id;
     public $dateRange;
+
     /**
      * {@inheritdoc}
      */
@@ -42,14 +43,14 @@ class CambioHorarioTrabajo extends \yii\db\ActiveRecord
         return [
             [['empleado_id', 'solicitud_id', 'motivo_fecha_permiso_id'], 'integer'],
             [['horario_inicio', 'horario_fin', 'fecha_inicio', 'fecha_termino'], 'safe'],
+            [['horario_inicio', 'turno', 'horario_fin'], 'required'],
             [['turno'], 'string', 'max' => 12],
             [['nombre_jefe_departamento'], 'string', 'max' => 90],
             [['empleado_id'], 'exist', 'skipOnError' => true, 'targetClass' => Empleado::class, 'targetAttribute' => ['empleado_id' => 'id']],
             [['motivo_fecha_permiso_id'], 'exist', 'skipOnError' => true, 'targetClass' => MotivoFechaPermiso::class, 'targetAttribute' => ['motivo_fecha_permiso_id' => 'id']],
             [['solicitud_id'], 'exist', 'skipOnError' => true, 'targetClass' => Solicitud::class, 'targetAttribute' => ['solicitud_id' => 'id']],
             [['jefe_departamento_id'], 'safe'], 
-            [['dateRange'], 'safe'], 
-
+            [['dateRange'], 'required', 'message' => 'El rango de fechas no puede estar vacío.'], // Regla y mensaje personalizado para dateRange
         ];
     }
 
@@ -64,13 +65,13 @@ class CambioHorarioTrabajo extends \yii\db\ActiveRecord
             'solicitud_id' => 'Solicitud ID',
             'motivo_fecha_permiso_id' => 'Motivo Fecha Permiso ID',
             'turno' => 'Turno',
-            'horario_inicio' => 'Horario Inicio',
-            'horario_fin' => 'Horario Fin',
+            'horario_inicio' => 'Inicio de horario',
+            'horario_fin' => 'Fin de horario',
             'fecha_inicio' => 'Fecha Inicio',
             'fecha_termino' => 'Fecha Termino',
             'nombre_jefe_departamento' => 'Nombre Jefe Departamento',
             'jefe_departamento_id' => 'Jefe de Departamento',
-
+            'dateRange' => 'Rango de Fechas',
         ];
     }
 

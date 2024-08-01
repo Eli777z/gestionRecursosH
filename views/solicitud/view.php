@@ -11,12 +11,20 @@ $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
 $this->title = $model->id;
 
 
+//$this->params['breadcrumbs'][] = ['label' => 'Solicitudes', 'url' => ['solicitud/index']];
+
+if ($empleadoId !== null && Yii::$app->user->can('medico') || Yii::$app->user->can('gestor-rh')) {
+   
+    $this->params['breadcrumbs'][] = ['label' => 'Empleado: ' .$model->empleado->nombre . ' ' . $model->empleado->apellido, 'url' => ['empleado/view', 'id' => $empleadoId]];
+}
+else  if (Yii::$app->user->can('empleado')) {
+    $this->params['breadcrumbs'][] = ['label' => 'Inicio', 'url' => ['site/portalempleado']];
+    
+     }
+ if (Yii::$app->user->can('gestor-rh')) {
 $this->params['breadcrumbs'][] = ['label' => 'Solicitudes', 'url' => ['solicitud/index']];
 
-if ($empleadoId !== null) {
-   
-    $this->params['breadcrumbs'][] = ['label' => 'Empleado ' . $empleadoId, 'url' => ['empleado/view', 'id' => $empleadoId]];
-}
+ }
 $this->params['breadcrumbs'][] = ['label' => 'Solicitud ' . $model->id];
 
 \yii\web\YiiAsset::register($this);
@@ -145,9 +153,13 @@ if ($formato) {
                 ],
                 [
                     'label' => 'Motivo',
-                    'value' => function ($formato) {
-                        return $formato->motivoFechaPermiso->motivo; 
+                    'attribute' => 'motivo',
+                    'format' => 'html',
+                    'value' => function ($model) {
+                        return \yii\helpers\Html::decode($model->motivoFechaPermiso->motivo);
                     },
+                    'filter' => false,
+                    'options' => ['style' => 'width: 65%;'],
                 ],
 
                 [
@@ -180,12 +192,16 @@ if ($formato) {
         case 'COMISION ESPECIAL':
             $formatoAttributes = [
                 
-                            [
-                                'label' => 'Motivo',
-                                'value' => function ($formato) {
-                                    return $formato->motivoFechaPermiso->motivo; // Reemplaza "nombre_del_atributo_del_motivo" con el nombre del atributo que deseas mostrar
-                                },
-                            ],
+                [
+                    'label' => 'Motivo',
+                    'attribute' => 'motivo',
+                    'format' => 'html',
+                    'value' => function ($model) {
+                        return \yii\helpers\Html::decode($model->motivoFechaPermiso->motivo);
+                    },
+                    'filter' => false,
+                    'options' => ['style' => 'width: 65%;'],
+                ],
                             [
                                 'label' => 'Fecha de Permiso',
                                 'value' => function ($formato) {
@@ -209,9 +225,13 @@ if ($formato) {
             $formatoAttributes = [
                 [
                     'label' => 'Motivo',
-                    'value' => function ($formato) {
-                        return $formato->motivoFechaPermiso->motivo; 
+                    'attribute' => 'motivo',
+                    'format' => 'html',
+                    'value' => function ($model) {
+                        return \yii\helpers\Html::decode($model->motivoFechaPermiso->motivo);
                     },
+                    'filter' => false,
+                    'options' => ['style' => 'width: 65%;'],
                 ],
                 [
                     'label' => 'Fecha de Permiso',
@@ -237,9 +257,13 @@ if ($formato) {
                 $formatoAttributes = [
                     [
                         'label' => 'Motivo',
-                        'value' => function ($formato) {
-                            return $formato->motivoFechaPermiso->motivo; 
+                        'attribute' => 'motivo',
+                        'format' => 'html',
+                        'value' => function ($model) {
+                            return \yii\helpers\Html::decode($model->motivoFechaPermiso->motivo);
                         },
+                        'filter' => false,
+                        'options' => ['style' => 'width: 65%;'],
                     ],
                     [
                         'label' => 'Fecha de Permiso',
@@ -280,9 +304,13 @@ if ($formato) {
                     $formatoAttributes = [
                         [
                             'label' => 'Motivo',
-                            'value' => function ($formato) {
-                                return $formato->motivoFechaPermiso->motivo; 
+                            'attribute' => 'motivo',
+                            'format' => 'html',
+                            'value' => function ($model) {
+                                return \yii\helpers\Html::decode($model->motivoFechaPermiso->motivo);
                             },
+                            'filter' => false,
+                            'options' => ['style' => 'width: 65%;'],
                         ],
                         [
                             'label' => 'Fecha de Permiso',
@@ -321,9 +349,13 @@ if ($formato) {
                         $formatoAttributes = [
                             [
                                 'label' => 'Motivo',
-                                'value' => function ($formato) {
-                                    return $formato->motivoFechaPermiso->motivo; 
+                                'attribute' => 'motivo',
+                                'format' => 'html',
+                                'value' => function ($model) {
+                                    return \yii\helpers\Html::decode($model->motivoFechaPermiso->motivo);
                                 },
+                                'filter' => false,
+                                'options' => ['style' => 'width: 65%;'],
                             ],
                             [
                                 'label' => 'Fecha de Permiso',
@@ -393,9 +425,13 @@ if ($formato) {
                             $formatoAttributes = [
                                 [
                                     'label' => 'Motivo',
-                                    'value' => function ($formato) {
-                                        return $formato->motivoFechaPermiso->motivo; 
+                                    'attribute' => 'motivo',
+                                    'format' => 'html',
+                                    'value' => function ($model) {
+                                        return \yii\helpers\Html::decode($model->motivoFechaPermiso->motivo);
                                     },
+                                    'filter' => false,
+                                    'options' => ['style' => 'width: 65%;'],
                                 ],
                                 [
                                     'label' => 'Fecha de Permiso',
@@ -417,11 +453,22 @@ if ($formato) {
                             break;
                             case 'CITA MEDICA':
                                 $formatoAttributes = [
+                                    //[
+                                      //  'label' => 'Motivo de cita medica',
+                                        //'value' => function ($formato) {
+                                          //  return $formato->comentario; 
+                                   //     },
+                                    ///],
+
                                     [
-                                        'label' => 'Comentario',
+                                        'label' => 'Motivo de cita medica',
+                                        'attribute' => 'comentario',
+                                        'format' => 'html',
                                         'value' => function ($formato) {
-                                            return $formato->comentario; 
+                                            return \yii\helpers\Html::decode($formato->comentario);
                                         },
+                                        'filter' => false,
+                                        'options' => ['style' => 'width: 65%;'],
                                     ],
                                    [
                                    'label' => 'Fecha de Cita medica',

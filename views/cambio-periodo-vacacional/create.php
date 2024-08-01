@@ -12,6 +12,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
                     <?=$this->render('_form', [
-                        'model' => $model
+                        'model' => $model,
+                        'empleado' => $empleado, // Pasar empleado a la vista
+
                     ]) ?>
        

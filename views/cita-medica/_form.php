@@ -2,8 +2,10 @@
 
 use yii\helpers\Html;
 use yii\bootstrap4\ActiveForm;
-use hail812\adminlte\widgets\Alert;
+use yii\bootstrap5\Alert;
+
 use yii\web\View;
+use froala\froalaeditor\FroalaEditorWidget;
 /* @var $this yii\web\View */
 /* @var $model app\models\CitaMedica */
 /* @var $form yii\bootstrap4\ActiveForm */
@@ -15,7 +17,7 @@ $this->registerCssFile('@web/css/grid-view.css', ['position' => View::POS_HEAD])
     <div class="row justify-content-center">
         <div class="col-md-10">
             <div class="card">
-            <?php $form = ActiveForm::begin(); ?>
+            <?php $form = ActiveForm::begin(['options' => [ 'id' => 'employee-form']]); ?>
                 <div class="card-header bg-info">
                     <h2>CITA MEDICA</h2>
                     <?php
@@ -45,7 +47,9 @@ if ($empleadoActual->id === $empleado->id) {
     }
 }
 ?>
-
+<div id="loading-spinner" style="display: none;">
+        <i class="fa fa-spinner fa-spin fa-2x"></i> Procesando...
+    </div>
 
                 </div>
 
@@ -77,7 +81,7 @@ if ($empleadoActual->id === $empleado->id) {
 
     <?= $form->field($model, 'empleado_id')->textInput() ?>
 
-    <div class="col-6 col-sm-2">
+    <div class="col-6 col-sm-3">
 
     <?= $form->field($model, 'fecha_para_cita')->input('date') ?>
     </div>
@@ -91,7 +95,25 @@ if ($empleadoActual->id === $empleado->id) {
     <?= $form->field($model, 'horario_finalizacion')->input('time') ?>
     </div>
 
-    <?= $form->field($model, 'comentario')->textarea(['rows' => 6]) ?>
+    
+<?= $form->field($model, 'comentario')->widget(FroalaEditorWidget::className(), [
+                                                                        'options' => [
+                                                                            'id' => 'exp-fisca'
+                                                                        ],
+                                                                        'clientOptions' => [
+                                                                            'toolbarInline' => false,
+                                                                            'theme' => 'royal', // optional: dark, red, gray, royal
+                                                                            'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
+                                                                            'height' => 200,
+                                                                            'pluginsEnabled' => [
+                                                                                'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
+                                                                                'draggable', 'emoticons', 'entities', 'fontFamily',
+                                                                                'fontSize', 'fullscreen', 'inlineStyle',
+                                                                                'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
+                                                                                'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
+                                                                            ]
+                                                                        ]
+                                                                    ])->label('Motivo:');?>
     
     </div>
 
@@ -107,7 +129,20 @@ if ($empleadoActual->id === $empleado->id) {
 
 <?php ActiveForm::end(); ?>
 
+<?php
+$script = <<< JS
+    $('#employee-form').on('beforeSubmit', function() {
+        var button = $('#save-button-personal');
+        var spinner = $('#loading-spinner');
 
+        button.prop('disabled', true); // Deshabilita el botón
+        spinner.show(); // Muestra el spinner
+
+        return true; // Permite que el formulario se envíe
+    });
+JS;
+$this->registerJs($script);
+?>
                             </div>
                         </div>
                     </div>

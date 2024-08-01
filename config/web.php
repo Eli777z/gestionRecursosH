@@ -128,7 +128,8 @@ $config = [
             'some-controller/some-action',
             'site/get-empleado-foto',
             'empleado/foto-empleado',
-            'debug/*'
+            'debug/*',
+            'cat-tipo-contrato/*'
 
             // The actions listed here will be allowed to everyone including guests.
             // So, 'admin/*' should not appear here in the production, of course.

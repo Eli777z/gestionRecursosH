@@ -71,6 +71,13 @@ class SolicitudController extends Controller
     {
         $model = $this->findModel($id);
         
+        if (Yii::$app->user->can('medico') || Yii::$app->user->can('gestor-rh')) {
+        if ($model->status === 'Nueva') {
+            $model->status = 'Visto';
+            $model->save(false); // Guarda el cambio sin validar el modelo
+        }
+
+    }
         // Obtener el formato asociado
         $formato = $this->getFormatoAsociado($model);
         $empleadoId = $model->empleado_id;

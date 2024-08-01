@@ -262,6 +262,22 @@ hr.solid {
 #nss-input[type=number] {
     -moz-appearance: textfield;
 }
+.badge {
+    background-color: #dc3545; /* Color rojo para el punto */
+    color: #fff; /* Color blanco para el texto del punto */
+    border-radius: 50%; /* Hacer el badge redondeado */
+    padding: 0.2em 0.6em; /* Ajustar tamaño del badge */
+    font-size: 0.75em; /* Tamaño del texto en el badge */
+}
+
+.dot-red {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background-color: #dc3545; /* Color rojo */
+    border-radius: 50%; /* Hace el punto redondo */
+    vertical-align: middle; /* Alinea verticalmente */
+}
 
 
 /* Ocultar botones de incremento y decremento solo para campos con la clase no-spinner */

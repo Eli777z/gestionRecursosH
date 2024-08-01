@@ -36,6 +36,7 @@ class ComisionEspecial extends \yii\db\ActiveRecord
     {
         return [
             [['empleado_id', 'solicitud_id', 'motivo_fecha_permiso_id'], 'integer'],
+            [['motivo_fecha_permiso_id'], 'required'],
             [['nombre_jefe_departamento'], 'string', 'max' => 90],
             [['empleado_id'], 'exist', 'skipOnError' => true, 'targetClass' => Empleado::class, 'targetAttribute' => ['empleado_id' => 'id']],
             [['motivo_fecha_permiso_id'], 'exist', 'skipOnError' => true, 'targetClass' => MotivoFechaPermiso::class, 'targetAttribute' => ['motivo_fecha_permiso_id' => 'id']],

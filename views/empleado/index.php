@@ -423,7 +423,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             <div class="dropdown-submenu">
                                 <a class="dropdown-item dropdown-toggle" href="#">CAMBIO PERIODO VACACIONAL</a>
                                 <ul class="dropdown-menu">
-                                    <li>' . Html::a('Ver', Url::to(['cambio-periodo-vacacional/view', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '</li>
+                                    <li>' . Html::a('Ver', Url::to(['cambio-periodo-vacacional/historial', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '</li>
                                       <div class="dropdown-divider"></div>
 
                                     <li>' . Html::a('Crear', Url::to(['cambio-periodo-vacacional/create', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) . '</li>

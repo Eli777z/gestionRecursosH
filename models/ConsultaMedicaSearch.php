@@ -48,7 +48,12 @@ class ConsultaMedicaSearch extends ConsultaMedica
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
-            'query' => $query,
+            'query' => $query->orderBy([
+                'id' => SORT_DESC,
+            ]),
+            'pagination' => [
+                'pageSize' => 50,
+            ],
         ]);
 
         $this->load($params);

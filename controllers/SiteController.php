@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use Yii;
+use app\models\NotificacionMedico;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\Response;
@@ -267,18 +268,25 @@ class SiteController extends Controller
     }
     
 
-    public function actionPortalMedico()
+   
+        public function actionPortalMedico()
     {
         $solicitudesRecientes = \app\models\Solicitud::find()
             ->where(['nombre_formato' => 'CITA MEDICA'])
             ->orderBy(['fecha_creacion' => SORT_DESC])
             ->limit(10)
             ->all();
-    
+
+        $usuarioId = Yii::$app->user->identity->id;
+        $notificacionesCount = NotificacionMedico::countUnread($usuarioId);
+
         return $this->render('portal-medico', [
             'solicitudesRecientes' => $solicitudesRecientes,
+            'notificacionesCount' => $notificacionesCount,
         ]);
     }
+
+    
     
 
    

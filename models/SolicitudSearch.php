@@ -41,31 +41,36 @@ class SolicitudSearch extends Solicitud
      */
     public function search($params)
     {
+        // Crear la consulta base
         if (Yii::$app->user->can('ver-solicitudes-medicas')) {
-
-        $query = Solicitud::find()->where(['nombre_formato' => 'CITA MEDICA']);
-        }elseif (Yii::$app->user->can('ver-solicitudes-formatos')){
-
+            $query = Solicitud::find()->where(['nombre_formato' => 'CITA MEDICA']);
+        } elseif (Yii::$app->user->can('ver-solicitudes-formatos') || Yii::$app->user->can('solicitudes-medicas-view-empleado')) {
             $query = Solicitud::find();
+        } else {
+            // En caso de que el usuario no tenga ninguno de los permisos
+            $query = Solicitud::find()->where('0=1');
         }
-
-       // $query = Solicitud::find();
-
-        // add conditions that should always apply here
-
+    
+        // Crear el proveedor de datos con la consulta
         $dataProvider = new ActiveDataProvider([
-            'query' => $query,
+            'query' => $query->orderBy([
+                'id' => SORT_DESC,
+            ]),
+            'pagination' => [
+                'pageSize' => 50,
+            ],
         ]);
-
+    
+        // Cargar los parámetros de búsqueda
         $this->load($params);
-
+    
+        // Validar los parámetros de búsqueda
         if (!$this->validate()) {
-            // uncomment the following line if you do not want to return any records when validation fails
-            // $query->where('0=1');
+            // Si la validación falla, devuelve el proveedor de datos sin aplicar filtros adicionales
             return $dataProvider;
         }
-
-        // grid filtering conditions
+    
+        // Aplicar condiciones de filtrado a la consulta
         $query->andFilterWhere([
             'id' => $this->id,
             'empleado_id' => $this->empleado_id,
@@ -73,13 +78,12 @@ class SolicitudSearch extends Solicitud
             'status' => $this->status,
             'fecha_aprobacion' => $this->fecha_aprobacion,
         ]);
-
-        $query->
-andFilterWhere(['like', 'nombre_aprobante', $this->nombre_aprobante])
-            ->andFilterWhere(['like', 'nombre_formato', $this->nombre_formato])
-
-            ->andFilterWhere(['like', 'status', $this->status]);
-
+    
+        $query->andFilterWhere(['like', 'nombre_aprobante', $this->nombre_aprobante])
+              ->andFilterWhere(['like', 'nombre_formato', $this->nombre_formato])
+              ->andFilterWhere(['like', 'status', $this->status]);
+    
         return $dataProvider;
     }
+    
 }

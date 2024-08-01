@@ -29,14 +29,14 @@ $assetDir = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed2010/admi
         }
     </style>
 </head>
-<body class="hold-transition login-page">
+<body class="hold-transition login-page bg-white">
 <?php $this->beginBody() ?>
 <div class="login-box">
     <div class="login-logo">
         <a href="#">
 
-            <img src="<?= Url::to('@web/img/logo-capasu.png') ?>" alt="Capasu Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-            <span class="brand-text font-weight-light">CAPASU</span>
+            <img src="<?= Url::to('@web/img/logo-capasu.png') ?>" alt="Capasu Logo" class="brand-image img-circle elevation-3" style="opacity: 1.0">
+            <span class="brand-text font-weight-light"></span>
         </a>    </div>
     <!-- /.login-logo -->
     <?= $content ?>

@@ -36,6 +36,25 @@ $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
     'columns' => [
         ['class' => 'yii\grid\SerialColumn'],
         [
+            'class' => 'yii\grid\DataColumn',
+            'header' => '',
+            'format' => 'raw',
+            'value' => function ($model) {
+                if ($model->status === 'Nueva') {
+                    return '<i class="fa fa-fire" aria-hidden="true" style="color: #ea4242 "></i>';
+                } elseif ($model->status === 'Visto') {
+                    return '<i class="fa fa-check-double" aria-hidden="true" style="color: #4678fc"></i>';
+                  
+                } else {
+                    return '<i class="fa fa-question" aria-hidden="true" style="color: #6c757d"></i>';
+                }
+            },
+            'contentOptions' => ['class' => 'text-center'],
+            'headerOptions' => ['class' => 'text-center'],
+        ],
+        
+        [
+
             'attribute' => 'empleado_id',
             'label' => 'Empleado',
             'value' => function ($model) {
@@ -142,13 +161,13 @@ $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
 ]); 
 Pjax::end();
 
-$script = <<< JS
-    setInterval(function(){
-        $.pjax.reload({container:'#pjax-container'});
-    }, 20000);
-JS;
-
-$this->registerJs($script);
+//$script = <<< JS
+  //  setInterval(function(){
+    //    $.pjax.reload({container:'#pjax-container'});
+   // }, 20000);
+//JS;
+//
+//$this->registerJs($script);
  ?>
 
 

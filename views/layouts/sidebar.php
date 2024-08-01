@@ -48,7 +48,7 @@ use yii\helpers\Url;
 
         <nav class="mt-2">
             <?php
-             if (Yii::$app->user->can('gestor-rh')) {
+             if (Yii::$app->user->can('gestor-rh') || Yii::$app->user->can('administrador') ) {
             echo \hail812\adminlte\widgets\Menu::widget([
                 'items' => [
                     ['label' => 'Inicio', 'icon' => 'home', 'url' => ['site/portalgestionrh']],
@@ -59,7 +59,7 @@ use yii\helpers\Url;
                     ['label' => 'Solicitudes', 'icon' => 'thumbs-up', 'url' => ['solicitud/index']],
 
                     ['label' => 'Gii',  'icon' => 'file-code', 'url' => ['/gii'], 'target' => '_blank'],
-                    ['label' => 'Administrador', 'icon' => 'user-tie', 'url' => ['/admin']],
+                    //['label' => 'Administrador', 'icon' => 'user-tie', 'url' => ['/admin']],
                     ['label' => 'MULTI LEVEL EXAMPLE', 'header' => true],
                     ['label' => 'Level1'],
                     [

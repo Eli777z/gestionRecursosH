@@ -89,7 +89,16 @@ if ($empleadoActual->id === $empleado->id) {
                                     return $fechaFormateada;
                                 },
                             ],
-                            'comentario:ntext',
+                            [
+                                'label' => 'Motivo',
+                                'attribute' => 'comentario',
+                                'format' => 'html',
+                                'value' => function ($model) {
+                                    return \yii\helpers\Html::decode($model->comentario);
+                                },
+                                'filter' => false,
+                                'options' => ['style' => 'width: 65%;'],
+                            ],
                             //'horario_inicio',
                             [
                                 'label' => 'Hora de inicio',

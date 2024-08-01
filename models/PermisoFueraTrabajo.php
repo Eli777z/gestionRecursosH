@@ -51,6 +51,10 @@ class PermisoFueraTrabajo extends \yii\db\ActiveRecord
             [['jefe_departamento_id'], 'safe'], 
 
                 [['fecha_hora_reponer'], 'safe'], 
+
+                [[ 'motivo_fecha_permiso_id', 'hora_salida', 'hora_regreso', 'fecha_a_reponer', 'horario_fecha_a_reponer' ], 'required'],
+
+
             ];
     }
 
@@ -64,10 +68,10 @@ class PermisoFueraTrabajo extends \yii\db\ActiveRecord
             'empleado_id' => 'Empleado ID',
             'solicitud_id' => 'Solicitud ID',
             'motivo_fecha_permiso_id' => 'Motivo Fecha Permiso ID',
-            'hora_salida' => 'Hora Salida',
-            'hora_regreso' => 'Hora Regreso',
-            'fecha_a_reponer' => 'Fecha A Reponer',
-            'horario_fecha_a_reponer' => 'Horario Fecha A Reponer',
+            'hora_salida' => 'Hora de salida',
+            'hora_regreso' => 'Hora de regreso',
+            'fecha_a_reponer' => 'Fecha a reponer',
+            'horario_fecha_a_reponer' => 'Horario de fecha a reponer',
             'jefe_departamento_id' => 'Jefe de Departamento',
             'nombre_jefe_departamento' => 'Jefe de Departamento'
            

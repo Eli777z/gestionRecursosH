@@ -57,13 +57,14 @@ $this->title = 'Citas Medicas';
         ],
 
         [
-            'attribute' => 'motivo',
             'label' => 'Motivo',
+            'attribute' => 'comentario',
+            'format' => 'html',
             'value' => function ($model) {
-                return $model->comentario;
+                return \yii\helpers\Html::decode($model->comentario);
             },
-          //  'options' => ['style' => 'width: 30%;'],
-
+            'filter' => false,
+            'options' => ['style' => 'width: 65%;'],
         ],
 
         ['class' => 'hail812\adminlte3\yii\grid\ActionColumn',

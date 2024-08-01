@@ -3,6 +3,8 @@
 use yii\helpers\Html;
 use yii\bootstrap4\ActiveForm;
 use froala\froalaeditor\FroalaEditorWidget;
+use yii\bootstrap5\Alert;
+
 /* @var $this yii\web\View */
 /* @var $model app\models\ConsultaMedica */
 /* @var $form yii\bootstrap4\ActiveForm */
@@ -12,13 +14,30 @@ use froala\froalaeditor\FroalaEditorWidget;
 
     <?php $form = ActiveForm::begin(); ?>
 
-
+    <div class="d-flex align-items-center mb-3">
+                                <?php
+                                foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
+                                    if ($type === 'error') {
+                                        echo Alert::widget([
+                                            'options' => ['class' => 'alert-danger'],
+                                            'body' => $message,
+                                        ]);
+                                    } else {
+                                        echo Alert::widget([
+                                            'options' => ['class' => 'alert-' . $type],
+                                            'body' => $message,
+                                        ]);
+                                    }
+                                }
+                                ?>
+                            </div>
 
     <?= $form->field($model, 'expediente_medico_id')->textInput(['readonly' => true]) ?>
 
     <div class="col-6 col-sm-12">
     
     <div class= "card">
+
                                                
                                                <div class="card-header custom-nopato text-white text-left">
                                                    <h5>Interrogatorio</h5>

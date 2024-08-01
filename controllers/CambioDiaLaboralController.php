@@ -147,7 +147,7 @@ class CambioDiaLaboralController extends Controller
                    // $model->horario_fecha_a_laborar = date('H:i:s', strtotime($model->horario_fecha_a_reponer));
     
                     $solicitudModel->empleado_id = $empleado->id;
-                    $solicitudModel->status = 'En Proceso';
+                    $solicitudModel->status = 'Nueva';
                     $solicitudModel->comentario = ''; 
                     $solicitudModel->fecha_aprobacion = null; 
                     $solicitudModel->fecha_creacion = date('Y-m-d H:i:s'); 
@@ -302,9 +302,12 @@ class CambioDiaLaboralController extends Controller
     
         $direccion = CatDireccion::findOne($model->empleado->informacionLaboral->cat_direccion_id);
     
-        if ($direccion && $direccion->nombre_direccion !== '1.- GENERAL' && $model->nombre_jefe_departamento) {
-            $nombreCompletoJefe = mb_strtoupper($model->nombre_jefe_departamento, 'UTF-8');
-            $sheet->setCellValue('H24', $nombreCompletoJefe);
+        if ($direccion && $direccion->nombre_direccion !== '1.- GENERAL') {
+            $nombreJefe = mb_strtoupper($model->empleado->informacionLaboral->juntaGobierno->empleado->nombre, 'UTF-8');
+        $apellidoJefe = mb_strtoupper($model->empleado->informacionLaboral->juntaGobierno->empleado->apellido, 'UTF-8');
+        $profesionJefe = mb_strtoupper($model->empleado->informacionLaboral->juntaGobierno->empleado->profesion, 'UTF-8');
+        $nombreCompletoJefe = $profesionJefe . ' ' . $apellidoJefe . ' ' . $nombreJefe;
+      $sheet->setCellValue('H24', $nombreCompletoJefe);
         } else {
             $sheet->setCellValue('H24', null);
         }
@@ -325,9 +328,15 @@ class CambioDiaLaboralController extends Controller
             $nombreDireccion = $juntaDirectorDireccion->catDireccion->nombre_direccion;
             switch ($nombreDireccion) {
                 case '1.- GENERAL':
-                    if ($juntaDirectorDireccion->nivel_jerarquico == 'Jefe de unidad') {
-                        $tituloDireccion = 'JEFE DE ' . $juntaDirectorDireccion->catDepartamento->nombre_departamento;
-                    } else {
+                    if ($model->empleado->informacionLaboral->juntaGobierno->nivel_jerarquico == 'Jefe de unidad') {
+                        $nombreJefe = mb_strtoupper($model->empleado->informacionLaboral->juntaGobierno->empleado->nombre, 'UTF-8');
+            $apellidoJefe = mb_strtoupper($model->empleado->informacionLaboral->juntaGobierno->empleado->apellido, 'UTF-8');
+            $profesionJefe = mb_strtoupper($model->empleado->informacionLaboral->juntaGobierno->empleado->profesion, 'UTF-8');
+            $nombreCompletoJefe = $profesionJefe . ' ' . $apellidoJefe . ' ' . $nombreJefe;
+            $sheet->setCellValue('N24', $nombreCompletoJefe);
+
+            $tituloDireccion = 'JEFE DE ' . $model->empleado->informacionLaboral->juntaGobierno->empleado->informacionLaboral->catDepartamento->nombre_departamento;
+        } else {
                         $tituloDireccion = 'DIRECTOR GENERAL';
                     }
                     break;
@@ -448,12 +457,16 @@ class CambioDiaLaboralController extends Controller
         $sheet->setCellValue('B25', $nombrePuesto);
         $direccion = CatDireccion::findOne($model->empleado->informacionLaboral->cat_direccion_id);
     
-        if ($direccion && $direccion->nombre_direccion !== '1.- GENERAL' && $model->nombre_jefe_departamento) {
-            $nombreCompletoJefe = mb_strtoupper($model->nombre_jefe_departamento, 'UTF-8');
-            $sheet->setCellValue('H24', $nombreCompletoJefe);
+        if ($direccion && $direccion->nombre_direccion !== '1.- GENERAL') {
+            $nombreJefe = mb_strtoupper($model->empleado->informacionLaboral->juntaGobierno->empleado->nombre, 'UTF-8');
+        $apellidoJefe = mb_strtoupper($model->empleado->informacionLaboral->juntaGobierno->empleado->apellido, 'UTF-8');
+        $profesionJefe = mb_strtoupper($model->empleado->informacionLaboral->juntaGobierno->empleado->profesion, 'UTF-8');
+        $nombreCompletoJefe = $profesionJefe . ' ' . $apellidoJefe . ' ' . $nombreJefe;
+      $sheet->setCellValue('H24', $nombreCompletoJefe);
         } else {
             $sheet->setCellValue('H24', null);
         }
+    
     
         $juntaDirectorDireccion = JuntaGobierno::find()
             ->where(['cat_direccion_id' => $model->empleado->informacionLaboral->cat_direccion_id])
@@ -471,9 +484,15 @@ class CambioDiaLaboralController extends Controller
             $nombreDireccion = $juntaDirectorDireccion->catDireccion->nombre_direccion;
             switch ($nombreDireccion) {
                 case '1.- GENERAL':
-                    if ($juntaDirectorDireccion->nivel_jerarquico == 'Jefe de unidad') {
-                        $tituloDireccion = 'JEFE DE ' . $juntaDirectorDireccion->catDepartamento->nombre_departamento;
-                    } else {
+                    if ($model->empleado->informacionLaboral->juntaGobierno->nivel_jerarquico == 'Jefe de unidad') {
+                        $nombreJefe = mb_strtoupper($model->empleado->informacionLaboral->juntaGobierno->empleado->nombre, 'UTF-8');
+            $apellidoJefe = mb_strtoupper($model->empleado->informacionLaboral->juntaGobierno->empleado->apellido, 'UTF-8');
+            $profesionJefe = mb_strtoupper($model->empleado->informacionLaboral->juntaGobierno->empleado->profesion, 'UTF-8');
+            $nombreCompletoJefe = $profesionJefe . ' ' . $apellidoJefe . ' ' . $nombreJefe;
+            $sheet->setCellValue('N24', $nombreCompletoJefe);
+
+            $tituloDireccion = 'JEFE DE ' . $model->empleado->informacionLaboral->juntaGobierno->empleado->informacionLaboral->catDepartamento->nombre_departamento;
+        } else {
                         $tituloDireccion = 'DIRECTOR GENERAL';
                     }
                     break;
@@ -517,8 +536,10 @@ class CambioDiaLaboralController extends Controller
      
     
 
-    public function actionExportHtmlSegundo($id)
+    public function actionExportHtmlSegundoCaso($id)
     {
+        $this->layout = false;
+
         $model = CambioDiaLaboral::findOne($id);
     
         if (!$model) {
@@ -557,6 +578,8 @@ $sheet->setCellValue('H10', $nombreDepartamento);
 
 $nombreTipoContrato = $model->empleado->informacionLaboral->catTipoContrato->nombre_tipo;
 $sheet->setCellValue('H11', $nombreTipoContrato);
+
+
 
 switch ($nombreTipoContrato) {
     case 'Confianza':
@@ -612,6 +635,11 @@ $sheet->setCellValue('B25', $nombrePuesto);
     //$sheet->setCellValue('H24', null);
 ////}
 
+$nombre = mb_strtoupper($model->empleado->nombre, 'UTF-8');
+$apellido = mb_strtoupper($model->empleado->apellido, 'UTF-8');
+$profesion = mb_strtoupper($model->empleado->profesion, 'UTF-8');
+$nombreCompleto = $profesion.''.$apellido . ' ' . $nombre;
+$sheet->setCellValue('H24', $nombreCompleto);
 
 
 
@@ -631,9 +659,10 @@ foreach ($juntaGobierno as $junta) {
 }
 
 if ($directorGeneral) {
-  $nombre = mb_strtoupper($directorGeneral->nombre, 'UTF-8');
-  $apellido = mb_strtoupper($directorGeneral->apellido, 'UTF-8');
-  $nombreCompleto = $apellido . ' ' . $nombre;
+    $nombre = mb_strtoupper($directorGeneral->nombre, 'UTF-8');
+    $apellido = mb_strtoupper($directorGeneral->apellido, 'UTF-8');
+    $profesion = mb_strtoupper($directorGeneral->profesion, 'UTF-8');
+    $nombreCompleto =  $profesion.''.$apellido . ' ' . $nombre;
   $sheet->setCellValue('N24', $nombreCompleto);
 } else {
 

@@ -37,6 +37,7 @@ class CitaMedica extends \yii\db\ActiveRecord
             [['empleado_id', 'solicitud_id'], 'integer'],
             [['fecha_para_cita', 'horario_inicio', 'horario_finalizacion'], 'safe'],
             [['comentario'], 'string'],
+            [['fecha_para_cita', 'horario_inicio', 'horario_finalizacion', 'comentario'], 'required'],
             [['empleado_id'], 'exist', 'skipOnError' => true, 'targetClass' => Empleado::class, 'targetAttribute' => ['empleado_id' => 'id']],
             [['solicitud_id'], 'exist', 'skipOnError' => true, 'targetClass' => Solicitud::class, 'targetAttribute' => ['solicitud_id' => 'id']],
         ];
@@ -51,10 +52,10 @@ class CitaMedica extends \yii\db\ActiveRecord
             'id' => 'ID',
             'empleado_id' => 'Empleado ID',
             'solicitud_id' => 'Solicitud ID',
-            'fecha_para_cita' => 'Fecha Para Cita',
+            'fecha_para_cita' => 'Fecha para la cita',
             'comentario' => 'Comentario',
-            'horario_inicio' => 'Horario Inicio',
-            'horario_finalizacion' => 'Horario Finalizacion',
+            'horario_inicio' => 'Hora de inicio',
+            'horario_finalizacion' => 'Hora de fin',
         ];
     }
 

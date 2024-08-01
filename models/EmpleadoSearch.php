@@ -5,7 +5,7 @@ namespace app\models;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\Empleado;
-
+use Yii;
 /**
  * EmpleadoSearch represents the model behind the search form of `app\models\Empleado`.
  */
@@ -50,10 +50,22 @@ class EmpleadoSearch extends Empleado
         $query->joinWith(['informacionLaboral.catDepartamento cd']); // Alias para la tabla cat_departamento
         $query->joinWith(['informacionLaboral.catDireccion cdir']); // Alias para la tabla cat_direccion
 
+
+        if (Yii::$app->user->can('medico')) {
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query->orderBy([
+                'id' => SORT_DESC,
+            ]),
+            'pagination' => [
+                'pageSize' => 50,
+            ],
+        ]);
+    }else{
+
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
-
+    }
         $this->load($params);
 
         if (!$this->validate()) {

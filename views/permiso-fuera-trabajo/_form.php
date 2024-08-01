@@ -8,7 +8,7 @@ use yii\helpers\ArrayHelper;
 use app\models\JuntaGobierno; 
 use kartik\select2\Select2;
 use app\models\Empleado;
-use hail812\adminlte\widgets\Alert;
+use yii\bootstrap5\Alert;
 use froala\froalaeditor\FroalaEditorWidget;
 
 /* @var $this yii\web\View */
@@ -83,7 +83,7 @@ if ($empleadoActual->id === $empleado->id) {
                                                 <div class="row">
 
 
-                                            <div class="col-6 col-sm-2">
+                                            <div class="col-6 col-sm-3">
 
 <?= $form->field($motivoFechaPermisoModel, 'fecha_permiso')->input('date')->label('Fecha de permiso') ?>
                                             </div>
@@ -114,7 +114,7 @@ if ($empleadoActual->id === $empleado->id) {
 <?= $form->field($model, 'hora_regreso')->input('time')->label('Hora de regreso') ?>
 </div>
 <div class="w-100"></div>
-<div class="col-6 col-sm-2">
+<div class="col-6 col-sm-3">
 
 
 
@@ -128,53 +128,7 @@ if ($empleadoActual->id === $empleado->id) {
 
 <div class="col-6 col-sm-4">
 
-<?php
 
-
-
-
-$usuarioId = Yii::$app->user->identity->id;
-
-$empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();
-
-$mostrarCampo = true;
-
-if ($empleado) {
-    $juntaGobierno = JuntaGobierno::find()
-        ->where(['empleado_id' => $empleado->id])
-        ->andWhere(['nivel_jerarquico' => ['Director', 'Jefe de unidad']])
-        ->one();
-
-    if ($juntaGobierno) {
-        $mostrarCampo = false;
-    }
-}
-
-$direccion = $model->empleado->informacionLaboral->catDireccion;
-
-if ($mostrarCampo && $direccion && in_array($direccion->nombre_direccion, ['2.- ADMINISTRACIÓN', '3.- COMERCIAL', '4.- OPERACIONES', '5.- PLANEACION'])) :
-    ?>
-    <?= $form->field($model, 'jefe_departamento_id')->widget(Select2::classname(), [
-        'data' => ArrayHelper::map(
-            JuntaGobierno::find()
-                ->where(['nivel_jerarquico' => 'Jefe de departamento'])
-                ->andWhere(['cat_direccion_id' => $model->empleado->informacionLaboral->cat_direccion_id])
-                ->all(),
-            'id',
-            function ($model) {
-                return $model->empleado->profesion . ' ' . $model->empleado->nombre . ' ' . $model->empleado->apellido;
-            }
-        ),
-        'options' => ['placeholder' => 'Seleccionar Jefe de Departamento'],
-        'pluginOptions' => [
-            'allowClear' => true,
-        ],
-        'theme' => Select2::THEME_KRAJEE_BS3, 
-
-    ])->label('Jefe de Departamento') ?>
-
-    <?= $form->field($model, 'nombre_jefe_departamento')->hiddenInput()->label(false) ?>
-<?php endif; ?>
 </div>
 </div>
 

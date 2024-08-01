@@ -49,6 +49,9 @@ class CambioPeriodoVacacional extends \yii\db\ActiveRecord
             [['jefe_departamento_id'], 'safe'], 
             [['dateRange'], 'safe'], 
             [['año'], 'string', 'max' => 8],
+            [['dateRange'], 'required', 'message' => 'El rango de fechas no puede estar vacío.'], // Regla y mensaje personalizado para dateRange
+
+            [['motivo', 'primera_vez', 'numero_periodo', 'año'], 'required']
 
         ];
     }
@@ -65,9 +68,9 @@ class CambioPeriodoVacacional extends \yii\db\ActiveRecord
             'empleado_id' => 'Empleado ID',
             'solicitud_id' => 'Solicitud ID',
             'motivo' => 'Motivo',
-            'primera_vez' => 'Primera Vez',
+            'primera_vez' => 'Primera vez',
             'nombre_jefe_departamento' => 'Nombre Jefe Departamento',
-            'numero_periodo' => 'Numero Periodo',
+            'numero_periodo' => 'Numero de periodo',
             'fecha_inicio_periodo' => 'Fecha Inicio Periodo',
             'fecha_fin_periodo' => 'Fecha Fin Periodo',
             'jefe_departamento_id' => 'Jefe de Departamento',

@@ -42,7 +42,7 @@ class MotivoFechaPermiso extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'fecha_permiso' => 'Fecha Permiso',
+            'fecha_permiso' => 'Fecha del permiso',
             'motivo' => 'Motivo',
         ];
     }

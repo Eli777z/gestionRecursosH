@@ -49,11 +49,11 @@ class Usuario extends  \yii\db\ActiveRecord implements \yii\web\IdentityInterfac
     {
         return [
             'id' => 'ID',
-            'password' => 'Password',
+            'password' => 'Contraseña',
             'status' => 'Status',
             'rol' => 'Rol',
             'nuevo' => 'Nuevo',
-            'username' => 'Username',
+            'username' => 'Usuario',
         ];
     }
     public static function isUserAdmin($id)

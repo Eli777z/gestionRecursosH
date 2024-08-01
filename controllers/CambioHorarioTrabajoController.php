@@ -147,7 +147,7 @@ class CambioHorarioTrabajoController extends Controller
 
 
                     $solicitudModel->empleado_id = $empleado->id;
-                    $solicitudModel->status = 'En Proceso';
+                    $solicitudModel->status = 'Nueva';
                     $solicitudModel->comentario = '';
                     $solicitudModel->fecha_aprobacion = null;
                     $solicitudModel->fecha_creacion = date('Y-m-d H:i:s');
@@ -252,8 +252,10 @@ class CambioHorarioTrabajoController extends Controller
 
 
 
-    public function actionExportSegundoCaso($id)
+    public function actionExportHtmlSegundoCaso($id)
     {
+        $this->layout = false;
+
         $model = CambioHorarioTrabajo::findOne($id);
 
         if (!$model) {
@@ -293,14 +295,38 @@ class CambioHorarioTrabajoController extends Controller
         $nombreTipoContrato = $model->empleado->informacionLaboral->catTipoContrato->nombre_tipo;
         $sheet->setCellValue('H12', $nombreTipoContrato);
 
+        
+switch ($nombreTipoContrato) {
+    case 'Confianza':
+        $style = $sheet->getStyle('H12');
+
+        $style->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+$style->getFill()->getStartColor()->setARGB('FFc7efce'); // Background color #c7efce
+
+$style->getFont()->getColor()->setARGB('FF217346'); // Font color #217346
+        break;
+    case 'Sindicalizado':
+        $style = $sheet->getStyle('H12');
+
+        $style->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+$style->getFill()->getStartColor()->setARGB('FFfeeb9d'); // Background color #c7efce
+
+$style->getFont()->getColor()->setARGB('FFa7720f'); // Font color #217346
+        break;
+  
+}
+
 
 
         $fecha_permiso = strftime('%A, %B %d, %Y', strtotime($model->motivoFechaPermiso->fecha_permiso));
         $sheet->setCellValue('M16', $fecha_permiso);
 
 
+        // Clean and set the motivo text
+$motivoTextoPlano = strip_tags($model->motivoFechaPermiso->motivo);
+$motivoTextoPlano = html_entity_decode($motivoTextoPlano, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+$sheet->setCellValue('M19', $motivoTextoPlano);
 
-        $sheet->setCellValue('M19', $model->motivoFechaPermiso->motivo);
 
         if ($model->turno === 'MATUTINO') {
             $sheet->setCellValue('N14', 'X');
@@ -355,6 +381,12 @@ class CambioHorarioTrabajoController extends Controller
          //   $sheet->setCellValue('I25', null);
        // }
 
+       $nombre = mb_strtoupper($model->empleado->nombre, 'UTF-8');
+$apellido = mb_strtoupper($model->empleado->apellido, 'UTF-8');
+$profesion = mb_strtoupper($model->empleado->profesion, 'UTF-8');
+$nombreCompleto = $profesion.''.$apellido . ' ' . $nombre;
+$sheet->setCellValue('I25', $nombreCompleto);
+
 
 
 
@@ -374,9 +406,10 @@ if ($empleado && $empleado->informacionLaboral->catPuesto->nombre_puesto === 'DI
 }
 
 if ($directorGeneral) {
-$nombre = mb_strtoupper($directorGeneral->nombre, 'UTF-8');
-$apellido = mb_strtoupper($directorGeneral->apellido, 'UTF-8');
-$nombreCompleto = $apellido . ' ' . $nombre;
+    $nombre = mb_strtoupper($directorGeneral->nombre, 'UTF-8');
+    $apellido = mb_strtoupper($directorGeneral->apellido, 'UTF-8');
+    $profesion = mb_strtoupper($directorGeneral->profesion, 'UTF-8');
+    $nombreCompleto =  $profesion.''.$apellido . ' ' . $nombre;
 $sheet->setCellValue('P25', $nombreCompleto);
 } else {
 
@@ -384,14 +417,19 @@ $sheet->setCellValue('P25', $nombreCompleto);
 
 $sheet->setCellValue('P26', 'DIRECTOR GENERAL');
 
-        $tempFileName = Yii::getAlias('@app/runtime/archivos_temporales/cambio_horario_trabajo.xlsx');
-        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-        $writer->save($tempFileName);
+ // Establecer el área de impresión
+ $htmlWriter = new Html($spreadsheet);
+ $htmlWriter->setSheetIndex(0); 
+ $htmlWriter->setPreCalculateFormulas(false);
 
-       
-        return $this->redirect(['download', 'filename' => basename($tempFileName)]);
+ $fullHtmlContent = $htmlWriter->generateHtmlAll();
+
+
+
+ $fullHtmlContent = str_replace('&nbsp;', ' ', $fullHtmlContent);
+
+ return $this->render('excel-html', ['htmlContent' => $fullHtmlContent, 'model' => $model]);
     }
-
 
 
 
@@ -499,9 +537,12 @@ $sheet->setCellValue('M18', $mensaje);
 
         $direccion = CatDireccion::findOne($model->empleado->informacionLaboral->cat_direccion_id);
 
-        if ($direccion && $direccion->nombre_direccion !== '1.- GENERAL' && $model->nombre_jefe_departamento) {
-            $nombreCompletoJefe = mb_strtoupper($model->nombre_jefe_departamento, 'UTF-8');
-            $sheet->setCellValue('I25', $nombreCompletoJefe);
+        if ($direccion && $direccion->nombre_direccion !== '1.- GENERAL' ) {
+            $nombreJefe = mb_strtoupper($model->empleado->informacionLaboral->juntaGobierno->empleado->nombre, 'UTF-8');
+            $apellidoJefe = mb_strtoupper($model->empleado->informacionLaboral->juntaGobierno->empleado->apellido, 'UTF-8');
+            $profesionJefe = mb_strtoupper($model->empleado->informacionLaboral->juntaGobierno->empleado->profesion, 'UTF-8');
+            $nombreCompletoJefe = $profesionJefe . ' ' . $apellidoJefe . ' ' . $nombreJefe;
+                   $sheet->setCellValue('I25', $nombreCompletoJefe);
         } else {
             $sheet->setCellValue('I25', null);
         }
@@ -525,9 +566,16 @@ $sheet->setCellValue('M18', $mensaje);
             $nombreDireccion = $juntaDirectorDireccion->catDireccion->nombre_direccion;
             switch ($nombreDireccion) {
                 case '1.- GENERAL':
-                    if ($juntaDirectorDireccion->nivel_jerarquico == 'Jefe de unidad') {
-                        $tituloDireccion = 'JEFE DE ' . $juntaDirectorDireccion->catDepartamento->nombre_departamento;
-                    } else {
+                    if ($model->empleado->informacionLaboral->juntaGobierno->nivel_jerarquico == 'Jefe de unidad') {
+                        $nombreJefe = mb_strtoupper($model->empleado->informacionLaboral->juntaGobierno->empleado->nombre, 'UTF-8');
+            $apellidoJefe = mb_strtoupper($model->empleado->informacionLaboral->juntaGobierno->empleado->apellido, 'UTF-8');
+            $profesionJefe = mb_strtoupper($model->empleado->informacionLaboral->juntaGobierno->empleado->profesion, 'UTF-8');
+            $nombreCompletoJefe = $profesionJefe . ' ' . $apellidoJefe . ' ' . $nombreJefe;
+            $sheet->setCellValue('P25', $nombreCompletoJefe);
+
+                      
+            $tituloDireccion = 'JEFE DE ' . $model->empleado->informacionLaboral->juntaGobierno->empleado->informacionLaboral->catDepartamento->nombre_departamento;
+        } else {
                         $tituloDireccion = 'DIRECTOR GENERAL';
                     }
                     break;
