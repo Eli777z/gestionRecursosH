@@ -14,11 +14,12 @@ use app\models\Empleado;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use yii\web\Response;
+use app\models\ParametroFormato;
 use app\models\JuntaGobierno;
 use app\models\CatDireccion;
 use app\models\Notificacion;
 use PhpOffice\PhpSpreadsheet\Writer\Html;
-
+use yii\helpers\Url;
 use Mpdf\Mpdf;
 /**
  * PermisoFueraTrabajoController implements the CRUD actions for PermisoFueraTrabajo model.
@@ -123,8 +124,6 @@ public function actionHistorial($empleado_id= null)
          $model = new PermisoFueraTrabajo();
          $motivoFechaPermisoModel = new MotivoFechaPermiso();
          $solicitudModel = new Solicitud();
-        // $motivoFechaPermisoModel->fecha_permiso = date('Y-m-d');
-        // $model->fecha_a_reponer = date('Y-m-d');
          $usuarioId = Yii::$app->user->identity->id;
      
          if ($empleado_id) {
@@ -138,6 +137,32 @@ public function actionHistorial($empleado_id= null)
          } else {
              Yii::$app->session->setFlash('error', 'No se pudo encontrar el empleado.');
              return $this->redirect(['index']);
+         }
+     
+         // Calcular permisos usados y disponibles
+         $year = date('Y');
+         $parametroFormato = ParametroFormato::find()
+             ->where(['tipo_permiso' => 'PERMISO FUERA DEL TRABAJO'])
+             ->one();
+         
+         if (!$parametroFormato) {
+             Yii::$app->session->setFlash('error', 'No se pudo encontrar el parámetro de formato.');
+             return $this->redirect(['index']);
+         }
+     
+         $totalPermisosAnuales = $parametroFormato->limite_anual;
+     
+         $permisosUsados = PermisoFueraTrabajo::find()
+             ->where(['empleado_id' => $empleado->id])
+             ->andWhere(['between', 'fecha_a_reponer', "$year-01-01", "$year-12-31"])
+             ->count();
+     
+         $permisosDisponibles = $totalPermisosAnuales - $permisosUsados;
+     
+         // Verificar si se alcanzó el límite de permisos
+         if ($permisosDisponibles <= 0) {
+             Yii::$app->session->setFlash('error', 'Has alcanzado el límite anual de permisos.');
+           //  return $this->redirect(['index']);
          }
      
          if ($model->load(Yii::$app->request->post()) && $motivoFechaPermisoModel->load(Yii::$app->request->post())) {
@@ -196,15 +221,12 @@ public function actionHistorial($empleado_id= null)
              'model' => $model,
              'motivoFechaPermisoModel' => $motivoFechaPermisoModel,
              'solicitudModel' => $solicitudModel,
-             'empleado' => $empleado, // Pasar empleado a la vista
-
-            ]);
+             'empleado' => $empleado,
+             'permisosUsados' => $permisosUsados,
+             'permisosDisponibles' => $permisosDisponibles,
+         ]);
      }
-          
      
-     
-     
-
     
     
 
@@ -240,10 +262,48 @@ public function actionHistorial($empleado_id= null)
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
+        $model = $this->findModel($id);
+        $empleado = Empleado::findOne($model->empleado_id);
+        if ($model === null) {
+            Yii::$app->session->setFlash('error', 'El registro de permiso no fue encontrado.');
+            return $this->redirect(['index']);
+        }
+        
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            // Obtener el ID de la solicitud asociada antes de eliminar el permiso
+            $solicitudId = $model->solicitud_id;
+            
+            // Eliminar el registro de PermisoFueraTrabajo
+            if ($model->delete()) {
+                // Buscar y eliminar el registro asociado en la tabla Solicitud
+                $solicitudModel = Solicitud::findOne($solicitudId);
+                if ($solicitudModel !== null) {
+                    $solicitudModel->delete();
+                }
+                $transaction->commit();
+                
+                Yii::$app->session->setFlash('success', 'El registro de permiso y la solicitud asociada han sido eliminados correctamente.');
+            } else {
+                Yii::$app->session->setFlash('error', 'Hubo un error al eliminar el registro de permiso.');
+            }
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            Yii::$app->session->setFlash('error', 'Hubo un error al eliminar el registro: ' . $e->getMessage());
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+            Yii::$app->session->setFlash('error', 'Hubo un error al eliminar el registro: ' . $e->getMessage());
+        }
+        
+        if (Yii::$app->user->can('gestor-rh')) {
+            Yii::$app->session->setFlash('success', 'El registro se ha eliminado exitosamente.');
+            $url = Url::to(['historial', 'empleado_id' => $empleado->id]) ;
+            return $this->redirect($url);
+        } else {
+            return $this->redirect(['index']);
+        }
     }
+    
 
     /**
      * Finds the PermisoFueraTrabajo model based on its primary key value.

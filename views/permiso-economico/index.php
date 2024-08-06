@@ -77,7 +77,7 @@ $this->title = 'Permiso Economico';
                     'view' => function ($url, $model) {
                         return Html::a('<i class="far fa-eye"></i>', $url, [
                             'title' => 'Ver solicitud',
-                            'class' => 'btn btn-info btn-xs',
+                            'class' => 'btn btn-outline-info btn-sm',
                             'data-pjax' => "0"
                         ]);
                     },

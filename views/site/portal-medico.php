@@ -51,7 +51,10 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
                                
                              
 
-                                <td><?= strftime('%A, %d de %B de %Y', strtotime($solicitud->fecha_creacion)) ?></td>
+                                <td>
+    <?= strftime('%A, %d de %B de %Y', strtotime($solicitud->created_at)) ?>
+    a las <?= date('H:i', strtotime($solicitud->created_at)) ?> horas
+</td>
                                 <td>
                                     <?= Html::a('Ver', ['solicitud/view', 'id' => $solicitud->id], ['class' => 'btn btn-primary btn-sm']) ?>
                                 </td>

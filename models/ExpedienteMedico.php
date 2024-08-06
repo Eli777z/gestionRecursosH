@@ -62,7 +62,7 @@ class ExpedienteMedico extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['consulta_medica_id', 'documento_id', 'antecedente_hereditario_id', 'antecedente_patologico_id', 'antecedente_no_patologico_id', 'no_seguridad_social', 'empleado_id'], 'integer'],
+            [['consulta_medica_id', 'documento_id', 'antecedente_hereditario_id', 'antecedente_patologico_id', 'antecedente_no_patologico_id', 'no_seguridad_social', 'empleado_id', 'primera_revision'], 'integer'],
             [['medicacion_necesitada', 'alergias'], 'string'],
             [['antecedente_no_patologico_id'], 'exist', 'skipOnError' => true, 'targetClass' => AntecedenteNoPatologico::class, 'targetAttribute' => ['antecedente_no_patologico_id' => 'id']],
             [['antecedente_hereditario_id'], 'exist', 'skipOnError' => true, 'targetClass' => AntecedenteHereditario::class, 'targetAttribute' => ['antecedente_hereditario_id' => 'id']],
@@ -103,6 +103,7 @@ class ExpedienteMedico extends \yii\db\ActiveRecord
             'antecedente_obstrectico_id' => 'Antecedente Obstrectico ID',
 
             'alergia_id' => 'Alergia ID',
+            'primera_revision' => 'Primera revisión'
 
 
 

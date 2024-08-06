@@ -287,8 +287,10 @@ use yii\helpers\Url;
     <?= Html::a('PERMISO ECONÓMICO', Url::to(['permiso-economico/index']), ['class' => 'dropdown-item text-primary']) ?>
     <?= Html::a('PERMISO SIN GOCE DE SUELDO', Url::to(['permiso-sin-sueldo/index']), ['class' => 'dropdown-item text-primary']) ?>
     <?= Html::a('CAMBIO PERIODO VACACIONAL', Url::to(['cambio-periodo-vacacional/index']), ['class' => 'dropdown-item text-primary']) ?>
-    <a class="dropdown-item" href="#">REPORTE DE TIEMPO EXTRA</a>
-    <a class="dropdown-item" href="#">REPORTE GENERAL DE TIEMPO EXTRA</a>
+    <?= Html::a('REPORTE DE TIEMPO EXTRA', Url::to(['reporte-tiempo-extra/index']), ['class' => 'dropdown-item text-primary']) ?>
+    <?= Html::a('REPORTE DE TIEMPO EXTRA GENERAL', Url::to(['reporte-tiempo-extra-general/index']), ['class' => 'dropdown-item text-primary']) ?>
+
+   
   </div>
 </div>
         <!-- Navbar Search -->

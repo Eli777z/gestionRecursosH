@@ -128,14 +128,13 @@ if (!$modelAlergia) {
                             <?php endif; ?>
                         </div>
                         <div class="ml-4">
-                            <div class="alert alert-light mb-0" role="alert">
+    <div class="alert alert-light mb-0" role="alert">
+        <h3 class="mb-0"><?= $model->nombre ?> <?= $model->apellido ?></h3>
+        <h5 class="mb-0">Número de empleado: <?= $model->numero_empleado ?></h5>
+        
+    </div>
+</div>
 
-                                <h3 class="mb-0"><?= $model->nombre ?> <?= $model->apellido ?></h3>
-                                <h5 class="mb-0">Numero de empleado: <?= $model->numero_empleado ?></h5>
-
-
-                            </div>
-                        </div>
 
                     </div>
                     <?php if (Yii::$app->user->can('crear-consulta-medica')) : ?>
@@ -162,6 +161,8 @@ if (!$modelAlergia) {
 
 
                     <?php endif; ?>
+
+                      
                 </div>
 
 
@@ -236,6 +237,17 @@ if (!$modelAlergia) {
                                     }
                                 }
                                 ?>
+                                <?php 
+        if ($model->expedienteMedico !== null) {
+            if ($model->expedienteMedico->primera_revision === 0) {
+                echo '
+                
+                
+                 <div class="alert alert-warning mb-0" role="alert">
+              <h6>  <i class="fas fa-exclamation-triangle" style="color: #dd0000 "></i> PENDIENTE DE PRIMERA REVISION MEDICA</h6> </div>';
+            }
+        }
+        ?>
                             </div>
                             <?php $this->beginBlock('datos'); ?>
                             <?php $this->beginBlock('info_p'); ?>

@@ -32,7 +32,7 @@ use yii\bootstrap5\Alert;
                                 ?>
                             </div>
 
-    <?= $form->field($model, 'expediente_medico_id')->textInput(['readonly' => true]) ?>
+    <?= $form->field($model, 'expediente_medico_id')->hiddenInput(['readonly' => true])->label(false) ?>
 
     <div class="col-6 col-sm-12">
     
@@ -41,6 +41,7 @@ use yii\bootstrap5\Alert;
                                                
                                                <div class="card-header custom-nopato text-white text-left">
                                                    <h5>Interrogatorio</h5>
+
                                                </div>
                                                <div class="card-body">
                                                    <div class="row">

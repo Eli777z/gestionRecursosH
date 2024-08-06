@@ -129,7 +129,11 @@ $config = [
             'site/get-empleado-foto',
             'empleado/foto-empleado',
             'debug/*',
-            'cat-tipo-contrato/*'
+            'cat-tipo-contrato/*',
+            'cat-puesto/*',
+            'parametro-formato/*',
+            'reporte-tiempo-extra/*',
+            'reporte-tiempo-extra-general/*'
 
             // The actions listed here will be allowed to everyone including guests.
             // So, 'admin/*' should not appear here in the production, of course.

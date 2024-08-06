@@ -4,7 +4,7 @@ use yii\helpers\Html;
 
 use yii\grid\GridView;
 use yii\widgets\Pjax;
-
+use yii\helpers\Url;
 use yii\jui\DatePicker;
 
 use kartik\select2\Select2;
@@ -18,7 +18,29 @@ use kartik\select2\Select2;
 
                                             <h3>HISTORIAL DE SOLICITUDES DE INCIDENCIAS: </h3>
 
+                                            <div class="dropdown float-right">
+  <button class="btn btn-dark dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+    FORMATOS DE INCIDENCIAS
+  </button>
+  <div class="dropdown-menu">
+  <?= Html::a('CITA MEDICA', Url::to(['cita-medica/historial', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) ?>
 
+    <?= Html::a('PERMISO FUERA DEL TRABAJO', Url::to(['permiso-fuera-trabajo/historial', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) ?>
+   
+
+    <?= Html::a('COMISIÓN ESPECIAL', Url::to(['comision-especial/historial', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) ?>
+    
+    <?= Html::a('CAMBIO DE DÍA LABORAL', Url::to(['cambio-dia-laboral/historial', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) ?>
+    <?=  Html::a('CAMBIO DE HORARIO DE TRABAJO', Url::to(['cambio-horario-trabajo/historial', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) ?>
+    <?=  Html::a('PERMISO ECONÓMICO', Url::to(['permiso-economico/historial', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) ?>
+    <?= Html::a('PERMISO SIN GOCE DE SUELDO', Url::to(['permiso-sin-sueldo/historial', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) ?>
+    <?= Html::a('CAMBIO DE PERIODO VACACIONAL', Url::to(['cambio-periodo-vacacional/historial', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) ?>
+    <?=  Html::a('REPORTE DE TIEMPO EXTRA', Url::to(['reporte-tiempo-extra/historial', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0'])?>
+    <?= Html::a('REPORTE DE TIEMPO EXTRA GENERAL', Url::to(['reporte-tiempo-extra-general/index']), ['class' => 'dropdown-item text-primary']) ?>
+
+   
+  </div>
+</div>
 
                                         <?php } elseif (Yii::$app->user->can('ver-solicitudes-medicas')) { ?>
                                             <h3>HISTORIAL DE SOLICITUDES MEDICAS: </h3>
@@ -92,7 +114,7 @@ use kartik\select2\Select2;
                 'template' => '{view} {delete}',
                 'buttons' => [
                     'view' => function ($url, $model, $key) {
-                        return Html::a('<i class="fa fa-eye"></i>', ['solicitud/view', 'id' => $model->id], ['title' => 'Ver', 'class' => 'btn btn-primary btn-xs']);
+                        return Html::a('<i class="fa fa-eye"></i>', ['solicitud/view', 'id' => $model->id], ['title' => 'Ver', 'class' => 'btn btn-outline-info btn-sm']);
                     },
                     'delete' => function ($url, $model, $key) {
                         return Html::a('<i class="fa fa-trash"></i>', ['solicitud/delete', 'id' => $model->id], [
@@ -175,7 +197,7 @@ use kartik\select2\Select2;
                 'template' => '{view}',
                 'buttons' => [
                     'view' => function ($url, $model, $key) {
-                        return Html::a('<i class="fa fa-eye"></i>', ['solicitud/view', 'id' => $model->id], ['title' => 'Ver', 'class' => 'btn btn-primary btn-xs']);
+                        return Html::a('<i class="fa fa-eye"></i>', ['solicitud/view', 'id' => $model->id], ['title' => 'Ver', 'class' => 'btn btn-outline-info btn-sm']);
                     },
                 ],
             ],
@@ -264,19 +286,19 @@ use kartik\select2\Select2;
             ],
             [
                 'class' => 'hail812\adminlte3\yii\grid\ActionColumn',
-                'template' => '{view} {delete}',
+                'template' => '{view}',// {delete}',
                 'buttons' => [
                     'view' => function ($url, $model, $key) {
-                        return Html::a('<i class="fa fa-eye"></i>', ['solicitud/view', 'id' => $model->id], ['title' => 'Ver', 'class' => 'btn btn-primary btn-xs']);
+                        return Html::a('<i class="fa fa-eye"></i>', ['solicitud/view', 'id' => $model->id], ['title' => 'Ver', 'class' => 'btn btn-outline-info btn-sm']);
                     },
-                    'delete' => function ($url, $model, $key) {
-                        return Html::a('<i class="fa fa-trash"></i>', ['solicitud/delete', 'id' => $model->id], [
-                            'title' => 'Eliminar',
-                            'class' => 'btn btn-danger btn-xs',
-                            'data-confirm' => '¿Estás seguro de eliminar este elemento?',
-                            'data-method' => 'post',
-                        ]);
-                    },
+               //     'delete' => function ($url, $model, $key) {
+                 //       return Html::a('<i class="fa fa-trash"></i>', ['solicitud/delete', 'id' => $model->id], [
+                   //         'title' => 'Eliminar',
+                     //       'class' => 'btn btn-danger btn-xs',
+                       //     'data-confirm' => '¿Estás seguro de eliminar este elemento?',
+                         //   'data-method' => 'post',
+              //          ]);
+                //    },
                 ],
             ],
         ],

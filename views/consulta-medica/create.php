@@ -24,6 +24,8 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="card">
             <div class="card-header gradient-blue text-white text-center">
                 <h2>Consulta médica</h2>
+                <p>  Empleado: <?= $empleadoNombre ?></p>
+
             </div>
             <div class="card-body bg-light">
                 <?=$this->render('_form', [

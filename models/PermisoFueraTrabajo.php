@@ -41,21 +41,18 @@ class PermisoFueraTrabajo extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            // ...
             [['empleado_id', 'solicitud_id', 'motivo_fecha_permiso_id'], 'integer'],
             [['hora_salida', 'hora_regreso', 'fecha_a_reponer', 'horario_fecha_a_reponer'], 'safe'],
             [['nombre_jefe_departamento'], 'string', 'max' => 90],
-
             [['motivo_fecha_permiso_id'], 'exist', 'skipOnError' => true, 'targetClass' => MotivoFechaPermiso::class, 'targetAttribute' => ['motivo_fecha_permiso_id' => 'id']],
             [['empleado_id'], 'exist', 'skipOnError' => true, 'targetClass' => Empleado::class, 'targetAttribute' => ['empleado_id' => 'id']],
             [['solicitud_id'], 'exist', 'skipOnError' => true, 'targetClass' => Solicitud::class, 'targetAttribute' => ['solicitud_id' => 'id']],
-            [['jefe_departamento_id'], 'safe'], 
-
-                [['fecha_hora_reponer'], 'safe'], 
-
-                [[ 'motivo_fecha_permiso_id', 'hora_salida', 'hora_regreso', 'fecha_a_reponer', 'horario_fecha_a_reponer' ], 'required'],
-
-
-            ];
+            [['jefe_departamento_id'], 'safe'],
+            [['fecha_hora_reponer'], 'safe'],
+            [['motivo_fecha_permiso_id', 'hora_salida', 'hora_regreso', 'fecha_a_reponer', 'horario_fecha_a_reponer'], 'required'],
+            ['empleado_id', 'validarLimiteAnual'], // Nueva regla de validación
+        ];
     }
 
     /**
@@ -120,4 +117,25 @@ class PermisoFueraTrabajo extends \yii\db\ActiveRecord
             return true;
         }
         return false;
-    }}
+    }
+
+
+    public function validarLimiteAnual($attribute, $params)
+{
+    $añoActual = date('Y');
+    $contadorPermisos = static::find()
+        ->where(['empleado_id' => $this->empleado_id])
+        ->andWhere(['between', 'fecha_a_reponer', "$añoActual-01-01", "$añoActual-12-31"])
+        ->count();
+
+    $limiteAnual = ParametroFormato::find()
+        ->where(['tipo_permiso' => 'PERMISO FUERA DEL TRABAJO'])
+        ->one()->limite_anual;
+
+    if ($contadorPermisos >= $limiteAnual) {
+        $this->addError($attribute, 'Has alcanzado el límite anual de permisos fuera del trabajo.');
+    }
+}
+
+
+}

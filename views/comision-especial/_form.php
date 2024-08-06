@@ -22,6 +22,8 @@ use froala\froalaeditor\FroalaEditorWidget;
             <?php $form = ActiveForm::begin(['options' => [ 'id' => 'employee-form']]); ?>
                 <div class="card-header bg-info text-white">
                     <h2>COMISIÓN ESPECIAL</h2>
+                    <p>  Empleado: <?= $empleado->nombre.' '.$empleado->apellido ?></p>
+
                     <?php
 // Obtener el ID del usuario actual
 $usuarioActual = Yii::$app->user->identity;

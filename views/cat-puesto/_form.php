@@ -13,17 +13,7 @@ use yii\bootstrap4\ActiveForm;
     <?php $form = ActiveForm::begin(); ?>
 
     <?= $form->field($model, 'nombre_puesto')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'nombre_puesto')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'nombre_puesto')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'nombre_puesto')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'nombre_puesto')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'nombre_puesto')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'nombre_puesto')->textInput(['maxlength' => true]) ?>
 
 
     <div class="form-group">

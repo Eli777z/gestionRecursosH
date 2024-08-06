@@ -52,29 +52,17 @@ use yii\helpers\Url;
             echo \hail812\adminlte\widgets\Menu::widget([
                 'items' => [
                     ['label' => 'Inicio', 'icon' => 'home', 'url' => ['site/portalgestionrh']],
+                    ['label' => 'Mi Perfil', 'icon' => 'user', 'url' => ['site/portalempleado']],
 
-                    ['label' => 'Empleados', 'icon' => 'user', 'url' => ['empleado/index']],
+
+                    ['label' => 'Empleados', 'icon' => 'users', 'url' => ['empleado/index']],
                     
-                    ['label' => 'Formatos', 'icon' => 'file', 'url' => ['empleado/formatos']],
-                    ['label' => 'Solicitudes', 'icon' => 'thumbs-up', 'url' => ['solicitud/index']],
+                   // ['label' => 'Formatos', 'icon' => 'file', 'url' => ['empleado/formatos']],
+                    ['label' => 'Solicitudes', 'icon' => 'envelope-square', 'url' => ['solicitud/index']],
 
                     ['label' => 'Gii',  'icon' => 'file-code', 'url' => ['/gii'], 'target' => '_blank'],
                     //['label' => 'Administrador', 'icon' => 'user-tie', 'url' => ['/admin']],
-                    ['label' => 'MULTI LEVEL EXAMPLE', 'header' => true],
-                    ['label' => 'Level1'],
-                    [
-                        'label' => 'Empleados',
-                        'items' => [
-                            ['label' => 'Junta de gobierno', 'iconStyle' => 'far'],
-                            
-                            
-                        ]
-                    ],
-                    ['label' => 'Level1'],
-                    ['label' => 'LABELS', 'header' => true],
-                    ['label' => 'Important', 'iconStyle' => 'far', 'iconClassAdded' => 'text-danger'],
-                    ['label' => 'Warning', 'iconClass' => 'nav-icon far fa-circle text-warning'],
-                    ['label' => 'Informational', 'iconStyle' => 'far', 'iconClassAdded' => 'text-info'],
+                 
                 ],
             ]);
         }elseif (Yii::$app->user->can('medico')) {

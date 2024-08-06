@@ -20,6 +20,7 @@ $this->title = $model->id;
     <div class="card">
     <div class="card-header bg-info text-white">
                     <h2>CAMBIO DE DÍA LABORAL</h2>
+                    <p>  Empleado: <?= $empleado->nombre.' '.$empleado->apellido ?></p>
                     <?php
 // Obtener el ID del usuario actual
 $usuarioActual = Yii::$app->user->identity;
@@ -47,7 +48,16 @@ if ($empleadoActual->id === $empleado->id) {
             'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
             'encode' => false,
         ]);
-    } else {
+    }else if (Yii::$app->user->can('gestor-rh')) {
+        // Redirige al historial del navegador
+        echo Html::a('<i class="fa fa-chevron-left"></i> Volver', 'javascript:void(0);', [
+            'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
+            'encode' => false,
+            'onclick' => 'window.history.back(); return false;',
+        ]);
+    } 
+    
+    else {
         echo Html::a('<i class="fa fa-home"></i> Inicio', ['site/portalempleado'], [
             'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
             'encode' => false,

@@ -67,7 +67,27 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                     
 
-                            ['class' => 'hail812\adminlte3\yii\grid\ActionColumn'],
+                            ['class' => 'hail812\adminlte3\yii\grid\ActionColumn',
+
+    
+                            'template' =>  '{view}',
+                    
+                         'buttons' => [
+                                        
+                                        'view' => function ($url, $model) {
+                                            return Html::a('<i class="far fa-eye"></i>', $url, [
+                                                'title' => 'Ver solicitud',
+                                               'class' => 'btn btn-outline-info btn-sm',
+                                                'data-pjax' => "0"
+                                            ]);
+                                        },
+                                       
+                                    ],
+                        
+                        
+                        
+                        
+                        ],
                         ],
                         'summaryOptions' => ['class' => 'summary mb-2'],
                         'pager' => [

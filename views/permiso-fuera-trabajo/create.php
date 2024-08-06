@@ -17,5 +17,7 @@ $this->title = 'Create Permiso Fuera Trabajo';
                         'empleado' => $empleado, // Pasar empleado a la vista
 
                         'solicitudModel' => $solicitudModel,
+                        'permisosUsados' => $permisosUsados,
+                        'permisosDisponibles' => $permisosDisponibles,
                     ]) ?>
               

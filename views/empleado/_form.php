@@ -102,73 +102,57 @@ $this->registerCssFile('@web/css/grid-view.css', ['position' => View::POS_HEAD])
                                     </div>
                                     <div class="col-md-6">
                                         <div class="card">
-                                            <div class="card-header gradient-verde text-white">Información Laboral</div>
-                                            <div class="card-body">
-                                            <div class="col-6 col-sm-12">
-                                                <?= $form->field($informacion_laboral, 'cat_departamento_id')->widget(Select2::classname(), [
-                                                    'data' => ArrayHelper::map(CatDepartamento::find()->all(), 'id', 'nombre_departamento'),
-                                                    'language' => 'es',
-                                                    'options' => ['placeholder' => 'Seleccione departamento'],
-                                                    'pluginOptions' => [
-                                                        'allowClear' => true,
-                                                        
+                                        <div class="card-header gradient-verde text-white">Información Laboral</div>
+<div class="card-body">
+    <div class="col-6 col-sm-12">
+        <?= $form->field($informacion_laboral, 'cat_departamento_id')->widget(Select2::classname(), [
+            'data' => ArrayHelper::map(CatDepartamento::find()->all(), 'id', 'nombre_departamento'),
+            'language' => 'es',
+            'options' => ['placeholder' => 'Seleccione departamento'],
+            'pluginOptions' => ['allowClear' => true],
+            'theme' => Select2::THEME_BOOTSTRAP,
+        ])->label('Departamento al que pertenece:') ?>
+    </div>
 
-                                                    ],
-                                                    'theme' => Select2::THEME_BOOTSTRAP,
-                                                ])->label('Departamento al que pertenece:') ?>
-                                            </div>
+    <div class="col-6 col-sm-12">
+        <?= $form->field($informacion_laboral, 'cat_puesto_id')->widget(Select2::classname(), [
+            'data' => ArrayHelper::map(CatPuesto::find()->all(), 'id', 'nombre_puesto'),
+            'language' => 'es',
+            'options' => ['placeholder' => 'Seleccione puesto del empleado'],
+            'pluginOptions' => ['allowClear' => true],
+            'theme' => Select2::THEME_BOOTSTRAP,
+        ])->label('Puesto del empleado:') ?>
+    </div>
 
-<div class="col-6 col-sm-12">
-<?= $form->field($informacion_laboral, 'cat_puesto_id')->widget(Select2::classname(), [
-                                                    'data' => ArrayHelper::map(CatPuesto::find()->all(), 'id', 'nombre_puesto'),
-                                                    'language' => 'es',
-                                                    'options' => ['placeholder' => 'Seleccione puesto del empleado'],
-                                                    'pluginOptions' => [
-                                                        'allowClear' => true
-                                                    ],
-                                                    'theme' => Select2::THEME_BOOTSTRAP,
-                                                ])->label('Puesto del empleado:') ?>
+    <div class="col-6 col-sm-8">
+        <?= $form->field($informacion_laboral, 'cat_tipo_contrato_id')->widget(Select2::classname(), [
+            'data' => ArrayHelper::map(CatTipoContrato::find()->all(), 'id', 'nombre_tipo'),
+            'language' => 'es',
+            'options' => ['placeholder' => 'Seleccione el tipo de contrato'],
+            'pluginOptions' => ['allowClear' => true],
+            'theme' => Select2::THEME_BOOTSTRAP,
+        ])->label('Tipo de contrato del empleado:') ?>
+    </div>
+
+    <div class="col-6 col-sm-8">
+        <?= $form->field($model, 'profesion')->dropDownList([
+            'No tiene' => 'No tiene',
+            'ING.' => 'ING.',
+            'LIC.' => 'LIC.',
+            'PROF.' => 'PROF.',
+            'ARQ.' => 'ARQ.',
+            'C.' => 'C.',
+            'DR.' => 'DR.',
+            'DRA.' => 'DRA.',
+            'TEC.' => 'TEC.',
+        ], ['prompt' => 'Selecciona el nivel académico...'])->label('Profesión:') ?>
+    </div>
+
+    <div class="col-6 col-sm-6">
+        <?= $form->field($informacion_laboral, 'fecha_ingreso')->input('date')->label('Fecha de ingreso del empleado:') ?>
+    </div>
 </div>
-                                              
-                                    <div class="col-6 col-sm-8">
-                                                <?= $form->field($informacion_laboral, 'cat_tipo_contrato_id')->widget(Select2::classname(), [
-                                                    'data' => ArrayHelper::map(CatTipoContrato::find()->all(), 'id', 'nombre_tipo'),
-                                                    'language' => 'es',
-                                                    'options' => ['placeholder' => 'Seleccione el tipo de contrato'],
-                                                    'pluginOptions' => [
-                                                        'allowClear' => true
-                                                    ],
-                                                    'theme' => Select2::THEME_BOOTSTRAP,
-                                                ])->label('Tipo de contrato del empleado:') ?>
-                                    </div>
-                                    <div class="col-6 col-sm-8">
 
-     <?= $form->field($juntaGobiernoModel, 'nivel_jerarquico')->dropDownList([
-        'Comun' => 'Comun',
-                                        'Director' => 'Director',
-                                        'Jefe de unidad' => 'Jefe de unidad',
-                                        'Jefe de departamento' => 'Jefe de departamento',
-                                    ], ['prompt' => 'Selecciona el nivel jerárquico...'])->label('Tipo de empleado:') ?>
-                                    </div>
-                                    <div class="col-6 col-sm-8">
-  <?= $form->field($model, 'profesion')->dropDownList([
-                                        'No tiene' => 'No tiene',
-                                        'ING.' => 'ING.',
-                                        'LIC.' => 'LIC.',
-                                        'PROF.' => 'PROF.',
-                                        'ARQ.' => 'ARQ.',
-                                        'C.' => 'C.',
-                                        'DR.' => 'DR.',
-                                        'DRA.' => 'DRA.',
-                                        'TEC.' => 'TEC.',
-
-                                    ], ['prompt' => 'Selecciona el nivel académico...'])->label('Profesión:') ?>
-                                    </div>
-                                    <div class="col-6 col-sm-6">
-                                                <?= $form->field($informacion_laboral, 'fecha_ingreso')->input('date')->label('Fecha de ingreso del empleado:') ?>
-
-                                    </div>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>

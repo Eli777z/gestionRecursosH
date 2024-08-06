@@ -22,6 +22,8 @@ use froala\froalaeditor\FroalaEditorWidget;
             <?php $form = ActiveForm::begin(['options' => [ 'id' => 'employee-form']]); ?>
                 <div class="card-header bg-info text-white">
                     <h2>PERMISO FUERA DEL TRABAJO</h2>
+                    <p>  Empleado: <?= $empleado->nombre.' '.$empleado->apellido ?></p>
+
                     <?php
 // Obtener el ID del usuario actual
 $usuarioActual = Yii::$app->user->identity;
@@ -56,6 +58,12 @@ if ($empleadoActual->id === $empleado->id) {
 
                 <div class="card-body">
                     <div class="row">
+
+                    <div class="col-12">
+                                                <p><strong>Permisos usados:</strong> <?= $permisosUsados ?></p>
+                                                <p><strong>Permisos disponibles:</strong> <?= $permisosDisponibles ?></p>
+                                            </div>
+
                         <div class="col-md-12">
                             <div class="d-flex align-items-center mb-3">
                                 <?php

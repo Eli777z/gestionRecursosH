@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\bootstrap5\Alert;
 use yii\web\View;
+use yii\grid\GridView;
 /* @var $this yii\web\View */
 /* @var $model app\models\Solicitud */
 $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
@@ -33,9 +34,20 @@ $this->params['breadcrumbs'][] = ['label' => 'Solicitud ' . $model->id];
     <div class="row justify-content-center"> 
         <div class="col-md-8">
             <div class="card">
-            <div class="card-header gradient-info text-white">
+            <div class="card-header bg-info text-white">
                     <div class="d-flex justify-content-between"> 
-                        <h1> CITA MEDICA </h1>
+
+                    <?php if (Yii::$app->user->can('medico')) { ?>
+                        <h3> CITA MEDICA </h3>
+                        <p>  Empleado: <?= $model->empleado->nombre.' '.$model->empleado->apellido ?></p>
+
+                        <?php }else { ?>
+                            <h3> Solicitud  </h3>
+                            <p>  Empleado: <?= $model->empleado->nombre.' '.$model->empleado->apellido ?></p>
+
+                            
+                        <?php } ?>
+
                         <?php if (Yii::$app->user->can('crear-consulta-medica')) : ?>
 
 <?php if ($model->empleado->expedienteMedico): ?>
@@ -131,6 +143,47 @@ if ($formato) {
     $formatoAttributes = [];
     
     switch ($model->nombre_formato) {
+        case 'REPORTE DE TIEMPO EXTRA':
+            $formatoAttributes = [
+                [
+                    'label' => 'ID',
+                    'attribute' => 'solicitud_id',
+                    'value' => function ($model) {
+                        return $model->solicitud_id;
+                    },
+                ],
+                [
+                    'label' => 'Fecha de creación',
+                    'attribute' => 'created_at',
+                    'value' => function ($model) {
+                        return $model->created_at;
+                    },
+                ],
+                // Otros atributos específicos de PermisoEconomico
+            ];
+            echo '<div class="row">';
+            echo '<div class="col-md-12">';
+            echo '<h3>Actividades</h3>';
+            echo GridView::widget([
+                'dataProvider' => new \yii\data\ArrayDataProvider([
+                    'allModels' => $actividades,
+                    'pagination' => false,
+                ]),
+                'columns' => [
+                    ['class' => 'yii\grid\SerialColumn'],
+                    'fecha',
+                    'hora_inicio',
+                    'hora_fin',
+                    'actividad',
+                    'no_horas',
+                   
+                    // otros campos de la actividad...
+                ],
+            ]);
+            echo '</div>';
+            echo '</div>';
+            break;
+
         case 'PERMISO FUERA DEL TRABAJO':
             $formatoAttributes = [
                 //[
@@ -253,51 +306,7 @@ if ($formato) {
             break;
 
 
-            case 'CAMBIO DE DÍA LABORAL':
-                $formatoAttributes = [
-                    [
-                        'label' => 'Motivo',
-                        'attribute' => 'motivo',
-                        'format' => 'html',
-                        'value' => function ($model) {
-                            return \yii\helpers\Html::decode($model->motivoFechaPermiso->motivo);
-                        },
-                        'filter' => false,
-                        'options' => ['style' => 'width: 65%;'],
-                    ],
-                    [
-                        'label' => 'Fecha de Permiso',
-                        'value' => function ($formato) {
-                           
-                            setlocale(LC_TIME, "es_419.UTF-8");
-                            
-                            $fechaPermiso = strtotime($formato->motivoFechaPermiso->fecha_permiso);
-                            
-                            $fechaFormateada = strftime('%A, %B %d, %Y', $fechaPermiso);
-                            
-                            setlocale(LC_TIME, null);
-                            
-                            return $fechaFormateada;
-                        },
-                    ],
-                    [
-                        'label' => 'Fecha a Laborar',
-                        'value' => function ($formato) {
-                           
-                            setlocale(LC_TIME, "es_419.UTF-8");
-                            
-                            $fechaPermiso = strtotime($formato->fecha_permiso);
-                            
-                            $fechaFormateada = strftime('%A, %B %d, %Y', $fechaPermiso);
-                            
-                            setlocale(LC_TIME, null);
-                            
-                            return $fechaFormateada;
-                        },
-                    ],
-                    // Otros atributos específicos de PermisoEconomico
-                ];
-                break;
+            
 
 
                 case 'CAMBIO DE DÍA LABORAL':
@@ -333,7 +342,7 @@ if ($formato) {
                                
                                 setlocale(LC_TIME, "es_419.UTF-8");
                                 
-                                $fechaPermiso = strtotime($formato->fecha_permiso);
+                                $fechaPermiso = strtotime($formato->fecha_a_laborar);
                                 
                                 $fechaFormateada = strftime('%A, %B %d, %Y', $fechaPermiso);
                                 
@@ -451,6 +460,7 @@ if ($formato) {
                                 // Otros atributos específicos de PermisoEconomico
                             ];
                             break;
+                           
                             case 'CITA MEDICA':
                                 $formatoAttributes = [
                                     //[

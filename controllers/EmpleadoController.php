@@ -37,6 +37,7 @@ use app\models\AntecedentePerinatal;
 use app\models\DocumentoMedico;
 use app\models\ExploracionFisica;
 use app\models\InterrogatorioMedico;
+use app\models\CatPuesto;
 
 /**
  * EmpleadoController implements the CRUD actions for Empleado model.
@@ -63,37 +64,53 @@ class EmpleadoController extends Controller
      * @return mixed
      */
 
-
-    public function actionIndex()
-    {
-        $searchModel = new EmpleadoSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        $juntaGobiernoModel = new JuntaGobierno();
-
-        // Obtener el id del departamento del empleado actual
-        $idDepartamentoEmpleadoActual = Yii::$app->user->identity->empleado->informacionLaboral->cat_departamento_id;
-
-
-        $idDireccionEmpleadoActual = Yii::$app->user->identity->empleado->informacionLaboral->cat_direccion_id;
-
-
-        // Configurar el dataProvider para mostrar empleados del mismo departamento si tiene el permiso correspondiente
-        if (Yii::$app->user->can('ver-empleados-departamento')) {
-            $dataProvider->query->andWhere(['il.cat_departamento_id' => $idDepartamentoEmpleadoActual]);
-        } else if (Yii::$app->user->can('ver-empleados-direccion')) {
-            $dataProvider->query->andWhere(['il.cat_direccion_id' => $idDireccionEmpleadoActual]);
-        }
-
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-            'juntaGobiernoModel' => $juntaGobiernoModel
-
-        ]);
-    }
-
-
-
+     public function actionIndex()
+     {
+         $searchModel = new EmpleadoSearch();
+         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+         $juntaGobiernoModel = new JuntaGobierno();
+     
+         // Obtener el id del departamento del empleado actual
+         $idDepartamentoEmpleadoActual = Yii::$app->user->identity->empleado->informacionLaboral->cat_departamento_id;
+         $idDireccionEmpleadoActual = Yii::$app->user->identity->empleado->informacionLaboral->cat_direccion_id;
+     
+         // Configurar el dataProvider para mostrar empleados del mismo departamento si tiene el permiso correspondiente
+         if (Yii::$app->user->can('ver-empleados-departamento')) {
+             $dataProvider->query->andWhere(['il.cat_departamento_id' => $idDepartamentoEmpleadoActual]);
+         } else if (Yii::$app->user->can('ver-empleados-direccion')) {
+             $dataProvider->query->andWhere(['il.cat_direccion_id' => $idDireccionEmpleadoActual]);
+         }
+     
+         // Obtener los empleados filtrados para los filtros Select2
+         $empleadosFiltrados = $dataProvider->query->all();
+     
+         // Obtener nombres de empleados únicos
+         $nombresEmpleados = \yii\helpers\ArrayHelper::map($empleadosFiltrados, 'id', function ($model) {
+             return $model->apellido . ' ' . $model->nombre;
+         });
+     
+         // Obtener números de empleados únicos
+         $numeroEmpleados = \yii\helpers\ArrayHelper::map($empleadosFiltrados, 'numero_empleado', function ($model) {
+             return $model->numero_empleado;
+         });
+     
+         // Obtener departamentos únicos
+         $departamentoIds = \yii\helpers\ArrayHelper::getColumn($empleadosFiltrados, function($model) {
+             return $model->informacionLaboral ? $model->informacionLaboral->cat_departamento_id : null;
+         });
+         $departamentos = CatDepartamento::find()->where(['id' => $departamentoIds])->all();
+         $departamentosData = \yii\helpers\ArrayHelper::map($departamentos, 'id', 'nombre_departamento');
+     
+         return $this->render('index', [
+             'searchModel' => $searchModel,
+             'dataProvider' => $dataProvider,
+             'juntaGobiernoModel' => $juntaGobiernoModel,
+             'departamentosData' => $departamentosData,
+             'nombresEmpleadosData' => $nombresEmpleados,
+             'numeroEmpleadosData' => $numeroEmpleados,
+         ]);
+     }
+     
 
 
     /**
@@ -126,6 +143,19 @@ class EmpleadoController extends Controller
 
 
         $expedienteMedico = $modelEmpleado->expedienteMedico;
+        $antecedenteHereditario = AntecedenteHereditario::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+        if (!$antecedenteHereditario) {
+            $antecedenteHereditario = new AntecedenteHereditario();
+            $antecedenteHereditario->expediente_medico_id = $expedienteMedico->id;
+            if (!$antecedenteHereditario->save()) {
+                Yii::$app->session->setFlash('error', 'Hubo un error al crear el registro de antecedente hereditario');
+            } else {
+
+                $expedienteMedico->antecedente_hereditario_id = $antecedenteHereditario->id;
+                $expedienteMedico->save(false); // Guardar sin validaciones adicionales
+            }
+        }
+
         $antecedentes = AntecedenteHereditario::find()->where(['expediente_medico_id' => $expedienteMedico->id])->all();
         $catAntecedentes = CatAntecedenteHereditario::find()->all();
 
@@ -214,6 +244,8 @@ class EmpleadoController extends Controller
                 $expedienteMedico->save(false); // Guardar sin validaciones adicionales
             }
         }
+
+      
 
 
         $antecedenteObstrectico = AntecedenteObstrectico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
@@ -318,36 +350,45 @@ class EmpleadoController extends Controller
     }
 
     public function actionAntecedentePatologico($id)
-    {
-        if (!Yii::$app->user->can('editar-expediente-medico')) {
-            Yii::$app->session->setFlash('error', 'No tiene permitido realizar esta acción.');
-            return $this->redirect(['view', 'id' => $id]);
-        }
-
-        $modelEmpleado = $this->findModel2($id);
-        $expedienteMedico = $modelEmpleado->expedienteMedico;
-
-        $modelAntecedentePatologico = AntecedentePatologico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
-        if (!$modelAntecedentePatologico) {
-            $modelAntecedentePatologico = new AntecedentePatologico();
-            $modelAntecedentePatologico->expediente_medico_id = $expedienteMedico->id;
-        }
-
-        if ($modelAntecedentePatologico->load(Yii::$app->request->post()) && $modelAntecedentePatologico->save()) {
-            Yii::$app->session->setFlash('success', 'Información antecedente patologico medico guardada correctamente.');
-        } else {
-            Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información de antecedente patologico');
-        }
-
-        $url = Url::to(['view', 'id' => $id]) . '#patologicos';
-        return $this->redirect($url);
-
-        return $this->render('view', [
-            'model' => $modelEmpleado,
-            'expedienteMedico' => $expedienteMedico,
-            'modelAntecedentePatologico' => $modelAntecedentePatologico, // Asegúrate de pasar este modelo
-        ]);
+{
+    if (!Yii::$app->user->can('editar-expediente-medico')) {
+        Yii::$app->session->setFlash('error', 'No tiene permitido realizar esta acción.');
+        return $this->redirect(['view', 'id' => $id]);
     }
+
+    $modelEmpleado = $this->findModel2($id);
+    $expedienteMedico = $modelEmpleado->expedienteMedico;
+
+    // Verificar si expedienteMedico existe
+    if ($expedienteMedico === null) {
+        Yii::$app->session->setFlash('error', 'No se encontró el expediente médico.');
+        return $this->redirect(['view', 'id' => $id]);
+    }
+
+    $modelAntecedentePatologico = AntecedentePatologico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+    if (!$modelAntecedentePatologico) {
+        $modelAntecedentePatologico = new AntecedentePatologico();
+        $modelAntecedentePatologico->expediente_medico_id = $expedienteMedico->id;
+    }
+
+    if ($modelAntecedentePatologico->load(Yii::$app->request->post()) && $modelAntecedentePatologico->save()) {
+        // Actualizar primera_revision del expediente médico
+        $expedienteMedico->primera_revision = 1;
+        if (!$expedienteMedico->save()) {
+            Yii::$app->session->setFlash('error', 'Error al actualizar el expediente médico.');
+        } else {
+            Yii::$app->session->setFlash('success', 'Información antecedente patológico médico guardada correctamente.');
+        }
+    } else {
+        Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información de antecedente patológico.');
+    }
+
+    $url = Url::to(['view', 'id' => $id]) . '#patologicos';
+    return $this->redirect($url);
+
+    // El código de renderizado ya no es necesario ya que rediriges inmediatamente
+}
+
 
 
     public function actionNoPatologicos($id)
@@ -395,6 +436,15 @@ class EmpleadoController extends Controller
             }
 
             if ($modelAntecedenteNoPatologico->save()) {
+
+ // Actualizar primera_revision del expediente médico
+ $expedienteMedico->primera_revision = 1;
+ if (!$expedienteMedico->save()) {
+     Yii::$app->session->setFlash('error', 'Error al actualizar el expediente médico.');
+ } else {
+     Yii::$app->session->setFlash('success', 'Información antecedente patológico médico guardada correctamente.');
+ }
+
                 Yii::$app->session->setFlash('success', 'Información de antecedentes no patológicos guardada correctamente.');
             } else {
                 Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información de antecedentes no patológicos.');
@@ -431,6 +481,13 @@ class EmpleadoController extends Controller
         }
 
         if ($modelExploracionFisica->load(Yii::$app->request->post()) && $modelExploracionFisica->save()) {
+             // Actualizar primera_revision del expediente médico
+        $expedienteMedico->primera_revision = 1;
+        if (!$expedienteMedico->save()) {
+            Yii::$app->session->setFlash('error', 'Error al actualizar el expediente médico.');
+        } else {
+            Yii::$app->session->setFlash('success', 'Información antecedente patológico médico guardada correctamente.');
+        }
             Yii::$app->session->setFlash('success', 'Información de exploración fisica guardada correctamente.');
         } else {
             Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información de antecedentes no patológicos.');
@@ -486,6 +543,13 @@ class EmpleadoController extends Controller
             }
 
             if ($modelAntecedentePerinatal->save()) {
+                 // Actualizar primera_revision del expediente médico
+        $expedienteMedico->primera_revision = 1;
+        if (!$expedienteMedico->save()) {
+            Yii::$app->session->setFlash('error', 'Error al actualizar el expediente médico.');
+        } else {
+            Yii::$app->session->setFlash('success', 'Información antecedente patológico médico guardada correctamente.');
+        }
                 Yii::$app->session->setFlash('success', 'Información de antecedente perinatal guardada correctamente.');
             } else {
                 Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información de antecedentes perinatales.');
@@ -552,6 +616,13 @@ class EmpleadoController extends Controller
             }
 
             if ($modelAntecedenteGinecologico->save()) {
+                 // Actualizar primera_revision del expediente médico
+        $expedienteMedico->primera_revision = 1;
+        if (!$expedienteMedico->save()) {
+            Yii::$app->session->setFlash('error', 'Error al actualizar el expediente médico.');
+        } else {
+            Yii::$app->session->setFlash('success', 'Información antecedente patológico médico guardada correctamente.');
+        }
                 Yii::$app->session->setFlash('success', 'Información de antecedente ginecologico guardada correctamente.');
             } else {
                 Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información de antecedentes ginecologicos.');
@@ -606,6 +677,13 @@ class EmpleadoController extends Controller
             }
 
             if ($modelAntecedenteObstrectico->save()) {
+                 // Actualizar primera_revision del expediente médico
+        $expedienteMedico->primera_revision = 1;
+        if (!$expedienteMedico->save()) {
+            Yii::$app->session->setFlash('error', 'Error al actualizar el expediente médico.');
+        } else {
+            Yii::$app->session->setFlash('success', 'Información antecedente patológico médico guardada correctamente.');
+        }
                 Yii::$app->session->setFlash('success', 'Información de antecedente obstrectico guardada correctamente.');
             } else {
                 Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información de antecedentes obstrecticos.');
@@ -645,6 +723,13 @@ class EmpleadoController extends Controller
         }
 
         if ($modelInterrogatorioMedico->load(Yii::$app->request->post()) && $modelInterrogatorioMedico->save()) {
+             // Actualizar primera_revision del expediente médico
+        $expedienteMedico->primera_revision = 1;
+        if (!$expedienteMedico->save()) {
+            Yii::$app->session->setFlash('error', 'Error al actualizar el expediente médico.');
+        } else {
+            Yii::$app->session->setFlash('success', 'Información antecedente patológico médico guardada correctamente.');
+        }
             Yii::$app->session->setFlash('success', 'Información de interrogatorio medico guardada correctamente.');
         } else {
             Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información de interrogatorio medico.');
@@ -679,6 +764,13 @@ class EmpleadoController extends Controller
         }
 
         if ($modelAlergia->load(Yii::$app->request->post()) && $modelAlergia->save()) {
+             // Actualizar primera_revision del expediente médico
+        $expedienteMedico->primera_revision = 1;
+        if (!$expedienteMedico->save()) {
+            Yii::$app->session->setFlash('error', 'Error al actualizar el expediente médico.');
+        } else {
+            Yii::$app->session->setFlash('success', 'Información antecedente patológico médico guardada correctamente.');
+        }
             Yii::$app->session->setFlash('success', 'Información alergica medico guardada correctamente.');
         } else {
             Yii::$app->session->setFlash('error', 'Hubo un error al guardar la información de alergias.');
@@ -718,8 +810,7 @@ class EmpleadoController extends Controller
     $usuario->scenario = Usuario::SCENARIO_CREATE;
     $model->scenario = Empleado::SCENARIO_CREATE;
 
-
-    if ($model->load(Yii::$app->request->post()) && $usuario->load(Yii::$app->request->post()) && $informacion_laboral->load(Yii::$app->request->post()) && $juntaGobiernoModel->load(Yii::$app->request->post())) { 
+    if ($model->load(Yii::$app->request->post()) && $usuario->load(Yii::$app->request->post()) && $informacion_laboral->load(Yii::$app->request->post())) {
         $transaction = Yii::$app->db->beginTransaction();
         $usuario->username = $model->nombre . $model->apellido;
         $nombres = explode(" ", $model->nombre);
@@ -738,6 +829,7 @@ class EmpleadoController extends Controller
         $usuario->password = $hash;
 
         try {
+            // Calcula los días de vacaciones y guarda la información laboral
             $totalDiasVacaciones = $this->calcularDiasVacaciones($informacion_laboral->fecha_ingreso, $informacion_laboral->cat_tipo_contrato_id);
             $diasPorPeriodo = ceil($totalDiasVacaciones / 2);
 
@@ -747,7 +839,7 @@ class EmpleadoController extends Controller
                 throw new \yii\db\Exception('Error al guardar PeriodoVacacional');
             }
 
-            $segundoPeriodoVacacional->dias_vacaciones_periodo = $totalDiasVacaciones - $diasPorPeriodo; 
+            $segundoPeriodoVacacional->dias_vacaciones_periodo = $totalDiasVacaciones - $diasPorPeriodo;
             if (!$segundoPeriodoVacacional->save()) {
                 Yii::$app->session->setFlash('error', 'Error al guardar SegundoPeriodoVacacional.');
                 throw new \yii\db\Exception('Error al guardar SegundoPeriodoVacacional');
@@ -761,6 +853,12 @@ class EmpleadoController extends Controller
                 throw new \yii\db\Exception('Error al guardar Vacaciones');
             }
 
+            $departamento = CatDepartamento::findOne($informacion_laboral->cat_departamento_id);
+            if ($departamento) {
+                $informacion_laboral->cat_direccion_id = $departamento->cat_direccion_id;
+                $informacion_laboral->cat_dpto_cargo_id = $departamento->cat_dpto_id;
+            }
+
             $informacion_laboral->vacaciones_id = $vacaciones->id;
             if (!$informacion_laboral->save()) {
                 Yii::$app->session->setFlash('error', 'Error al guardar InformacionLaboral.');
@@ -771,7 +869,6 @@ class EmpleadoController extends Controller
             if ($usuario->save()) {
                 $model->usuario_id = $usuario->id;
 
-                // Asignar rol basado en la propiedad rol del usuario
                 if ($usuario->rol == 1) {
                     $rol = 'empleado';
                 } elseif ($usuario->rol == 2) {
@@ -791,6 +888,7 @@ class EmpleadoController extends Controller
                     throw new \Exception("El rol $rol no existe en el sistema de RBAC.");
                 }
 
+                // Subir foto del empleado si se proporcionó
                 $upload = UploadedFile::getInstance($model, 'foto');
                 if (is_object($upload)) {
                     $nombreCarpetaTrabajador = Yii::getAlias('@runtime') . '/empleados/' . $model->nombre . '_' . $model->apellido;
@@ -811,33 +909,36 @@ class EmpleadoController extends Controller
                     $model->foto = $upload_filename;
                 }
 
-                if ($antecedenteHereditario->save()) {
-                    $expedienteMedico->antecedente_hereditario_id = $antecedenteHereditario->id;
-                    if ($expedienteMedico->save()) {
-                        $model->expediente_medico_id = $expedienteMedico->id;
+                // Asignar primera_revision a 0 antes de guardar el expediente médico
+                $expedienteMedico->antecedente_hereditario_id = $antecedenteHereditario->id;
+                $expedienteMedico->primera_revision = 0; // Establecer primera_revision a 0
 
-                        if ($model->save()) {
-                            $departamento = CatDepartamento::findOne($informacion_laboral->cat_departamento_id);
-                            if ($departamento) {
-                                $informacion_laboral->cat_direccion_id = $departamento->cat_direccion_id;
-                                $informacion_laboral->cat_dpto_cargo_id = $departamento->cat_dpto_id;
+                if ($expedienteMedico->save()) {
+                    $model->expediente_medico_id = $expedienteMedico->id;
 
-                                if (!empty($juntaGobiernoModel->nivel_jerarquico) && $juntaGobiernoModel->nivel_jerarquico !== 'Comun') {
-                                    $juntaGobiernoModel->empleado_id = $model->id;
-                                    $juntaGobiernoModel->cat_departamento_id = $informacion_laboral->cat_departamento_id;
-                                    $juntaGobiernoModel->cat_direccion_id = $informacion_laboral->cat_direccion_id;
+                    if ($model->save()) {
+                        // Determinar el nivel jerárquico basado en el puesto
+                        $puesto = CatPuesto::findOne($informacion_laboral->cat_puesto_id);
+                        if ($puesto) {
+                            $nivelJerarquico = 'Comun';
+                            if (stripos($puesto->nombre_puesto, 'DIRECTOR') !== false) {
+                                $nivelJerarquico = 'Director';
+                            } elseif (stripos($puesto->nombre_puesto, 'JEFE DE UNIDAD') !== false) {
+                                $nivelJerarquico = 'Jefe de unidad';
+                            } elseif (stripos($puesto->nombre_puesto, 'JEFE DEL DEPARTAMENTO') !== false) {
+                                $nivelJerarquico = 'Jefe de departamento';
+                            }
 
-                                    if (!$juntaGobiernoModel->save()) {
-                                        Yii::$app->session->setFlash('error', 'Error al guardar JuntaGobierno.');
-                                        $transaction->rollBack();
-                                        throw new \yii\db\Exception('Error al guardar JuntaGobierno: ' . json_encode($juntaGobiernoModel->errors));
-                                    }
-                                }
-
-                                if (!$informacion_laboral->save()) {
-                                    Yii::$app->session->setFlash('error', 'Error al guardar InformacionLaboral.');
+                            // Guardar la información en junta_gobierno si aplica
+                            if ($nivelJerarquico !== 'Comun') {
+                                $juntaGobiernoModel->empleado_id = $model->id;
+                                $juntaGobiernoModel->nivel_jerarquico = $nivelJerarquico;
+                                $juntaGobiernoModel->cat_departamento_id = $informacion_laboral->cat_departamento_id;
+                                $juntaGobiernoModel->cat_direccion_id = $informacion_laboral->cat_direccion_id; // Asigna la dirección correcta
+                                if (!$juntaGobiernoModel->save()) {
+                                    Yii::$app->session->setFlash('error', 'Error al guardar JuntaGobierno.');
                                     $transaction->rollBack();
-                                    throw new \yii\db\Exception('Error al guardar InformacionLaboral: ' . json_encode($informacion_laboral->errors));
+                                    throw new \yii\db\Exception('Error al guardar JuntaGobierno: ' . json_encode($juntaGobiernoModel->errors));
                                 }
                             }
 
@@ -845,17 +946,15 @@ class EmpleadoController extends Controller
                                 ->setFrom('elitaev7@gmail.com')
                                 ->setTo($model->email)
                                 ->setSubject('Datos de acceso al sistema')
-                                ->setTextBody("Nos comunicamos con usted, {$model->nombre}.\nAquí están tus datos de acceso:\nNombre de Usuario: {$usuario->username}\nContraseña: contrasena")
+                                ->setTextBody("Nos comunicamos con usted, {$model->nombre}.\nAquí están tus datos de acceso:\nUsuario: {$usuario->username}\nContraseña: contrasena")
                                 ->send();
 
                             $transaction->commit();
-                            Yii::$app->session->setFlash('success', "Trabajador y usuario creados con éxito.");
-                            Yii::$app->session->setFlash('warning', "Complete los demás datos del empleado.");
-
+                            Yii::$app->session->setFlash('success', "Se guardó la información correctamente.");
                             return $this->redirect(['view', 'id' => $model->id]);
                         } else {
                             Yii::$app->session->setFlash('error', 'Error al guardar Empleado.');
-                            $transaction->rollBack();
+                            throw new \yii\db\Exception('Error al guardar Empleado');
                         }
                     } else {
                         Yii::$app->session->setFlash('error', 'Error al guardar ExpedienteMedico.');
@@ -869,10 +968,9 @@ class EmpleadoController extends Controller
                 Yii::$app->session->setFlash('error', 'Error al guardar Usuario.');
                 throw new \yii\db\Exception('Error al guardar Usuario');
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $transaction->rollBack();
-            Yii::$app->session->setFlash('error', 'Ha ocurrido un error durante el proceso de creación: ' . $e->getMessage());
-            throw $e;
+            Yii::$app->session->setFlash('error', 'Ocurrió un error al guardar la información: ' . $e->getMessage());
         }
     }
 
@@ -880,6 +978,13 @@ class EmpleadoController extends Controller
         'model' => $model,
         'usuario' => $usuario,
         'informacion_laboral' => $informacion_laboral,
+        'vacaciones' => $vacaciones,
+        'periodoVacacional' => $periodoVacacional,
+        'segundoPeriodoVacacional' => $segundoPeriodoVacacional,
+        'expedienteMedico' => $expedienteMedico,
+        'antecedenteHereditario' => $antecedenteHereditario,
+        'puestos' => CatPuesto::find()->all(), // Asumiendo que tienes un modelo CatPuesto para los puestos
+        'departamentos' => CatDepartamento::find()->all(), // Asumiendo que tienes un modelo CatDepartamento para los departamentos
         'juntaGobiernoModel' => $juntaGobiernoModel,
     ]);
 }
@@ -1302,46 +1407,83 @@ class EmpleadoController extends Controller
     {
         $model = $this->findModel2($id);
         $informacion_laboral = InformacionLaboral::findOne($model->informacion_laboral_id);
-    
+        
         if ($informacion_laboral->load(Yii::$app->request->post())) {
             // Obtener el nuevo departamento
             $departamento = CatDepartamento::findOne($informacion_laboral->cat_departamento_id);
-    
+        
             if ($departamento) {
                 // Asignar la dirección y el departamento correspondientes al departamento seleccionado
                 $informacion_laboral->cat_direccion_id = $departamento->cat_direccion_id;
                 $informacion_laboral->cat_dpto_cargo_id = $departamento->cat_dpto_id;
             }
-    
+        
+            // Guardar los cambios en InformacionLaboral
             if ($informacion_laboral->save()) {
                 // Actualizar los días de vacaciones
                 $vacaciones = Vacaciones::findOne($informacion_laboral->vacaciones_id);
                 $totalDiasVacaciones = $this->calcularDiasVacaciones($informacion_laboral->fecha_ingreso, $informacion_laboral->cat_tipo_contrato_id);
                 $vacaciones->total_dias_vacaciones = $totalDiasVacaciones;
-    
-                if ($vacaciones->save()) {
-                    Yii::$app->session->setFlash('success', 'Los cambios de la información laboral han sido actualizados correctamente.');
-                } else {
+        
+                if (!$vacaciones->save()) {
                     Yii::$app->session->setFlash('error', 'Hubo un error al actualizar los días de vacaciones.');
                 }
     
-                $url = Url::to(['view', 'id' => $model->id]) . '#informacion_laboral';
-                return $this->redirect($url);
+                // Manejar el cambio en el puesto
+                $nuevoPuesto = CatPuesto::findOne($informacion_laboral->cat_puesto_id);
+                $juntaGobiernoModel = JuntaGobierno::findOne(['empleado_id' => $model->id, 'cat_direccion_id' => $informacion_laboral->cat_direccion_id]);
+    
+                // Verifica si el puesto requiere estar en junta_gobierno
+                if ($nuevoPuesto) {
+                    $nuevoNivelJerarquico = $this->determinarNivelJerarquico($nuevoPuesto->nombre_puesto);
+    
+                    if ($nuevoNivelJerarquico !== 'Comun') {
+                        // Si no existe en junta_gobierno, se agrega
+                        if (!$juntaGobiernoModel) {
+                            $juntaGobiernoModel = new JuntaGobierno();
+                            $juntaGobiernoModel->empleado_id = $model->id;
+                            $juntaGobiernoModel->nivel_jerarquico = $nuevoNivelJerarquico;
+                            $juntaGobiernoModel->cat_departamento_id = $informacion_laboral->cat_departamento_id;
+                            $juntaGobiernoModel->cat_direccion_id = $informacion_laboral->cat_direccion_id;
+                            if (!$juntaGobiernoModel->save()) {
+                                Yii::$app->session->setFlash('error', 'Error al guardar JuntaGobierno.');
+                            }
+                        }
+                    } else {
+                        // Si el puesto no requiere estar en junta_gobierno, eliminar del registro
+                        if ($juntaGobiernoModel) {
+                            $juntaGobiernoModel->delete();
+                        }
+                    }
+                }
+                
+                Yii::$app->session->setFlash('success', 'Los cambios de la información laboral han sido actualizados correctamente.');
             } else {
                 Yii::$app->session->setFlash('error', 'Hubo un error al actualizar la información laboral del trabajador.');
-                $url = Url::to(['view', 'id' => $model->id]) . '#informacion_laboral';
-                return $this->redirect($url);
             }
+    
+            $url = Url::to(['view', 'id' => $model->id]) . '#informacion_laboral';
+            return $this->redirect($url);
         } else {
             Yii::$app->session->setFlash('error', 'Hubo un error al cargar los datos de la solicitud.');
             $url = Url::to(['view', 'id' => $model->id]) . '#informacion_laboral';
             return $this->redirect($url);
         }
     }
+
+    protected function determinarNivelJerarquico($nombrePuesto)
+{
+    if (stripos($nombrePuesto, 'DIRECTOR') !== false) {
+        return 'Director';
+    } elseif (stripos($nombrePuesto, 'JEFE DE UNIDAD') !== false) {
+        return 'Jefe de unidad';
+    } elseif (stripos($nombrePuesto, 'JEFE DE DEPARTAMENTO') !== false) {
+        return 'Jefe de departamento';
+    }
+    return 'Comun';
+}
+
     
-
-
-
 
     public function actionActualizarPrimerPeriodo($id)
     {

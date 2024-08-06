@@ -12,6 +12,9 @@ use app\models\Solicitud;
 use app\models\Empleado;
 use app\models\Usuario;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
+
+
 /**
  * CitaMedicaController implements the CRUD actions for CitaMedica model.
  */
@@ -242,11 +245,47 @@ class CitaMedicaController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
+        $model = $this->findModel($id);
+        $empleado = Empleado::findOne($model->empleado_id);
+        if ($model === null) {
+            Yii::$app->session->setFlash('error', 'El registro de permiso no fue encontrado.');
+            return $this->redirect(['index']);
+        }
+        
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            // Obtener el ID de la solicitud asociada antes de eliminar el permiso
+            $solicitudId = $model->solicitud_id;
+            
+            // Eliminar el registro de PermisoFueraTrabajo
+            if ($model->delete()) {
+                // Buscar y eliminar el registro asociado en la tabla Solicitud
+                $solicitudModel = Solicitud::findOne($solicitudId);
+                if ($solicitudModel !== null) {
+                    $solicitudModel->delete();
+                }
+                $transaction->commit();
+                
+                Yii::$app->session->setFlash('success', 'El registro de permiso y la solicitud asociada han sido eliminados correctamente.');
+            } else {
+                Yii::$app->session->setFlash('error', 'Hubo un error al eliminar el registro de permiso.');
+            }
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            Yii::$app->session->setFlash('error', 'Hubo un error al eliminar el registro: ' . $e->getMessage());
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+            Yii::$app->session->setFlash('error', 'Hubo un error al eliminar el registro: ' . $e->getMessage());
+        }
+        
+        if (Yii::$app->user->can('gestor-rh')) {
+            Yii::$app->session->setFlash('success', 'El registro se ha eliminado exitosamente.');
+            $url = Url::to(['historial', 'empleado_id' => $empleado->id]) ;
+            return $this->redirect($url);
+        } else {
+            return $this->redirect(['index']);
+        }
     }
-
     /**
      * Finds the CitaMedica model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
