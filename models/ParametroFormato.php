@@ -29,6 +29,8 @@ class ParametroFormato extends \yii\db\ActiveRecord
         return [
             [['limite_anual'], 'integer'],
             [['tipo_permiso'], 'string', 'max' => 255],
+            [['tipo_permiso'], 'unique', 'message' => 'Ya se configuró este formato.'],
+
         ];
     }
 

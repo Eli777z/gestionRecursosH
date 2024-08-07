@@ -2,7 +2,8 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
-
+use yii\widgets\Pjax;
+use kartik\select2\Select2;
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\ParametroFormatoSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -10,31 +11,88 @@ use yii\grid\GridView;
 $this->title = Yii::t('app', 'Parametro Formatos');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-md-12">
+<div class="row justify-content-center">
+<div class="col-md-8">
             <div class="card">
+            <div class="card-header bg-info text-white">
+                    <h3>Limites de formatos:</h3>
+                    <?= Html::a('Agregar nuevo <i class="fa fa-plus-circle"></i> ', ['//parametro-formato/create'], ['class' => 'btn btn-dark fa-lg mt-3 ml-3'])?>
+                   
+
+
+                </div>
                 <div class="card-body">
                     <div class="row mb-2">
                         <div class="col-md-12">
-                            <?= Html::a(Yii::t('app', 'Create Parametro Formato'), ['create'], ['class' => 'btn btn-success']) ?>
+                       
+
                         </div>
                     </div>
-
-
-                    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-
+<?php Pjax::begin();?>
                     <?= GridView::widget([
                         'dataProvider' => $dataProvider,
                         'filterModel' => $searchModel,
                         'columns' => [
                             ['class' => 'yii\grid\SerialColumn'],
 
-                            'id',
-                            'tipo_permiso',
-                            'limite_anual',
+                            //'id',
+                            //'tipo_permiso',
 
-                            ['class' => 'hail812\adminlte3\yii\grid\ActionColumn'],
+                            [
+                                'attribute' => 'tipo_permiso',
+                                'label' => 'Tipo de formato:',
+                                'value' => function ($model) {
+                                    return $model->tipo_permiso;
+                                },
+                                'filter' => Select2::widget([
+                                    'model' => $searchModel,
+                                    'attribute' => 'tipo_permiso',
+                                    'data' => \yii\helpers\ArrayHelper::map(\app\models\ParametroFormato::find()->select(['tipo_permiso'])->distinct()->all(), 'tipo_permiso', 'tipo_permiso'),
+                                    'options' => ['placeholder' => 'Buscar Formato'],
+                                    'pluginOptions' => [
+                                        'allowClear' => true
+                                    ],
+                                    'theme' => Select2::THEME_KRAJEE_BS3, 
+                                ]),
+                                'contentOptions' => ['class' => 'small-font'], 
+                            ],
+                          ///  'limite_anual',
+
+                            [
+                                'attribute' => 'limite_anual',
+                                'label' => 'Limite Anual',
+                              
+                                'filter' => false,
+                                'value' => function ($model) {
+                                    
+                                    return $model->limite_anual;
+                                },
+                            ],
+
+                             // Otras columnas que desees mostrar...
+                             [
+                                'class' => 'hail812\adminlte3\yii\grid\ActionColumn',
+                                'template' => ' {update} {delete}',
+                                'buttons' => [
+                                    
+                                 //   'view' => function ($url, $model, $key) {
+                                   //     return Html::a('<i class="fa fa-eye"></i>', ['//parametro-formato/view', 'id' => $model->id], ['title' => 'Ver', 'class' => 'btn btn-primary btn-xs']);
+                                   // },
+                                    'update' => function ($url, $model, $key) {
+                                        return Html::a('<i class="fa fa-pen"></i>', ['//parametro-formato/update', 'id' => $model->id], ['title' => 'Editar', 'class' => 'btn btn-warning btn-xs']);
+                                    },
+                                    'delete' => function ($url, $model, $key) {
+                                        return Html::a('<i class="fa fa-trash"></i>', ['//parametro-formato/delete', 'id' => $model->id], [
+                                            'title' => 'Eliminar',
+                                            'class' => 'btn btn-danger btn-xs',
+                                            'data-confirm' => '¿Estás seguro de eliminar este elemento?',
+                                            'data-method' => 'post',
+                                        ]);
+                                    },
+                                ],
+                            ],
                         ],
                         'summaryOptions' => ['class' => 'summary mb-2'],
                         'pager' => [
@@ -42,13 +100,12 @@ $this->params['breadcrumbs'][] = $this->title;
                         ]
                     ]); ?>
 
+<?php Pjax::end(); ?>
 
-                </div>
-                <!--.card-body-->
-            </div>
-            <!--.card-->
-        </div>
-        <!--.col-md-12-->
-    </div>
-    <!--.row-->
+</div>
+<!--.card-body-->
+</div>
+<!--.card-->
+</div>
+</div>
 </div>

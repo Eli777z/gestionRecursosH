@@ -1,6 +1,7 @@
 <?php
 /* @var $content string */
 
+use yii\bootstrap4\Breadcrumbs as Bootstrap4Breadcrumbs;
 use yii\bootstrap5\Breadcrumbs;
 
 ?>
@@ -27,7 +28,7 @@ use yii\bootstrap5\Breadcrumbs;
             ]
         ]);
     } elseif (Yii::$app->user->can('gestor-rh')) { // Verifica si el usuario tiene el rol 'gestor-rh'
-        echo Breadcrumbs::widget([
+        echo Bootstrap4Breadcrumbs::widget([
             'homeLink' => ['url' => ['/site/portalgestionrh'], 'label' => 'Inicio'],
             'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
             'options' => [

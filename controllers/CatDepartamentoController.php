@@ -69,7 +69,7 @@ class CatDepartamentoController extends Controller
         $model = new CatDepartamento();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['create']);
+            return $this->redirect(['//site/configuracion#conf-departamentos']);
         }
 
         return $this->render('create', [
@@ -89,7 +89,7 @@ class CatDepartamentoController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['//site/configuracion#conf-departamentos']);
         }
 
         return $this->render('update', [
@@ -121,7 +121,7 @@ class CatDepartamentoController extends Controller
     
        
 
-        return $this->redirect(['index']);
+        return $this->redirect(['//site/configuracion#conf-departamentos']);
     }
 
     /**

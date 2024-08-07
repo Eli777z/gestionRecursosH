@@ -13,20 +13,27 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 
 <div class="container-fluid">
-    <div class="card">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-12">
-                    <p>
-                        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-                        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
-                            'class' => 'btn btn-danger',
-                            'data' => [
-                                'confirm' => 'Are you sure you want to delete this item?',
-                                'method' => 'post',
-                            ],
-                        ]) ?>
-                    </p>
+<div class="row justify-content-center">
+<div class="col-md-8">
+            <div class="card">
+            <div class="card-header bg-info text-white">
+                    <h3>Nombramiento:</h3>
+                    <?php  echo Html::a('<i class="fa fa-chevron-left"></i> Volver', ['//site/configuracion'], [
+                'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
+                'encode' => false,
+            ]);
+
+            ?>
+
+
+                </div>
+                <div class="card-body">
+                    <div class="row mb-2">
+                        <div class="col-md-12">
+                       
+
+                        </div>
+                    </div>
                     <?= DetailView::widget([
                         'model' => $model,
                         'attributes' => [
@@ -34,12 +41,12 @@ $this->params['breadcrumbs'][] = $this->title;
                             'nombre_puesto',
                         ],
                     ]) ?>
-                </div>
-                <!--.col-md-12-->
-            </div>
-            <!--.row-->
-        </div>
-        <!--.card-body-->
-    </div>
-    <!--.card-->
+          </div>
+<!--.card-body-->
+</div>
+<!--.card-->
+</div>
+<!--.col-md-12-->
+</div>
+<!--.row-->
 </div>

@@ -57,10 +57,7 @@ class CatPuestoSearch extends CatPuesto
         }
 
         // grid filtering conditions
-        $query->andFilterWhere([
-            'id' => $this->id,
-        ]);
-
+        
         $query->andFilterWhere(['like', 'nombre_puesto', $this->nombre_puesto]);
 
         return $dataProvider;

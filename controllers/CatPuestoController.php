@@ -67,7 +67,7 @@ class CatPuestoController extends Controller
         $model = new CatPuesto();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index']);
+            return $this->redirect(['//site/configuracion#conf-puestos']);
         }
 
         return $this->render('create', [
@@ -87,7 +87,7 @@ class CatPuestoController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['//site/configuracion#conf-puestos']);
         }
 
         return $this->render('update', [
@@ -106,7 +106,7 @@ class CatPuestoController extends Controller
     {
         $this->findModel($id)->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect(['//site/configuracion#conf-puestos']);
     }
 
     /**

@@ -51,10 +51,11 @@ use kartik\select2\Select2;
                                     </div>
 
                                     <li class="dropdown-divider"></li>
-                                    <?php Pjax::begin(); ?>
+                                  
 
                                     <?php if (Yii::$app->user->can('solicitudes-medicas-view-medico')) { ?>
 <div class="row">
+<?php Pjax::begin(); ?>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
@@ -131,13 +132,14 @@ use kartik\select2\Select2;
         'pager' => [
             'class' => 'yii\bootstrap4\LinkPager',
         ],
-    ]); ?>
+    ]); ?>     <?php Pjax::end(); ?>
+    
  
 </div>
 
 <?php } elseif (Yii::$app->user->can('solicitudes-medicas-view-empleado')) { ?>
 <div class="row">
-
+<?php Pjax::begin(); ?>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
@@ -207,12 +209,13 @@ use kartik\select2\Select2;
             'class' => 'yii\bootstrap4\LinkPager',
         ],
     ]); ?>
+    <?php Pjax::end(); ?>
   
 </div>
 
 <?php } elseif (Yii::$app->user->can('ver-solicitudes-formatos')) { ?>
 <div class="row">
-
+<?php Pjax::begin(); ?>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
@@ -307,10 +310,10 @@ use kartik\select2\Select2;
             'class' => 'yii\bootstrap4\LinkPager',
         ],
     ]); ?>
- 
+     <?php Pjax::end(); ?>
 </div>
 <?php } ?>
-<?php Pjax::end(); ?>
+
 
                                 </div>
                             </div>

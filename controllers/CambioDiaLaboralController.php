@@ -154,7 +154,7 @@ class CambioDiaLaboralController extends Controller
                     $solicitudModel->comentario = ''; 
                     $solicitudModel->fecha_aprobacion = null; 
                     $solicitudModel->fecha_creacion = date('Y-m-d H:i:s'); 
-                    $solicitudModel->nombre_formato = 'CAMBIO DE DÍA LABORAL';
+                    $solicitudModel->nombre_formato = 'CAMBIO DE DIA LABORAL';
                     if ($solicitudModel->save()) {
                         $model->solicitud_id = $solicitudModel->id;
     

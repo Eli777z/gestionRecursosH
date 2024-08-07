@@ -31,9 +31,14 @@ use app\models\Usuario;
 use app\models\Notificacion;
 use app\models\Empleado;
 use app\models\CambiarContrasenaForm;
+use app\models\CatDepartamentoSearch;
 use app\models\DocumentoMedico;
 use yii\helpers\ArrayHelper;
 use app\models\JuntaGobierno;
+use app\models\ParametroFormatoSearch;
+use app\models\CatPuestoSearch;
+use yii\widgets\Breadcrumbs;
+
 class SiteController extends Controller
 
 {
@@ -215,6 +220,32 @@ class SiteController extends Controller
             'notificaciones' => $notificaciones,
         ]);
     }
+
+
+    public function actionConfiguracion()
+    {
+        // Para el GridView de Parámetro Formato
+        $parametroFormatoSearchModel = new ParametroFormatoSearch();
+        $parametroFormatoDataProvider = $parametroFormatoSearchModel->search(Yii::$app->request->queryParams);
+    
+        // Para el GridView de Cat Puesto
+        $catPuestoSearchModel = new CatPuestoSearch();
+        $catPuestoDataProvider = $catPuestoSearchModel->search(Yii::$app->request->queryParams);
+
+    
+        $catDepartamentoSearchModel = new CatDepartamentoSearch();
+        $catDepartamentoDataProvider = $catDepartamentoSearchModel->search(Yii::$app->request->queryParams);
+    
+        return $this->render('configuracion', [
+            'parametroFormatoSearchModel' => $parametroFormatoSearchModel,
+            'parametroFormatoDataProvider' => $parametroFormatoDataProvider,
+            'catPuestoSearchModel' => $catPuestoSearchModel,
+            'catPuestoDataProvider' => $catPuestoDataProvider,
+            'catDepartamentoSearchModel' => $catDepartamentoSearchModel,
+            'catDepartamentoDataProvider' => $catDepartamentoDataProvider
+        ]);
+    }
+    
 
     /**
      * Logout action.

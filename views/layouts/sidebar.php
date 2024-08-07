@@ -63,6 +63,9 @@ use yii\helpers\Url;
                     ['label' => 'Gii',  'icon' => 'file-code', 'url' => ['/gii'], 'target' => '_blank'],
                     //['label' => 'Administrador', 'icon' => 'user-tie', 'url' => ['/admin']],
                  
+                    ['label' => 'Configuración',  'icon' => 'wrench', 'url' => ['site/configuracion']],
+
+
                 ],
             ]);
         }elseif (Yii::$app->user->can('medico')) {
