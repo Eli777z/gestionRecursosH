@@ -51,7 +51,9 @@ class CambioPeriodoVacacional extends \yii\db\ActiveRecord
             [['año'], 'string', 'max' => 8],
             [['dateRange'], 'required', 'message' => 'El rango de fechas no puede estar vacío.'], // Regla y mensaje personalizado para dateRange
 
-            [['motivo', 'primera_vez', 'numero_periodo', 'año'], 'required']
+            [['motivo', 'primera_vez', 'numero_periodo', 'año'], 'required'],
+            ['empleado_id', 'validarLimiteAnual'], // Nueva regla de validación
+
 
         ];
     }
@@ -110,4 +112,26 @@ class CambioPeriodoVacacional extends \yii\db\ActiveRecord
             return false;
         }
     }
+
+    
+public function validarLimiteAnual($attribute, $params)
+{
+    $añoActual = date('Y');
+    $empleado = Empleado::findOne($this->empleado_id);
+    $tipoContratoId = $empleado->informacionLaboral->cat_tipo_contrato_id;
+
+    $contadorPermisos = static::find()
+        ->where(['empleado_id' => $this->empleado_id])
+        ->andWhere(['between', 'fecha_fin_periodo', "$añoActual-01-01", "$añoActual-12-31"])
+        ->count();
+
+    $limiteAnual = ParametroFormato::find()
+        ->where(['tipo_permiso' => 'CAMBIO DE PERIODO VACACIONAL', 'cat_tipo_contrato_id' => $tipoContratoId])
+        ->one()->limite_anual;
+
+    if ($contadorPermisos >= $limiteAnual) {
+        $this->addError($attribute, 'Has alcanzado el límite anual de cambio de periodo vacacional para tu tipo de contrato.');
+    }
+}
+
 }

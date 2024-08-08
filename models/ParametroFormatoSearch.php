@@ -17,7 +17,7 @@ class ParametroFormatoSearch extends ParametroFormato
     public function rules()
     {
         return [
-            [['id', 'limite_anual'], 'integer'],
+            [['id', 'limite_anual', 'cat_tipo_contrato_id'], 'integer'],
             [['tipo_permiso'], 'safe'],
         ];
     }
@@ -60,6 +60,7 @@ class ParametroFormatoSearch extends ParametroFormato
         $query->andFilterWhere([
             'id' => $this->id,
             'limite_anual' => $this->limite_anual,
+            'cat_tipo_contrato_id' => $this->cat_tipo_contrato_id,
         ]);
 
         $query->andFilterWhere(['like', 'tipo_permiso', $this->tipo_permiso]);

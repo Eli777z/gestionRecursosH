@@ -14,7 +14,8 @@ $this->title = 'Create Cambio Dia Laboral';
                         'model' => $model,
                         'motivoFechaPermisoModel' => $motivoFechaPermisoModel,
                         'empleado' => $empleado, // Pasar empleado a la vista
-
+                        'permisosUsados' => $permisosUsados,
+                        'permisosDisponibles' => $permisosDisponibles,
                         'solicitudModel' => $solicitudModel,
                     ]) ?>
          

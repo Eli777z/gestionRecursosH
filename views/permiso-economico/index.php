@@ -1,9 +1,11 @@
 <?php
 
+use yii\bootstrap5\Alert;
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
 use yii\web\View;
+
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\PermisoFueraTrabajoSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -33,7 +35,21 @@ $this->title = 'Permiso Economico';
                     <div class="row mb-2">
                         <div class="col-md-12">
                        
-
+                        <?php
+                                foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
+                                    if ($type === 'error') {
+                                        echo Alert::widget([
+                                            'options' => ['class' => 'alert-danger'],
+                                            'body' => $message,
+                                        ]);
+                                    } else {
+                                        echo Alert::widget([
+                                            'options' => ['class' => 'alert-' . $type],
+                                            'body' => $message,
+                                        ]);
+                                    }
+                                }
+                                ?>
                         </div>
                     </div>
 <?php Pjax::begin();?>

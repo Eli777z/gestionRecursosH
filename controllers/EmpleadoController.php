@@ -291,7 +291,7 @@ class EmpleadoController extends Controller
             if ($post = Yii::$app->request->post('AntecedenteHereditario')) {
                 $observacionGeneral = Yii::$app->request->post('observacion_general');
 
-                AntecedenteHereditario::deleteAll(['expediente_medico_id' => $expedienteMedico->id]);
+              //  AntecedenteHereditario::deleteAll(['expediente_medico_id' => $expedienteMedico->id]);
 
                 foreach ($post as $catAntecedenteId => $parentezcos) {
                     foreach ($parentezcos as $parentezco => $value) {
@@ -957,11 +957,11 @@ class EmpleadoController extends Controller
                             throw new \yii\db\Exception('Error al guardar Empleado');
                         }
                     } else {
-                        Yii::$app->session->setFlash('error', 'Error al guardar ExpedienteMedico.');
-                        throw new \yii\db\Exception('Error al guardar ExpedienteMedico');
+                       // Yii::$app->session->setFlash('error', 'Error al guardar ExpedienteMedico.');
+                       // throw new \yii\db\Exception('Error al guardar ExpedienteMedico');
                     }
                 } else {
-                    Yii::$app->session->setFlash('error', 'Error al guardar AntecedenteHereditario.');
+                    //Yii::$app->session->setFlash('error', 'Error al guardar AntecedenteHereditario.');
                     throw new \yii\db\Exception('Error al guardar AntecedenteHereditario');
                 }
             } else {

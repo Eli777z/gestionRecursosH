@@ -13,36 +13,34 @@ use Yii;
  */
 class ParametroFormato extends \yii\db\ActiveRecord
 {
-    /**
-     * {@inheritdoc}
-     */
     public static function tableName()
     {
         return 'parametro_formato';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rules()
     {
         return [
-            [['limite_anual'], 'integer'],
+            [['limite_anual', 'cat_tipo_contrato_id'], 'integer'],
             [['tipo_permiso'], 'string', 'max' => 255],
-            [['tipo_permiso'], 'unique', 'message' => 'Ya se configuró este formato.'],
+            [['cat_tipo_contrato_id'], 'exist', 'skipOnError' => true, 'targetClass' => CatTipoContrato::class, 'targetAttribute' => ['cat_tipo_contrato_id' => 'id']],
 
+            [['tipo_permiso', 'cat_tipo_contrato_id'], 'unique', 'targetAttribute' => ['tipo_permiso', 'cat_tipo_contrato_id'], 'message' => 'Ya se configuró este formato para este tipo de contrato.'],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels()
     {
         return [
             'id' => 'ID',
             'tipo_permiso' => 'Tipo Permiso',
-            'limite_anual' => 'Limite Anual',
+            'limite_anual' => 'Límite Anual',
+            'cat_tipo_contrato_id' => 'Tipo de Contrato',
         ];
+    }
+
+    public function getCatTipoContrato()
+    {
+        return $this->hasOne(CatTipoContrato::class, ['id' => 'cat_tipo_contrato_id']);
     }
 }

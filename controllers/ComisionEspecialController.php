@@ -16,7 +16,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use Mpdf\Mpdf;
 use yii\helpers\Url;
 
-
+use app\models\ParametroFormato;
 use PhpOffice\PhpSpreadsheet\Chart\Layout;
 use PhpOffice\PhpSpreadsheet\Writer\Html;
 
@@ -109,14 +109,12 @@ class ComisionEspecialController extends Controller
     public function actionCreate($empleado_id = null)
     {
         $this->layout = "main-trabajador";
-
+    
         $model = new ComisionEspecial();
         $motivoFechaPermisoModel = new MotivoFechaPermiso();
         $solicitudModel = new Solicitud();
-        //$motivoFechaPermisoModel->fecha_permiso = date('Y-m-d');
-        //  $model->fecha_a_reponer = date('Y-m-d');
         $usuarioId = Yii::$app->user->identity->id;
-
+    
         if ($empleado_id) {
             $empleado = Empleado::findOne($empleado_id);
         } else {
@@ -129,21 +127,49 @@ class ComisionEspecialController extends Controller
             Yii::$app->session->setFlash('error', 'No se pudo encontrar el empleado.');
             return $this->redirect(['index']);
         }
-
+    
+        $year = date('Y');
+        $tipoContratoId = $empleado->informacionLaboral->cat_tipo_contrato_id;
+    
+        $parametroFormato = ParametroFormato::find()
+            ->where(['tipo_permiso' => 'COMISION ESPECIAL', 'cat_tipo_contrato_id' => $tipoContratoId])
+            ->one();
+        
+        if (!$parametroFormato) {
+            Yii::$app->session->setFlash('error', 'No se pudo encontrar el parámetro de formato para tu tipo de contrato.');
+           return $this->redirect(['index']);
+        }
+    
+        $totalPermisosAnuales = $parametroFormato->limite_anual;
+    
+        // Contar los permisos usados en el año actual basados en la fecha del permiso de la relación motivo_fecha_permiso
+        $permisosUsados = ComisionEspecial::find()
+            ->joinWith('motivoFechaPermiso') // Unir con la tabla motivo_fecha_permiso
+            ->where(['comision_especial.empleado_id' => $empleado->id])
+            ->andWhere(['between', 'motivo_fecha_permiso.fecha_permiso', "$year-01-01", "$year-12-31"])
+            ->count();
+    
+        $permisosDisponibles = $totalPermisosAnuales - $permisosUsados;
+    
+        // Verificar si se alcanzó el límite de permisos
+        if ($permisosDisponibles <= 0) {
+            Yii::$app->session->setFlash('error', 'Has alcanzado el límite anual de permisos.');
+           // return $this->redirect(['index']);
+        }
+    
         if ($motivoFechaPermisoModel->load(Yii::$app->request->post())) {
             $transaction = Yii::$app->db->beginTransaction();
             try {
                 if ($motivoFechaPermisoModel->save()) {
                     $model->motivo_fecha_permiso_id = $motivoFechaPermisoModel->id;
-
-
+    
                     $solicitudModel->empleado_id = $empleado->id;
                     $solicitudModel->status = 'Nueva';
                     $solicitudModel->comentario = '';
                     $solicitudModel->fecha_aprobacion = null;
                     $solicitudModel->fecha_creacion = date('Y-m-d H:i:s');
                     $solicitudModel->nombre_formato = 'COMISION ESPECIAL';
-
+    
                     if ($solicitudModel->save()) {
                         $model->solicitud_id = $solicitudModel->id;
                         $model->load(Yii::$app->request->post());
@@ -151,13 +177,11 @@ class ComisionEspecialController extends Controller
                             $jefeDepartamento = JuntaGobierno::findOne($model->jefe_departamento_id);
                             $model->nombre_jefe_departamento = $jefeDepartamento ? $jefeDepartamento->empleado->profesion . ' ' . $jefeDepartamento->empleado->nombre . ' ' . $jefeDepartamento->empleado->apellido : null;
                         }
-
-
+    
                         if ($model->save()) {
                             $transaction->commit();
                             Yii::$app->session->setFlash('success', 'Su solicitud ha sido generada exitosamente.');
-
-                          
+    
                             $notificacion = new Notificacion();
                             $notificacion->usuario_id = $model->empleado->usuario_id;
                             $notificacion->mensaje = 'Tienes una nueva solicitud pendiente de revisión.';
@@ -182,17 +206,17 @@ class ComisionEspecialController extends Controller
                 Yii::$app->session->setFlash('error', 'Hubo un error al crear el registro: ' . $e->getMessage());
             }
         }
-
+    
         return $this->render('create', [
             'model' => $model,
             'motivoFechaPermisoModel' => $motivoFechaPermisoModel,
             'solicitudModel' => $solicitudModel,
             'empleado' => $empleado, // Pasar empleado a la vista
-
+            'permisosUsados' => $permisosUsados,
+            'permisosDisponibles' => $permisosDisponibles,
         ]);
     }
-
-
+    
     /**
      * Updates an existing ComisionEspecial model.
      * If update is successful, the browser will be redirected to the 'view' page.

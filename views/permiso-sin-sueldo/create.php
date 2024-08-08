@@ -17,6 +17,7 @@ $this->title = 'Create Permiso Sin Sueldo';
                          'noPermisoAnterior' => $noPermisoAnterior, 
                          'fechaPermisoAnterior' => $fechaPermisoAnterior,
                          'empleado' => $empleado, // Pasar empleado a la vista
-
+                         'permisosUsados' => $permisosUsados,
+                         'permisosDisponibles' => $permisosDisponibles,
                     ]) ?>
             

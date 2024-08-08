@@ -141,14 +141,17 @@ public function actionHistorial($empleado_id= null)
      
          // Calcular permisos usados y disponibles
          $year = date('Y');
+         $tipoContratoId = $empleado->informacionLaboral->cat_tipo_contrato_id;
+
          $parametroFormato = ParametroFormato::find()
-             ->where(['tipo_permiso' => 'PERMISO FUERA DEL TRABAJO'])
+             ->where(['tipo_permiso' => 'PERMISO FUERA DEL TRABAJO', 'cat_tipo_contrato_id' => $tipoContratoId])
              ->one();
          
          if (!$parametroFormato) {
-             Yii::$app->session->setFlash('error', 'No se pudo encontrar el parámetro de formato.');
+             Yii::$app->session->setFlash('error', 'No se pudo encontrar el parámetro de formato para tu tipo de contrato.');
              return $this->redirect(['index']);
          }
+         
      
          $totalPermisosAnuales = $parametroFormato->limite_anual;
      

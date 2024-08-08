@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
 use yii\web\View;
+use yii\bootstrap5\Alert;
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\PermisoFueraTrabajoSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -28,11 +29,26 @@ $this->title = 'Cambio de Día Laboral';
 
 
                 </div>
+               
                 <div class="card-body">
                     <div class="row mb-2">
                         <div class="col-md-12">
                        
-
+                        <?php
+                                foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
+                                    if ($type === 'error') {
+                                        echo Alert::widget([
+                                            'options' => ['class' => 'alert-danger'],
+                                            'body' => $message,
+                                        ]);
+                                    } else {
+                                        echo Alert::widget([
+                                            'options' => ['class' => 'alert-' . $type],
+                                            'body' => $message,
+                                        ]);
+                                    }
+                                }
+                                ?>
                         </div>
                     </div>
 <?php Pjax::begin();?>

@@ -52,6 +52,7 @@ class PermisoFueraTrabajo extends \yii\db\ActiveRecord
             [['fecha_hora_reponer'], 'safe'],
             [['motivo_fecha_permiso_id', 'hora_salida', 'hora_regreso', 'fecha_a_reponer', 'horario_fecha_a_reponer'], 'required'],
             ['empleado_id', 'validarLimiteAnual'], // Nueva regla de validación
+        
         ];
     }
 
@@ -120,22 +121,28 @@ class PermisoFueraTrabajo extends \yii\db\ActiveRecord
     }
 
 
-    public function validarLimiteAnual($attribute, $params)
+
+
+public function validarLimiteAnual($attribute, $params)
 {
     $añoActual = date('Y');
+    $empleado = Empleado::findOne($this->empleado_id);
+    $tipoContratoId = $empleado->informacionLaboral->cat_tipo_contrato_id;
+
     $contadorPermisos = static::find()
         ->where(['empleado_id' => $this->empleado_id])
         ->andWhere(['between', 'fecha_a_reponer', "$añoActual-01-01", "$añoActual-12-31"])
         ->count();
 
     $limiteAnual = ParametroFormato::find()
-        ->where(['tipo_permiso' => 'PERMISO FUERA DEL TRABAJO'])
+        ->where(['tipo_permiso' => 'PERMISO FUERA DEL TRABAJO', 'cat_tipo_contrato_id' => $tipoContratoId])
         ->one()->limite_anual;
 
     if ($contadorPermisos >= $limiteAnual) {
-        $this->addError($attribute, 'Has alcanzado el límite anual de permisos fuera del trabajo.');
+        $this->addError($attribute, 'Has alcanzado el límite anual de permisos fuera del trabajo para tu tipo de contrato.');
     }
 }
+
 
 
 }

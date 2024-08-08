@@ -48,10 +48,10 @@ $jefesDirectores = ArrayHelper::map(
         'action' => ['actualizar-informacion-laboral', 'id' => $model->id],
         'options' => ['id' => 'laboral-info-form']
     ]); ?>
- <div id="loading-spinner-laboral" style="display: none;">
-<i class="fa fa-spinner fa-spin fa-2x" style="color: #000000;"></i> Procesando...
-</div>
-  
+    <div id="loading-spinner-laboral" style="display: none;">
+        <i class="fa fa-spinner fa-spin fa-2x" style="color: #000000;"></i> Procesando...
+    </div>
+
     <div class="card-header bg-info text-white">
         <h3>Información Laboral</h3>
         <?php if (Yii::$app->user->can('modificar-informacion-empleados')) : ?>
@@ -137,11 +137,8 @@ $jefesDirectores = ArrayHelper::map(
                         'pluginOptions' => [
                             'allowClear' => true
                         ],
-                        'theme' => Select2::THEME_BOOTSTRAP,
-                        'pluginEvents' => [
-                            'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
-                            'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
-                        ],
+                        'theme' => Select2::THEME_KRAJEE_BS3,
+
                     ])->label('Tipo de contrato', [
                         'title' => $model->informacionLaboral->cat_tipo_contrato_id ?
                             CatTipoContrato::findOne($model->informacionLaboral->cat_tipo_contrato_id)->nombre_tipo : ''
@@ -171,10 +168,9 @@ $jefesDirectores = ArrayHelper::map(
                     'pluginOptions' => [
                         'allowClear' => true
                     ],
-                    'theme' => Select2::THEME_BOOTSTRAP,
-                    'pluginEvents' => [
-                        'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
-                    ],
+                    'theme' => Select2::THEME_KRAJEE_BS3,
+
+
                 ])->label('Departamento', ['title' => $model->informacionLaboral->cat_departamento_id ?
                     CatDepartamento::findOne($model->informacionLaboral->cat_departamento_id)->nombre_departamento : '']) ?>
             </div>
@@ -199,34 +195,32 @@ $jefesDirectores = ArrayHelper::map(
 
             <div class="w-100"></div>
 
-<div class="col-6 col-sm-3">
-<?= $form->field($model->informacionLaboral, 'junta_gobierno_id')->widget(Select2::classname(), [
-'data' => $jefesDirectores,
-'options' => [
-'placeholder' => 'Seleccionar Jefe o director a cargo',
-'disabled' => true,
-'title' => isset($jefesDirectores[$model->informacionLaboral->junta_gobierno_id]) ? 
-$jefesDirectores[$model->informacionLaboral->junta_gobierno_id] : 'No asignado',
-],
-'pluginOptions' => [
-'allowClear' => true
-],
-'theme' => Select2::THEME_BOOTSTRAP,
-'pluginEvents' => [
-'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
-'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
-],
-])->label('Jefe inmediato', ['title' => isset($jefesDirectores[$model->informacionLaboral->junta_gobierno_id]) ? 
-      $jefesDirectores[$model->informacionLaboral->junta_gobierno_id] : 'No asignado']) ?>
-</div>
+            <div class="col-6 col-sm-3">
+                <?= $form->field($model->informacionLaboral, 'junta_gobierno_id')->widget(Select2::classname(), [
+                    'data' => $jefesDirectores,
+                    'options' => [
+                        'placeholder' => 'Seleccionar Jefe o director a cargo',
+                        'disabled' => true,
+                        'title' => isset($jefesDirectores[$model->informacionLaboral->junta_gobierno_id]) ?
+                            $jefesDirectores[$model->informacionLaboral->junta_gobierno_id] : 'No asignado',
+                    ],
+                    'pluginOptions' => [
+                        'allowClear' => true
+                    ],
+                    'theme' => Select2::THEME_KRAJEE_BS3, 
+
+                    
+                ])->label('Jefe inmediato', ['title' => isset($jefesDirectores[$model->informacionLaboral->junta_gobierno_id]) ?
+                    $jefesDirectores[$model->informacionLaboral->junta_gobierno_id] : 'No asignado']) ?>
+            </div>
 
 
             <div class="col-6 col-sm-3">
-                
+
 
                 <div class="form-group">
                     <label class="control-label" title="<?= $juntaDirectorDireccion ? Html::encode($juntaDirectorDireccion->empleado->nombre . ' ' . $juntaDirectorDireccion->empleado->apellido) : 'No Asignado' ?>">Director de dirección</label>
-                    <p id="director-label" title="<?= $juntaDirectorDireccion ? Html::encode($juntaDirectorDireccion->empleado->nombre . ' ' . $juntaDirectorDireccion->empleado->apellido) : 'No asignado'?>"><?= $juntaDirectorDireccion ? Html::encode($juntaDirectorDireccion->empleado->nombre . ' ' . $juntaDirectorDireccion->empleado->apellido) : 'No asignado'?></p>
+                    <p id="director-label" title="<?= $juntaDirectorDireccion ? Html::encode($juntaDirectorDireccion->empleado->nombre . ' ' . $juntaDirectorDireccion->empleado->apellido) : 'No asignado' ?>"><?= $juntaDirectorDireccion ? Html::encode($juntaDirectorDireccion->empleado->nombre . ' ' . $juntaDirectorDireccion->empleado->apellido) : 'No asignado' ?></p>
                 </div>
             </div>
 
@@ -242,11 +236,9 @@ $jefesDirectores[$model->informacionLaboral->junta_gobierno_id] : 'No asignado',
                     'pluginOptions' => [
                         'allowClear' => true
                     ],
-                    'theme' => Select2::THEME_BOOTSTRAP,
-                    'pluginEvents' => [
-                        'select2:opening' => "function() { $('.select2-selection__clear').html('<span class=\"fas fa-times\"></span>'); }",
-                        'select2:opening' => "function() { $('.select2-selection__clear').css('margin-left', '2px'); }",
-                    ],
+                    'theme' => Select2::THEME_KRAJEE_BS3, 
+
+                   
                 ])->label('Nombramiento', [
                     'title' => $model->informacionLaboral->cat_puesto_id ?
                         CatPuesto::findOne($model->informacionLaboral->cat_puesto_id)->nombre_puesto : ''
@@ -256,15 +248,15 @@ $jefesDirectores[$model->informacionLaboral->junta_gobierno_id] : 'No asignado',
 
             <?php if (Yii::$app->user->can('ver-informacion-completa-empleados')) : ?>
                 <div class="col-6 col-sm-4">
-<?= $form->field($model->informacionLaboral, 'numero_cuenta')->input('number', [
-'maxlength' => 18,
-'readonly' => true,
-'class' => 'form-control no-spinner',
-'title' => $model->informacionLaboral->numero_cuenta,
-])->label('Número de cuenta', [
-'title' => $model->informacionLaboral->numero_cuenta
-]) ?>
-</div>
+                    <?= $form->field($model->informacionLaboral, 'numero_cuenta')->input('number', [
+                        'maxlength' => 18,
+                        'readonly' => true,
+                        'class' => 'form-control no-spinner',
+                        'title' => $model->informacionLaboral->numero_cuenta,
+                    ])->label('Número de cuenta', [
+                        'title' => $model->informacionLaboral->numero_cuenta
+                    ]) ?>
+                </div>
 
 
             <?php endif; ?>
@@ -298,7 +290,7 @@ $jefesDirectores[$model->informacionLaboral->junta_gobierno_id] : 'No asignado',
 
             <?php ActiveForm::end(); ?>
             <?php
-$script = <<< JS
+            $script = <<< JS
 $(document).ready(function() {
 $('#laboral-info-form').on('beforeSubmit', function() {
 var button = $('#save-button-laboral');
@@ -311,8 +303,8 @@ return true; // Permite que el formulario se envíe
 });
 });
 JS;
-$this->registerJs($script);
-?>
+            $this->registerJs($script);
+            ?>
 
 
         </div>
@@ -355,8 +347,8 @@ $this->registerJs($script);
             document.getElementById('edit-button-laboral').style.display = 'block';
             document.getElementById('save-button-laboral').style.display = 'none';
             document.getElementById('cancel-button-laboral').style.display = 'none';
+
+            location.reload();
         });
     });
 </script>
-
-

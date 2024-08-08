@@ -8,13 +8,14 @@ use app\models\JuntaGobierno;
 use kartik\select2\Select2;
 use app\models\Empleado;
 use yii\bootstrap5\Alert;
-
+use yii\web\View;
 use froala\froalaeditor\FroalaEditorWidget;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\CambioPeriodoVacacional */
 /* @var $form yii\bootstrap4\ActiveForm */
 $currentDate = date('Y-m-d');
+$this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
 
 ?>
 <div class="container-fluid">
@@ -54,13 +55,17 @@ if ($empleadoActual->id === $empleado->id) {
 }
 ?>
 
-<div id="loading-spinner" style="display: none;">
-        <i class="fa fa-spinner fa-spin fa-2x"></i> Procesando...
-    </div>
-                </div>
 
+                </div>
+                <div id="loading-spinner-laboral" style="display: none;">
+        <i class="fa fa-spinner fa-spin fa-2x" style="color: #000000;"></i> Procesando...
+    </div>
                 <div class="card-body">
                     <div class="row">
+                    <div class="col-12">
+                                                <p><strong>Permisos usados:</strong> <?= $permisosUsados ?></p>
+                                                <p><strong>Permisos disponibles:</strong> <?= $permisosDisponibles ?></p>
+                                            </div>
                         <div class="col-md-12">
                             <div class="d-flex align-items-center mb-3">
                                 <?php
@@ -173,11 +178,11 @@ if ($empleadoActual->id === $empleado->id) {
 
 
                                         <?php ActiveForm::end(); ?>
-<?php
+                                        <?php
 $script = <<< JS
     $('#employee-form').on('beforeSubmit', function() {
         var button = $('#save-button-personal');
-        var spinner = $('#loading-spinner');
+        var spinner = $('#loading-spinner-laboral');
 
         button.prop('disabled', true); // Deshabilita el botón
         spinner.show(); // Muestra el spinner

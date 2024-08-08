@@ -10,10 +10,12 @@ use kartik\select2\Select2;
 use app\models\Empleado;
 use yii\bootstrap5\Alert;
 use froala\froalaeditor\FroalaEditorWidget;
-
+use yii\web\View;
 /* @var $this yii\web\View */
 /* @var $model app\models\PermisoFueraTrabajo */
 /* @var $form yii\bootstrap4\ActiveForm */
+$this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
+
 ?>
 <div class="container-fluid">
     <div class="row justify-content-center">
@@ -25,19 +27,15 @@ use froala\froalaeditor\FroalaEditorWidget;
                     <p>  Empleado: <?= $empleado->nombre.' '.$empleado->apellido ?></p>
 
                     <?php
-// Obtener el ID del usuario actual
 $usuarioActual = Yii::$app->user->identity;
 $empleadoActual = $usuarioActual->empleado;
 
-// Comparar el ID del empleado actual con el ID del empleado para el cual se está creando el registro
 if ($empleadoActual->id === $empleado->id) {
-    // El empleado está creando un registro para sí mismo
     echo Html::a('<i class="fa fa-home"></i> Inicio', ['site/portalempleado'], [
         'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
         'encode' => false,
     ]);
 } else {
-    // El empleado está creando un registro para otro empleado
     if (Yii::$app->user->can('crear-formatos-incidencias-empleados')) {
         echo Html::a('<i class="fa fa-chevron-left"></i> Volver', ['empleado/index'], [
             'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
@@ -51,11 +49,11 @@ if ($empleadoActual->id === $empleado->id) {
     }
 }
 ?>
-    <div id="loading-spinner" style="display: none;">
-        <i class="fa fa-spinner fa-spin fa-2x"></i> Procesando...
-    </div>
+   
                 </div>
-
+                <div id="loading-spinner-laboral" style="display: none;">
+        <i class="fa fa-spinner fa-spin fa-2x" style="color: #000000;"></i> Procesando...
+    </div>
                 <div class="card-body">
                     <div class="row">
 
@@ -95,25 +93,7 @@ if ($empleadoActual->id === $empleado->id) {
 
 <?= $form->field($motivoFechaPermisoModel, 'fecha_permiso')->input('date')->label('Fecha de permiso') ?>
                                             </div>
-                                            <?= $form->field($motivoFechaPermisoModel, 'motivo')->widget(FroalaEditorWidget::className(), [
-                                                                        'options' => [
-                                                                            'id' => 'exp-fisca'
-                                                                        ],
-                                                                        'clientOptions' => [
-                                                                            'toolbarInline' => false,
-                                                                            'theme' => 'royal', // optional: dark, red, gray, royal
-                                                                            'language' => 'es', // optional: ar, bs, cs, da, de, en_ca, en_gb, en_us ...
-                                                                            'height' => 200,
-                                                                            'pluginsEnabled' => [
-                                                                                'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
-                                                                                'draggable', 'emoticons', 'entities', 'fontFamily',
-                                                                                'fontSize', 'fullscreen', 'inlineStyle',
-                                                                                'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
-                                                                                'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
-                                                                            ]
-                                                                        ]
-                                                                    ])->label('Motivo:');?>
-<div class="col-6 col-sm-2">
+                                            <div class="col-6 col-sm-2">
 
 <?= $form->field($model, 'hora_salida')->input('time')->label('Hora de salida') ?>
 </div>
@@ -133,6 +113,25 @@ if ($empleadoActual->id === $empleado->id) {
 
 <?= $form->field($model, 'horario_fecha_a_reponer')->input('time')->label('Horario de fecha a reponer') ?>
 </div>
+                                            <?= $form->field($motivoFechaPermisoModel, 'motivo')->widget(FroalaEditorWidget::className(), [
+                                                                        'options' => [
+                                                                            'id' => 'exp-fisca'
+                                                                        ],
+                                                                        'clientOptions' => [
+                                                                            'toolbarInline' => false,
+                                                                            'theme' => 'royal', 
+                                                                            'language' => 'es', 
+                                                                            'height' => 200,
+                                                                            'pluginsEnabled' => [
+                                                                                'align', 'charCounter', 'codeBeautifier', 'codeView', 'colors',
+                                                                                'draggable', 'emoticons', 'entities', 'fontFamily',
+                                                                                'fontSize', 'fullscreen', 'inlineStyle',
+                                                                                'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle',
+                                                                                'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
+                                                                            ]
+                                                                        ]
+                                                                    ])->label('Motivo:');?>
+
 
 <div class="col-6 col-sm-4">
 
@@ -154,7 +153,7 @@ if ($empleadoActual->id === $empleado->id) {
 $script = <<< JS
     $('#employee-form').on('beforeSubmit', function() {
         var button = $('#save-button-personal');
-        var spinner = $('#loading-spinner');
+        var spinner = $('#loading-spinner-laboral');
 
         button.prop('disabled', true); // Deshabilita el botón
         spinner.show(); // Muestra el spinner
@@ -164,6 +163,7 @@ $script = <<< JS
 JS;
 $this->registerJs($script);
 ?>
+
 
                             </div>
                         </div>

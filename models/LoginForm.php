@@ -71,7 +71,7 @@ class LoginForm extends Model
            else
            {
             if(!$user->validatePassword($this->password))
-                $this->addError($attribute, 'Incorrect username or password.');
+                $this->addError($attribute, 'Usuario o Contraseña incorrecta.');
                 //echo "$user->status";
                  echo '<script>console.log("'.$user->status.'");</script>';
            

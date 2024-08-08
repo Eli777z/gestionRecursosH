@@ -2,7 +2,8 @@
 
 use yii\helpers\Html;
 use yii\bootstrap4\ActiveForm;
-
+use yii\helpers\ArrayHelper;
+use app\models\CatTipoContrato;
 /* @var $this yii\web\View */
 /* @var $model app\models\ParametroFormato */
 /* @var $form yii\bootstrap4\ActiveForm */
@@ -44,12 +45,21 @@ use yii\bootstrap4\ActiveForm;
     'PERMISO ECONOMICO' => 'PERMISO ECONOMICO',
     'PERMISO SIN GOCE DE SUELDO' => 'PERMISO SIN GOCE DE SUELDO',
     'CAMBIO DE PERIODO VACACIONAL' => 'CAMBIO DE PERIODO VACACIONAL',
-    'REPORTE DE TIEMPO EXTRA' => 'REPORTE DE TIEMPO EXTRA',
-    'REPORTE DE TIEMPO EXTRA GENERAL' => 'REPORTE DE TIEMPO EXTRA GENERAL'
+    //'REPORTE DE TIEMPO EXTRA' => 'REPORTE DE TIEMPO EXTRA',
+    //'REPORTE DE TIEMPO EXTRA GENERAL' => 'REPORTE DE TIEMPO EXTRA GENERAL'
     
 
    
 ], ['prompt' => 'Selecciona el nombre del formato'])->label('Formatos:') ?>
+</div>
+
+
+<div class="col-6 col-sm-6">
+
+<?= $form->field($model, 'cat_tipo_contrato_id')->dropDownList(
+    ArrayHelper::map(CatTipoContrato::find()->all(), 'id', 'nombre_tipo'),
+    ['prompt' => 'Selecciona el tipo de contrato']
+)->label('Tipo de Contrato') ?>
 </div>
 
     

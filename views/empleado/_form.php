@@ -24,9 +24,9 @@ $this->registerCssFile('@web/css/grid-view.css', ['position' => View::POS_HEAD])
         <div class="col-md-10">
             <div class="card">
                 <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data', 'id' => 'form-empleado']]); ?>
-                <div id="loading-spinner" style="color: #000000;">
-    <i class="fa fa-spinner fa-spin fa-2x" style="color: #000000;"></i> Procesando...
-</div>
+                <div id="loading-spinner-laboral" style="display: none;">
+        <i class="fa fa-spinner fa-spin fa-2x" style="color: #000000;"></i> Procesando...
+    </div>
                 <div class="card-header bg-primary text-white">
                     <h2>AÑADIR NUEVO EMPLEADO</h2>
                     <?= Html::submitButton('Guardar y enviar datos de usuario <i class="fa fa-save fa-md"></i>', [
@@ -166,7 +166,7 @@ $this->registerCssFile('@web/css/grid-view.css', ['position' => View::POS_HEAD])
                                         $script = <<< JS
     $('#form-empleado').on('beforeSubmit', function() {
         var button = $('#save-button-personal');
-        var spinner = $('#loading-spinner');
+        var spinner = $('#loading-spinner-laboral');
 
         button.prop('disabled', true); // Deshabilita el botón
         spinner.show(); // Muestra el spinner

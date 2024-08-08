@@ -19,7 +19,7 @@ use app\models\CambioDiaLaboralSearch;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Html;
 use yii\helpers\Url;
-
+use app\models\ParametroFormato;
 
 use Mpdf\Mpdf;
 /**
@@ -153,6 +153,36 @@ class PermisoEconomicoController extends Controller
     
         $model->no_permiso_anterior = $noPermisoAnterior;
         $model->fecha_permiso_anterior = $fechaPermisoAnterior;
+
+        $year = date('Y');
+        $tipoContratoId = $empleado->informacionLaboral->cat_tipo_contrato_id;
+    
+        $parametroFormato = ParametroFormato::find()
+            ->where(['tipo_permiso' => 'PERMISO ECONOMICO', 'cat_tipo_contrato_id' => $tipoContratoId])
+            ->one();
+        
+        if (!$parametroFormato) {
+            Yii::$app->session->setFlash('error', 'No se pudo encontrar el parámetro de formato para tu tipo de contrato.');
+            return $this->redirect(['index']);
+        }
+    
+        $totalPermisosAnuales = $parametroFormato->limite_anual;
+    
+        // Contar los permisos usados en el año actual basados en la fecha del permiso de la relación motivo_fecha_permiso
+        $permisosUsados = PermisoEconomico::find()
+            ->joinWith('motivoFechaPermiso') // Unir con la tabla motivo_fecha_permiso
+            ->where(['permiso_economico.empleado_id' => $empleado->id])
+            ->andWhere(['between', 'motivo_fecha_permiso.fecha_permiso', "$year-01-01", "$year-12-31"])
+            ->count();
+    
+        $permisosDisponibles = $totalPermisosAnuales - $permisosUsados;
+    
+        // Verificar si se alcanzó el límite de permisos
+        if ($permisosDisponibles <= 0) {
+            Yii::$app->session->setFlash('error', 'Has alcanzado el límite anual de permisos.');
+           // return $this->redirect(['index']);
+        }
+    
     
         if ($motivoFechaPermisoModel->load(Yii::$app->request->post())) {
             $transaction = Yii::$app->db->beginTransaction();
@@ -215,6 +245,8 @@ class PermisoEconomicoController extends Controller
             'noPermisoAnterior' => $noPermisoAnterior,
             'fechaPermisoAnterior' => $fechaPermisoAnterior,
             'empleado' => $empleado, // Pasar empleado a la vista
+            'permisosUsados' => $permisosUsados,
+            'permisosDisponibles' => $permisosDisponibles,
 
         ]);
     }

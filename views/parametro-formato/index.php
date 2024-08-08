@@ -59,7 +59,29 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'contentOptions' => ['class' => 'small-font'], 
                             ],
                           ///  'limite_anual',
-
+                          [
+                            'attribute' => 'cat_tipo_contrato_id',
+                            'label' => 'Tipo de Contrato:',
+                            'value' => function ($model) {
+                                return $model->catTipoContrato->nombre_tipo;
+                            },
+                            'filter' => Select2::widget([
+                                'model' => $searchModel,
+                                'attribute' => 'cat_tipo_contrato_id',
+                                'data' => \yii\helpers\ArrayHelper::map(
+                                    \app\models\CatTipoContrato::find()->all(),
+                                    'id', 
+                                    'nombre_tipo'
+                                ),
+                                'options' => ['placeholder' => 'Buscar Contrato'],
+                                'pluginOptions' => [
+                                    'allowClear' => true,
+                                ],
+                                'theme' => Select2::THEME_KRAJEE_BS3,
+                            ]),
+                            'contentOptions' => ['class' => 'small-font'],
+                        ],
+                        
                             [
                                 'attribute' => 'limite_anual',
                                 'label' => 'Limite Anual',

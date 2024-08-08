@@ -10,10 +10,14 @@ use kartik\select2\Select2;
 use app\models\Empleado;
 use yii\bootstrap5\Alert;
 use froala\froalaeditor\FroalaEditorWidget;
+use yii\web\View;
+
 
 /* @var $this yii\web\View */
 /* @var $model app\models\CambioDiaLaboral */
 /* @var $form yii\bootstrap4\ActiveForm */
+$this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
+
 ?>
 <div class="container-fluid">
     <div class="row justify-content-center">
@@ -52,13 +56,17 @@ if ($empleadoActual->id === $empleado->id) {
 }
 ?>
 
-<div id="loading-spinner" style="display: none;">
-        <i class="fa fa-spinner fa-spin fa-2x"></i> Procesando...
-    </div>
-                </div>
 
+                </div>
+                <div id="loading-spinner-laboral" style="display: none;">
+        <i class="fa fa-spinner fa-spin fa-2x" style="color: #000000;"></i> Procesando...
+    </div>
                 <div class="card-body">
                     <div class="row">
+                    <div class="col-12">
+                                                <p><strong>Permisos usados:</strong> <?= $permisosUsados ?></p>
+                                                <p><strong>Permisos disponibles:</strong> <?= $permisosDisponibles ?></p>
+                                            </div>
                         <div class="col-md-12">
                             <div class="d-flex align-items-center mb-3">
                                 <?php
@@ -92,6 +100,12 @@ if ($empleadoActual->id === $empleado->id) {
                                            
 
 </div>
+<div class="col-6 col-sm-3">
+
+<?= $form->field($model, 'fecha_a_laborar')->input('date')->label('Fecha a laborar') ?>
+                                           
+
+</div>
 
                                           
                                             <?= $form->field($motivoFechaPermisoModel, 'motivo')->widget(FroalaEditorWidget::className(), [
@@ -113,12 +127,7 @@ if ($empleadoActual->id === $empleado->id) {
                                                                         ]
                                                                     ])->label('Motivo:');?>
   
-<div class="col-6 col-sm-3">
 
-<?= $form->field($model, 'fecha_a_laborar')->input('date')->label('Fecha a laborar') ?>
-                                           
-
-</div>
 <div class="col-6 col-sm-4">
 </div>
 
@@ -137,7 +146,7 @@ if ($empleadoActual->id === $empleado->id) {
 $script = <<< JS
     $('#employee-form').on('beforeSubmit', function() {
         var button = $('#save-button-personal');
-        var spinner = $('#loading-spinner');
+        var spinner = $('#loading-spinner-laboral');
 
         button.prop('disabled', true); // Deshabilita el botón
         spinner.show(); // Muestra el spinner
@@ -147,6 +156,7 @@ $script = <<< JS
 JS;
 $this->registerJs($script);
 ?>
+
 
 
                             </div>

@@ -43,6 +43,8 @@ class PermisoSinSueldo extends \yii\db\ActiveRecord
             [['motivo_fecha_permiso_id'], 'exist', 'skipOnError' => true, 'targetClass' => MotivoFechaPermiso::class, 'targetAttribute' => ['motivo_fecha_permiso_id' => 'id']],
             [['solicitud_id'], 'exist', 'skipOnError' => true, 'targetClass' => Solicitud::class, 'targetAttribute' => ['solicitud_id' => 'id']],
             [['jefe_departamento_id'], 'safe'], 
+            ['empleado_id', 'validarLimiteAnual'], // Nueva regla de validación
+
 
         ];
     }
@@ -94,4 +96,27 @@ class PermisoSinSueldo extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Solicitud::class, ['id' => 'solicitud_id']);
     }
+
+    public function validarLimiteAnual($attribute, $params)
+    {
+        $añoActual = date('Y');
+        $empleado = Empleado::findOne($this->empleado_id);
+        $tipoContratoId = $empleado->informacionLaboral->cat_tipo_contrato_id;
+    
+        // Contar los registros de ComisionEspecial del año actual, basándose en la fecha de MotivoFechaPermiso
+        $contadorPermisos = static::find()
+            ->joinWith('motivoFechaPermiso') // Unir con la tabla motivo_fecha_permiso
+            ->where(['empleado_id' => $this->empleado_id])
+            ->andWhere(['between', 'motivo_fecha_permiso.fecha_permiso', "$añoActual-01-01", "$añoActual-12-31"])
+            ->count();
+    
+        $limiteAnual = ParametroFormato::find()
+            ->where(['tipo_permiso' => 'PERMISO SIN GOCE DE SUELDO', 'cat_tipo_contrato_id' => $tipoContratoId])
+            ->one()->limite_anual;
+    
+        if ($contadorPermisos >= $limiteAnual) {
+            $this->addError($attribute, 'Has alcanzado el límite anual de permisos sin goce de sueldo para tu tipo de contrato.');
+        }
+    }
+
 }

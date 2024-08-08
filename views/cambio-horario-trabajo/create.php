@@ -14,6 +14,7 @@ $this->title = 'Create Cambio Horario Trabajo';
                       'motivoFechaPermisoModel' => $motivoFechaPermisoModel,
                       'solicitudModel' => $solicitudModel,
                       'empleado' => $empleado, // Pasar empleado a la vista
-
+'permisosUsados' => $permisosUsados,
+            'permisosDisponibles' => $permisosDisponibles,
                     ]) ?>
           

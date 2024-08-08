@@ -19,6 +19,7 @@ use app\models\CatDireccion;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use DateTime;
 use yii\helpers\Url;
+use app\models\ParametroFormato;
 
 
 use app\models\PeriodoVacacionalHistorial;
@@ -136,12 +137,45 @@ class CambioPeriodoVacacionalController extends Controller
             Yii::$app->session->setFlash('error', 'No se pudo encontrar el empleado.');
             return $this->redirect(['index']);
         }
+
+        // Calcular permisos usados y disponibles
+        $year = date('Y');
+        $tipoContratoId = $empleado->informacionLaboral->cat_tipo_contrato_id;
+
+        $parametroFormato = ParametroFormato::find()
+            ->where(['tipo_permiso' => 'CAMBIO DE PERIODO VACACIONAL', 'cat_tipo_contrato_id' => $tipoContratoId])
+            ->one();
+        
+        if (!$parametroFormato) {
+            Yii::$app->session->setFlash('error', 'No se pudo encontrar el parámetro de formato para tu tipo de contrato.');
+         //   return $this->redirect(['index']);
+        }
+        
+    
+        $totalPermisosAnuales = $parametroFormato->limite_anual;
+    
+        $permisosUsados = CambioPeriodoVacacional::find()
+            ->where(['empleado_id' => $empleado->id])
+            ->andWhere(['between', 'fecha_fin_periodo', "$year-01-01", "$year-12-31"])
+            ->count();
+    
+        $permisosDisponibles = $totalPermisosAnuales - $permisosUsados;
+    
+        // Verificar si se alcanzó el límite de permisos
+        if ($permisosDisponibles <= 0) {
+            Yii::$app->session->setFlash('error', 'Has alcanzado el límite anual de permisos.');
+          //  return $this->redirect(['index']);
+        }
+    
+
         $solicitudModel->empleado_id = $empleado->id;
         $solicitudModel->status = 'Nueva';
         $solicitudModel->comentario = '';
         $solicitudModel->fecha_aprobacion = null;
         $solicitudModel->fecha_creacion = date('Y-m-d H:i:s');
         $solicitudModel->nombre_formato = 'CAMBIO DE PERIODO VACACIONAL';
+
+
     
         if ($model->load(Yii::$app->request->post())) {
             $transaction = Yii::$app->db->beginTransaction();
@@ -226,6 +260,8 @@ class CambioPeriodoVacacionalController extends Controller
             'model' => $model,
             'solicitudModel' => $solicitudModel,
             'empleado' => $empleado,
+            'permisosUsados' => $permisosUsados,
+            'permisosDisponibles' => $permisosDisponibles,
         ]);
     }
      

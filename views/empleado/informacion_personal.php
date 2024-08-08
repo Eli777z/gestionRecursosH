@@ -482,6 +482,7 @@ JS;
                                     document.getElementById('edit-button-personal').style.display = 'block';
                                     document.getElementById('save-button-personal').style.display = 'none';
                                     document.getElementById('cancel-button-personal').style.display = 'none';
+                                    location.reload();
                                 });
                             </script>
 
