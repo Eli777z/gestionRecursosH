@@ -38,7 +38,7 @@ use app\models\JuntaGobierno;
 use app\models\ParametroFormatoSearch;
 use app\models\CatPuestoSearch;
 use yii\widgets\Breadcrumbs;
-
+use app\models\Aviso;
 class SiteController extends Controller
 
 {
@@ -288,6 +288,10 @@ class SiteController extends Controller
     }
     public function actionPortalgestionrh()
     {
+        $avisos = \app\models\Aviso::find()->all();
+
+        
+
         $solicitudesRecientes = \app\models\Solicitud::find()
             ->orderBy(['fecha_creacion' => SORT_DESC])
             ->limit(10) 
@@ -295,6 +299,7 @@ class SiteController extends Controller
     
         return $this->render('portalgestionrh', [
             'solicitudesRecientes' => $solicitudesRecientes,
+            'avisos' => $avisos,
         ]);
     }
     
@@ -327,7 +332,8 @@ class SiteController extends Controller
     {
         
         $modelPermisoFueraTrabajo = new PermisoFueraTrabajo();
-    
+       
+
        
         return $this->render('portaltrabajador', [
             'modelPermisoFueraTrabajo' => $modelPermisoFueraTrabajo,
@@ -350,6 +356,14 @@ class SiteController extends Controller
     }
     public function actionPortalempleado()
     {
+
+        $avisos = \app\models\Aviso::find()->all();
+
+        
+
+       
+    
+       
         $usuario = Yii::$app->user->identity;
         $modelEmpleado = $usuario->empleado;
         
@@ -405,6 +419,7 @@ class SiteController extends Controller
             'AntecedenteObstrectico' => $AntecedenteObstrectico,
             'Alergia' => $Alergia,
             'antecedentePatologico' => $antecedentePatologico,
+            'avisos' => $avisos,
         ]);
     }
     

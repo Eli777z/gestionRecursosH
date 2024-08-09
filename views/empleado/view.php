@@ -109,7 +109,7 @@ if (!$modelAlergia) {
 
 <div class="container-fluid">
     <div class="row justify-content-center">
-        <div class="col-md-11">
+        <div class="col-md-12">
             <div class="card bg-light">
                 <div class="card-header gradient-info text-white">
                     <div class="d-flex align-items-center position-relative ml-4">

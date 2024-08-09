@@ -81,22 +81,37 @@ if (!$modelAlergia) {
 }
 
 ?>
-
 <div class="container-fluid">
-    <div class="row justify-content-center">
-     
-                            <div class="d-flex align-items-center mb-3">
-                                <?php
-                                foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
-                                    echo Alert::widget([
-                                        'options' => ['class' => 'alert-' . ($type === 'error' ? 'danger' : $type)],
-                                        'body' => $message,
-                                    ]);
-                                }
-                                ?>
-                            </div>
+<div class="row ">
+    <?php
 
-                            <?= $this->render('//empleado/view', [
+
+
+foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
+    if ($type === 'error') {
+        echo Alert::widget([
+            'options' => ['class' => 'alert-danger'],
+            'body' => $message,
+        ]);
+    } else {
+        echo Alert::widget([
+            'options' => ['class' => 'alert-' . $type],
+            'body' => $message,
+        ]);
+    }
+}
+?>
+   
+   <div class="col-md-8">
+ 
+              
+             
+  
+  
+                 
+                      
+                   
+                      <?= $this->render('//empleado/view', [
                                 'model' => $model,
                                 'documentos' => $documentos,
                                 'documentoModel' => $documentoModel,
@@ -118,6 +133,59 @@ if (!$modelAlergia) {
                                 'antecedentePatologico' => $antecedentePatologico,
                                 'documentoMedicoModel' => $documentoMedicoModel
                             ]) ?>
+
+              
+       
+         
+                  
+       
+  
+
+</div>
+
+<div class="col-md-4">
+   <div class="card bg-light">
+   <div class="card-header bg-info text-white">
+<h4>Avisos</h4>
+   </div>
+             
+  
+  
+                  <div class="card-body">
+                     
+                  <div style="max-height: 700px; overflow-y: auto;">
+
+                             
+                             <?php setlocale(LC_TIME, "es_419.UTF-8");?>
+                
+                             <?php
+                
+                // Otros contenidos de la vista principal
+
+                            // Incluir el contenido del nuevo archivo de vista
+
+                            echo $this->render('//aviso/carrusel-avisos', [
+                                'avisos' => $avisos,
+
+                            ]);
+                            ?>
+  
+                  </div>
+  
+  
+  
+              
+       
+  
+                  
+              </div>
+          </div>
+  
+
+</div>
+
+
                         
-    </div>
+</div>
+
 </div>

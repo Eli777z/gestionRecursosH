@@ -1,0 +1,17 @@
+.d-flex {
+    display: flex;
+    width: 100%;
+}
+
+.justify-content-between {
+    justify-content: space-between;
+}
+
+.left-content {
+    flex: 1; /* Ocupa el espacio restante */
+}
+
+.right-content {
+    width: 33%; /* Ajusta el tamaño como desees */
+  
+}
