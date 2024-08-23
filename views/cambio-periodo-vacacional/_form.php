@@ -100,13 +100,7 @@ if ($empleadoActual->id === $empleado->id) {
     ) ?>
     
                                             </div>
-                                            <div class="col-6 col-sm-2">
-                      
-    <?= $form->field($model, 'año')->dropDownList(
-    array_combine(range(date('Y'), 2000), range(date('Y'), 2000)), 
-    ['prompt' => 'Seleccionar Año']
-) ?>
-    </div>
+                                   
     
     <div class="col-6 col-sm-3">
 
@@ -115,7 +109,30 @@ if ($empleadoActual->id === $empleado->id) {
         ['prompt' => 'Seleccionar opción']
     ) ?>
     </div>
+    <div class="w-100"></div>
 
+    <div class="col-6 col-sm-4">
+
+<?= $form->field($model, 'dateRangeOriginal', [
+])->widget(DateRangePicker::classname(), [
+    'convertFormat' => true,
+    'pluginOptions' => [
+        'locale' => [
+            'format' => 'Y-m-d',
+            'separator' => ' a ',
+        ],
+        'opens' => 'left',
+        'singleDatePicker' => false,
+        'showDropdowns' => true,
+        'alwaysShowCalendars' => true,
+        'minDate' => '2000-01-01',  
+        'maxDate' => '2100-12-31',  
+        'startDate' => $currentDate, 
+        'endDate' => $currentDate, 
+        'autoApply' => true,
+    ]
+])->label('Periodo vacacional original') ?>
+</div>
     <div class="col-6 col-sm-4">
 
 <?= $form->field($model, 'dateRange', [
@@ -138,6 +155,8 @@ if ($empleadoActual->id === $empleado->id) {
     ]
 ])->label('Nuevo periodo vacacional') ?>
 </div>
+
+
    
     <div class="w-100"></div>
 

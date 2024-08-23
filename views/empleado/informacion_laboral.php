@@ -51,6 +51,7 @@ $jefesDirectores = ArrayHelper::map(
 
     <div class="card-header bg-info text-white">
         <h3>Información Laboral</h3>
+
         <?php if (Yii::$app->user->can('modificar-informacion-empleados')) : ?>
 
             <button type="button" id="edit-button-laboral" class="btn btn-light float-right"><i class="fa fa-edit"></i></button>
@@ -121,9 +122,10 @@ $jefesDirectores = ArrayHelper::map(
 
 
             <div class="col-6 col-sm-2">
-                    <label class="control-label" >Horas extras</label>
-                    <p><?= $model->informacionLaboral->horas_extras?> (horas)</p>
-                </div>
+    <label class="control-label">Horas extras</label>
+    <p><?= $model->informacionLaboral->horas_extras ?? '0' ?> (horas)</p>
+</div>
+
             <div class="w-100"></div>
 
             <?php if (Yii::$app->user->can('ver-informacion-completa-empleados')) : ?>
@@ -275,6 +277,13 @@ $jefesDirectores = ArrayHelper::map(
                         'title' => $model->informacionLaboral->salario
                     ]) ?>
                 </div>
+
+                <div class="col-6 col-sm-3">
+                <label class="control-label" >Total de días de vacacaciones anual</label>
+                <p><?= $model->informacionLaboral->vacaciones->total_dias_vacaciones ?? '0' ?> días</p>
+                </div>
+
+            
 
 
             <?php endif; ?>

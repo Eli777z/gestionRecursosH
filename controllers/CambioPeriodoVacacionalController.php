@@ -212,10 +212,9 @@ if ($solicitudReciente) {
                 if ($solicitudModel->save()) {
                     $model->solicitud_id = $solicitudModel->id;
     
-                    if ($model->jefe_departamento_id) {
-                        $jefeDepartamento = JuntaGobierno::findOne($model->jefe_departamento_id);
-                        $model->nombre_jefe_departamento = $jefeDepartamento ? $jefeDepartamento->profesion . ' ' . $jefeDepartamento->empleado->nombre . ' ' . $jefeDepartamento->empleado->apellido : null;
-                    }
+                     // Asegúrate de que dias_pendientes se calcule antes de guardar
+                $model->beforeSave(true); // Puedes llamar a beforeSave manualmente para calcular los días pendientes
+
     
                     if ($model->save()) {
                         // Lógica para manejar el historial del período vacacional
@@ -413,15 +412,18 @@ if ($solicitudReciente) {
     
             $periodoVacacional = $model->empleado->informacionLaboral->vacaciones->periodoVacacional;
     
-            $fechaInicioOriginal = strftime('%d de %B del %Y', strtotime($periodoOriginal->fecha_inicio));
-            $fechaFinOriginal = strftime('%d de %B del %Y', strtotime($periodoOriginal->fecha_final));
+            $fechaInicioOriginal = strftime('%d de %B del %Y', strtotime($model->fecha_inicio_original));
+            $fechaFinOriginal = strftime('%d de %B del %Y', strtotime($model->fecha_final_original));
             $fechaInicioNuevo = strftime('%d de %B del %Y', strtotime($model->fecha_inicio_periodo));
             $fechaFinNuevo = strftime('%d de %B del %Y', strtotime($model->fecha_fin_periodo));
     
+
+            $diasVacacionesTotales = ($model->empleado->informacionLaboral->dias_vacaciones_periodo) /2;
+
             $sheet->setCellValue('G16', "$fechaInicioOriginal al $fechaFinOriginal");
             $sheet->setCellValue('G17', "$fechaInicioNuevo al $fechaFinNuevo");
-            $sheet->setCellValue('G18', $periodoVacacional->dias_vacaciones_periodo);
-            $sheet->setCellValue('G19', $periodoVacacional->dias_disponibles);
+            $sheet->setCellValue('G18', $diasVacacionesTotales);
+            $sheet->setCellValue('G19', $model->dias_pendientes);
     
             if ($model->primera_vez === 'Sí') {
                 $sheet->setCellValue('P23', 'X');
@@ -443,15 +445,18 @@ if ($solicitudReciente) {
     
             $periodoVacacional = $model->empleado->informacionLaboral->vacaciones->segundoPeriodoVacacional;
     
-            $fechaInicioOriginal = strftime('%d de %B del %Y', strtotime($periodoOriginal->fecha_inicio));
-            $fechaFinOriginal = strftime('%d de %B del %Y', strtotime($periodoOriginal->fecha_final));
+            $fechaInicioOriginal = strftime('%d de %B del %Y', strtotime($model->fecha_inicio_original));
+            $fechaFinOriginal = strftime('%d de %B del %Y', strtotime($model->fecha_final_original));
             $fechaInicioNuevo = strftime('%d de %B del %Y', strtotime($model->fecha_inicio_periodo));
             $fechaFinNuevo = strftime('%d de %B del %Y', strtotime($model->fecha_fin_periodo));
     
+
+            $diasVacacionesTotales = ($model->empleado->informacionLaboral->dias_vacaciones_periodo) /2;
+
             $sheet->setCellValue('G16', "$fechaInicioOriginal al $fechaFinOriginal");
             $sheet->setCellValue('G17', "$fechaInicioNuevo al $fechaFinNuevo");
-            $sheet->setCellValue('G18', $periodoVacacional->dias_vacaciones_periodo);
-            $sheet->setCellValue('G19', $periodoVacacional->dias_disponibles);
+            $sheet->setCellValue('G18', $diasVacacionesTotales);
+            $sheet->setCellValue('G19', $model->dias_pendientes);
     
             if ($model->primera_vez === 'Sí') {
                 $sheet->setCellValue('P23', 'X');
@@ -617,6 +622,7 @@ if ($solicitudReciente) {
 
         setlocale(LC_TIME, 'es_419.UTF-8');
 
+        
         if ($model->numero_periodo === '1ero') {
             $sheet->setCellValue('G14', 'X');
             $sheet->setCellValue('P14', '');
@@ -629,15 +635,16 @@ if ($solicitudReciente) {
     
             $periodoVacacional = $model->empleado->informacionLaboral->vacaciones->periodoVacacional;
     
-            $fechaInicioOriginal = strftime('%d de %B del %Y', strtotime($periodoOriginal->fecha_inicio));
-            $fechaFinOriginal = strftime('%d de %B del %Y', strtotime($periodoOriginal->fecha_final));
+            $fechaInicioOriginal = strftime('%d de %B del %Y', strtotime($model->fecha_inicio_original));
+            $fechaFinOriginal = strftime('%d de %B del %Y', strtotime($model->fecha_fin_original));
             $fechaInicioNuevo = strftime('%d de %B del %Y', strtotime($model->fecha_inicio_periodo));
             $fechaFinNuevo = strftime('%d de %B del %Y', strtotime($model->fecha_fin_periodo));
-    
+            $diasVacacionesTotales = ($model->empleado->informacionLaboral->vacaciones->total_dias_vacaciones)/2 ;
+
             $sheet->setCellValue('G16', "$fechaInicioOriginal al $fechaFinOriginal");
             $sheet->setCellValue('G17', "$fechaInicioNuevo al $fechaFinNuevo");
-            $sheet->setCellValue('G18', $periodoVacacional->dias_vacaciones_periodo);
-            $sheet->setCellValue('G19', $periodoVacacional->dias_disponibles);
+            $sheet->setCellValue('G18', $diasVacacionesTotales);
+            $sheet->setCellValue('G19', $model->dias_pendientes);
     
             if ($model->primera_vez === 'Sí') {
                 $sheet->setCellValue('P23', 'X');
@@ -659,16 +666,18 @@ if ($solicitudReciente) {
     
             $periodoVacacional = $model->empleado->informacionLaboral->vacaciones->segundoPeriodoVacacional;
     
-            $fechaInicioOriginal = strftime('%d de %B del %Y', strtotime($periodoOriginal->fecha_inicio));
-            $fechaFinOriginal = strftime('%d de %B del %Y', strtotime($periodoOriginal->fecha_final));
+            $fechaInicioOriginal = strftime('%d de %B del %Y', strtotime($model->fecha_inicio_original));
+            $fechaFinOriginal = strftime('%d de %B del %Y', strtotime($model->fecha_fin_original));
             $fechaInicioNuevo = strftime('%d de %B del %Y', strtotime($model->fecha_inicio_periodo));
             $fechaFinNuevo = strftime('%d de %B del %Y', strtotime($model->fecha_fin_periodo));
-    
+            $diasVacacionesTotales = ($model->empleado->informacionLaboral->vacaciones->total_dias_vacaciones) /2;
+
             $sheet->setCellValue('G16', "$fechaInicioOriginal al $fechaFinOriginal");
             $sheet->setCellValue('G17', "$fechaInicioNuevo al $fechaFinNuevo");
-            $sheet->setCellValue('G18', $periodoVacacional->dias_vacaciones_periodo);
-            $sheet->setCellValue('G19', $periodoVacacional->dias_disponibles);
+            $sheet->setCellValue('G18', $diasVacacionesTotales);
+            $sheet->setCellValue('G19', $model->dias_pendientes);
     
+
             if ($model->primera_vez === 'Sí') {
                 $sheet->setCellValue('P23', 'X');
                 $sheet->setCellValue('S23', '');
@@ -852,15 +861,16 @@ $sheet->setCellValue('I28', $nombreCompleto);
     
             $periodoVacacional = $model->empleado->informacionLaboral->vacaciones->periodoVacacional;
     
-            $fechaInicioOriginal = strftime('%d de %B del %Y', strtotime($periodoOriginal->fecha_inicio));
-            $fechaFinOriginal = strftime('%d de %B del %Y', strtotime($periodoOriginal->fecha_final));
+            $fechaInicioOriginal = strftime('%d de %B del %Y', strtotime($model->fecha_inicio_original));
+            $fechaFinOriginal = strftime('%d de %B del %Y', strtotime($model->fecha_fin_original));
             $fechaInicioNuevo = strftime('%d de %B del %Y', strtotime($model->fecha_inicio_periodo));
             $fechaFinNuevo = strftime('%d de %B del %Y', strtotime($model->fecha_fin_periodo));
-    
+            $diasVacacionesTotales = ($model->empleado->informacionLaboral->vacaciones->total_dias_vacaciones)/2 ;
+
             $sheet->setCellValue('G16', "$fechaInicioOriginal al $fechaFinOriginal");
             $sheet->setCellValue('G17', "$fechaInicioNuevo al $fechaFinNuevo");
-            $sheet->setCellValue('G18', $periodoVacacional->dias_vacaciones_periodo);
-            $sheet->setCellValue('G19', $periodoVacacional->dias_disponibles);
+            $sheet->setCellValue('G18', $diasVacacionesTotales);
+            $sheet->setCellValue('G19', $model->dias_pendientes);
     
             if ($model->primera_vez === 'Sí') {
                 $sheet->setCellValue('P23', 'X');
@@ -882,15 +892,16 @@ $sheet->setCellValue('I28', $nombreCompleto);
     
             $periodoVacacional = $model->empleado->informacionLaboral->vacaciones->segundoPeriodoVacacional;
     
-            $fechaInicioOriginal = strftime('%d de %B del %Y', strtotime($periodoOriginal->fecha_inicio));
-            $fechaFinOriginal = strftime('%d de %B del %Y', strtotime($periodoOriginal->fecha_final));
+            $fechaInicioOriginal = strftime('%d de %B del %Y', strtotime($model->fecha_inicio_original));
+            $fechaFinOriginal = strftime('%d de %B del %Y', strtotime($model->fecha_fin_original));
             $fechaInicioNuevo = strftime('%d de %B del %Y', strtotime($model->fecha_inicio_periodo));
             $fechaFinNuevo = strftime('%d de %B del %Y', strtotime($model->fecha_fin_periodo));
-    
+            $diasVacacionesTotales = ($model->empleado->informacionLaboral->vacaciones->total_dias_vacaciones) /2;
+
             $sheet->setCellValue('G16', "$fechaInicioOriginal al $fechaFinOriginal");
             $sheet->setCellValue('G17', "$fechaInicioNuevo al $fechaFinNuevo");
-            $sheet->setCellValue('G18', $periodoVacacional->dias_vacaciones_periodo);
-            $sheet->setCellValue('G19', $periodoVacacional->dias_disponibles);
+            $sheet->setCellValue('G18', $diasVacacionesTotales);
+            $sheet->setCellValue('G19', $model->dias_pendientes);
     
             if ($model->primera_vez === 'Sí') {
                 $sheet->setCellValue('P23', 'X');

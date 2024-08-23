@@ -658,9 +658,13 @@ if ($formato) {
                                 $formatoAttributes = [
                                     [
                                         'label' => 'Motivo',
-                                        'value' => function ($formato) {
-                                            return $formato->motivo; 
+                                        'attribute' => 'motivo',
+                                        'format' => 'html',
+                                        'value' => function ($model) {
+                                            return \yii\helpers\Html::decode($model->motivo);
                                         },
+                                        'filter' => false,
+                                        'options' => ['style' => 'width: 65%;'],
                                     ],
                                     [
                                         'label' => 'Año',

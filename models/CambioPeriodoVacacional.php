@@ -24,6 +24,7 @@ class CambioPeriodoVacacional extends \yii\db\ActiveRecord
 {
     public $jefe_departamento_id;
     public $dateRange;
+    public $dateRangeOriginal;
     /**
      * {@inheritdoc}
      */
@@ -38,18 +39,18 @@ class CambioPeriodoVacacional extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['empleado_id', 'solicitud_id'], 'integer'],
+            [['empleado_id', 'solicitud_id', 'dias_pendientes'], 'integer'],
             [['motivo'], 'string'],
-            [['fecha_inicio_periodo', 'fecha_fin_periodo'], 'safe'],
+            [['fecha_inicio_periodo', 'fecha_fin_periodo', 'fecha_inicio_original', 'fecha_fin_original'], 'safe'],
             [['primera_vez'], 'string', 'max' => 3],
             [['nombre_jefe_departamento'], 'string', 'max' => 90],
             [['numero_periodo'], 'string', 'max' => 12],
             [['empleado_id'], 'exist', 'skipOnError' => true, 'targetClass' => Empleado::class, 'targetAttribute' => ['empleado_id' => 'id']],
             [['solicitud_id'], 'exist', 'skipOnError' => true, 'targetClass' => Solicitud::class, 'targetAttribute' => ['solicitud_id' => 'id']],
             [['jefe_departamento_id'], 'safe'], 
-            [['dateRange'], 'safe'], 
+            [['dateRange', 'dateRangeOriginal'], 'safe'], 
             [['año'], 'string', 'max' => 8],
-            [['dateRange'], 'required', 'message' => 'El rango de fechas no puede estar vacío.'], // Regla y mensaje personalizado para dateRange
+            [['dateRange', 'dateRangeOriginal'], 'required', 'message' => 'El rango de fechas no puede estar vacío.'], // Regla y mensaje personalizado para dateRange
 
             [['motivo', 'primera_vez', 'numero_periodo', 'año'], 'required'],
             ['empleado_id', 'validarLimiteAnual'], // Nueva regla de validación
@@ -76,7 +77,9 @@ class CambioPeriodoVacacional extends \yii\db\ActiveRecord
             'fecha_inicio_periodo' => 'Fecha Inicio Periodo',
             'fecha_fin_periodo' => 'Fecha Fin Periodo',
             'jefe_departamento_id' => 'Jefe de Departamento',
-
+            'fecha_inicio_original' => 'Fecha Inicio Original',
+            'fecha_fin_original' => 'Fecha Fin Original',
+            'dias_pendientes' => 'Dias pendientes'
         ];
     }
 
@@ -99,19 +102,48 @@ class CambioPeriodoVacacional extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Solicitud::class, ['id' => 'solicitud_id']);
     }
-
     public function beforeSave($insert)
     {
         if (parent::beforeSave($insert)) {
-            if ($this->dateRange) {
-                list($this->fecha_inicio_periodo, $this->fecha_fin_periodo) = explode(' a ', $this->dateRange);
+            // Asigna el año actual si no está establecido
+            if (empty($this->año)) {
+                $this->año = date('Y');
             }
-            
+    
+            // Procesar dateRange
+            if (!empty($this->dateRange) && strpos($this->dateRange, ' a ') !== false) {
+                list($this->fecha_inicio_periodo, $this->fecha_fin_periodo) = explode(' a ', $this->dateRange);
+                $this->fecha_inicio_periodo = date('Y-m-d', strtotime($this->fecha_inicio_periodo));
+                $this->fecha_fin_periodo = date('Y-m-d', strtotime($this->fecha_fin_periodo));
+            }
+    
+            // Procesar dateRangeOriginal
+            if (!empty($this->dateRangeOriginal) && strpos($this->dateRangeOriginal, ' a ') !== false) {
+                list($this->fecha_inicio_original, $this->fecha_fin_original) = explode(' a ', $this->dateRangeOriginal);
+                $this->fecha_inicio_original = date('Y-m-d', strtotime($this->fecha_inicio_original));
+                $this->fecha_fin_original = date('Y-m-d', strtotime($this->fecha_fin_original));
+            }
+    
+            // Calcular dias_pendientes
+            $empleado = Empleado::findOne($this->empleado_id);
+            if ($empleado && $empleado->informacionLaboral && $empleado->informacionLaboral->vacaciones) {
+                $totalDiasVacaciones = $empleado->informacionLaboral->vacaciones->total_dias_vacaciones;
+                $diasPorPeriodo = $totalDiasVacaciones / 2;
+    
+                $fechaInicio = new \DateTime($this->fecha_inicio_periodo);
+                $fechaFin = new \DateTime($this->fecha_fin_periodo);
+                $diasSolicitados = $fechaFin->diff($fechaInicio)->days + 1; // +1 para incluir el día final
+    
+                $this->dias_pendientes = $diasPorPeriodo - $diasSolicitados;
+            }
+    
             return true;
         } else {
             return false;
         }
     }
+    
+
 
     
 public function validarLimiteAnual($attribute, $params)
