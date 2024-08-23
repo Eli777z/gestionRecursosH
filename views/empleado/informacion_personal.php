@@ -1,6 +1,5 @@
 <?php
-
-
+//IMPORTACIONES
 use app\models\CatNivelEstudio;
 
 use yii\helpers\Html;
@@ -32,7 +31,9 @@ use kartik\select2\Select2;
 <div id="loading-spinner" style="color: #000000;">
     <i class="fa fa-spinner fa-spin fa-2x" style="color: #000000;"></i> Procesando...
 </div>
-<?php if (Yii::$app->user->can('modificar-informacion-empleados')) : ?>
+<?php
+//PERMISO PARA HABILITAR LA EDICIÓN DE LA INFORMACIÓN
+if (Yii::$app->user->can('modificar-informacion-empleados')) : ?>
     <div id="floating-buttons">
         <button type="button" id="edit-button-personal" class="btn btn-warning"><i class="fa fa-edit"></i></button>
         <?= Html::submitButton('<i class="fa fa-save"></i>', ['class' => 'btn btn-success', 'id' => 'save-button-personal', 'style' => 'display:none;']) ?>
@@ -40,7 +41,7 @@ use kartik\select2\Select2;
 
        
     </div>
-<?php endif; ?>
+<?php endif; //INFORMACION PERSONAL ?>
 
                             
 
@@ -247,7 +248,9 @@ use kartik\select2\Select2;
                                 <div class="card-body">
                                     <div class="row">
                                     <div class="col-6 col-sm-3">
-    <?= $form->field($model, 'email')->textInput([
+    <?=
+    //INFORMACIÓN DE CONTACTO
+    $form->field($model, 'email')->textInput([
         'maxlength' => true, 
         'readonly' => true, 
         'class' => 'form-control',
@@ -485,11 +488,5 @@ JS;
                                     location.reload();
                                 });
                             </script>
-
-
-
-
-
-
 
                             <?php Pjax::end(); ?>

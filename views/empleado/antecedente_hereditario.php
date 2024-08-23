@@ -1,19 +1,17 @@
 <?php
-
+//IMPORTACIONES
 use yii\helpers\Html;
-
 use kartik\form\ActiveForm;
-
-
 
 
 $antecedentesExistentes = [];
 $observacionGeneral = '';
 $descripcionAntecedentes = '';
 
+//SE ASIGNA EL PERMISO PARA PODER EDITAR SOBRE LOS REGISTROS A UNA VARIABLE
 $editable = Yii::$app->user->can('editar-expediente-medico');
 
-
+//SE OBTIENEN LOS REGISTROS EXISTENTES
 if ($antecedentes) {
     foreach ($antecedentes as $antecedente) {
         $antecedentesExistentes[$antecedente->cat_antecedente_hereditario_id][$antecedente->parentezco] = true;
@@ -24,7 +22,10 @@ if ($antecedentes) {
 }
 
 ?>
-<?php $form = ActiveForm::begin(['action' => ['empleado/view', 'id' => $model->id]]); ?>
+
+<?php
+//FORMULARIO DE TABLA QUE PERMITE SELECCIONAR LA ENFERMEDAD Y AL FAMILAR
+$form = ActiveForm::begin(['action' => ['empleado/view', 'id' => $model->id]]); ?>
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="card">

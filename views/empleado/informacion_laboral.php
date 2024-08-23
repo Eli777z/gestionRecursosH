@@ -1,18 +1,12 @@
 <?php
-
+//IMPORTAR
 use app\models\CatDepartamento;
-
 use app\models\CatPuesto;
 use app\models\CatTipoContrato;
-
 use yii\helpers\Html;
-
 use kartik\form\ActiveForm;
-
 use yii\helpers\ArrayHelper;
-
 use app\models\JuntaGobierno;
-
 use kartik\select2\Select2;
 
 ?>
@@ -21,6 +15,7 @@ use kartik\select2\Select2;
 <br>
 
 <?php
+//CARGAR  REGISTROS DE EMPLEADOS QUE SEAN DIRECTORES, JEFES DE UNIDAD O DEPARTAMENTO
 $juntaDirectorDireccion = JuntaGobierno::find()
     ->where(['nivel_jerarquico' => 'Director'])
     ->andWhere(['cat_direccion_id' => $model->informacionLaboral->cat_direccion_id])
@@ -44,7 +39,9 @@ $jefesDirectores = ArrayHelper::map(
 
 ?>
 <div class="card">
-    <?php $form = ActiveForm::begin([
+    <?php 
+    //FORMULARIO PARA REGISTRAR LA INFORMACION LABORAL DEL EMPLEADO
+    $form = ActiveForm::begin([
         'action' => ['actualizar-informacion-laboral', 'id' => $model->id],
         'options' => ['id' => 'laboral-info-form']
     ]); ?>
@@ -122,6 +119,11 @@ $jefesDirectores = ArrayHelper::map(
                 ]) ?>
             </div>
 
+
+            <div class="col-6 col-sm-2">
+                    <label class="control-label" >Horas extras</label>
+                    <p><?= $model->informacionLaboral->horas_extras?> (horas)</p>
+                </div>
             <div class="w-100"></div>
 
             <?php if (Yii::$app->user->can('ver-informacion-completa-empleados')) : ?>
@@ -199,7 +201,7 @@ $jefesDirectores = ArrayHelper::map(
                 <?= $form->field($model->informacionLaboral, 'junta_gobierno_id')->widget(Select2::classname(), [
                     'data' => $jefesDirectores,
                     'options' => [
-                        'placeholder' => 'Seleccionar Jefe o director a cargo',
+                        'placeholder' => 'Seleccionar Jefe Inmediato',
                         'disabled' => true,
                         'title' => isset($jefesDirectores[$model->informacionLaboral->junta_gobierno_id]) ?
                             $jefesDirectores[$model->informacionLaboral->junta_gobierno_id] : 'No asignado',
@@ -276,17 +278,6 @@ $jefesDirectores = ArrayHelper::map(
 
 
             <?php endif; ?>
-
-
-
-
-
-
-
-
-
-
-
 
             <?php ActiveForm::end(); ?>
             <?php

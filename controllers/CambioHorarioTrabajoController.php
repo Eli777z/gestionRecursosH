@@ -140,6 +140,35 @@ class CambioHorarioTrabajoController extends Controller
             return $this->redirect(['index']);
         }
 
+                  // Lógica para verificar si se han creado solicitudes muy recientes
+$nombreFormato = 'CAMBIO DE HORARIO DE TRABAJO';
+$tiempoLimite = new \DateTime('-24 hours');
+
+$solicitudReciente = Solicitud::find()
+    ->where(['empleado_id' => $empleado->id, 'nombre_formato' => $nombreFormato])
+    ->andWhere(['>', 'created_at', $tiempoLimite->format('Y-m-d H:i:s')])
+    ->orderBy(['created_at' => SORT_DESC])
+    ->one();
+
+if ($solicitudReciente) {
+    $fechaUltimaSolicitud = new \DateTime($solicitudReciente->created_at);
+    $intervalo = $fechaUltimaSolicitud->diff(new \DateTime());
+    
+    // Convertir el intervalo a un formato amigable (días, horas, minutos)
+    $tiempoTranscurrido = '';
+    if ($intervalo->d > 0) {
+        $tiempoTranscurrido .= $intervalo->d . ' día(s) ';
+    }
+    if ($intervalo->h > 0) {
+        $tiempoTranscurrido .= $intervalo->h . ' hora(s) ';
+    }
+    if ($intervalo->i > 0) {
+        $tiempoTranscurrido .= $intervalo->i . ' minuto(s)';
+    }
+
+    Yii::$app->session->setFlash('warning', '<i class="fas fa-bell"></i> Ya has creado una solicitud recientemente. Última solicitud hace: ' . $tiempoTranscurrido);
+}
+
         $year = date('Y');
         $tipoContratoId = $empleado->informacionLaboral->cat_tipo_contrato_id;
     
@@ -149,7 +178,7 @@ class CambioHorarioTrabajoController extends Controller
         
         if (!$parametroFormato) {
             Yii::$app->session->setFlash('error', 'No se pudo encontrar el parámetro de formato para tu tipo de contrato.');
-            return $this->redirect(['index']);
+            return $this->redirect(['empleado/index']);
         }
     
         $totalPermisosAnuales = $parametroFormato->limite_anual;
@@ -550,6 +579,26 @@ $sheet->setCellValue('P26', 'DIRECTOR GENERAL');
 
         $nombreTipoContrato = $model->empleado->informacionLaboral->catTipoContrato->nombre_tipo;
         $sheet->setCellValue('H12', $nombreTipoContrato);
+
+        switch ($nombreTipoContrato) {
+            case 'Confianza':
+                $style = $sheet->getStyle('H12');
+    
+                $style->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+        $style->getFill()->getStartColor()->setARGB('FFc7efce'); // Background color #c7efce
+    
+        $style->getFont()->getColor()->setARGB('FF217346'); // Font color #217346
+                break;
+            case 'Sindicalizado':
+                $style = $sheet->getStyle('H12');
+    
+                $style->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+        $style->getFill()->getStartColor()->setARGB('FFfeeb9d'); // Background color #c7efce
+    
+        $style->getFont()->getColor()->setARGB('FFa7720f'); // Font color #217346
+                break;
+          
+        }
 
 
 

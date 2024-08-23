@@ -1,5 +1,5 @@
 <?php
-
+//IMPORTACIONES
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\bootstrap5\Alert;
@@ -9,8 +9,7 @@ use app\models\JuntaGobierno;
 /* @var $model app\models\PermisoFueraTrabajo */
 
 $this->title = $model->id;
-//$this->params['breadcrumbs'][] = ['label' => 'Permiso Fuera Trabajos', 'url' => ['index']];
-//$this->params['breadcrumbs'][] = $this->title;
+
 \yii\web\YiiAsset::register($this);
 ?>
 
@@ -19,10 +18,11 @@ $this->title = $model->id;
 <div class="col-md-10">
     <div class="card">
     <div class="card-header bg-info text-white">
-                    <h2>PERMISO FUERA TRABAJO</h2>
+                    <h2>PERMISO FUERA DEL TRABAJO</h2>
                     <p>  Empleado: <?= $empleado->nombre.' '.$empleado->apellido ?></p>
                     <?php
 // Obtener el ID del usuario actual
+
 $usuarioActual = Yii::$app->user->identity;
 $empleadoActual = $usuarioActual->empleado;
 $juntaGobierno = JuntaGobierno::find()->where(['empleado_id' => $model->empleado_id])->one();
@@ -108,6 +108,7 @@ if ($empleado) {
                    
 
                     <?php 
+                    //ALERTA
     foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
         echo Alert::widget([
             'options' => ['class' => 'alert-' . $type],
@@ -118,20 +119,9 @@ if ($empleado) {
                   <?= DetailView::widget([
     'model' => $model,
     'attributes' => [
-       // 'empleado_id',
+   
         'solicitud_id',
-       // [
-         //   'label' => 'Número de Empleado',
-//            'value' => function ($model) {
-  //              return $model->empleado->numero_empleado; 
-    //        },
-      //  ],
- //       [
-   //         'label' => 'Nombre',
-     //       'value' => function ($model) {
-       //         return $model->empleado->nombre; 
-//            },
-  //      ],
+      
   [
     'label' => 'Motivo',
     'attribute' => 'motivo',

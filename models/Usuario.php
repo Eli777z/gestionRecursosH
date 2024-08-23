@@ -1,5 +1,5 @@
 <?php
-
+//IMPORTACIONES
 namespace app\models;
 
 use Yii;
@@ -56,6 +56,8 @@ class Usuario extends  \yii\db\ActiveRecord implements \yii\web\IdentityInterfac
             'username' => 'Usuario',
         ];
     }
+
+    //FUNCIONES PARA VALIDAR EL ROL DEL TIPO DE USUARIO Y SU ESTATUS
     public static function isUserAdmin($id)
     {
         $user = self::findOne(['id' => $id, 'status' => '10']);
@@ -107,7 +109,8 @@ class Usuario extends  \yii\db\ActiveRecord implements \yii\web\IdentityInterfac
      public function getId(){
          return $this->id;
      }
-         
+      // FUNCIONES QUE SE ENCARGAN DE BUSCAR Y VALIDAR QUE LAS CREDENCIALES DEL USUARIO INGRESADO
+      //EXISTEN EN LA BAE DE DATOS   
      public static function findIdentity($id) {
          return static::findOne(['id' => $id]);
      }
@@ -126,6 +129,8 @@ class Usuario extends  \yii\db\ActiveRecord implements \yii\web\IdentityInterfac
      *
      * @return \yii\db\ActiveQuery
      */
+
+     //RELACIONES CON LA TABLA EMPLEADO
     public function getEmpleados()
     {
         return $this->hasMany(Empleado::class, ['usuario_id' => 'id']);

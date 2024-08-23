@@ -51,7 +51,7 @@ class CambioHorarioTrabajo extends \yii\db\ActiveRecord
             [['solicitud_id'], 'exist', 'skipOnError' => true, 'targetClass' => Solicitud::class, 'targetAttribute' => ['solicitud_id' => 'id']],
             [['jefe_departamento_id'], 'safe'], 
             [['dateRange'], 'required', 'message' => 'El rango de fechas no puede estar vacío.'], // Regla y mensaje personalizado para dateRange
-            ['empleado_id', 'validarLimiteAnual'], // Nueva regla de validación
+            ['empleado_id', 'validarLimiteAnual'], // VALIDA EL LIMITE ANUAL ESTABLECIDO
 
         
         ];
@@ -65,7 +65,7 @@ class CambioHorarioTrabajo extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'empleado_id' => 'Empleado ID',
-            'solicitud_id' => 'Solicitud ID',
+            'solicitud_id' => 'ID de solicitud',
             'motivo_fecha_permiso_id' => 'Motivo Fecha Permiso ID',
             'turno' => 'Turno',
             'horario_inicio' => 'Inicio de horario',
@@ -108,6 +108,7 @@ class CambioHorarioTrabajo extends \yii\db\ActiveRecord
         return $this->hasOne(Solicitud::class, ['id' => 'solicitud_id']);
     }
 
+    // FUNCIÓN QUE PERMITE RECIBIR FECHAS EN RANGO DESDE INPUS DE DATE RANGE
     public function beforeSave($insert)
     {
         if (parent::beforeSave($insert)) {
@@ -121,7 +122,9 @@ class CambioHorarioTrabajo extends \yii\db\ActiveRecord
         }
     }
 
-
+//FUNCION QUE VALIDA EL LIMITE DE REGISTROS ANUALES,
+//SE INDENTIFICA EL AÑO PRESENTE, EL TIPO DE PERMISO  Y EL TIPO DE CONTRATO DEL EMPLEADO
+//Y SABER LA CANTIDAD DE PERMISOS QUE TIENE SU TIPO DE CONTRATO
     public function validarLimiteAnual($attribute, $params)
     {
         $añoActual = date('Y');

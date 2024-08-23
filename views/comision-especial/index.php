@@ -20,7 +20,7 @@ $this->title = 'Comisión Especial';
 <div class="col-md-10">
             <div class="card">
             <div class="card-header bg-info text-white">
-                    <h3>Historial de Comision Especial</h3>
+                    <h3>Historial de Comisión Especial</h3>
                     <?= Html::a('Crear una nueva <i class="fa fa-plus-circle"></i> ', ['create'], ['class' => 'btn btn-dark fa-lg mt-3 ml-3'])?>
                     <?= Html::a('<i class="fa fa-home"></i> Inicio', ['site/portalempleado'], [
 'class' => 'btn btn-outline-warning mr-3 mt-3 float-right fa-lg',

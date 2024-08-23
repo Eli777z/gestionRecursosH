@@ -6,7 +6,7 @@ use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $avisos app\models\Aviso[] */
 
-$this->title = 'Avisos';
+$this->title = 'Inicio';
 
 setlocale(LC_TIME, 'es_419.UTF-8'); 
 

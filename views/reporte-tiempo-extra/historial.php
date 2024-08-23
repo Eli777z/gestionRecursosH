@@ -50,6 +50,7 @@ $this->title = 'Reporte de Tiempo extra';
                     ?>
                 </div>
                     <div class="row mb-2">
+
                         <div class="col-md-12">
                             <?= GridView::widget([
                                 'dataProvider' => $dataProvider,
@@ -69,13 +70,64 @@ $this->title = 'Reporte de Tiempo extra';
                                         'label' => 'Fecha de creación',
                                         'attribute' => 'created_at',
                                         'value' => function ($model) {
-                                            return $model->created_at;
+                                           
+                                            setlocale(LC_TIME, "es_419.UTF-8");
+                                            
+                                            $fechaPermiso = strtotime($model->created_at);
+                                            
+                                            $fechaFormateada = strftime('%A, %B %d, %Y', $fechaPermiso);
+                                            
+                                            setlocale(LC_TIME, null);
+                                            
+                                            return $fechaFormateada;
+                                        },
+                                    ],
+                                
+                                   
+                                    [
+                                        'class' => 'yii\grid\DataColumn',
+                                        'header' => 'Aprobación',
+                                        'format' => 'raw',
+                                        
+                                        'value' => function ($model) {//AYUDA A INDENTIFICAR EL ESTATUS DE LA SOLICITUD Y VERIFICAR SI SON NUEVAS O YA HAN SIDO VISUALIZADAS
+                                            if ($model->solicitud->aprobacion === 'PENDIENTE') {
+                                                return 'PENDIENTE <i class="fas fa-stopwatch" aria-hidden="true" style="color: #ea4242 "></i>';
+                                            } elseif ($model->solicitud->aprobacion  === 'APROBADO') {
+                                                return 'APROBADO <i class="fas fa-check" aria-hidden="true" style="color: #4678fc"></i>';
+                                            } elseif ($model->solicitud->aprobacion  === 'RECHAZADO') {
+                                                return 'RECHAZADO <i class="fa fa-times" aria-hidden="true" style="color: #4678fc"></i>';
+                                           
+                                            }else{
+                                                return 'No aplica';
+        
+        
+        
+                                            }
+                                            
+                                        },
+                                        'contentOptions' => ['class' => 'text-center'],
+                                        'headerOptions' => ['class' => 'text-center'],
+                                    ],
+                                    [
+                                        'label' => 'Revisado en',
+                                        'attribute' => 'fecha_aprobacion',
+                                        'value' => function ($model) {
+                                           
+                                            setlocale(LC_TIME, "es_419.UTF-8");
+                                            
+                                            $fechaPermiso = strtotime($model->solicitud->fecha_aprobacion);
+                                            
+                                            $fechaFormateada = strftime('%A, %B %d, %Y', $fechaPermiso);
+                                            
+                                            setlocale(LC_TIME, null);
+                                            
+                                            return $fechaFormateada;
                                         },
                                     ],
                                     // otros atributos del reporte...
                                     [
                                         'class' => 'yii\grid\ActionColumn',
-                                        'template' => Yii::$app->user->can('ver-empleados-departamento') ? '{view}' : '{view} {delete}',
+                                        'template' => Yii::$app->user->can('ver-empleados-departamento') || Yii::$app->user->can('ver-empleados-direccion')  ? '{view}' : '{view} {delete}',
 
         'buttons' => [
                        

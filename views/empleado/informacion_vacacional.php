@@ -1,4 +1,5 @@
 <?php 
+//IMPORTACIONES
 use kartik\form\ActiveForm;
 use yii\helpers\Html;
 use yii\web\JsExpression;
@@ -17,7 +18,9 @@ use kartik\daterange\DateRangePicker;
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="card">
-                                                <?php $form = ActiveForm::begin([
+                                                <?php
+                                                //FORMULARIO PARA REGISTRAR LA INFORMACIÓN VACACIONAL DEL EMPLEADO
+                                                $form = ActiveForm::begin([
                                                     'action' => ['actualizar-primer-periodo', 'id' => $model->id],
                                                     'options' => ['id' => 'first-period-form']
                                                 ]); ?>
@@ -97,6 +100,7 @@ use kartik\daterange\DateRangePicker;
 
 
                                         <script>
+                                            //SCRIPT PARA HABILITAR LA EDICION DE LOS CAMPOS
                                             document.getElementById('edit-button-first-period').addEventListener('click', function() {
                                                 var fields = document.querySelectorAll('#first-period-form input, #first-period-form select');
                                                 fields.forEach(function(field) {
@@ -211,6 +215,7 @@ use kartik\daterange\DateRangePicker;
 
                                         </div>
                                         <script>
+                                             //SCRIPT PARA HABILITAR LA EDICION DE LOS CAMPOS
                                             document.getElementById('edit-button-period').addEventListener('click', function() {
                                                 var fields = document.querySelectorAll('#second-period-form input, #second-period-form select');
                                                 fields.forEach(function(field) {
@@ -263,6 +268,7 @@ use kartik\daterange\DateRangePicker;
                                         </div>
 
                                         <script>
+                                             //SCRIPT PARA MOSTRAL EL HISTORIAL DE CAMBIOS EN LA INFORMACIÓN VACACIONAL
                                             document.getElementById('toggle-historial-button').addEventListener('click', function() {
                                                 var historialContent = document.getElementById('historial-content');
                                                 if (historialContent.style.display === 'none') {

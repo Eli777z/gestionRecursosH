@@ -64,8 +64,10 @@ class AvisoController extends Controller
      * @return mixed
      */
    
+     //FUNCIÓN QUE PERMITE EXTRAER Y MOSTRAR LA IMAGEN DEL REGISTRO
      public function actionVerImagen($nombre)
 {
+    //OBTIENE LA RUTA Y BUSCA LA IMAGEN
     $filePath = Yii::getAlias('@runtime/imagenes_avisos/' . $nombre);
 
     if (file_exists($filePath)) {
@@ -75,6 +77,7 @@ class AvisoController extends Controller
     }
 }
 
+//SE ENCARGA DE MOSTRAR TODO LOS REGISTROS DE AVISOS
 public function actionCarruselAvisos()
 {
     $avisos = \app\models\Aviso::find()->all();
@@ -85,7 +88,7 @@ public function actionCarruselAvisos()
 }
 
 
-    
+    //FUNCION QUE CREA EL REGISTRO DEL AVISO Y SE ENCARGA DE LA SUBIDA DE IMAGENES
     public function actionCreate()
     {
         $model = new Aviso();
@@ -217,7 +220,6 @@ public function actionCarruselAvisos()
         ]);
     }
     
-    
     /**
      * Deletes an existing Aviso model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
@@ -225,6 +227,8 @@ public function actionCarruselAvisos()
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
+
+     //FUNCIÓN PARA ELMINAR EL REGISTRO ASOCIADO
   public function actionDelete($id)
 {
     $model = $this->findModel($id);

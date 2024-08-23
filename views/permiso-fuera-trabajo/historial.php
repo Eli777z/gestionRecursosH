@@ -1,5 +1,5 @@
 <?php
-
+//IMPORTACIONES
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
@@ -7,6 +7,8 @@ use yii\web\View;
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\PermisoFueraTrabajoSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+
+//SE CARGAN LOS ESTILOS
 $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
 $this->registerCssFile('@web/css/grid-view.css', ['position' => View::POS_HEAD]);
 
@@ -46,7 +48,7 @@ $this->title = 'Permiso Fuera del Trabajo';
                     </div>
 <?php Pjax::begin();?>
 
-<?= GridView::widget([
+<?= GridView::widget([ //SE MUESTRA LA LISTA DE LOS REGISTROS REALIZADOS 
     'dataProvider' => $dataProvider,
     'filterModel' => $searchModel,
     //'options' => ['class' => 'my-custom-grid-view'], // Clase específica para el GridView
@@ -76,8 +78,8 @@ $this->title = 'Permiso Fuera del Trabajo';
 
         ['class' => 'hail812\adminlte3\yii\grid\ActionColumn',
 
-    
-        'template' => Yii::$app->user->can('ver-empleados-departamento') ? '{view}' : '{view}  {delete}',
+    //SI SOLO TIENE EL PERMISO DE VER, SOLO PODRA OBSERVAR LOS REGISTROS, EN CAMBIO, SI NO, PUEDE ELIMINAR LOS REGISTROS
+        'template' => Yii::$app->user->can('ver-empleados-departamento') || Yii::$app->user->can('ver-empleados-direccion')  ? '{view}' : '{view}  {delete}',
 
      'buttons' => [
                     
@@ -110,10 +112,7 @@ $this->title = 'Permiso Fuera del Trabajo';
     'pager' => [
         'class' => 'yii\bootstrap4\LinkPager',
     ],
-   // 'tableOptions' => ['class' => 'si-style-gridview'],
-     //                                           'rowOptions' => function ($model, $key, $index, $grid) {
-       //                                             return ['class' => 'si-style-gridview'];
-         //                                       },
+
 ]) ?>
 
                     <?php Pjax::end(); ?>

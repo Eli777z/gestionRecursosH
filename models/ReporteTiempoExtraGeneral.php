@@ -39,7 +39,6 @@ class ReporteTiempoExtraGeneral extends \yii\db\ActiveRecord
             [['solicitud_id'], 'exist', 'skipOnError' => true, 'targetClass' => Solicitud::class, 'targetAttribute' => ['solicitud_id' => 'id']],
         ];
     }
-
     /**
      * {@inheritdoc}
      */
@@ -48,7 +47,7 @@ class ReporteTiempoExtraGeneral extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'empleado_id' => 'Empleado ID',
-            'solicitud_id' => 'Solicitud ID',
+            'solicitud_id' => 'ID de solicitud',
             'total_horas' => 'Total Horas',
             'created_at' => 'Created At',
         ];

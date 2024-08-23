@@ -10,8 +10,7 @@ use app\models\JuntaGobierno;
 /* @var $model app\models\ReporteTiempoExtra */
 
 $this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Reporte de tiempo extra', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+
 \yii\web\YiiAsset::register($this);
 ?>
 
@@ -117,42 +116,86 @@ if ($empleado) {
         ]);
     }
     ?>
-                            <?= DetailView::widget([
-                                'model' => $model,
-                                'attributes' => [
-                                    'id',
-                                    'solicitud_id',
-                                    // otros atributos...
-                                ],
-                            ]) ?>
-                        </div>
-                        <!-- .col-md-12 -->
-                    </div>
-                    <!-- .row -->
+                       <?= DetailView::widget([
+            'model' => $model,
+            'attributes' => [
+                'id',
+                'solicitud_id',
+                // otros atributos...
+                [
+                    'label' => 'Aprobado en',
+                    'attribute' => 'fecha_aprobacion',
+                    'value' => function ($model) {
+                       
+                        setlocale(LC_TIME, "es_419.UTF-8");
+                        
+                        $fechaPermiso = strtotime($model->solicitud->fecha_aprobacion);
+                        
+                        $fechaFormateada = strftime('%A, %B %d, %Y', $fechaPermiso);
+                        
+                        setlocale(LC_TIME, null);
+                        
+                        return $fechaFormateada;
+                    },
+                ],
 
-                    <!-- Agregar GridView para las actividades -->
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h3>Actividades</h3>
-                            <?= GridView::widget([
-                                'dataProvider' => new \yii\data\ArrayDataProvider([
-                                    'allModels' => $actividades,
-                                    'pagination' => false,
-                                ]),
-                                'columns' => [
-                                    ['class' => 'yii\grid\SerialColumn'],
-                                    'fecha',
-                                    'hora_inicio',
-                                    'hora_fin',
-                                    'actividad',
-                                    'no_horas'
-                                    // otros campos de la actividad...
-                                ],
-                            ]) ?>
+                [
+                    'label' => 'Aprobante',
+                    'attribute' => 'nombre_aprobante',
+                    'value' => function ($model) {
+                        return $model->solicitud->nombre_aprobante;
+                    },
+                ],
+                [
+                    'label' => 'Comentario',
+                    'attribute' => 'comentario',
+                    'value' => function ($model) {
+                        return $model->solicitud->comentario;
+                    },
+                ],
+            ],
+        ]) ?>
+    </div>
+    <!-- .col-md-12 -->
+</div>
+<!-- .row -->
+
+<?php
+// Calcular el total de horas
+$totalHoras = array_reduce($actividades, function ($carry, $actividad) {
+    return $carry + $actividad['no_horas'];
+}, 0);
+?>
+
+<!-- Agregar GridView para las actividades -->
+<div class="row">
+    <div class="col-md-12">
+        <h3>Actividades</h3>
+        <?= GridView::widget([
+            'dataProvider' => new \yii\data\ArrayDataProvider([
+                'allModels' => $actividades,
+                'pagination' => false,
+            ]),
+            'columns' => [
+                ['class' => 'yii\grid\SerialColumn'],
+                'fecha',
+                'hora_inicio',
+                'hora_fin',
+                'actividad',
+                'no_horas',
+                // otros campos de la actividad...
+            ],
+        ]) ?>
+
+        <!-- Mostrar el total de horas fuera del GridView -->
+        <div class="total-horas">
+            <h4>Total de horas: <?= $totalHoras ?></h4>
         </div>
-                <!--.col-md-12-->
-            </div>
-            <!--.row-->
+    </div>
+    <!-- .col-md-12 -->
+</div>
+<!-- .row -->
+
         </div>
         <!--.card-body-->
     </div>

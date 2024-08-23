@@ -1,5 +1,5 @@
 <?php
-
+// IMPORTACIONES
 namespace app\models;
 
 use Yii;
@@ -49,7 +49,9 @@ class LoginForm extends Model
      * @param string $attribute the attribute currently being validated
      * @param array $params the additional name-value pairs given in the rule
      */
-    public function validatePassword($attribute, $params)
+   
+   /// FUNCION PARA VALIDAR LA CONTRASEÑA
+     public function validatePassword($attribute, $params)
     {
         if (!$this->hasErrors()) {
             $user = $this->getUser();
@@ -77,10 +79,7 @@ class LoginForm extends Model
            
             
                // $this->addError($attribute, 'usuario activo.');
-            }
-          
-
-           
+            }           
 
         }
     }
@@ -89,6 +88,7 @@ class LoginForm extends Model
      * Logs in a user using the provided username and password.
      * @return bool whether the user is logged in successfully
      */
+    //FUNCION QUE VALIDA EL USUARIO
     public function login()
     {
         $usuario = $this->getUser(); 
@@ -105,6 +105,7 @@ class LoginForm extends Model
      *
      * @return User|null
      */
+    // FUNCION QUE OBTIENE Y VERIFICA SI EXISTE REGISTRO DE LAS CREDENCIALES INGRESADAS POR EL USUARIO
     public function getUser()
     {
         if ($this->_user === false) {

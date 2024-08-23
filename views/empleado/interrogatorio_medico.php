@@ -160,46 +160,8 @@ $editable = Yii::$app->user->can('editar-expediente-medico');
                                                 </div>
 
 
-                                                <div class="card">
-                                                    <div class="card-header custom-nopato text-white text-left">
-                                                        <h5>HEMOLINFATICO</h5>
-                                                    </div>
-                                                    <div class="card-body bg-light">
-                                                        <div class="row">
-
-                                                            <!-- Columna derecha con el textarea -->
-
-
-                                                            <div class="form-group bg-white">
-                                                                <?= Html::label('Descripción') ?>
-                                                                <br>
-
-
-                                                                <?php
-
-                                                                if ($editable) {
-                                                                    echo $form->field($InterrogatorioMedico, 'desc_hemolinfatico')->widget(FroalaEditorWidget::className(), [
-                                                                        'options' => [
-                                                                            'id' => 'exp-fisca'
-                                                                        ],
-
-                                                                    ])->label(false);
-                                                                } else {
-                                                                    // Si no tiene permiso, mostrar el texto plano
-                                                                    $htmlcont = Html::decode($InterrogatorioMedico->desc_hemolinfatico);
-                                                                    echo HtmlPurifier::process($htmlcont);
-                                                                }
-                                                                ?>
-                                                            </div>
-
-                                                        </div>
-                                                        <div class="alert alert-white custom-alert" role="alert">
-                                                            <i class="fa fa-exclamation-circle" style="color: #007bff;" aria-hidden="true"></i>Anemias, hemolisis, tendencia a hemorragia, adenopatias, menor resistencia a infecciones.
-                                                        </div>
-                                                    </div>
-
-                                                </div>
-
+                                                <?php if($model->expedienteMedico->empleado->sexo === "Femenino" ){ ?>
+ 
                                                 <div class="card">
                                                     <div class="card-header custom-nopato text-white text-left">
                                                         <h5>MAMAS</h5>
@@ -241,6 +203,7 @@ $editable = Yii::$app->user->can('editar-expediente-medico');
 
                                                 </div>
                                                 <!-- aqui -->
+                                                <?php } ?>
 
 
                                                 <div class="card">

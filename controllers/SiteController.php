@@ -1,5 +1,5 @@
 <?php
-
+//IMPORTACIONES
 namespace app\controllers;
 
 use Yii;
@@ -45,6 +45,7 @@ class SiteController extends Controller
     /**
      * {@inheritdoc}
      */
+    //CONTROL DE ACCESO
     public function behaviors()
     {
         return [
@@ -118,16 +119,18 @@ class SiteController extends Controller
      *
      * @return string
      */
-    public function actionIndex()
-    {
-        return $this->render('index');
-    }
+
+  
 
     /**
      * Login action.
      *
      * @return Response|string
      */
+
+
+//FUNCIÓN QUE SE ENCARGA DE RECIBIR LAS CREDENCIALES INGRESADAS
+//POR LOS USUARIOS Y REDIRIGIRLOS A LAS VISTAS CORRESPONDIENTES A SU ROL
     public function actionLogin()
     {
         if (!Yii::$app->user->isGuest) {
@@ -176,59 +179,20 @@ class SiteController extends Controller
         }
     }
 
-    public function actionCambiarcontrasena()
-{
-    // Aquí asumimos que tienes un modelo de formulario para cambiar la contraseña.
-    $model = new CambiarContrasenaForm();
 
-    if ($model->load(Yii::$app->request->post()) && $model->changePassword()) {
-        // Aquí manejamos la redirección después de que la contraseña ha sido cambiada.
-        $userId = Yii::$app->user->identity->id;
-        $user = Usuario::findOne($userId);
-
-        if (Usuario::isUserAdmin($userId)) {
-            return $this->redirect(['site/portalgestionrh']);
-        } 
-        elseif (Usuario::isUserMedico($userId)) {
-            return $this->redirect(['site/portal-medico']);
-        }
-        elseif (Usuario::isUserSimple($userId)) {
-            return $this->redirect(['site/portalempleado']);
-        }
-    }
-
-    return $this->render('cambiarcontrasena', [
-        'model' => $model,
-    ]);
-}
-
+   
    
     
 
-    public function actionViewNotificaciones()
-    {
-        $this->layout = "main-trabajador";
-
-        $notificaciones = Notificacion::find()
-            ->where(['usuario_id' => Yii::$app->user->identity->id])
-            ->orderBy(['created_at' => SORT_DESC])
-            ->all();
-    
-        Notificacion::updateAll(['leido' => 1], ['usuario_id' => Yii::$app->user->identity->id]);
-    
-        return $this->render('view-notificaciones', [
-            'notificaciones' => $notificaciones,
-        ]);
-    }
-
-
+    //SE RENDERIZA LA VISTA DE CONFIGURACIONES DONDE SE CARGAN LOS REGISTROS DE LOS MODELOS
+    //DE CAT_DEPARTAMENTO, PARAMETRO_FORMATO, CAT_PUESTO
     public function actionConfiguracion()
     {
-        // Para el GridView de Parámetro Formato
+        
         $parametroFormatoSearchModel = new ParametroFormatoSearch();
         $parametroFormatoDataProvider = $parametroFormatoSearchModel->search(Yii::$app->request->queryParams);
     
-        // Para el GridView de Cat Puesto
+        
         $catPuestoSearchModel = new CatPuestoSearch();
         $catPuestoDataProvider = $catPuestoSearchModel->search(Yii::$app->request->queryParams);
 
@@ -252,6 +216,7 @@ class SiteController extends Controller
      *
      * @return Response
      */
+    //FUNCION QUE SE ENCARGA DE CERRAR LA SESIÓN DE LOS USUARIOS
     public function actionLogout()
     {
         Yii::$app->user->logout();
@@ -264,47 +229,35 @@ class SiteController extends Controller
      *
      * @return Response|string
      */
-    public function actionContact()
-    {
-        $model = new ContactForm();
-        if ($model->load(Yii::$app->request->post()) && $model->contact(Yii::$app->params['adminEmail'])) {
-            Yii::$app->session->setFlash('contactFormSubmitted');
-
-            return $this->refresh();
-        }
-        return $this->render('contact', [
-            'model' => $model,
-        ]);
-    }
-
+   
     /**
      * Displays about page.
      *
      * @return string
      */
-    public function actionAbout()
-    {
-        return $this->render('about');
-    }
-    public function actionPortalgestionrh()
-    {
-        $avisos = \app\models\Aviso::find()->all();
 
-        
 
-        $solicitudesRecientes = \app\models\Solicitud::find()
-            ->orderBy(['fecha_creacion' => SORT_DESC])
-            ->limit(10) 
-            ->all();
-    
-        return $this->render('portalgestionrh', [
-            'solicitudesRecientes' => $solicitudesRecientes,
-            'avisos' => $avisos,
-        ]);
-    }
-    
+   // FUNCION QUE SE ENCARGA DE RENDERIZAR EL INICIO DEL USUARIO MEDICO
+   public function actionPortalgestionrh()
+   {
+       $avisos = \app\models\Aviso::find()->all();
+$nuevasSolicitudesCount = \app\models\Solicitud::find()->where(['status' => 'Nueva'])->count();
 
+       
+
+       $solicitudesRecientes = \app\models\Solicitud::find()
+           ->orderBy(['fecha_creacion' => SORT_DESC])
+           ->limit(10) 
+           ->all();
    
+       return $this->render('portalgestionrh', [
+           'solicitudesRecientes' => $solicitudesRecientes,
+           'avisos' => $avisos,
+           'nuevasSolicitudesCount'=>  $nuevasSolicitudesCount,
+
+       ]);
+   }
+      // BUSCA LAS SOLICITUDES DE CITAS MEDICAS MÁS RECIENTES
         public function actionPortalMedico()
     {
         $solicitudesRecientes = \app\models\Solicitud::find()
@@ -328,23 +281,14 @@ class SiteController extends Controller
    
 
 
-    public function actionPortaltrabajador()
-    {
-        
-        $modelPermisoFueraTrabajo = new PermisoFueraTrabajo();
-       
-
-       
-        return $this->render('portaltrabajador', [
-            'modelPermisoFueraTrabajo' => $modelPermisoFueraTrabajo,
-        ]);
-    }
-
+    
 
     
 
    
-
+// FUNCION QUE SE ENCARGA DE OBTENER LA FOTO DEL USUARIO
+// LA OBTIENE DE LA CARPETA DEL EMPLEADO QUE SE ENCUENTRA
+// EN EL DIRECTORIO DE RUNTIME
     public function actionGetEmpleadoFoto($filename)
     {
         $filePath = Yii::getAlias('@runtime') . '/empleados/' . $filename;
@@ -354,6 +298,10 @@ class SiteController extends Controller
             throw new \yii\web\NotFoundHttpException("File not found");
         }
     }
+
+    // FUNCION QUE RENDERIZA EL INICIO DEL USUARIO EMPLEADO
+    // SE CARGA LA INFORMACIÓN ESPECIFICA DEL EMPLEADO EN BASE A LOS MODELOS
+    // PROPORCIONADOS
     public function actionPortalempleado()
     {
 
@@ -371,7 +319,6 @@ class SiteController extends Controller
             throw new NotFoundHttpException('El empleado no existe.');
         }
     
-        // Replicamos la lógica de la acción view del controlador empleado
         $documentos = $modelEmpleado->documentos;
         $documentoModel = new Documento();
         $documentoMedicoModel = new DocumentoMedico();

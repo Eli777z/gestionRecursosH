@@ -1,23 +1,18 @@
 <?php
-
-
+//IMPORTACIONES
 use app\models\Solicitud;
-
 use yii\bootstrap5\Alert;
 use yii\helpers\Html;
-
 use kartik\file\FileInput;
-
 use yii\web\View;
 use kartik\form\ActiveForm;
-
 use kartik\tabs\TabsX;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Empleado */
 
 //$activeTab = Yii::$app->request->get('tab', 'info_p');
-
+//CARGAR ESTILOS
 $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
 $this->registerCssFile('@web/css/grid-view.css', ['position' => View::POS_HEAD]);
 
@@ -39,7 +34,7 @@ $modelAntecedenteNoPatologico = new \app\models\AntecedenteNoPatologico();
 $modelExploracionFisica = new \app\models\ExploracionFisica();
 $editable = Yii::$app->user->can('editar-expediente-medico');
 
-
+//CARGAR ANTECEDENTES
 if ($antecedentes) {
     foreach ($antecedentes as $antecedente) {
         $antecedentesExistentes[$antecedente->cat_antecedente_hereditario_id][$antecedente->parentezco] = true;
@@ -49,7 +44,7 @@ if ($antecedentes) {
     }
 }
 
-// Si ya existe un antecedente patológico, obtenemos su descripción
+// Si ya existe un antecedente patológico se obtiene el registro
 $modelAntecedentePatologico = \app\models\AntecedentePatologico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
 if (!$modelAntecedentePatologico) {
     $modelAntecedentePatologico = new \app\models\AntecedentePatologico();
@@ -105,7 +100,7 @@ if (!$modelAlergia) {
         });
     }
 </script>
-<!-- Include Bootstrap Multiselect CSS and JS -->
+
 
 <div class="container-fluid">
     <div class="row justify-content-center">
@@ -118,7 +113,9 @@ if (!$modelAlergia) {
                                 'class' => 'rounded-circle',
                                 'style' => 'width: 130px; height: 130px;'
                             ]) ?>
-                            <?php if (Yii::$app->user->can('modificar-informacion-empleados')) : ?>
+                            <?php
+                            //PERMISO PARA PODER CAMBIAR LA FOTO DEL EMPLEADO
+                            if (Yii::$app->user->can('modificar-informacion-empleados')) : ?>
                                 <?= Html::button('<i class="fas fa-edit"></i>', [
                                     'class' => 'btn btn-dark position-absolute',
                                     'style' => 'top: 5px; right: 5px; padding: 5px 10px;',
@@ -137,7 +134,9 @@ if (!$modelAlergia) {
 
 
                     </div>
-                    <?php if (Yii::$app->user->can('crear-consulta-medica')) : ?>
+                    <?php 
+                    //PERMISO PARA MOSTRAR LOS BOTONES DE CREAR CONSULTA Y CITA MEDICA
+                    if (Yii::$app->user->can('crear-consulta-medica')) : ?>
 
                         <?php if ($model->expedienteMedico) : ?>
                             <?= Html::a('Nueva consulta <i class="fa fa-user-md" ></i>', ['consulta-medica/create', 'expediente_medico_id' => $model->expedienteMedico->id], [
@@ -160,16 +159,27 @@ if (!$modelAlergia) {
                         <?php endif; ?>
 
 
+                        <?php if ($model->id) : ?>
+        <?= Html::a('Informe Médico General <i class="fa fa-file-medical"></i>', ['informe-medico-general', 'id' => $model->id], [
+            'class' => 'btn btn-success mr-3 float-right fa-lg',
+            'title' => 'Ver informe médico general del empleado',
+            'target' => '_blank',
+        ]) ?>
+    <?php endif; ?>
+
+
+
                     <?php endif; ?>
+                    <?php 
+                    //PERMISO PARA MOSTRAR LOS BOTONES DE CREAR CONSULTA Y CITA MEDICA
+                    if (Yii::$app->user->can('aprobar-solicitudes')) { ?>
+                    <?= Html::a('Ver Horas Extras', ['//reporte-tiempo-extra/reporte', 'empleado_id' => $model->id], [   'class' => 'btn btn-success mr-3 float-right fa-lg']) ?>
+                    <?php }?>
 
                       
                 </div>
 
-
-
-
-
-                <!-- Modal -->
+            
                 <div class="modal fade" id="changePhotoModal" tabindex="-1" role="dialog" aria-labelledby="changePhotoModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-md" role="document">
                         <div class="modal-content">
@@ -181,7 +191,9 @@ if (!$modelAlergia) {
                                 </button>
                             </div>
                             <div class="modal-body">
-                                <?php $form = ActiveForm::begin([
+                                <?php 
+                                //FORMULARIO PARA SUBIR Y HACER EL CAMBIO DE FOTO DEL PERFIL
+                                $form = ActiveForm::begin([
                                     'action' => ['empleado/change-photo', 'id' => $model->id],
                                     'options' => ['enctype' => 'multipart/form-data']
                                 ]); ?>
@@ -222,7 +234,7 @@ if (!$modelAlergia) {
                                 <?php
 
 
-
+//ALERTA
                                 foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
                                     if ($type === 'error') {
                                         echo Alert::widget([
@@ -238,6 +250,7 @@ if (!$modelAlergia) {
                                 }
                                 ?>
                                 <?php 
+                                //VERIFICA EL ESTATUS DE PRIMERA_REVISION
         if ($model->expedienteMedico !== null) {
             if ($model->expedienteMedico->primera_revision === 0) {
                 echo '
@@ -314,17 +327,17 @@ if (!$modelAlergia) {
 
                             <?php $this->endBlock(); ?>
 
-
-
-
-
                             <?php
                             // Función para contar las nuevas solicitudes
                          // Función para contar las nuevas solicitudes de un empleado específico
 function countNewSolicitudes($empleado_id)
 {
-    // Cambia la condición según tu lógica para determinar qué solicitudes se consideran nuevas
     return Solicitud::find()->where(['status' => 'Nueva', 'empleado_id' => $empleado_id])->count();
+}
+
+function countNewSolicitudesMedicas($empleado_id)
+{
+    return Solicitud::find()->where(['status' => 'Nueva', 'nombre_formato' => 'CITA MEDICA', 'empleado_id' => $empleado_id])->count();
 }
 
 
@@ -334,9 +347,8 @@ $empleado_id = $model->id;
 
 // Contar las nuevas solicitudes para el empleado específico
 $newSolicitudesCount = countNewSolicitudes($empleado_id);
+$newSolicitudesMedicasCount = countNewSolicitudesMedicas($empleado_id);
 
-
-                            // Configurar las pestañas
                            // Configurar las pestañas
 $tabs = [
     [
@@ -365,7 +377,7 @@ if (Yii::$app->user->can('ver-informacion-vacacional')) {
     ];
 }
 
-if (Yii::$app->user->can('medico') || Yii::$app->user->can('gestor-rh')) {
+if ( Yii::$app->user->can('gestor-rh')) {
     $tabs[] = [
         'label' => 'Solicitudes' . ($newSolicitudesCount > 0 ? " <span class='badge badge-danger'>$newSolicitudesCount</span>" : ''),
         'content' => $this->blocks['info_solicitudes'],
@@ -373,7 +385,22 @@ if (Yii::$app->user->can('medico') || Yii::$app->user->can('gestor-rh')) {
             'id' => 'informacion_solicitudes',
         ],
     ];
-} else {
+} 
+
+
+else if (Yii::$app->user->can('medico') ) {
+    $tabs[] = [
+        'label' => 'Solicitudes' . ($newSolicitudesMedicasCount > 0 ? " <span class='badge badge-danger'>$newSolicitudesMedicasCount</span>" : ''),
+        'content' => $this->blocks['info_solicitudes'],
+        'options' => [
+            'id' => 'informacion_solicitudes',
+        ],
+    ];
+} 
+
+
+
+else {
     $tabs[] = [
         'label' => 'Solicitudes',
         'content' => $this->blocks['info_solicitudes'],
@@ -382,7 +409,7 @@ if (Yii::$app->user->can('medico') || Yii::$app->user->can('gestor-rh')) {
         ],
     ];
 }
-
+// CARGAR TABS CON LOS BLOQUES QUE RENDERIZAN LAS VISTAS DE INFORMACION
 echo TabsX::widget([
     'enableStickyTabs' => true,
     'options' => ['class' => 'nav-tabs-custom'],
@@ -396,6 +423,7 @@ echo TabsX::widget([
 
                             <?php $this->beginBlock('info_consultas'); ?>
                             <?php
+                            //RENDERIZAR HISTORIAL DE CONSULTAS MEDICAS
                             echo $this->render('informacion_consultas', [
                                 'model' => $model,
 
@@ -411,7 +439,7 @@ echo TabsX::widget([
 
                             <?php $this->beginBlock('expediente'); ?>
                             <?php
-                           
+                           //RENDERIZAR DOCUMENTOS DEL EMPLEADO
                             echo $this->render('documentos_empleado', [
                                 'model' => $model,
                                 'searchModel' => $searchModel,
@@ -423,20 +451,22 @@ echo TabsX::widget([
                             ?>
 
                             <?php $this->endBlock(); ?>
-                            <?php $this->beginBlock('expediente_medico'); ?>
+                            <?php 
+                            //BLOQUE DONDE SE RENDERIZA LA INFORMACION MEDICA DEL
+                            //EMPLEADO Y SUS RESPECTIVOS FORMULARIOS
+                                                       $this->beginBlock('expediente_medico'); ?>
 
                             <?php $this->beginBlock('documento-medico'); ?>
                             <?php
-                            // Otros contenidos de la vista principal
+                            // RENDERIZA DOCUMENTO MEDICOS
 
-                            // Incluir el contenido del nuevo archivo de vista
+                       
                             echo $this->render('documento_medico_empleado', [
                                 'model' => $model,
                                 'searchModel' => $searchModel,
                                 'dataProvider' => $dataProvider,
                                 'documentoMedicoModel' => $documentoMedicoModel,
-                                // 'currentDate' => $currentDate,
-                                //'historial' => $historial,
+                              
                             ]);
                             ?>
                             <?php $this->endBlock(); ?>
@@ -468,8 +498,7 @@ echo TabsX::widget([
 
                             echo $this->render('antecedente_patologico', [
                                 'model' => $model,
-                                // 'catAntecedentes' => $catAntecedentes,
-                                //'antecedentes' => $antecedentes,
+         
                                 'antecedentePatologico' => $antecedentePatologico,
 
 
@@ -482,15 +511,11 @@ echo TabsX::widget([
 
                             <?php $this->beginBlock('no_patologicos'); ?>
                             <?php
-
+                        
                             echo $this->render('antecedente_no_patologico', [
                                 'model' => $model,
-                                // 'catAntecedentes' => $catAntecedentes,
-                                //'antecedentes' => $antecedentes,
+
                                 'antecedenteNoPatologico' => $antecedenteNoPatologico,
-
-
-
 
                             ]);
                             ?>
@@ -501,8 +526,7 @@ echo TabsX::widget([
 
                             echo $this->render('antecedente_perinatal', [
                                 'model' => $model,
-                                // 'catAntecedentes' => $catAntecedentes,
-                                //'antecedentes' => $antecedentes,
+
                                 'AntecedentePerinatal' => $AntecedentePerinatal,
                                 'expedienteMedico' => $expedienteMedico,
 
@@ -520,8 +544,7 @@ echo TabsX::widget([
 
                             echo $this->render('antecedente_ginecologico', [
                                 'model' => $model,
-                                // 'catAntecedentes' => $catAntecedentes,
-                                //'antecedentes' => $antecedentes,
+
                                 'AntecedenteGinecologico' => $AntecedenteGinecologico,
 
                                 'expedienteMedico' => $expedienteMedico,
@@ -540,11 +563,9 @@ echo TabsX::widget([
 
                             echo $this->render('antecedente_obstrectico', [
                                 'model' => $model,
-                                // 'catAntecedentes' => $catAntecedentes,
-                                //'antecedentes' => $antecedentes,
+
                                 'AntecedenteObstrectico' => $AntecedenteObstrectico,
 
-                                //'expedienteMedico' => $expedienteMedico,
 
 
 
@@ -554,96 +575,99 @@ echo TabsX::widget([
                             ?>
                             <?php $this->endBlock(); ?>
 
+                            <!-- TABS EXPEDIENTE MEDICO  -->
 
-
-
-
-
-
-
-                            <!-- TABS EXPEDIENTE MEDICO / ANTECEDENTES SUBTAB -->
-
-                            <?php echo TabsX::widget([
-                                'enableStickyTabs' => true,
-                                'options' => ['class' => 'nav-tabs-custom'],
-                                'items' => [
-                                    [
-                                        'label' => 'Hereditarios',
-                                        'content' => $this->blocks['hereditarios'],
-                                        //'active' => true,
-                                        'options' => [
-                                            'id' => 'hereditarios',
-                                        ],
-
-
-                                    ],
-                                    [
-                                        'label' => 'Patologicos',
-                                        'content' => $this->blocks['patologicos'],
-
-                                        'options' => [
-                                            'id' => 'patologicos',
-                                        ],
-
-
-                                    ],
-                                    [
-                                        'label' => 'No Patologicos',
-                                        'content' => $this->blocks['no_patologicos'],
-
-                                        'options' => [
-                                            'id' => 'nopatologicos',
-                                        ],
-
-
-                                    ],
-                                    [
-                                        'label' => 'Perinatales',
-                                        'content' => $this->blocks['perinatales'],
-
-                                        'options' => [
-                                            'id' => 'perinatales',
-                                        ],
-
-
-                                    ],
-
-                                    [
-                                        'label' => 'Ginecologicos',
-                                        'content' => $this->blocks['ginecologicos'],
-
-                                        'options' => [
-                                            'id' => 'ginecologicos',
-                                        ],
-
-
-                                    ],
-
-                                    [
-                                        'label' => 'Obstrecticos',
-                                        'content' => $this->blocks['obstrecticos'],
-
-                                        'options' => [
-                                            'id' => 'obstrecticos',
-                                        ],
-
-
-                                    ],
-
-
-
-
-                                ],
-                                'position' => TabsX::POS_ABOVE,
-                                'align' => TabsX::ALIGN_CENTER,
-                                //     'bordered'=>true,
-                                'encodeLabels' => false
-
-
-                            ]);
-
-                            ?>
-
+                            <?php if($model->sexo === "Femenino" ){ ?>
+    <?php echo TabsX::widget([
+        'enableStickyTabs' => true,
+        'options' => ['class' => 'nav-tabs-custom'],
+        'items' => [
+            [
+                'label' => 'Hereditarios',
+                'content' => $this->blocks['hereditarios'],
+                'options' => [
+                    'id' => 'hereditarios',
+                ],
+            ],
+            [
+                'label' => 'Patologicos',
+                'content' => $this->blocks['patologicos'],
+                'options' => [
+                    'id' => 'patologicos',
+                ],
+            ],
+            [
+                'label' => 'No Patologicos',
+                'content' => $this->blocks['no_patologicos'],
+                'options' => [
+                    'id' => 'nopatologicos',
+                ],
+            ],
+            [
+                'label' => 'Perinatales',
+                'content' => $this->blocks['perinatales'],
+                'options' => [
+                    'id' => 'perinatales',
+                ],
+            ],
+            [
+                'label' => 'Ginecologicos',
+                'content' => $this->blocks['ginecologicos'],
+                'options' => [
+                    'id' => 'ginecologicos',
+                ],
+            ],
+            [
+                'label' => 'Obstrecticos',
+                'content' => $this->blocks['obstrecticos'],
+                'options' => [
+                    'id' => 'obstrecticos',
+                ],
+            ],
+        ],
+        'position' => TabsX::POS_ABOVE,
+        'align' => TabsX::ALIGN_CENTER,
+        'encodeLabels' => false
+    ]); ?>
+<?php } else { ?>
+    <?php echo TabsX::widget([
+        'enableStickyTabs' => true,
+        'options' => ['class' => 'nav-tabs-custom'],
+        'items' => [
+            [
+                'label' => 'Hereditarios',
+                'content' => $this->blocks['hereditarios'],
+                'options' => [
+                    'id' => 'hereditarios',
+                ],
+            ],
+            [
+                'label' => 'Patologicos',
+                'content' => $this->blocks['patologicos'],
+                'options' => [
+                    'id' => 'patologicos',
+                ],
+            ],
+            [
+                'label' => 'No Patologicos',
+                'content' => $this->blocks['no_patologicos'],
+                'options' => [
+                    'id' => 'nopatologicos',
+                ],
+            ],
+            [
+                'label' => 'Perinatales',
+                'content' => $this->blocks['perinatales'],
+                'options' => [
+                    'id' => 'perinatales',
+                ],
+            ],
+        ],
+        'position' => TabsX::POS_ABOVE,
+        'align' => TabsX::ALIGN_CENTER,
+        'encodeLabels' => false
+    ]); ?>
+<?php } ?>
 
 
                             <?php $this->endBlock(); ?>
@@ -654,15 +678,8 @@ echo TabsX::widget([
 
                             echo $this->render('alergias', [
                                 'model' => $model,
-                                // 'catAntecedentes' => $catAntecedentes,
-                                //'antecedentes' => $antecedentes,
+                               
                                 'Alergia' => $Alergia,
-
-                                //'expedienteMedico' => $expedienteMedico,
-
-
-
-
 
                             ]);
                             ?>
@@ -675,15 +692,8 @@ echo TabsX::widget([
 
                             echo $this->render('exploracion_fisica', [
                                 'model' => $model,
-                                // 'catAntecedentes' => $catAntecedentes,
-                                //'antecedentes' => $antecedentes,
+                               
                                 'ExploracionFisica' => $ExploracionFisica,
-
-
-                                //'expedienteMedico' => $expedienteMedico,
-
-
-
 
 
                             ]);
@@ -696,12 +706,10 @@ echo TabsX::widget([
 
                             echo $this->render('interrogatorio_medico', [
                                 'model' => $model,
-                                // 'catAntecedentes' => $catAntecedentes,
-                                //'antecedentes' => $antecedentes,
+                               
                                 'InterrogatorioMedico' => $InterrogatorioMedico,
 
 
-                                //'expedienteMedico' => $expedienteMedico,
 
 
 
@@ -740,7 +748,6 @@ echo TabsX::widget([
                                 ],
                             ];
 
-                            // Agregar la pestaña de Documentos Médicos si el usuario tiene el permiso
                             if (Yii::$app->user->can('ver-documentos-medicos')) {
                                 $items[] = [
                                     'label' => 'Documentos Médicos',
@@ -848,23 +855,21 @@ echo TabsX::widget([
     </div>
     <!--.row-->
     <script>
+        //SCRIPT PARA SEGURARSE DE QUE SE RECARGUEN BIEN 
+        //LAS PESTAÑAS EN BASE A SU ID
         $(document).ready(function() {
-            // Function to activate tabs based on the hash in the URL
             function activateTabFromHash() {
                 var hash = window.location.hash;
 
-                // Check if the hash exists and it's not empty
                 if (hash) {
                     var tabId = hash.replace('#', '');
 
-                    // Find the tab that matches the hash
                     var tabLink = $('a[href="' + hash + '"]');
 
-                    // If the tab exists, activate it
                     if (tabLink.length) {
                         tabLink.tab('show');
 
-                        // Activate parent tabs if the tab is nested
+                       
                         tabLink.parents('.tab-pane').each(function() {
                             var parentTabId = $(this).attr('id');
                             $('a[href="#' + parentTabId + '"]').tab('show');
@@ -873,19 +878,15 @@ echo TabsX::widget([
                 }
             }
 
-            // Activate the tab based on the hash in the URL when the page loads
             activateTabFromHash();
 
-            // Activate the tab based on the hash in the URL when the hash changes
             $(window).on('hashchange', function() {
                 activateTabFromHash();
             });
 
-            // Update the URL hash when a tab is clicked
             $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
                 window.location.hash = $(e.target).attr('href');
             });
         });
     </script>
 </div>
-<!--.container-fluid-->

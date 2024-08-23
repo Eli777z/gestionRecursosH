@@ -53,17 +53,14 @@ $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
                     }
                     ?>
 
-                    <?= Html::button('Mostrar', [
-                        'class' => 'btn btn-warning float-right',
-                        'id' => 'toggle-card-body',
-                    ]) ?>
+                    
                 </div>
 
                 <div id="loading-spinner-laboral" style="display: none;">
                     <i class="fa fa-spinner fa-spin fa-2x" style="color: #000000;"></i> Procesando...
                 </div>
 
-                <div class="card-body" style="display: none;">
+                <div class="card-body">
                     <div class="row">
                         <div class="col-12">
                             <p><strong>Permisos usados:</strong> <?= $permisosUsados ?></p>
@@ -95,7 +92,7 @@ $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
                                             <div class="col-6 col-sm-3">
                                                 <?= $form->field($motivoFechaPermisoModel, 'fecha_permiso')->input('date')->label('Fecha de permiso') ?>
                                             </div>
-
+                                            <div class="w-100"></div>
                                             <div class="col-6 col-sm-9">
                                                 <?= $form->field($motivoFechaPermisoModel, 'motivo')->widget(FroalaEditorWidget::className(), [
                                                     'options' => [
@@ -137,17 +134,7 @@ $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
                 <?php
                 $script = <<<JS
                 // Script para el botón de mostrar/ocultar y cambiar el texto del botón
-                $('#toggle-card-body').on('click', function() {
-                    var cardBody = $('.card-body');
-                    cardBody.toggle();
-
-                    // Cambia el texto del botón dependiendo del estado de cardBody
-                    if (cardBody.is(':visible')) {
-                        $(this).text('Ocultar');
-                    } else {
-                        $(this).text('Mostrar');
-                    }
-                });
+               
 
                 $('#employee-form').on('beforeSubmit', function() {
                     var button = $('#save-button-personal');

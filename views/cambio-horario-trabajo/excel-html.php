@@ -114,7 +114,7 @@ $this->title = 'Cambio_Horario_Trabajo_'.$model->empleado->nombre.' '.$model->em
     .floating-btn {
         position: fixed;
         bottom: 45%; /* Ajusta la distancia desde la parte inferior */
-        right: 45%; /* Ajusta la distancia desde la parte derecha */
+        right: 35%; /* Ajusta la distancia desde la parte derecha */
         z-index: 1000; /* Asegúrate de que el botón esté por encima de otros elementos */
         padding: 10px 20px; /* Ajusta el relleno del botón */
         border-radius: 50px; /* Haz que el botón sea redondeado */

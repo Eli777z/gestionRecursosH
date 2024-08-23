@@ -138,6 +138,35 @@ class CambioPeriodoVacacionalController extends Controller
             return $this->redirect(['index']);
         }
 
+             // Lógica para verificar si se han creado solicitudes muy recientes
+$nombreFormato = 'CAMBIO DE PERIODO VACACIONAL';
+$tiempoLimite = new \DateTime('-24 hours');
+
+$solicitudReciente = Solicitud::find()
+    ->where(['empleado_id' => $empleado->id, 'nombre_formato' => $nombreFormato])
+    ->andWhere(['>', 'created_at', $tiempoLimite->format('Y-m-d H:i:s')])
+    ->orderBy(['created_at' => SORT_DESC])
+    ->one();
+
+if ($solicitudReciente) {
+    $fechaUltimaSolicitud = new \DateTime($solicitudReciente->created_at);
+    $intervalo = $fechaUltimaSolicitud->diff(new \DateTime());
+    
+    // Convertir el intervalo a un formato amigable (días, horas, minutos)
+    $tiempoTranscurrido = '';
+    if ($intervalo->d > 0) {
+        $tiempoTranscurrido .= $intervalo->d . ' día(s) ';
+    }
+    if ($intervalo->h > 0) {
+        $tiempoTranscurrido .= $intervalo->h . ' hora(s) ';
+    }
+    if ($intervalo->i > 0) {
+        $tiempoTranscurrido .= $intervalo->i . ' minuto(s)';
+    }
+
+    Yii::$app->session->setFlash('warning', '<i class="fas fa-bell"></i> Ya has creado una solicitud recientemente. Última solicitud hace: ' . $tiempoTranscurrido);
+}
+
         // Calcular permisos usados y disponibles
         $year = date('Y');
         $tipoContratoId = $empleado->informacionLaboral->cat_tipo_contrato_id;
@@ -148,7 +177,7 @@ class CambioPeriodoVacacionalController extends Controller
         
         if (!$parametroFormato) {
             Yii::$app->session->setFlash('error', 'No se pudo encontrar el parámetro de formato para tu tipo de contrato.');
-         //   return $this->redirect(['index']);
+            return $this->redirect(['empleado/index']);
         }
         
     

@@ -1,7 +1,7 @@
 <?php
 
 namespace app\controllers;
-
+use app\models\Usuario;
 use app\models\CambioDiaLaboral;
 use app\models\CambioHorarioTrabajo;
 use Yii;
@@ -22,6 +22,7 @@ use app\models\ComisionEspecialSearch;
 use app\models\PeriodoVacacionalHistorial;
 use app\models\PermisoEconomico;
 use app\models\ActividadReporteTiempoExtra;
+use app\models\ContratoParaPersonalEventual;
 use app\models\PermisoFueraTrabajo;
 use app\models\PermisoSinSueldo;
 use app\models\ReporteTiempoExtra;
@@ -68,6 +69,8 @@ class SolicitudController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
+
+     //MOSTRAR LA SOLICITUD CON EL REGISTRO DEL FORMATO ASOCIADO
     public function actionView($id)
     {
         $model = $this->findModel($id);
@@ -102,9 +105,12 @@ class SolicitudController extends Controller
     
 
     
-    
+    //OBTENER EL FORMATO ASOCIADO A LA SOLICITUD
     protected function getFormatoAsociado($solicitud)
     {
+        //EN BASE A LOS DIFERENTES MODELOS DE FORMATOS QUE EXISTEN
+        //SE IDENTIFICA LA SOLICITUD ASOCIADA A LOS REGISTROS 
+        //Y SE SABE DE QUE TIPO DE SOLICITUD ES LA QUE SE ESTA SOLICITANDO
         switch ($solicitud->nombre_formato) {
             case 'PERMISO FUERA DEL TRABAJO':
                 return PermisoFueraTrabajo::findOne(['solicitud_id' => $solicitud->id]);
@@ -125,6 +131,8 @@ class SolicitudController extends Controller
                 return CambioPeriodoVacacional::findOne(['solicitud_id' => $solicitud->id]);
                 case 'REPORTE DE TIEMPO EXTRA':
                     return ReporteTiempoExtra::findOne(['solicitud_id' => $solicitud->id]);
+                    case 'SOLICITUD DE CONTRATO PARA PERSONAL EVENTUAL':
+                        return ContratoParaPersonalEventual::findOne(['solicitud_id' => $solicitud->id]);
             default:
                 return null;
         }
@@ -154,23 +162,25 @@ class SolicitudController extends Controller
         $model = $this->findModel($id);
     
         if (Yii::$app->request->isPost) {
-            $status = Yii::$app->request->post('status');
+            //se recibien los valores del active form
+            $aprobacion = Yii::$app->request->post('aprobacion');
             $comentario = Yii::$app->request->post('comentario');
     
-            $model->status = $status;
+            $model->aprobacion = $aprobacion;
             $model->comentario = $comentario;
-    
+    //se identifica el usuario que tiene la sesion iniciada
             $usuarioId = Yii::$app->user->identity->id;
             $empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();
     
             if ($empleado) {
+                //se añade la fecha en que se aprobo y el nombre del aprobante
                 $model->fecha_aprobacion = date('Y-m-d H:i:s');
                 $model->nombre_aprobante = $empleado->nombre . ' ' . $empleado->apellido;
     
                 if ($model->save()) {
                     $notificacion = new Notificacion();
                     $notificacion->usuario_id = $model->empleado->usuario_id;
-                    $notificacion->mensaje = 'Su solicitud ha sido ' . ($status == 'Aprobado' ? 'aprobada' : 'rechazada') . '.';
+                  //  $notificacion->mensaje = 'Su solicitud ha sido ' . ($status == 'Aprobado' ? 'aprobada' : 'rechazada') . '.';
                     $notificacion->created_at = date('Y-m-d H:i:s');
                     $notificacion->leido = 0;
     
@@ -276,6 +286,93 @@ class SolicitudController extends Controller
         }
     
         return $this->redirect(['index']);
+    }
+
+
+
+
+
+    public function actionAprobarSolicitudMedica($id)
+{
+    $model = $this->findModel($id);
+
+    if (Yii::$app->request->isPost) {
+        $aprobacion = Yii::$app->request->post('aprobacion');
+        $comentario = Yii::$app->request->post('comentario');
+
+        $model->aprobacion = $aprobacion;
+        $model->comentario = $comentario;
+
+        $usuarioId = Yii::$app->user->identity->id;
+        $empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();
+
+        if ($empleado) {
+            $model->fecha_aprobacion = date('Y-m-d H:i:s');
+            $model->nombre_aprobante = $empleado->nombre . ' ' . $empleado->apellido;
+
+            if ($model->save()) {
+                // Verificar si la solicitud fue aprobada
+                if ($aprobacion === 'APROBADO') {
+                    // Obtener el email del médico
+                    $medicoEmail = $this->getMedicoEmail();
+                    
+                    // Configurar el mensaje de éxito con el email del médico y el enlace
+                    $successMessage = 'La cita médica y la solicitud han sido creadas exitosamente.';
+                    $enlaceEmpleado = Yii::$app->urlManager->createUrl(['empleado/view', 'id' => $model->empleado->id]);
+                    $successMessage .= " Puedes ver el empleado en el siguiente enlace: <a href='$enlaceEmpleado'>$enlaceEmpleado</a>";
+
+                    if ($medicoEmail) {
+                        $successMessage .= " El correo del médico es: $medicoEmail";
+                    } else {
+                        $successMessage .= " No se encontró el correo del médico.";
+                    }
+
+                    // Enviar correo al médico
+                    if ($medicoEmail) {
+                        Yii::$app->mailer->compose()
+                        ->setTo($medicoEmail)
+                        ->setFrom(Yii::$app->params['adminEmail'])
+                        ->setSubject('Nueva cita médica creada')
+                        ->setTextBody("Se ha creado una nueva cita médica para el empleado: {$model->empleado->nombre} {$model->empleado->apellido}. Puedes ver el empleado en el siguiente enlace: http://localhost:82$enlaceEmpleado")
+                        ->send();
+                    
+                    }
+
+                    Yii::$app->session->setFlash('success', $successMessage);
+                } else {
+                    Yii::$app->session->setFlash('success', 'La solicitud ha sido rechazada.');
+                }
+            } else {
+                Yii::$app->session->setFlash('error', 'Hubo un error al modificar la solicitud.');
+            }
+        } else {
+            Yii::$app->session->setFlash('error', 'No se pudo encontrar el empleado asociado al usuario actual.');
+        }
+
+        return $this->redirect(['view', 'id' => $model->id]);
+    }
+
+    return $this->redirect(['index']);
+}
+
+
+    private function getMedicoEmail()
+    {
+        $usuarioMedico = Usuario::find()->where(['rol' => 3])->one();
+    
+        if ($usuarioMedico) {
+            $medicoEmpleado = Empleado::find()->where(['usuario_id' => $usuarioMedico->id])->one();
+            
+            if ($medicoEmpleado) {
+                return $medicoEmpleado->email;
+            } else {
+                Yii::debug("No se encontró un empleado asociado al usuario médico con ID: " . $usuarioMedico->id);
+            }
+        } else {
+            Yii::debug("No se encontró un usuario con rol médico (rol = 3).");
+        }
+    
+        return null;
     }
     
      /**

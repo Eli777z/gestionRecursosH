@@ -15,7 +15,9 @@ $this->params['breadcrumbs'] = [['label' => $this->title]];
         <h3><i class="fas fa-exclamation-triangle text-danger"></i> <?= Html::encode($name) ?></h3>
 
         <p>
-            <?= nl2br(Html::encode($message)) ?>
+            <?=
+            //SE OBTIENE EL MENSAJE DEL ERROR PRODUCIDO EN EL SISTEMA
+            nl2br(Html::encode($message)) ?>
         </p>
 
         <p>

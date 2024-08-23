@@ -45,6 +45,7 @@ use Yii;
 class Empleado extends \yii\db\ActiveRecord
 {
 
+    //ESCENARIO PARA IDENTIFICAR EN QUE MOMENTO SERAN OBLIGATORIOS ALGUNOS CAMPOS
     const SCENARIO_CREATE = 'create';
     const SCENARIO_UPDATE = 'update';
     const SCENARIO_UPDATE_INFO_EDU = 'update';
@@ -65,29 +66,22 @@ class Empleado extends \yii\db\ActiveRecord
     {
         return [
             [['numero_empleado', 'usuario_id', 'informacion_laboral_id', 'nombre', 'apellido', 'email', 'profesion',
-        //'fecha_nacimiento',
-       // 'sexo',
-        //'estado_civil',
-        //'curp',
-        //'nss',
-        //'rfc'
+      
         
         
         ], 'required'],
             [['numero_empleado', 'usuario_id', 'informacion_laboral_id', 'cat_nivel_estudio_id', 'parametro_formato_id', 'edad', 'codigo_postal', 'expediente_medico_id'], 'integer'],
             [['fecha_nacimiento'], 'safe'],
             [['numero_empleado'], 'unique', 'message' => 'Este número de empleado ya existe.'],
-
-          //  [['numero_empleado'], 'match', 'pattern' => '/^\d{4}$/', 'message' => 'Solo se aceptan maximo 4 digitos.'],
             [['numero_casa'], 'string', 'max' => 4],
             [['estado_civil', 'sexo'], 'string', 'max' => 12],
             [['nombre'], 'string', 'max' => 30],
-            [['nombre', 'apellido'], 'match', 'pattern' => '/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/', 'message' => 'Solo se permiten letras y espacios.'],
+            [['nombre', 'apellido'], 'match', 'pattern' => '/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/', 'message' => 'Solo se permiten letras y espacios.'],//EXPRESIÓN PARA VALIDAR NOMBRE
             [['email'], 'email'],
             [['apellido'], 'string', 'max' => 60],
             [[ 'email'], 'string', 'max' => 100],
             [['foto'], 'string', 'max' => 255],
-            [['telefono', 'telefono_contacto_emergencia'], 'match', 'pattern' => '/^[0-9+\-\(\)\s]*$/', 'message' => 'El teléfono solo puede contener números, espacios y los símbolos +, -, (, ).'],
+            [['telefono', 'telefono_contacto_emergencia'], 'match', 'pattern' => '/^[0-9+\-\(\)\s]*$/', 'message' => 'El teléfono solo puede contener números, espacios y los símbolos +, -, (, ).'], //EXPRESIÓN PARA VALIDAR NUMERO DE CELULAR
             [['telefono', 'telefono_contacto_emergencia'], 'string', 'max' => 15],
             [['colonia'], 'string', 'max' => 50],
             [['profesion'], 'string', 'max' => 15],
@@ -95,11 +89,11 @@ class Empleado extends \yii\db\ActiveRecord
             [['nombre_contacto_emergencia'], 'string', 'max' => 90],
             [['relacion_contacto_emergencia'], 'string', 'max' => 25],
             [['curp'], 'match', 'pattern' => '/^([A-Z][AEIOUX][A-Z]{2}\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])[HM](?:AS|B[CS]|C[CLMSH]|D[FG]|G[TR]|HG|JC|M[CNS]|N[ETL]|OC|PL|Q[TR]|S[PLR]|T[CSL]|VZ|YN|ZS)[B-DF-HJ-NP-TV-Z]{3}[A-Z\d])(\d)$/
-', 'message' => 'El CURP no tiene un formato válido.'],
+', 'message' => 'El CURP no tiene un formato válido.'], //EXPRESIÓN PARA VALIDAR CURP
             [['curp'], 'string', 'max' => 18],
 
             [['rfc'], 'match', 'pattern' => '/^([A-ZÑ&]{3,4}) ?(?:- ?)?(\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])) ?(?:- ?)?([A-Z\d]{2})([A\d])$/
-', 'message' => 'El RFC no tiene un formato válido.'],
+', 'message' => 'El RFC no tiene un formato válido.'], //EXPRESIÓN PARA VALIDAR RFC
             [['rfc'], 'string', 'max' => 13],
             [['nss'], 'match', 'pattern' => '/^\d{11}$/', 'message' => 'El NSS debe contener exactamente 11 dígitos.'],
             [['nss'], 'string', 'max' => 11],
@@ -122,18 +116,16 @@ class Empleado extends \yii\db\ActiveRecord
         
             [['numero_empleado', 'usuario_id', 'nombre', 'apellido', 'email', 'profesion'], 'required', 'on' => self::SCENARIO_CREATE],
             [['fecha_nacimiento', 'sexo', 'estado_civil', 'curp', 'nss', 'rfc', 'colonia', 'calle', 'codigo_postal', 'numero_casa', 'telefono'], 'required', 'on' => self::SCENARIO_UPDATE],
-
- //[['cat_nivel_estudio_id', 'institucion_educativa'], 'required', 'on' => self::SCENARIO_UPDATE_INFO_EDU],
         
         ];
     }
 
     public function scenarios()
     {
+        //SE ESTABLECEN LOS ESCENARIOS CON LOS CAMPOS QUE PARTICIPARAN EN CADA UNO DE ESTOS
         $scenarios = parent::scenarios();
         $scenarios[self::SCENARIO_CREATE] = ['numero_empleado', 'usuario_id', 'nombre', 'apellido', 'email', 'profesion'];
         $scenarios[self::SCENARIO_UPDATE] = ['numero_empleado', 'usuario_id', 'informacion_laboral_id', 'nombre', 'apellido', 'email', 'profesion','fecha_nacimiento', 'sexo', 'estado_civil', 'curp', 'nss', 'rfc', 'colonia', 'calle', 'codigo_postal', 'numero_casa', 'telefono', 'telefono_contacto_emergencia'];
-       // $scenarios[self:: SCENARIO_UPDATE_INFO_EDU] = ['cat_nivel_estudio_id', 'institucion_educativa'];
         return $scenarios;
     }
 
@@ -188,6 +180,8 @@ class Empleado extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
+   
+     // RELACIONES
     public function getDocumentos()
     {
         return $this->hasMany(Documento::class, ['empleado_id' => 'id']);

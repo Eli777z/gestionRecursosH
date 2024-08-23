@@ -1,10 +1,8 @@
 
 <?php
-
-
+//IMPORTACIONES
 use yii\helpers\Html;
 use froala\froalaeditor\FroalaEditorWidget;
-
 use kartik\file\FileInput;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
@@ -19,7 +17,9 @@ use app\models\DocumentoMedicoSearch;
                                     <div class="card">
                                         <div class="card-header bg-info text-white">
                                             <h3>Documentos médicos del empleado</h3>
-                                            <?php if (Yii::$app->user->can('acciones-documentos-medicos')) { ?>
+                                            <?php
+                                            //PERMISO PARA PODER REALIZAR ACCIONES DE LOS REGISTROS DE LOS DOCUMENTOS MEDICOS
+                                            if (Yii::$app->user->can('acciones-documentos-medicos')) { ?>
 
                                                 <button type="button" id="toggle-expediente-medico-button" class="btn btn-dark float-right">
                                                     <i class="fa fa-upload"></i>&nbsp; &nbsp; Agregar nuevo archivo
@@ -42,7 +42,9 @@ use app\models\DocumentoMedicoSearch;
                                         </script>
 
                                         <div class="card-body" id="expediente-medico-content" style="display: none;">
-                                            <?php $form = ActiveForm::begin([
+                                            <?php 
+                                            //FORMULARIO PARA SUBIR EL ARCHIVO MEDICO Y CREAR UN NUEVO REGISTRO
+                                            $form = ActiveForm::begin([
                                                 'action' => ['documento-medico/create', 'empleado_id' => $model->id],
                                                 'options' => ['enctype' => 'multipart/form-data', 'class' => 'narrow-form']
                                             ]); ?>
@@ -69,7 +71,7 @@ use app\models\DocumentoMedicoSearch;
                                                             'quickInsert', 'quote', 'save', 'table', 'url', 'wordPaste'
                                                         ]
                                                     ]
-                                                ]) ?>
+                                                ]) //EXTENSION QUE PERMITE QUE EL CAMPO DE TEXTO PUEDA MOSTRARSE COMO UN EDITOR DE TEXTO FUNCIONAL ?>
                                             </div>
 
                                             <div class="form-group">
@@ -151,6 +153,9 @@ use app\models\DocumentoMedicoSearch;
                                                             'options' => ['style' => 'width: 51%;'],
                                                         ],
                                                         [
+                                                            //ACCIONES QUE SE PUEDEN REALIZAR CON LOS REGISTROS DE LOS DOCUMENTOS MEDICOS
+                                                            // SE VERIFICA LOS TIPOS DE ARCHIVO QUE PUEDE SER VISIBLES DESDE EL NAVEGADOR Y LOS 
+                                                            //QUE NO, SOLO SE PERMITE QUE SEAN DESCARGADOS
                                                             'class' => 'hail812\adminlte3\yii\grid\ActionColumn',
                                                             //'template' => '{view} {delete} {download}',
                                                             'template' => Yii::$app->user->can('acciones-documentos-medicos') ? '{view} {delete} {download}' : '{view} {download}',
@@ -169,7 +174,6 @@ use app\models\DocumentoMedicoSearch;
                                                                             'data-pjax' => "0"
                                                                         ]);
                                                                     } else {
-                                                                        // Si no es un archivo con extensión permitida, no mostrar el ícono del ojo
                                                                         return '';
                                                                     }
                                                                 },

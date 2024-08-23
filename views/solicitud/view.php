@@ -1,5 +1,5 @@
 <?php
-
+//IMPORTACIONES
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\bootstrap5\Alert;
@@ -12,10 +12,9 @@ $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
 $this->title = $model->id;
 
 
-//$this->params['breadcrumbs'][] = ['label' => 'Solicitudes', 'url' => ['solicitud/index']];
 
 if ($empleadoId !== null && Yii::$app->user->can('medico') || Yii::$app->user->can('gestor-rh')) {
-   
+//PERMISO   
     $this->params['breadcrumbs'][] = ['label' => 'Empleado: ' .$model->empleado->nombre . ' ' . $model->empleado->apellido, 'url' => ['empleado/view', 'id' => $empleadoId]];
 }
 else  if (Yii::$app->user->can('empleado')) {
@@ -44,7 +43,8 @@ $this->params['breadcrumbs'][] = ['label' => 'Solicitud ' . $model->id];
                         <?php }else { ?>
                             <h3> Solicitud  </h3>
                             <p>  Empleado: <?= $model->empleado->nombre.' '.$model->empleado->apellido ?></p>
-
+                            
+                 
                             
                         <?php } ?>
 
@@ -59,44 +59,13 @@ $this->params['breadcrumbs'][] = ['label' => 'Solicitud ' . $model->id];
             <?php endif; ?>
             
             <?php endif; ?>
-                    <?php /* ?>
-<div class="form-group mr-2">
-    <?= Html::beginForm(['aprobar-solicitud', 'id' => $model->id], 'post', ['class' => 'form-inline']) ?>
-        <?= Html::label('Añadir Comentarios:', null, ['class' => 'control-label']) ?>
-        <?= Html::textInput('comentario', $model->comentario, ['class' => 'form-control']) ?>
-    <?= Html::endForm() ?>
-</div>
-
-<div class="form-group mr-2 mb-2">
-    <?php if ($model->nombre_formato == 'CAMBIO PERIODO VACACIONAL'): ?>
-        <?= Html::beginForm(['aprobar-cambio-periodo-vacacional', 'id' => $model->id], 'post', ['class' => 'form-inline']) ?>
-        <?= Html::submitButton(Html::tag('i', '  Aprobar', ['class' => 'fas fa-check']), ['name' => 'status', 'value' => 'Aprobado', 'class' => 'btn btn-primary', 'title' => 'Aceptar']) ?>
-        <?= Html::endForm() ?>
-    <?php else: ?>
-        <?= Html::beginForm(['aprobar-solicitud', 'id' => $model->id], 'post', ['class' => 'form-inline']) ?>
-        <?= Html::submitButton(Html::tag('i', '  Aprobar', ['class' => 'fas fa-check']), ['name' => 'status', 'value' => 'Aprobado', 'class' => 'btn btn-success', 'title' => 'Aceptar']) ?>
-        <?= Html::endForm() ?>
-    <?php endif; ?>
-</div>
-<?php 
-
-
-
-
-                        <div class="form-group mr-2 mb-2">
-                            <?= Html::submitButton(Html::tag('i', '  Rechazar', ['class' => 'fas fa-times']), ['name' => 'status', 'value' => 'Rechazado', 'class' => 'btn btn-danger', 'title' => 'Rechazar']) ?>
-                        </div>
-                        
-                        <?= Html::endForm() ?>
-                    </div>
-
-                    */ ?>
+                   
                 </div>
             </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-12">
-                            <?php foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
+                            <?php foreach (Yii::$app->session->getAllFlashes() as $type => $message) {//ALERTA
                                 echo Alert::widget([
                                     'options' => ['class' => 'alert-' . $type],
                                     'body' => $message,
@@ -107,8 +76,16 @@ $this->params['breadcrumbs'][] = ['label' => 'Solicitud ' . $model->id];
 <?php
 
 echo DetailView::widget([
+    ///MUESTRA LA INFORMACION DEL REGISTRO DE SOLICITUD
     'model' => $model,
     'attributes' => [
+        [
+            'label' => 'ID de solicitud',
+            'attribute' => 'id',
+            'value' => function ($model) {
+                return $model->id;
+            },
+        ],
         [
             'label' => 'Número de empleado',
             'value' => function ($model) {
@@ -128,6 +105,7 @@ echo DetailView::widget([
             },
         ],
         [
+            'label' => 'Fecha de creación',
             'attribute' => 'fecha_creacion',
             'format' => 'raw',
             'value' => function ($model) {
@@ -135,32 +113,76 @@ echo DetailView::widget([
                 return strftime('%A, %d de %B de %Y', strtotime($model->fecha_creacion));
             },
         ],
-        // Otros atributos de la solicitud...
+        
+        
+      
     ],
 ]);
 
 if ($formato) {
     $formatoAttributes = [];
-    
+    //ESTE SWITCH SE ENCARGA DE IDENTIFICAR CUALES ATRIBUTOS SE VAN A MOSTRAR EN EL DETAILVIEW
+    //YA QUE DEPENDE DEL TIPO DE SOLICITUD QUE SE HAYA REALIZADO SE VAN A MOSTRAR DIFERENTES DATOS
+    //SE MOSTRARA LA INFORMACION DEL FORMATO ASOCIADO A LA SOLICTUD
     switch ($model->nombre_formato) {
         case 'REPORTE DE TIEMPO EXTRA':
+
             $formatoAttributes = [
                 [
-                    'label' => 'ID',
+                    'label' => 'ID de solicitud',
                     'attribute' => 'solicitud_id',
                     'value' => function ($model) {
                         return $model->solicitud_id;
                     },
                 ],
+              
                 [
-                    'label' => 'Fecha de creación',
+                    'label' => 'Fecha de creación de solicitud',
                     'attribute' => 'created_at',
                     'value' => function ($model) {
-                        return $model->created_at;
+                       
+                        setlocale(LC_TIME, "es_419.UTF-8");
+                        
+                        $fechaPermiso = strtotime($model->created_at);
+                        
+                        $fechaFormateada = strftime('%A, %B %d, %Y', $fechaPermiso);
+                        
+                        setlocale(LC_TIME, null);
+                        
+                        return $fechaFormateada;
                     },
                 ],
-                // Otros atributos específicos de PermisoEconomico
+                [
+                    'label' => 'Aprobado en',
+                    'attribute' => 'fecha_aprobacion',
+                    'value' => function ($model) {
+                       
+                        setlocale(LC_TIME, "es_419.UTF-8");
+                        
+                        $fechaPermiso = strtotime($model->solicitud->fecha_aprobacion);
+                        
+                        $fechaFormateada = strftime('%A, %B %d, %Y', $fechaPermiso);
+                        
+                        setlocale(LC_TIME, null);
+                        
+                        return $fechaFormateada;
+                    },
+                ],
+
+                [
+                    'label' => 'Aprobante',
+                    'attribute' => 'nombre_aprobante',
+                    'value' => function ($model) {
+                        return $model->solicitud->nombre_aprobante;
+                    },
+                ],
             ];
+        
+            // Calcular el total de horas
+            $totalHoras = array_reduce($actividades, function ($carry, $actividad) {
+                return $carry + $actividad['no_horas'];
+            }, 0);
+        
             echo '<div class="row">';
             echo '<div class="col-md-12">';
             echo '<h3>Actividades</h3>';
@@ -171,25 +193,59 @@ if ($formato) {
                 ]),
                 'columns' => [
                     ['class' => 'yii\grid\SerialColumn'],
-                    'fecha',
+                //    'fecha',
+
+
+                    [
+                        'label' => 'Fecha',
+                        'value' => function ($formato) {
+                           
+                            setlocale(LC_TIME, "es_419.UTF-8");
+                            
+                            $fechaPermiso = strtotime($formato->fecha);
+                            
+                            $fechaFormateada = strftime('%A, %B %d, %Y', $fechaPermiso);
+                            
+                            setlocale(LC_TIME, null);
+                            
+                            return $fechaFormateada;
+                        },
+                    ],
+
                     'hora_inicio',
                     'hora_fin',
                     'actividad',
                     'no_horas',
-                   
-                    // otros campos de la actividad...
                 ],
             ]);
+        
+            // Mostrar el total de horas fuera del GridView
+            echo '<div class="total-horas">';
+            echo '<h4>Total de horas: ' . $totalHoras . '</h4>';
+            echo '</div>';
+        if(Yii::$app->user->can('aprobar-solicitudes')){
+            echo Html::beginForm(['aprobar-solicitud', 'id' => $model->id], 'post', ['class' => 'form-inline']);
+            echo '<div class="form-group mr-2 mb-2">';
+            echo Html::submitButton(Html::tag('i', ' Aprobar', ['class' => 'fas fa-check']), ['name' => 'aprobacion', 'value' => 'APROBADO', 'class' => 'btn btn-success', 'title' => 'Aprobar']);
+            echo '</div>';
+            echo '<div class="form-group mr-2 mb-2">';
+            echo Html::submitButton(Html::tag('i', ' Rechazar', ['class' => 'fas fa-times']), ['name' => 'aprobacion', 'value' => 'RECHAZADO', 'class' => 'btn btn-danger', 'title' => 'Rechazar']);
+            echo '</div>';
+            echo '<div class="form-group mr-2">';
+            echo Html::label('Comentario', null, ['class' => 'control-label']);
+            echo Html::textInput('comentario', $model->comentario, ['class' => 'form-control']);
+            echo '</div>';
+            echo Html::endForm();
+        }
+        
             echo '</div>';
             echo '</div>';
             break;
+        
 
         case 'PERMISO FUERA DEL TRABAJO':
             $formatoAttributes = [
-                //[
-                  //  'label' => 'Motivo Fecha Permiso',
-                    //'value' => $formato->motivo_fecha_permiso ? $formato->motivo_fecha_permiso->descripcion : 'N/A',
-                //],
+               
                 [
                     'attribute' => 'hora_salida',
                     'value' => function ($formato) {
@@ -238,7 +294,6 @@ if ($formato) {
                         return $fechaFormateada;
                     },
                 ],
-                // Otros atributos específicos de PermisoFueraTrabajo
             ];
             break;
 
@@ -270,7 +325,6 @@ if ($formato) {
                                     return $fechaFormateada;
                                 },
                             ],
-                // Otros atributos específicos de ComisionEspecial
             ];
             break;
 
@@ -301,13 +355,92 @@ if ($formato) {
                         return $fechaFormateada;
                     },
                 ],
-                // Otros atributos específicos de PermisoEconomico
             ];
             break;
 
+            case 'SOLICITUD DE CONTRATO PARA PERSONAL EVENTUAL':
+                $formatoAttributes = [
+                  //  'numero_contrato',
+        
+                    [
+                        'label' => 'Numero de contrato',
+                        'value' => function ($formato) {
+                            return $formato->numero_contrato; 
+                        },
+                    ],
+                    [
+                        'label' => 'Fecha de Inicio',
+                        'value' => function ($formato) {
+                           
+                            setlocale(LC_TIME, "es_419.UTF-8");
+                            
+                            $fechaPermiso = strtotime($formato->fecha_inicio);
+                            
+                            $fechaFormateada = strftime('%A, %B %d, %Y', $fechaPermiso);
+                            
+                            setlocale(LC_TIME, null);
+                            
+                            return $fechaFormateada;
+                        },
+                    ],
 
-            
+                    [
+                        'label' => 'Fecha de Finalización',
+                        'value' => function ($formato) {
+                           
+                            setlocale(LC_TIME, "es_419.UTF-8");
+                            
+                            $fechaPermiso = strtotime($formato->fecha_termino);
+                            
+                            $fechaFormateada = strftime('%A, %B %d, %Y', $fechaPermiso);
+                            
+                            setlocale(LC_TIME, null);
+                            
+                            return $fechaFormateada;
+                        },
+                    ],
 
+
+                   // 'duracion',
+                   // 'modalidad',
+                    [
+                        'label' => 'Duración en días',
+                        'value' => function ($formato) {
+                            return $formato->duracion; 
+                        },
+                    ],
+                    
+                    [
+                        'label' => 'Modalidad',
+                        'value' => function ($formato) {
+                            return $formato->modalidad; 
+                        },
+                    ],
+                    [
+                        'label' => 'Actividad a realizar',
+                        'attribute' => 'actividades_realizar',
+                        'format' => 'html',
+                        'value' => function ($formato) {
+                            return \yii\helpers\Html::decode($formato->actividades_realizar);
+                        },
+                        'filter' => false,
+                        //'options' => ['style' => 'width: 65%;'],
+                    ],
+
+                    [
+                        'label' => 'Origen de contrato',
+                        'attribute' => 'origen_contrato',
+                        'format' => 'html',
+                        'value' => function ($formato) {
+                            return \yii\helpers\Html::decode($formato->origen_contrato);
+                        },
+                        'filter' => false,
+                       // 'options' => ['style' => 'width: 65%;'],
+                    ],
+                   
+                ];
+                break;
+    
 
                 case 'CAMBIO DE DÍA LABORAL':
                     $formatoAttributes = [
@@ -351,7 +484,6 @@ if ($formato) {
                                 return $fechaFormateada;
                             },
                         ],
-                        // Otros atributos específicos de PermisoEconomico
                     ];
                     break;
                     case 'CAMBIO DE HORARIO DE TRABAJO':
@@ -426,7 +558,6 @@ if ($formato) {
                                 },
                             ],
                            
-                            // Otros atributos específicos de PermisoEconomico
                         ];
                         break;
 
@@ -457,18 +588,13 @@ if ($formato) {
                                         return $fechaFormateada;
                                     },
                                 ],
-                                // Otros atributos específicos de PermisoEconomico
                             ];
                             break;
                            
                             case 'CITA MEDICA':
+                                
                                 $formatoAttributes = [
-                                    //[
-                                      //  'label' => 'Motivo de cita medica',
-                                        //'value' => function ($formato) {
-                                          //  return $formato->comentario; 
-                                   //     },
-                                    ///],
+                                   
 
                                     [
                                         'label' => 'Motivo de cita medica',
@@ -510,8 +636,21 @@ if ($formato) {
                                             return $hora;
                                         },
                                     ],
-                                    // Otros atributos específicos de PermisoEconomico
                                 ];
+                                if(Yii::$app->user->can('aprobar-solicitudes-medicas')){
+                                    echo Html::beginForm(['aprobar-solicitud-medica', 'id' => $model->id], 'post', ['class' => 'form-inline']);
+                                    echo '<div class="form-group mr-2 mb-2">';
+                                    echo Html::submitButton(Html::tag('i', ' Aprobar', ['class' => 'fas fa-check']), ['name' => 'aprobacion', 'value' => 'APROBADO', 'class' => 'btn btn-success', 'title' => 'Aprobar']);
+                                    echo '</div>';
+                                    echo '<div class="form-group mr-2 mb-2">';
+                                    echo Html::submitButton(Html::tag('i', ' Rechazar', ['class' => 'fas fa-times']), ['name' => 'aprobacion', 'value' => 'RECHAZADO', 'class' => 'btn btn-danger', 'title' => 'Rechazar']);
+                                    echo '</div>';
+                                    echo '<div class="form-group mr-2">';
+                                    echo Html::label('Comentario', null, ['class' => 'control-label']);
+                                    echo Html::textInput('comentario', $model->comentario, ['class' => 'form-control']);
+                                    echo '</div>';
+                                    echo Html::endForm();
+                                }
                                 break;
                     
 
@@ -573,14 +712,9 @@ if ($formato) {
                                             return $fechaFormateada;
                                         },
                                     ],
-                                    // Otros atributos específicos de PermisoEconomico
                                 ];
                                 break;
-                     
-            
-
-        // Agrega aquí más casos para otros formatos si es necesario...
-    }
+            }
 
     echo DetailView::widget([
         'model' => $formato,

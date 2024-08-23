@@ -40,9 +40,11 @@ class Solicitud extends \yii\db\ActiveRecord
             [['comentario'], 'string'],
             [['created_at'], 'safe'],
             [['nombre_aprobante'], 'string', 'max' => 90],
-            [['status'], 'string', 'max' => 30],
+            [['status', 'aprobacion'], 'string', 'max' => 30],
             [['nombre_formato'], 'string', 'max' => 50],
             [['empleado_id'], 'exist', 'skipOnError' => true, 'targetClass' => Empleado::class, 'targetAttribute' => ['empleado_id' => 'id']],
+            
+        
         ];
     }
 
@@ -55,12 +57,13 @@ class Solicitud extends \yii\db\ActiveRecord
             'id' => 'ID',
             'empleado_id' => 'Empleado ID',
             'fecha_creacion' => 'Fecha Creacion',
-            'status' => 'Status',
+            'status' => 'Estatus',
             'comentario' => 'Comentario',
             'fecha_aprobacion' => 'Fecha Aprobacion',
             'nombre_aprobante' => 'Nombre Aprobante',
             'nombre_formato' => 'Nombre Formato',
-            'created_at' => 'Fecha y hora de creación:'
+            'created_at' => 'Fecha y hora de creación:',
+            'aprobacion' => 'Estatus de aprobación'
          ];
     }
 

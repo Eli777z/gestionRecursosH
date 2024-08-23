@@ -6,8 +6,7 @@ use yii\helpers\Html;
 /* @var $model app\models\CatPuesto */
 
 $this->title = 'Create Cat Puesto';
-$this->params['breadcrumbs'][] = ['label' => 'Cat Puestos', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+
 ?>
 
 

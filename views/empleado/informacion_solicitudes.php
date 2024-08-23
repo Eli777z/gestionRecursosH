@@ -1,5 +1,5 @@
 <?php
-
+// IMPORTACIONES
 use yii\helpers\Html;
 
 use yii\grid\GridView;
@@ -14,10 +14,13 @@ use kartik\select2\Select2;
 <div class="card">
                                 <div class="card-body">
                                     <div class="card-header bg-success text-dark text-center">
-                                        <?php if (Yii::$app->user->can('ver-solicitudes-formatos')) { ?>
+                                        
+                                        <?php 
+                                        //PERMISO QUE MUESTRA TODAS LAS SOLICITUDES
+                                        if (Yii::$app->user->can('ver-solicitudes-formatos')) { ?>
 
                                             <h3>HISTORIAL DE SOLICITUDES DE INCIDENCIAS: </h3>
-
+<?php if (Yii::$app->user->can('gestor-rh')) {?>
                                             <div class="dropdown float-right">
   <button class="btn btn-dark dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
     FORMATOS DE INCIDENCIAS
@@ -38,11 +41,15 @@ use kartik\select2\Select2;
     <?=  Html::a('REPORTE DE TIEMPO EXTRA', Url::to(['reporte-tiempo-extra/historial', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0'])?>
     <?= Html::a('REPORTE DE TIEMPO EXTRA GENERAL', Url::to(['reporte-tiempo-extra-general/index']), ['class' => 'dropdown-item text-primary']) ?>
 
+   <?php if ($model->informacionLaboral->catTipoContrato->nombre_tipo === 'Eventual'): ?>
+    <?= Html::a('SOLICITUD DE CONTRATO PARA PERSONAL EVENTUAL', Url::to(['contrato-para-personal-eventual/historial', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) ?>
+<?php endif; ?>
    
   </div>
 </div>
-
+<?php }?>
                                         <?php } elseif (Yii::$app->user->can('ver-solicitudes-medicas')) { ?>
+                                        
                                             <h3>HISTORIAL DE SOLICITUDES MEDICAS: </h3>
 
 
@@ -53,7 +60,9 @@ use kartik\select2\Select2;
                                     <li class="dropdown-divider"></li>
                                   
 
-                                    <?php if (Yii::$app->user->can('solicitudes-medicas-view-medico')) { ?>
+                                    <?php
+                                    //PERMISO QUE MUESTRA SOLO EL HISTORIAL DE SOLICITUDES MEDICAS
+                                    if (Yii::$app->user->can('solicitudes-medicas-view-medico')) { ?>
 <div class="row">
 <?php Pjax::begin(); ?>
     <?= GridView::widget([
@@ -65,7 +74,7 @@ use kartik\select2\Select2;
                 'class' => 'yii\grid\DataColumn',
                 'header' => '',
                 'format' => 'raw',
-                'value' => function ($model) {
+                'value' => function ($model) {// MUESTRA EL ESTATUS DE SOLICITUD PARA INDENTIFICAR SI ESTA ES NUEVA
                     if ($model->status === 'Nueva') {
                         return '<i class="fa fa-fire" aria-hidden="true" style="color: #ea4242 "></i>';
                     } elseif ($model->status === 'Visto') {
@@ -112,19 +121,19 @@ use kartik\select2\Select2;
         
             [
                 'class' => 'hail812\adminlte3\yii\grid\ActionColumn',
-                'template' => '{view} {delete}',
+                'template' => '{view} ',
                 'buttons' => [
                     'view' => function ($url, $model, $key) {
                         return Html::a('<i class="fa fa-eye"></i>', ['solicitud/view', 'id' => $model->id], ['title' => 'Ver', 'class' => 'btn btn-outline-info btn-sm']);
                     },
-                    'delete' => function ($url, $model, $key) {
-                        return Html::a('<i class="fa fa-trash"></i>', ['solicitud/delete', 'id' => $model->id], [
-                            'title' => 'Eliminar',
-                            'class' => 'btn btn-danger btn-xs',
-                            'data-confirm' => '¿Estás seguro de eliminar este elemento?',
+              //      'delete' => function ($url, $model, $key) {
+                //        return Html::a('<i class="fa fa-trash"></i>', ['solicitud/delete', 'id' => $model->id], [
+                  //          'title' => 'Eliminar',
+                    //        'class' => 'btn btn-danger btn-xs',
+                      //      'data-confirm' => '¿Estás seguro de eliminar este elemento?',
                             'data-method' => 'post',
-                        ]);
-                    },
+                      //  ]);
+                   // },
                 ],
             ],
         ],
@@ -137,7 +146,7 @@ use kartik\select2\Select2;
  
 </div>
 
-<?php } elseif (Yii::$app->user->can('solicitudes-medicas-view-empleado')) { ?>
+<?php } elseif (Yii::$app->user->can('solicitudes-medicas-view-empleado')) { //MUESTRA TODO TIPO DE SOLICITUDES?>
 <div class="row">
 <?php Pjax::begin(); ?>
     <?= GridView::widget([
@@ -294,14 +303,7 @@ use kartik\select2\Select2;
                     'view' => function ($url, $model, $key) {
                         return Html::a('<i class="fa fa-eye"></i>', ['solicitud/view', 'id' => $model->id], ['title' => 'Ver', 'class' => 'btn btn-outline-info btn-sm']);
                     },
-               //     'delete' => function ($url, $model, $key) {
-                 //       return Html::a('<i class="fa fa-trash"></i>', ['solicitud/delete', 'id' => $model->id], [
-                   //         'title' => 'Eliminar',
-                     //       'class' => 'btn btn-danger btn-xs',
-                       //     'data-confirm' => '¿Estás seguro de eliminar este elemento?',
-                         //   'data-method' => 'post',
-              //          ]);
-                //    },
+             
                 ],
             ],
         ],

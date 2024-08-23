@@ -1,5 +1,6 @@
 <?php
 
+use yii\bootstrap5\Alert;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
@@ -17,21 +18,33 @@ $this->params['breadcrumbs'][] = ['label' => 'Consulta Medica ' . $model->id];
 \yii\web\YiiAsset::register($this);
 ?>
 
+
 <div class="container-fluid">
+<div class="row justify-content-center">
+<div class="col-md-10">
     <div class="card">
+    <div class="card-header bg-info text-white">
+                    <h2>PERMISO FUERA TRABAJO</h2>
+                    <p>  Empleado: <?= $empleado->nombre.' '.$empleado->apellido ?></p>
+                
+
+                          
+                
+                </div>
         <div class="card-body">
             <div class="row">
                 <div class="col-md-12">
-                    <p>
-                        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-                        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
-                            'class' => 'btn btn-danger',
-                            'data' => [
-                                'confirm' => 'Are you sure you want to delete this item?',
-                                'method' => 'post',
-                            ],
-                        ]) ?>
-                    </p>
+                   
+
+                    <?php 
+                    //ALERTA
+    foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
+        echo Alert::widget([
+            'options' => ['class' => 'alert-' . $type],
+            'body' => $message,
+        ]);
+    }
+    ?>
                     <?= DetailView::widget([
                         'model' => $model,
                         'attributes' => [
@@ -110,4 +123,6 @@ $this->params['breadcrumbs'][] = ['label' => 'Consulta Medica ' . $model->id];
         <!--.card-body-->
     </div>
     <!--.card-->
+</div>
+</div>
 </div>

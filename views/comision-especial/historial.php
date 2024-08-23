@@ -18,7 +18,7 @@ $this->title = 'Comisión Especial';
 <div class="col-md-10">
             <div class="card">
             <div class="card-header bg-info text-white">
-                    <h3>Historial de Comision Especial</h3>
+                    <h3>Historial de Comisión Especial</h3>
                   <p>  Empleado: <?= $empleado->nombre.' '.$empleado->apellido ?></p>
                     <?php if (Yii::$app->user->can('ver-empleados-departamento') || Yii::$app->user->can('ver-empleados-direccion') ) {?>
                             <?= Html::a('<i class="fa fa-chevron-left"></i> Volver', ['empleado/index'], [
@@ -78,7 +78,7 @@ $this->title = 'Comisión Especial';
         ['class' => 'hail812\adminlte3\yii\grid\ActionColumn',
 
     
-        'template' => Yii::$app->user->can('ver-empleados-departamento') ? '{view}' : '{view} {delete}',
+        'template' => Yii::$app->user->can('ver-empleados-departamento') || Yii::$app->user->can('ver-empleados-direccion')  ? '{view}' : '{view} {delete}',
 
      'buttons' => [
                     

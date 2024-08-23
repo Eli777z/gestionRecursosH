@@ -9,7 +9,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use app\models\ExpedienteMedico;
-
+use app\models\Empleado;
 /**
  * ConsultaMedicaController implements the CRUD actions for ConsultaMedica model.
  */
@@ -54,11 +54,15 @@ class ConsultaMedicaController extends Controller
     public function actionView($id)
     {
         $model = $this->findModel($id);
+        $empleado = Empleado::findOne($model->expedienteMedico->empleado_id);
+
         $empleadoId = $model->expedienteMedico->empleado_id;
         return $this->render('view', [
             'model' => $model,
             //'formato' => $formato,
             'empleadoId' => $empleadoId,
+            'empleado' => $empleado, // Pasar empleado a la vista
+
 
         ]);
     }

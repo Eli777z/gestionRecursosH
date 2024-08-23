@@ -55,11 +55,7 @@ if (!$modelAntecedenteGinecologico) {
 
                                                     </div>
 
-                                                    <div class="col-6 col-sm-2">
-                                                        <?= Html::label('F.U. Citología', 'p_f_u_m') ?>
-                                                        <?= Html::input('date', 'AntecedenteGinecologico[p_f_u_citologia]', $AntecedenteGinecologico->p_f_u_citologia, ['class' => 'form-control', 'disabled' => !$editable]) ?>
-
-                                                    </div>
+                                                  
 
 
 
@@ -68,59 +64,7 @@ if (!$modelAntecedenteGinecologico) {
                                                     <div class="w-100"></div>
 
                                                     <br>
-                                                    <hr class="solid">
-                                                    <div class="col-6 col-sm-4">
-                                                        <h4>Alteraciones de la menstruación</h4>
-                                                    </div>
-                                                    <div class="w-100"></div>
-
-                                                    <div class="col-6 col-sm-3">
-
-                                                        <div class="form-group">
-                                                            <?= Html::label('de Frecuencia', 'p_alteracion_frecuencia') ?>
-                                                            <?= Html::dropDownList('AntecedenteGinecologico[p_alteracion_frecuencia]', $AntecedenteGinecologico->p_alteracion_frecuencia, [
-
-                                                                'Amenorrea' => 'Amenorrea',
-                                                                'Polimenorrea' => 'Polimenorrea',
-                                                                'Oligomenorrea' => 'Oligomenorrea',
-                                                            ], [
-                                                                'class' => 'form-control',         'prompt' => 'Seleccione si tiene alguna', 'disabled' => !$editable
-                                                            ]) ?>
-                                                        </div>
-
-                                                    </div>
-                                                    <div class="col-6 col-sm-3">
-
-                                                        <div class="form-group">
-                                                            <?= Html::label('de Duración', 'p_alteracion_duracion') ?>
-                                                            <?= Html::dropDownList('AntecedenteGinecologico[p_alteracion_duracion]', $AntecedenteGinecologico->p_alteracion_duracion, [
-
-                                                                'Menometrorragia' => 'Menometrorragia',
-
-                                                            ], [
-                                                                'class' => 'form-control',         'prompt' => 'Seleccione si tiene alguna', 'disabled' => !$editable
-                                                            ]) ?>
-                                                        </div>
-
-                                                    </div>
-
-                                                    <div class="col-6 col-sm-3">
-
-                                                        <div class="form-group">
-                                                            <?= Html::label('de Cantidad', 'p_alteracion_cantidad') ?>
-                                                            <?= Html::dropDownList('AntecedenteGinecologico[p_alteracion_cantidad]', $AntecedenteGinecologico->p_alteracion_cantidad, [
-
-                                                                'Hipermenorrea' => 'Hipermenorrea',
-                                                                'Hipomenorrea' => 'Hipomenorrea',
-                                                            ], [
-                                                                'class' => 'form-control',         'prompt' => 'Seleccione si tiene alguna', 'disabled' => !$editable
-                                                            ]) ?>
-                                                        </div>
-
-                                                    </div>
-
-                                                    <div class="w-100"></div>
-                                                    <br>
+                                                  
                                                     <hr class="solid">
 
                                                     <div class="col-6 col-sm-2 ">

@@ -33,15 +33,7 @@ $editable = Yii::$app->user->can('editar-expediente-medico');
 
 
                                                 <div class="row">
-                                                    <div class="col-6 col-sm-3 ">
-                                                        <?= Html::label('Fecha probable de parto.', 'p_f_p_p') ?>
-                                                        <?= Html::input('date', 'AntecedenteObstrectico[p_f_p_p]', $AntecedenteObstrectico->p_f_p_p, ['class' => 'form-control',  'disabled' => !$editable]) ?>
-
-
-
-                                                    </div>
-                                                    <!-- Columna derecha con el textarea -->
-                                                    <div class="w-100"></div>
+                                                   
 
                                                     <br>
                                                     <hr class="solid">
@@ -90,87 +82,10 @@ $editable = Yii::$app->user->can('editar-expediente-medico');
                                                         <?= Html::input('number', 'AntecedenteObstrectico[p_nacidos_muerto]', $AntecedenteObstrectico->p_nacidos_muerto, ['class' => 'form-control',  'disabled' => !$editable]) ?>
 
                                                     </div>
-                                                    <div class="col-6 col-sm-3 ">
-                                                        <?= Html::label('Muerto - 1ra semana', 'p_muerto_primera_semana') ?>
-                                                        <?= Html::input('number', 'AntecedenteObstrectico[p_mmuerto_primera_semana]', $AntecedenteObstrectico->p_muerto_primera_semana, ['class' => 'form-control',  'disabled' => !$editable]) ?>
-
-                                                    </div>
-                                                    <div class="w-100"></div>
-
-                                                    <div class="col-6 col-sm-3 ">
-
-                                                    </div>
-
-                                                    <div class="col-6 col-sm-3 ">
-                                                        <?= Html::label('Muerto despues - 1ra semana', 'p_muerto_despues_semana') ?>
-                                                        <?= Html::input('number', 'AntecedenteObstrectico[p_mmuerto_despues_semana]', $AntecedenteObstrectico->p_muerto_despues_semana, ['class' => 'form-control',  'disabled' => !$editable]) ?>
-
-                                                    </div>
-
-                                                    <div class="w-100"></div>
-
-                                                    <br>
 
 
+                                                  
 
-
-                                                    <div class="col-6 col-sm-3 ">
-
-                                                        <div class="custom-control custom-checkbox">
-                                                            <?= Html::checkbox('AntecedenteObstrectico[p_intergenesia]', $AntecedenteObstrectico->p_intergenesia, [
-                                                                'class' => 'custom-control-input',
-                                                                'id' => 'p_intergenesia',
-                                                                'disabled' => !$editable
-                                                            ]) ?>
-                                                            <?= Html::label('Intergenesia', 'p_intergenesia', ['class' => 'custom-control-label']) ?>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-6 col-sm-3 ">
-
-                                                        <div class="custom-control custom-checkbox">
-                                                            <?= Html::checkbox('AntecedenteObstrectico[p_malformaciones]', $AntecedenteObstrectico->p_malformaciones, [
-                                                                'class' => 'custom-control-input',
-                                                                'id' => 'p_malformaciones',
-                                                                'disabled' => !$editable
-                                                            ]) ?>
-                                                            <?= Html::label('Malformaciones', 'p_malformaciones', ['class' => 'custom-control-label']) ?>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-6 col-sm-3 ">
-
-                                                        <div class="custom-control custom-checkbox">
-                                                            <?= Html::checkbox('AntecedenteObstrectico[p_atencion_prenatal]', $AntecedenteObstrectico->p_atencion_prenatal, [
-                                                                'class' => 'custom-control-input',
-                                                                'id' => 'p_atencion_prenatal',
-                                                                'disabled' => !$editable
-                                                            ]) ?>
-                                                            <?= Html::label('Atención prenatal', 'p_atencion_prenatal', ['class' => 'custom-control-label']) ?>
-                                                        </div>
-                                                    </div>
-                                                    <div class="w-100"></div>
-                                                    <br>
-                                                    <div class="col-6 col-sm-3 ">
-
-                                                        <div class="custom-control custom-checkbox">
-                                                            <?= Html::checkbox('AntecedenteObstrectico[p_parto_prematuro]', $AntecedenteObstrectico->p_parto_prematuro, [
-                                                                'class' => 'custom-control-input',
-                                                                'id' => 'p_parto_prematuro',
-                                                                'disabled' => !$editable
-                                                            ]) ?>
-                                                            <?= Html::label('Parto prematuro', 'p_parto_prematuro', ['class' => 'custom-control-label']) ?>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-6 col-sm-3 ">
-
-                                                        <div class="custom-control custom-checkbox">
-                                                            <?= Html::checkbox('AntecedenteObstrectico[p_isoinmunizacion]', $AntecedenteObstrectico->p_isoinmunizacion, [
-                                                                'class' => 'custom-control-input',
-                                                                'id' => 'p_isoinmunizacion',
-                                                                'disabled' => !$editable
-                                                            ]) ?>
-                                                            <?= Html::label('Isoinmunización', 'p_isoinmunizacion', ['class' => 'custom-control-label']) ?>
-                                                        </div>
-                                                    </div>
 
 
                                                     <div class="w-100"></div>

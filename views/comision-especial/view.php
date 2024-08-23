@@ -9,8 +9,7 @@ use app\models\JuntaGobierno;
 /* @var $model app\models\ComisionEspecial */
 
 $this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Comision Especials', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+
 \yii\web\YiiAsset::register($this);
 ?>
 

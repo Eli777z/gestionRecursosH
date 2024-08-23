@@ -57,7 +57,7 @@ class ComisionEspecial extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'empleado_id' => 'Empleado ID',
-            'solicitud_id' => 'Solicitud ID',
+            'solicitud_id' => 'ID de solicitud',
             'motivo_fecha_permiso_id' => 'Motivo Fecha Permiso ID',
             'nombre_jefe_departamento' => 'Nombre Jefe Departamento',
             'jefe_departamento_id' => 'Jefe de Departamento',

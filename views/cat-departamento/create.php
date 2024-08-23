@@ -6,8 +6,7 @@ use yii\helpers\Html;
 /* @var $model app\models\CatDepartamento */
 
 $this->title = 'Create Cat Departamento';
-$this->params['breadcrumbs'][] = ['label' => 'Cat Departamentos', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+
 ?>
 
 

@@ -1,10 +1,13 @@
 <?php
+
 use yii\helpers\Html;
 
 $this->title = 'Permiso_Fuera_Trabajo_'.$model->empleado->nombre.' '.$model->empleado->apellido;
 //$this->params['breadcrumbs'][] = $this->title;
 ?>
 <head>
+    <?php //IMPORTACIONES NECESARIAS?>
+
     <!-- bootstrap 5.x or 4.x is supported. You can also use the bootstrap css 3.3.x versions -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" crossorigin="anonymous">
  
@@ -96,7 +99,7 @@ $this->title = 'Permiso_Fuera_Trabajo_'.$model->empleado->nombre.' '.$model->emp
 <div class="excel-html-preview">
     <div class="print-area">
         <div class="excel-content">
-            <?= $htmlContent ?>
+            <?= $htmlContent //OBTIENE EL CONTENIDO DEL HTML QUE SE GENERA EN EL CONTROLADOR ?>
         </div>
     </div>
 </div>
@@ -105,9 +108,7 @@ $this->title = 'Permiso_Fuera_Trabajo_'.$model->empleado->nombre.' '.$model->emp
 
    
 
-            <!--.row-->
-       
-        <!--.card-body-->
+
 
 
 <style>
@@ -126,5 +127,7 @@ $this->title = 'Permiso_Fuera_Trabajo_'.$model->empleado->nombre.' '.$model->emp
 
 
 </div>
-<?= Html::a('Imprimir', '#', ['class' => 'btn btn-primary no-print floating-btn', 'onclick' => 'window.print(); return false;']) ?>
+<?= Html::a('Imprimir', '#', ['class' => 'btn btn-primary no-print floating-btn', 'onclick' => 'window.print(); return false;']) 
+//PERMITE ABRIR LA VENTANA DE IMPRESIÓN DEL NAVEGADOR PARA IMPRIMIR EL CONTENIDO HTML, ES DECIR, EL FORMATO GENERADO A FORMA DE HTML
+?>
 

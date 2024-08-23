@@ -1,17 +1,17 @@
 <?php
-
-
+//IMPORTACIONES
 use yii\helpers\Html;
 use froala\froalaeditor\FroalaEditorWidget;
 use yii\helpers\HtmlPurifier;
-
 use kartik\form\ActiveForm;
 
 $editable = Yii::$app->user->can('editar-expediente-medico');
 
 ?>
 
-<?php $form = ActiveForm::begin(['action' => ['empleado/antecedente-patologico', 'id' => $model->id]]); ?>
+<?php 
+//FORMULARIO PARA AGREGAR O EDITAR INFORMACIÓN DE REGISTRO
+$form = ActiveForm::begin(['action' => ['empleado/antecedente-patologico', 'id' => $model->id]]); ?>
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="card">
@@ -46,7 +46,7 @@ $editable = Yii::$app->user->can('editar-expediente-medico');
                                                 <div class="form-group text-right">
                                                     <?= Html::submitButton('Guardar &nbsp; &nbsp; <i class="fa fa-save"></i>', ['class' => 'btn btn-success fa-lg']) ?>
                                                 </div>
-                                            <?php else : ?>
+                                            <?php else : //SI EL PERMISO ES DE SOLO VISUALIZAR, SE MUESTRA EL PURO CONTENIDO DEL REGISTRO?>
                                                 <div class="form-group">
                                                     <?= Html::label('Descripción de Antecedentes Patológicos', 'descripcion_antecedentes') ?>
                                                     <?php

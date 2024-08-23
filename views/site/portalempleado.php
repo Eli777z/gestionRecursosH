@@ -1,14 +1,17 @@
 <?php
+//IMPORTACIONES
 use yii\web\View;
 use kartik\tabs\TabsX;
-use hail812\adminlte\widgets\Alert;
+use yii\bootstrap5\Alert;
+
+
 use yii\widgets\DetailView;
 use yii\helpers\Html;
 
 $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
 
 $this->title = 'PAGINA DE INICIO - EMPLEADO';
-
+//SE CARGAN LOS MODELOS
 $activeTab = Yii::$app->request->get('tab', 'info_p');
 $currentDate = date('Y-m-d');
 $antecedentesExistentes = [];
@@ -16,6 +19,7 @@ $observacionGeneral = '';
 $descripcionAntecedentes = '';
 $modelAntecedenteNoPatologico = new \app\models\AntecedenteNoPatologico();
 $modelExploracionFisica = new \app\models\ExploracionFisica();
+//PERMISO
 $editable = Yii::$app->user->can('editar-expediente-medico');
 
 
@@ -28,14 +32,14 @@ if ($antecedentes) {
     }
 }
 
-// Si ya existe un antecedente patológico, obtenemos su descripción
+//SE OBTIENEN LOS REGISTROS
 $modelAntecedentePatologico = \app\models\AntecedentePatologico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
 if (!$modelAntecedentePatologico) {
     $modelAntecedentePatologico = new \app\models\AntecedentePatologico();
     $modelAntecedentePatologico->expediente_medico_id = $expedienteMedico->id;
 }
 
-// Obtener antecedentes no patológicos
+
 $modelAntecedenteNoPatologico = \app\models\AntecedenteNoPatologico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
 if (!$modelAntecedenteNoPatologico) {
     $modelAntecedenteNoPatologico = new \app\models\AntecedenteNoPatologico();
@@ -54,7 +58,7 @@ if (!$modelInterrogatorioMedico) {
     $modelInterrogatorioMedico = new \app\models\InterrogatorioMedico();
     $modelInterrogatorioMedico->expediente_medico_id = $expedienteMedico->id;
 }
-// Obtener antecedentes no patológicos
+
 $modelAntecedentePerinatal = \app\models\AntecedentePerinatal::findOne(['expediente_medico_id' => $expedienteMedico->id]);
 if (!$modelAntecedentePerinatal) {
     $modelAntecedentePerinatal = new \app\models\AntecedentePerinatal();
@@ -82,110 +86,101 @@ if (!$modelAlergia) {
 
 ?>
 <div class="container-fluid">
-<div class="row ">
-    <?php
+    <div class="row ">
+        <?php
+
+
+        //ALERTA
+        foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
+            if ($type === 'error') {
+                echo Alert::widget([
+                    'options' => ['class' => 'alert-danger'],
+                    'body' => $message,
+                ]);
+            } else {
+                echo Alert::widget([
+                    'options' => ['class' => 'alert-' . $type],
+                    'body' => $message,
+                ]);
+            }
+        }
+        ?>
+
+        <div class="col-md-8">
 
 
 
-foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
-    if ($type === 'error') {
-        echo Alert::widget([
-            'options' => ['class' => 'alert-danger'],
-            'body' => $message,
-        ]);
-    } else {
-        echo Alert::widget([
-            'options' => ['class' => 'alert-' . $type],
-            'body' => $message,
-        ]);
-    }
-}
-?>
-   
-   <div class="col-md-8">
- 
-              
-             
-  
-  
-                 
-                      
-                   
-                      <?= $this->render('//empleado/view', [
-                                'model' => $model,
-                                'documentos' => $documentos,
-                                'documentoModel' => $documentoModel,
-                                'historial' => $historial,
-                                'searchModelConsultas' => $searchModelConsultas,
-                                'dataProviderConsultas' => $dataProviderConsultas,
-                                'searchModel' => $searchModel,
-                                'dataProvider' => $dataProvider,
-                                'expedienteMedico' => $expedienteMedico,
-                                'antecedentes' => $antecedentes,
-                                'catAntecedentes' => $catAntecedentes,
-                                'antecedenteNoPatologico' => $antecedenteNoPatologico, 
-                                'ExploracionFisica' => $ExploracionFisica,
-                                'InterrogatorioMedico' => $InterrogatorioMedico,
-                                'AntecedentePerinatal' => $AntecedentePerinatal,
-                                'AntecedenteGinecologico' => $AntecedenteGinecologico,
-                                'AntecedenteObstrectico' => $AntecedenteObstrectico,
-                                'Alergia' => $Alergia,
-                                'antecedentePatologico' => $antecedentePatologico,
-                                'documentoMedicoModel' => $documentoMedicoModel
-                            ]) ?>
-
-              
-       
-         
-                  
-       
-  
-
-</div>
-
-<div class="col-md-4">
-   <div class="card bg-light">
-   <div class="card-header bg-info text-white">
-<h4>Avisos</h4>
-   </div>
-             
-  
-  
-                  <div class="card-body">
-                     
-                  <div style="max-height: 700px; overflow-y: auto;">
-
-                             
-                             <?php setlocale(LC_TIME, "es_419.UTF-8");?>
-                
-                             <?php
-                
-                // Otros contenidos de la vista principal
-
-                            // Incluir el contenido del nuevo archivo de vista
-
-                            echo $this->render('//aviso/carrusel-avisos', [
-                                'avisos' => $avisos,
-
-                            ]);
-                            ?>
-  
-                  </div>
-  
-  
-  
-              
-       
-  
-                  
-              </div>
-          </div>
-  
-
-</div>
+            <?=
+            //SE RENDERIZA LISA QUE SE EN ENCUENTRA EN EMPLEADO Y SE CARGAN LOS MODELOS
+            //CORRESPONDIENTES AL EMPLEADO
+            $this->render('//empleado/view', [
+                'model' => $model,
+                'documentos' => $documentos,
+                'documentoModel' => $documentoModel,
+                'historial' => $historial,
+                'searchModelConsultas' => $searchModelConsultas,
+                'dataProviderConsultas' => $dataProviderConsultas,
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+                'expedienteMedico' => $expedienteMedico,
+                'antecedentes' => $antecedentes,
+                'catAntecedentes' => $catAntecedentes,
+                'antecedenteNoPatologico' => $antecedenteNoPatologico,
+                'ExploracionFisica' => $ExploracionFisica,
+                'InterrogatorioMedico' => $InterrogatorioMedico,
+                'AntecedentePerinatal' => $AntecedentePerinatal,
+                'AntecedenteGinecologico' => $AntecedenteGinecologico,
+                'AntecedenteObstrectico' => $AntecedenteObstrectico,
+                'Alergia' => $Alergia,
+                'antecedentePatologico' => $antecedentePatologico,
+                'documentoMedicoModel' => $documentoMedicoModel
+            ]) ?>
 
 
-                        
-</div>
+
+
+
+
+
+
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-light">
+                <div class="card-header bg-info text-white">
+                    <h4>Avisos</h4>
+                </div>
+
+
+
+                <div class="card-body">
+
+                    <div style="max-height: 700px; overflow-y: auto;">
+
+
+                        <?php setlocale(LC_TIME, "es_419.UTF-8"); ?>
+
+                        <?php
+                        //SE RENDERIZA LA VISTA DE CARRUSEL-AVISOS DE AVISO, Y SE
+                        //CARGA EL MODELO DE AVISO
+                        echo $this->render('//aviso/carrusel-avisos', [
+                            'avisos' => $avisos,
+
+                        ]);
+                        ?>
+
+                    </div>
+
+
+
+
+
+
+
+                </div>
+            </div>
+        </div>
+
+    </div>
 
 </div>

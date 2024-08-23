@@ -7,8 +7,7 @@ use yii\widgets\DetailView;
 /* @var $model app\models\CatDepartamento */
 
 $this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Cat Departamentos', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+
 \yii\web\YiiAsset::register($this);
 ?>
 

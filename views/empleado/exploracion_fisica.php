@@ -275,7 +275,7 @@ $editable = Yii::$app->user->can('editar-expediente-medico');
 
 
                                                 </div>
-
+                                                <?php if($model->expedienteMedico->empleado->sexo === "Femenino" ){ ?>
                                                 <div class="card">
                                                     <div class="card-header custom-nopato text-white text-left">
                                                         <h5>EXPLORACIÓN GINECOLOGICA</h5>
@@ -320,6 +320,7 @@ $editable = Yii::$app->user->can('editar-expediente-medico');
 
 
                                                 </div>
+                                                <?php }?>
 
                                                 <div class="card">
                                                     <div class="card-header custom-nopato text-white text-left">

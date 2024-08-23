@@ -68,7 +68,7 @@ class CambioPeriodoVacacional extends \yii\db\ActiveRecord
             'año' => 'Año',
 
             'empleado_id' => 'Empleado ID',
-            'solicitud_id' => 'Solicitud ID',
+            'solicitud_id' => 'ID de solicitud',
             'motivo' => 'Motivo',
             'primera_vez' => 'Primera vez',
             'nombre_jefe_departamento' => 'Nombre Jefe Departamento',

@@ -82,10 +82,62 @@ if (Yii::$app->user->can('crear-formatos-incidencias-empleados')) {
                                 }
                                 ?>
                             </div>
+                            <?= DetailView::widget([
+            'model' => $model,
+            'attributes' => [
+                'id',
+                'solicitud_id',
+                // otros atributos...
+                [
+                   // 'class' => 'yii\grid\DataColumn',
+                   'label' => 'Estatus de la aprobación',
+                    'attribute' => 'aprobacion',
+                    
+                    'value' => function ($model) {//AYUDA A INDENTIFICAR EL ESTATUS DE LA SOLICITUD Y VERIFICAR SI SON NUEVAS O YA HAN SIDO VISUALIZADAS
+                        return $model->solicitud->aprobacion;
+                        
+                    },
+                    'contentOptions' => ['class' => 'text-center'],
+                    'headerOptions' => ['class' => 'text-center'],
+                ],
+                [
+                    'label' => 'Aprobado en',
+                    'attribute' => 'fecha_aprobacion',
+                    'value' => function ($model) {
+                       
+                        setlocale(LC_TIME, "es_419.UTF-8");
+                        
+                        $fechaPermiso = strtotime($model->solicitud->fecha_aprobacion);
+                        
+                        $fechaFormateada = strftime('%A, %B %d, %Y', $fechaPermiso);
+                        
+                        setlocale(LC_TIME, null);
+                        
+                        return $fechaFormateada;
+                    },
+                ],
+
+                [
+                    'label' => 'Aprobante',
+                    'attribute' => 'nombre_aprobante',
+                    'value' => function ($model) {
+                        return $model->solicitud->nombre_aprobante;
+                    },
+                ],
+                [
+                    'label' => 'Comentario',
+                    'attribute' => 'comentario',
+                    'value' => function ($model) {
+                        return $model->solicitud->comentario;
+                    },
+                ],
+            ],
+        ]) ?>
                     <?= DetailView::widget([
                         'model' => $model,
                         'attributes' => [
-                            'id',
+                           // 'id',
+
                             //'empleado_id',
                           //  'solicitud_id',
                             //'fecha_para_cita',
@@ -120,14 +172,7 @@ if (Yii::$app->user->can('crear-formatos-incidencias-empleados')) {
                                 },
                             ],
                            // 'horario_finalizacion',
-                            [
-                                'label' => 'Hora de finalización',
-                                'attribute' => 'horario_finalizacion',
-                                'value' => function ($model) {
-                                    $hora = date("g:i A", strtotime($model->horario_finalizacion));
-                                    return $hora;
-                                },
-                            ],
+                           
                         ],
                     ]) ?>
                 </div>

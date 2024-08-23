@@ -91,22 +91,22 @@ class ReporteTiempoExtraController extends Controller
     }
 
     
-    
+    //CARGAR HISTORIAL DE SOLICITUDES DE REPORTES DE TIEMPO EXTRA
     public function actionHistorial($empleado_id = null)
     {
         if ($empleado_id === null) {
             throw new NotFoundHttpException('El empleado seleccionado no existe.');
         }
-    
+    //SE BUSCA EL EMPLEADO SELECCIONADO
         $empleado = Empleado::findOne($empleado_id);
         if ($empleado === null) {
             throw new NotFoundHttpException('El empleado seleccionado no existe.');
         }
-    
+    //SE CARGA LOS REGISTROS DEL EMPLEADO SELECCIONADO
         $searchModel = new ReporteTiempoExtraSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->query->andFilterWhere(['empleado_id' => $empleado->id]);
-    
+    //SE BUSCAN LOS REGISTROS DE ACTIVIDADES QUE ESTA RELACIONADOS AL REGISTRO DE REPORTE DE TIEMPO EXTRA
         $actividades = [];
         foreach ($dataProvider->getModels() as $reporte) {
             $reporteActividades = ActividadReporteTiempoExtra::find()->where(['reporte_tiempo_extra_id' => $reporte->id])->all();
@@ -158,6 +158,7 @@ class ReporteTiempoExtraController extends Controller
                 $solicitudModel->empleado_id = $empleado->id;
                 $solicitudModel->status = 'Nueva';
                 $solicitudModel->comentario = '';
+                $solicitudModel->aprobacion = 'PENDIENTE';
                 $solicitudModel->fecha_aprobacion = null;
                 $solicitudModel->fecha_creacion = date('Y-m-d H:i:s');
                 $solicitudModel->nombre_formato = 'REPORTE DE TIEMPO EXTRA';
@@ -223,6 +224,23 @@ class ReporteTiempoExtraController extends Controller
         ]);
     }
     
+    public function actionReport()
+{
+    $searchModel = new ReporteTiempoExtraSearch();
+    $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+    // Calcula la suma total de horas extras
+    $totalHoras = ReporteTiempoExtra::find()
+        ->select(['SUM(total_horas) as total_horas'])
+        ->one()->total_horas;
+
+    return $this->render('reporte', [
+        'searchModel' => $searchModel,
+        'dataProvider' => $dataProvider,
+        'totalHoras' => $totalHoras,
+    ]);
+}
+
 
     /**
      * Updates an existing ReporteTiempoExtra model.
@@ -313,6 +331,67 @@ class ReporteTiempoExtraController extends Controller
 
         throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
     }
+
+    public function actionReporte($empleado_id)
+{
+    // Verifica si el empleado existe
+    $empleado = Empleado::findOne($empleado_id);
+    if ($empleado === null) {
+        throw new NotFoundHttpException('El empleado seleccionado no existe.');
+    }
+
+    // Filtrar los reportes de tiempo extra para el empleado específico y con solicitud aprobada
+    $reportes = ReporteTiempoExtra::find()
+        ->joinWith('solicitud') // Asegúrate de tener la relación 'solicitud' definida en el modelo ReporteTiempoExtra
+        ->where(['reporte_tiempo_extra.empleado_id' => $empleado_id])
+        ->andWhere(['solicitud.aprobacion' => 'APROBADO'])
+        ->all();
+    
+    // Crear un array para almacenar los datos del reporte
+    $reporteData = [];
+    
+    // Variable para sumar las horas totales
+    $horasTotales = 0;
+    
+    // Iterar sobre cada reporte para calcular las horas totales y recolectar datos
+    foreach ($reportes as $reporte) {
+        $actividades = ActividadReporteTiempoExtra::find()->where(['reporte_tiempo_extra_id' => $reporte->id])->all();
+        $horasReporte = 0;
+    
+        foreach ($actividades as $actividad) {
+            $horasReporte += $actividad->no_horas;
+        }
+    
+        // Agregar el total de horas del reporte a las horas totales
+        $horasTotales += $horasReporte;
+    
+        // Agregar los datos al array
+        $reporteData[] = [
+            'reporte_id' => $reporte->id,
+            'total_horas' => $horasReporte,
+            'actividades' => $actividades,
+        ];
+    }
+
+    // Actualizar el campo de horas extras del empleado
+    $empleado->informacionLaboral->horas_extras = $horasTotales;
+    
+    // Guardar los cambios en la base de datos
+    if (!$empleado->informacionLaboral->save()) {
+        Yii::$app->session->setFlash('error', 'No se pudo actualizar el campo de horas extras.');
+    }
+    
+    return $this->render('reporte', [
+        'reporteData' => $reporteData,
+        'horasTotales' => $horasTotales,
+    ]);
+}
+
+
+public function getSolicitud()
+{
+    return $this->hasOne(Solicitud::className(), ['id' => 'solicitud_id']);
+}
 
 
 

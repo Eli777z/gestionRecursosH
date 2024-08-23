@@ -45,8 +45,11 @@ class PermisoFueraTrabajoController extends Controller
      * Lists all PermisoFueraTrabajo models.
      * @return mixed
      */
+
+     //FUNCION PARA MOSTRAR TODOS LO REGISTROS DE ESTE FORMATO CREADOS POR EL EMPLEADO
   public function actionIndex()
 {
+    //OBTIENE LOS REGISTROS SOLO DEL USUARIO IDENTIFICADO
     $usuarioId = Yii::$app->user->identity->id;
 
     $empleado = Empleado::find()->where(['usuario_id' => $usuarioId])->one();
@@ -67,7 +70,7 @@ class PermisoFueraTrabajoController extends Controller
         Yii::$app->session->setFlash('error', 'No se pudo encontrar el empleado asociado al usuario actual.');
         return $this->redirect(['index']); 
     }
-}
+}//FUNCION PARA MOSTRAR TODOS LO REGISTROS DE ESTE FORMATO CREADOS POR EL EMPLEADO
 
 public function actionHistorial($empleado_id= null)
 {
@@ -97,11 +100,13 @@ public function actionHistorial($empleado_id= null)
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
+    //FUNCIÓN PARA MOSTRAR LA INFORMACIÓN DETALLADA DEL REGISTRO DEL FORMATO
     public function actionView($id)
     {
+        
         $model = $this->findModel($id);
         $empleado = Empleado::findOne($model->empleado_id);
-    
+    //OBTIENE EL REGISTRO DEL EMPLEADO ASOCIADO
         return $this->render('view', [
             'model' => $model,
             'empleado' => $empleado, // Pasar empleado a la vista
@@ -116,16 +121,18 @@ public function actionHistorial($empleado_id= null)
    
 
  
-
+    //FUNCIÓN QUE CREA EL REGISTRO DEL FORMATO
      public function actionCreate($empleado_id = null)
      {
          $this->layout = "main-trabajador";
-     
+     //OBTIENE LOS MODELOS ASOCIADOS
          $model = new PermisoFueraTrabajo();
-         $motivoFechaPermisoModel = new MotivoFechaPermiso();
+         $motivoFechaPermisoModel = new MotivoFechaPermiso(); //PARA REGISTRAR FECHA Y MOTIVO DEL PERMISO
+        
          $solicitudModel = new Solicitud();
          $usuarioId = Yii::$app->user->identity->id;
-     
+     //VERIFICA SI EL REGISTRO ESTA SIENDO CREADO POR EL MISMO EMPLEADO CON LA
+     //SESION INICIADA, O SI OTRO EMPLEADO ESTA CREANDO SU REGISTRO
          if ($empleado_id) {
              $empleado = Empleado::findOne($empleado_id);
          } else {
@@ -138,6 +145,36 @@ public function actionHistorial($empleado_id= null)
              Yii::$app->session->setFlash('error', 'No se pudo encontrar el empleado.');
              return $this->redirect(['index']);
          }
+
+
+             // Lógica para verificar si se han creado solicitudes muy recientes
+         $nombreFormato = 'PERMISO FUERA DEL TRABAJO';
+         $tiempoLimite = new \DateTime('-24 hours');
+         
+         $solicitudReciente = Solicitud::find()
+             ->where(['empleado_id' => $empleado->id, 'nombre_formato' => $nombreFormato])
+             ->andWhere(['>', 'created_at', $tiempoLimite->format('Y-m-d H:i:s')])
+             ->orderBy(['created_at' => SORT_DESC])
+             ->one();
+         
+         if ($solicitudReciente) {
+             $fechaUltimaSolicitud = new \DateTime($solicitudReciente->created_at);
+             $intervalo = $fechaUltimaSolicitud->diff(new \DateTime());
+             
+             // Convertir el intervalo a un formato amigable (días, horas, minutos)
+             $tiempoTranscurrido = '';
+             if ($intervalo->d > 0) {
+                 $tiempoTranscurrido .= $intervalo->d . ' día(s) ';
+             }
+             if ($intervalo->h > 0) {
+                 $tiempoTranscurrido .= $intervalo->h . ' hora(s) ';
+             }
+             if ($intervalo->i > 0) {
+                 $tiempoTranscurrido .= $intervalo->i . ' minuto(s)';
+             }
+         
+             Yii::$app->session->setFlash('warning', '<i class="fas fa-bell"></i> Ya has creado una solicitud recientemente. Última solicitud hace: ' . $tiempoTranscurrido);
+         }
      
          // Calcular permisos usados y disponibles
          $year = date('Y');
@@ -149,7 +186,7 @@ public function actionHistorial($empleado_id= null)
          
          if (!$parametroFormato) {
              Yii::$app->session->setFlash('error', 'No se pudo encontrar el parámetro de formato para tu tipo de contrato.');
-             return $this->redirect(['index']);
+             return $this->redirect(['empleado/index']);
          }
          
      
@@ -176,7 +213,7 @@ public function actionHistorial($empleado_id= null)
                      $model->hora_salida = date('H:i:s', strtotime($model->hora_salida));
                      $model->hora_regreso = date('H:i:s', strtotime($model->hora_regreso));
                      $model->horario_fecha_a_reponer = date('H:i:s', strtotime($model->horario_fecha_a_reponer));
-     
+                    //GENERA EL REGISTRO DE LA SOLICITUD Y ASIGNA DATOS AL REGISTRO
                      $solicitudModel->empleado_id = $empleado->id;
                      $solicitudModel->status = 'Nueva';
                      $solicitudModel->comentario = '';
@@ -263,6 +300,8 @@ public function actionHistorial($empleado_id= null)
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
+
+     //FUNCIÓN PARA ELIMINAR EL REGISTRO DEL FORMATO Y EL REGISTRO DE SOLICITUD ASOCIADO
     public function actionDelete($id)
     {
         $model = $this->findModel($id);
@@ -330,7 +369,7 @@ public function actionHistorial($empleado_id= null)
     
     
    
-
+//FUNCION QUE LEE LA PLANTILLA EXCEL, ESCRIBE SOBRE ESTA MISMA Y CONVIERTE A HTML
     public function actionExportHtmlSegundoCaso($id)
     {
         $this->layout = false;
@@ -340,12 +379,14 @@ public function actionHistorial($empleado_id= null)
         if (!$model) {
             throw new NotFoundHttpException('El registro no existe.');
         }
-    
+    //LEE LA PLANTILLA EXCEL
         $templatePath = Yii::getAlias('@app/templates/permiso_fuera_trabajo.xlsx');
     
         $spreadsheet = IOFactory::load($templatePath);
     
         $sheet = $spreadsheet->getActiveSheet();
+
+        //COMIENZA A ESCRIBIR LOS VALORES DEL REGISTRO DEL FORMATO SOBRE LAS CELDAS ESPECIFICADAS
         $sheet->setCellValue('F6', $model->empleado->numero_empleado);
        
        
@@ -356,7 +397,7 @@ public function actionHistorial($empleado_id= null)
 
 
         setlocale(LC_TIME, 'es_419.UTF-8'); 
-        $fechaHOY = strftime('%A, %B %d, %Y'); 
+        $fechaHOY = strftime('%A, %B %d, %Y'); //formato de fecha
         $sheet->setCellValue('N6', $fechaHOY);
         
         $nombrePuesto = $model->empleado->informacionLaboral->catPuesto->nombre_puesto;
@@ -374,7 +415,7 @@ $sheet->setCellValue('H11', $nombreDepartamento);
 $nombreTipoContrato = $model->empleado->informacionLaboral->catTipoContrato->nombre_tipo;
 $sheet->setCellValue('H12', $nombreTipoContrato);
 
-
+//EN BASE AL TIPO DE CONTRATO ASIGNA UN COLOR A LA CELDA
 switch ($nombreTipoContrato) {
     case 'Confianza':
         $style = $sheet->getStyle('H12');
@@ -395,8 +436,6 @@ $style->getFont()->getColor()->setARGB('FFa7720f'); // Font color #217346
   
 }
 
-
-
 $fecha_permiso = strftime('%A, %B %d, %Y', strtotime($model->motivoFechaPermiso->fecha_permiso));
 $sheet->setCellValue('H14', $fecha_permiso);
 
@@ -408,7 +447,7 @@ $horaAReponer = date("g:i A", strtotime($model->horario_fecha_a_reponer));
 $sheet->setCellValue('H15', $horaSalida);
 $sheet->setCellValue('H16', $horaRegreso);
 
-// Clean and set the motivo text
+//OBTIENE EL TEXTO INGRESADO EN MOTIVO Y LO LIMPIA
 $motivoTextoPlano = strip_tags($model->motivoFechaPermiso->motivo);
 $motivoTextoPlano = html_entity_decode($motivoTextoPlano, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 $sheet->setCellValue('H18', $motivoTextoPlano);
@@ -419,22 +458,7 @@ $sheet->setCellValue('H20', $fecha_a_reponer);
 $sheet->setCellValue('P20', $horaAReponer);
 $sheet->setCellValue('A32', $nombreCompleto);
 
-
-
-
-
-
 $sheet->setCellValue('A33', $nombrePuesto);
-
-
-//$direccion = CatDireccion::findOne($model->empleado->informacionLaboral->cat_direccion_id);
-
-///if ($direccion && $direccion->nombre_direccion !== '1.- GENERAL' && $model->nombre_jefe_departamento) {
-   // $nombreCompletoJefe = mb_strtoupper($model->nombre_jefe_departamento, 'UTF-8');
-    //$sheet->setCellValue('H32', $nombreCompletoJefe);
-//} else {
-  //  $sheet->setCellValue('H32', null);
-//}
 
 $nombre = mb_strtoupper($model->empleado->nombre, 'UTF-8');
 $apellido = mb_strtoupper($model->empleado->apellido, 'UTF-8');
@@ -442,7 +466,7 @@ $profesion = mb_strtoupper($model->empleado->profesion, 'UTF-8');
 $nombreCompleto = $profesion.''.$apellido . ' ' . $nombre;
 $sheet->setCellValue('H32', $nombreCompleto);
 
-
+//BUSCA EL EMPLEADO QUE ES DIRECTOR 
 $juntaGobierno = JuntaGobierno::find()
 ->where(['nivel_jerarquico' => 'Director'])
 ->all();
@@ -451,13 +475,14 @@ $directorGeneral = null;
 
 foreach ($juntaGobierno as $junta) {
 $empleado = Empleado::findOne($junta->empleado_id);
-
+//VALIDAD SI SE TRATA DE EL DIRECTOR GENERAL
 if ($empleado && $empleado->informacionLaboral->catPuesto->nombre_puesto === 'DIRECTOR GENERAL') {
     $directorGeneral = $empleado;
     break;
 }
 }
 
+//SI ES DIRECTOR GENERAL
 if ($directorGeneral) {
 $nombre = mb_strtoupper($directorGeneral->nombre, 'UTF-8');
 $apellido = mb_strtoupper($directorGeneral->apellido, 'UTF-8');
@@ -473,13 +498,11 @@ $sheet->setCellValue('N33', 'DIRECTOR GENERAL');
  $htmlWriter = new Html($spreadsheet);
  $htmlWriter->setSheetIndex(0); 
  $htmlWriter->setPreCalculateFormulas(false);
-
+//GENERA EL HTML EN BASE A LA PLANTILLA
  $fullHtmlContent = $htmlWriter->generateHtmlAll();
 
-
-
  $fullHtmlContent = str_replace('&nbsp;', ' ', $fullHtmlContent);
-
+//RENDERIZA LA VISTA PREVIA DEL HTML GENERADO Y MANDA EL CONTENIDO A ESTA VISTA
  return $this->render('excel-html', ['htmlContent' => $fullHtmlContent, 'model' => $model]);
     }
 
@@ -550,25 +573,13 @@ $style->getFont()->getColor()->setARGB('FFa7720f'); // Font color #217346
         break;
   
 }
-
-
-
-
-
 $fecha_permiso = strftime('%A, %B %d, %Y', strtotime($model->motivoFechaPermiso->fecha_permiso));
 $sheet->setCellValue('H14', $fecha_permiso);
-
-
 $horaSalida = date("g:i A", strtotime($model->hora_salida));
 $horaRegreso = date("g:i A", strtotime($model->hora_regreso));
 $horaAReponer = date("g:i A", strtotime($model->horario_fecha_a_reponer));
-
 $sheet->setCellValue('H15', $horaSalida);
 $sheet->setCellValue('H16', $horaRegreso);
-
-
- 
-// Clean and set the motivo text
 $motivoTextoPlano = strip_tags($model->motivoFechaPermiso->motivo);
 $motivoTextoPlano = html_entity_decode($motivoTextoPlano, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 $sheet->setCellValue('H18', $motivoTextoPlano);
@@ -615,7 +626,7 @@ $profesionDirector = mb_strtoupper($juntaDirectorDireccion->empleado->profesion,
 $nombreCompletoDirector = $profesionDirector . ' ' . $apellidoDirector . ' ' . $nombreDirector;
 
 $sheet->setCellValue('N32', $nombreCompletoDirector);
-
+//VALIDACIONES PARA IDENTIFICAR LA ESTRUCTURA EN LA QUE SE LLENARA LA PLANTILLA EN BASE A LA DIRECCION PERTENECIENTE DEL EMPLEADO
 $nombreDireccion = $juntaDirectorDireccion->catDireccion->nombre_direccion;
 switch ($nombreDireccion) {
     case '1.- GENERAL':

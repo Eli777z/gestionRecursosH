@@ -49,7 +49,7 @@ class ReporteTiempoExtra extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'empleado_id' => 'Empleado ID',
-            'solicitud_id' => 'Solicitud ID',
+            'solicitud_id' => 'ID de solicitud',
            // 'no_horas' => 'No Horas',
             'total_horas' => 'Total Horas',
             'created_at' => 'Created At',

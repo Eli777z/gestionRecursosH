@@ -68,6 +68,7 @@ class DocumentoController extends Controller
      */
     public function actionCreate($empleado_id)
     {
+        //CARGA LOS MODELOS
         $model = new Documento();
         $cat_tipo_documento = new CatTipoDocumento();
     
@@ -103,17 +104,20 @@ class DocumentoController extends Controller
                 $nombreDocumento = CatTipoDocumento::findOne($tipoDocumentoIdSeleccionado)->nombre_tipo;
             }
             $model->nombre = $nombreDocumento;
-    
+            //LOGICA DE DIRECTORIOS
             if ($file && $model->cat_tipo_documento_id !== null) {
                 $empleado = Empleado::findOne($model->empleado_id);
+                //BUSCA EL DIRECTORIO DEL EMPLEADO
                 $nombreCarpetaTrabajador = Yii::getAlias('@runtime') . '/empleados/' . $empleado->nombre . '_' . $empleado->apellido;
                 if (!is_dir($nombreCarpetaTrabajador)) {
                     mkdir($nombreCarpetaTrabajador, 0775, true);
                 }
+                //CREA LA CARPETA DE DOCUMNETOS EN EL DIRECTORIO
                 $nombreCarpetaExpedientes = $nombreCarpetaTrabajador . '/documentos';
                 if (!is_dir($nombreCarpetaExpedientes)) {
                     mkdir($nombreCarpetaExpedientes, 0775, true);
                 }
+                //GUARDA EL ARCHIVO EN EL DIRECTORIO
                 $rutaArchivo = $nombreCarpetaExpedientes . '/' . $file->baseName . '.' . $file->extension;
                 $file->saveAs($rutaArchivo);
     
@@ -129,6 +133,7 @@ class DocumentoController extends Controller
         }
     
         return $this->render('create', [
+            //RENDERIZA LA VISTA Y CARGA LOS MODELOS CORRESPONDIENTES
             'model' => $model,
             'cat_tipo_documento' => $cat_tipo_documento,
         ]);
@@ -212,12 +217,15 @@ class DocumentoController extends Controller
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 
-
+//ABRIR DOCUMENTO
     public function actionOpen($id)
 {
+    //EN CASO DE QUE SE TRATE DE UN TIPO DE DOCUMENTO QUE SE PUEDA ABRIR O VISUALIZAR 
+    //DESDE EL NAVEGADOR, ESTA FUNCION SE ENCARGAR
     $model = Documento::findOne($id);
     if ($model) {
         $rutaArchivo = $model->ruta;
+        //BUSCA LA RUTA DEL ARCHIVO
         if (file_exists($rutaArchivo)) {
             return Yii::$app->response->sendFile($rutaArchivo, $model->nombre, ['inline' => true]);
         }
@@ -225,9 +233,12 @@ class DocumentoController extends Controller
     Yii::$app->session->setFlash('error', 'El archivo solicitado no se encuentra disponible.');
     return $this->redirect(['empleado/index']); 
 }
-
+//DESCARGAR DOCUMENTO
 public function actionDownload($id)
 {
+    //SI SE DESEA DESCARGAR EL DOCUMENTO, ESTA FUNCION
+    //BUSCA EL REGISTRO DEL DOCUMENTO, PARA QUE USANDO LA RUTA
+    //ENCONTRAR Y OBTENER EL ARCHIVO, ASI PODERLO DESCARGAR
     $model = Documento::findOne($id);
     if ($model) {
         $rutaArchivo = $model->ruta;

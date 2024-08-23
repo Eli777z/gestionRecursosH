@@ -75,7 +75,7 @@ $this->title = 'Cambio de Periodo Vacacional';
                             ['class' => 'hail812\adminlte3\yii\grid\ActionColumn',
 
     
-        'template' => Yii::$app->user->can('ver-empleados-departamento') ? '{view}' : '{view} {delete}',
+        'template' => Yii::$app->user->can('ver-empleados-departamento') || Yii::$app->user->can('ver-empleados-direccion')  ? '{view}' : '{view} {delete}',
 
    
         'buttons' => [

@@ -44,7 +44,7 @@ class InformacionLaboral extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['cat_tipo_contrato_id', 'cat_puesto_id', 'cat_departamento_id', 'vacaciones_id', 'cat_direccion_id', 'junta_gobierno_id'], 'integer'],
+            [['cat_tipo_contrato_id', 'cat_puesto_id', 'cat_departamento_id', 'vacaciones_id', 'cat_direccion_id', 'junta_gobierno_id', 'horas_extras'], 'integer'],
             [[ 'fecha_ingreso',
             'cat_departamento_id',
             'cat_puesto_id',

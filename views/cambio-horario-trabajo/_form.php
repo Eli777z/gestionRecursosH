@@ -143,7 +143,7 @@ if ($empleadoActual->id === $empleado->id) {
             'endDate' => $currentDate,
             'autoApply' => true,
         ]
-    ])->label('Rango de Fechas') ?>
+    ])->label('Periodo del horario') ?>
 </div>
 <?= $form->field($motivoFechaPermisoModel, 'motivo')->widget(FroalaEditorWidget::className(), [
                                                                         'options' => [

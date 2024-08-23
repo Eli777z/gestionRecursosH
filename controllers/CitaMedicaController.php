@@ -134,6 +134,8 @@ class CitaMedicaController extends Controller
                 $solicitudModel->empleado_id = $empleado->id;
                 $solicitudModel->status = 'Nueva';
                 $solicitudModel->comentario = '';
+                $solicitudModel->aprobacion = 'PENDIENTE';
+
                 $solicitudModel->fecha_aprobacion = null;
                 $solicitudModel->fecha_creacion = date('Y-m-d H:i:s');
                 $solicitudModel->nombre_formato = 'CITA MEDICA';
@@ -144,31 +146,7 @@ class CitaMedicaController extends Controller
                     if ($model->save()) {
                         $transaction->commit();
                         
-                        // Obtener el email del médico
-                        $medicoEmail = $this->getMedicoEmail();
-                        
-                        // Configurar el mensaje de éxito con el email del médico y el enlace
-                        $successMessage = 'La cita médica y la solicitud han sido creadas exitosamente.';
-                        $enlaceEmpleado = Yii::$app->urlManager->createUrl(['empleado/view', 'id' => $empleado->id]);
-                        $successMessage .= " Puedes ver el empleado en el siguiente enlace: <a href='$enlaceEmpleado'>$enlaceEmpleado</a>";
-                        
-                        if ($medicoEmail) {
-                            $successMessage .= " El correo del médico es: $medicoEmail";
-                        } else {
-                            $successMessage .= " No se encontró el correo del médico.";
-                        }
-    
-                        Yii::$app->session->setFlash('success', $successMessage);
-    
-                        // Enviar correo al médico
-                        if ($medicoEmail) {
-                            Yii::$app->mailer->compose()
-                                ->setTo($medicoEmail)
-                                ->setFrom(Yii::$app->params['adminEmail'])
-                                ->setSubject('Nueva cita médica creada')
-                                ->setTextBody("Se ha creado una nueva cita médica para el empleado: {$empleado->nombre}. Puedes ver el empleado en el siguiente enlace: http://localhost:82$enlaceEmpleado")
-                                ->send();
-                        }
+                       
     
                         return $this->redirect(['view', 'id' => $model->id]);
                     } else {

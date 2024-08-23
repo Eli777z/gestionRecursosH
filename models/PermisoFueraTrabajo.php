@@ -64,7 +64,7 @@ class PermisoFueraTrabajo extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'empleado_id' => 'Empleado ID',
-            'solicitud_id' => 'Solicitud ID',
+            'solicitud_id' => 'ID de solicitud',
             'motivo_fecha_permiso_id' => 'Motivo Fecha Permiso ID',
             'hora_salida' => 'Hora de salida',
             'hora_regreso' => 'Hora de regreso',

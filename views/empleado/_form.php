@@ -1,5 +1,5 @@
 <?php
-
+//IMPORTACIONES
 use app\models\CatDepartamento;
 use app\models\CatDireccion;
 use app\models\CatPuesto;
@@ -15,6 +15,7 @@ use yii\web\View;
 /* @var $this yii\web\View */
 /* @var $model app\models\Empleado */
 /* @var $form yii\bootstrap4\ActiveForm */
+//CARGAR ESTILOS
 $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
 $this->registerCssFile('@web/css/grid-view.css', ['position' => View::POS_HEAD]);
 ?>
@@ -23,7 +24,9 @@ $this->registerCssFile('@web/css/grid-view.css', ['position' => View::POS_HEAD])
     <div class="row justify-content-center">
         <div class="col-md-10">
             <div class="card">
-                <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data', 'id' => 'form-empleado']]); ?>
+                <?php
+                //FORMULARIO DE CREACION DE EMPLEADO
+                $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data', 'id' => 'form-empleado']]); ?>
                 <div id="loading-spinner-laboral" style="display: none;">
         <i class="fa fa-spinner fa-spin fa-2x" style="color: #000000;"></i> Procesando...
     </div>
@@ -42,6 +45,7 @@ $this->registerCssFile('@web/css/grid-view.css', ['position' => View::POS_HEAD])
                         <div class="col-md-12">
                             <div class="d-flex align-items-center mb-3">
                                 <?php
+                                //ALERTA
                                 foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
                                     if ($type === 'error') {
                                         echo Alert::widget([
@@ -87,7 +91,9 @@ $this->registerCssFile('@web/css/grid-view.css', ['position' => View::POS_HEAD])
                                             <div class="col-6 col-sm-10">
                                                 <?= $form->field($model, 'email')->textInput(['maxlength' => true])->label('Email del empleado:') ?>
                                             </div>
-                                                <?= $form->field($model, 'foto')->widget(FileInput::classname(), [
+                                                <?= 
+                                                //SE CARGA LA EXTENSIÓN DE KARTIK / FILEINPUT PARA SUBIR ARCHIVOS
+                                                $form->field($model, 'foto')->widget(FileInput::classname(), [
                                                    // 'options' => ['accept' => 'file/*'],
                                                     'pluginOptions' => [
                                                         'showUpload' => false,
@@ -105,7 +111,9 @@ $this->registerCssFile('@web/css/grid-view.css', ['position' => View::POS_HEAD])
                                         <div class="card-header gradient-verde text-white">Información Laboral</div>
 <div class="card-body">
     <div class="col-6 col-sm-12">
-        <?= $form->field($informacion_laboral, 'cat_departamento_id')->widget(Select2::classname(), [
+        <?=
+        //SE CARGA EL WIDGET (EXTENSION) SELECT2 CON LOS DATOS DEL MODELO DE CAT_DEPARTAMENTO
+        $form->field($informacion_laboral, 'cat_departamento_id')->widget(Select2::classname(), [
             'data' => ArrayHelper::map(CatDepartamento::find()->all(), 'id', 'nombre_departamento'),
             'language' => 'es',
             'options' => ['placeholder' => 'Seleccione departamento'],
@@ -115,7 +123,9 @@ $this->registerCssFile('@web/css/grid-view.css', ['position' => View::POS_HEAD])
     </div>
 
     <div class="col-6 col-sm-12">
-        <?= $form->field($informacion_laboral, 'cat_puesto_id')->widget(Select2::classname(), [
+        <?=
+        //SE CARGA EL WIDGET (EXTENSION) SELECT2 CON LOS DATOS DEL MODELO DE CAT_PUESTO
+        $form->field($informacion_laboral, 'cat_puesto_id')->widget(Select2::classname(), [
             'data' => ArrayHelper::map(CatPuesto::find()->all(), 'id', 'nombre_puesto'),
             'language' => 'es',
             'options' => ['placeholder' => 'Seleccione puesto del empleado'],
@@ -125,7 +135,9 @@ $this->registerCssFile('@web/css/grid-view.css', ['position' => View::POS_HEAD])
     </div>
 
     <div class="col-6 col-sm-8">
-        <?= $form->field($informacion_laboral, 'cat_tipo_contrato_id')->widget(Select2::classname(), [
+        <?=
+        //SE CARGA EL WIDGET (EXTENSION) SELECT2 CON LOS DATOS DEL MODELO DE CAT_TIPO_CONTRATO
+        $form->field($informacion_laboral, 'cat_tipo_contrato_id')->widget(Select2::classname(), [
             'data' => ArrayHelper::map(CatTipoContrato::find()->all(), 'id', 'nombre_tipo'),
             'language' => 'es',
             'options' => ['placeholder' => 'Seleccione el tipo de contrato'],
@@ -163,6 +175,7 @@ $this->registerCssFile('@web/css/grid-view.css', ['position' => View::POS_HEAD])
 
                 <?php ActiveForm::end(); ?>
                 <?php
+                //SECRIPT PARA ALERTAR AL USUARIO QUE SU SOLICITUD SE ESTRA PROCESANDO
                                         $script = <<< JS
     $('#form-empleado').on('beforeSubmit', function() {
         var button = $('#save-button-personal');

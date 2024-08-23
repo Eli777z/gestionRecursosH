@@ -43,7 +43,7 @@ class Documento extends \yii\db\ActiveRecord
             [['fecha_subida'], 'safe'],
             [['nombre'], 'string', 'max' => 85],
             [['ruta'], 'string', 'max' => 255],
-            [['archivoSubido'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg, pdf, doc, docx'],
+            [['archivoSubido'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg, pdf, doc, docx'],//EXTENSIONES PERMITIDAS DE DOCUMENTOS
             [['observacion'], 'string'],
 
            
@@ -69,7 +69,7 @@ class Documento extends \yii\db\ActiveRecord
 
         ];
     }
-
+//RELACIONES
     /**
      * Gets query for [[CatTipoDocumento]].
      *
@@ -90,7 +90,8 @@ class Documento extends \yii\db\ActiveRecord
         return $this->hasOne(Empleado::class, ['id' => 'empleado_id']);
     }
 
-
+//FUNCION QUE PERMITE LA SUBIDA DE ARCHIVOS EN EL DIRECTORIO DE RUNTIME, A SU VES SIGUE LA 
+//LOGICA NECESARIA PARA GUARDAR EL ARCHIVO EN LA CARPETA DEL EMPLEADO
     public function upload()
     {
         if ($this->validate()) {

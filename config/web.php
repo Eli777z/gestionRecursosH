@@ -95,6 +95,7 @@ $config = [
                 'obtener-formulario' => 'site/obtener-formulario',
                 'delete-formato' => 'empleado/delete-formato',
                 'download-formato' => 'empleado/download-formato',
+                'empleado/generar-reporte' => 'empleado/generar-reporte',
 
 
                
@@ -122,20 +123,25 @@ $config = [
         'allowActions' => [
            // 'site/*',
            'gii/*',
-            'admin/*',
+           ///
+           // 'admin/*',
             'site/login',
             'site/logout',
-            'some-controller/some-action',
+            'site/error',
+           // 'some-controller/some-action',
             'site/get-empleado-foto',
             'empleado/foto-empleado',
-            'debug/*',
-            'cat-tipo-contrato/*',
-            'cat-puesto/*',
-            'parametro-formato/*',
-            'reporte-tiempo-extra/*',
-            'reporte-tiempo-extra-general/*',
-            'cat-departamento/*',
-            'aviso/*'
+            'aviso/ver-imagen'
+           // 'debug/*',
+           // 'cat-tipo-contrato/*',
+            //'cat-puesto/*',
+          //  'parametro-formato/*',
+            //'reporte-tiempo-extra/*',
+          //  'reporte-tiempo-extra-general/*',
+            //'cat-departamento/*',
+           // 'aviso/*',
+           // 'usuario/cambiarcontrasena',
+         //   'contrato-para-personal-eventual/*'
 
 
             // The actions listed here will be allowed to everyone including guests.

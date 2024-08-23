@@ -7,7 +7,7 @@ use yii\widgets\Pjax;
 /* @var $searchModel app\models\AvisoSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('app', 'Avisos');
+$this->title = Yii::t('app', 'Inicio');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="container-fluid">

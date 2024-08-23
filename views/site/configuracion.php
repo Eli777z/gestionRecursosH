@@ -1,4 +1,5 @@
 <?php
+//IMPORTACIONES
 use kartik\tabs\TabsX;
 
 use yii\helpers\Html;
@@ -8,33 +9,26 @@ use yii\widgets\Pjax;
 
 use yii\jui\DatePicker;
 
-
-
-
-
-
 ?>
 
 <div class="container-fluid">
 
-
-
-
-<?php $this->beginBlock('block-parametro-formato'); ?>
+<?php
+//BLOQUES PARA AÑADIRLOS AL TABS
+$this->beginBlock('block-parametro-formato'); ?>
         <?php
-        // Parámetro Formato
+        // REDENRIZAR VISTA Y CARGAR MODELO DE PARAMETRO_FORMATO
         echo $this->render('//parametro-formato/index', [
             'searchModel' => $parametroFormatoSearchModel,
             'dataProvider' => $parametroFormatoDataProvider,
         ]);
         ?>
 
-
 <?php $this->endBlock();?>
 
 <?php $this->beginBlock('block-departamentos'); ?>
 <?php
-        // Cat Puesto
+          // REDENRIZAR VISTA Y CARGAR MODELO DE CAT_DEPARTAMENTO
         echo $this->render('//cat-departamento/index', [
             'searchModel' => $catDepartamentoSearchModel,
             'dataProvider' => $catDepartamentoDataProvider
@@ -44,7 +38,7 @@ use yii\jui\DatePicker;
   
   <?php $this->beginBlock('block-puestos'); ?>
         <?php
-        // Cat Puesto
+          // REDENRIZAR VISTA Y CARGAR MODELO DE CAT_PUESTO
         echo $this->render('//cat-puesto/index', [
             'searchModel' => $catPuestoSearchModel,
             'dataProvider' => $catPuestoDataProvider,
@@ -52,11 +46,8 @@ use yii\jui\DatePicker;
         ?>
     <?php $this->endBlock();?> 
 
-
-
-
-
 <?php
+//ORGANIZAR PESTAÑAS
 $tabs = [
     [
         'label' => 'Formatos',
@@ -85,7 +76,7 @@ $tabs = [
 ];
 
 
-
+//MOSTRAR LOS BLOQUES EN LOS TABS
 echo TabsX::widget([
     'enableStickyTabs' => true,
     'options' => ['class' => 'custom-tabs-2'],
@@ -96,10 +87,4 @@ echo TabsX::widget([
 ]);
 ?>
 
-
-
-
-<!--.col-md-12-->
-
-<!--.row-->
 </div>

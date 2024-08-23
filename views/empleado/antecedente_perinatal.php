@@ -148,45 +148,8 @@ if (!$modelAntecedentePerinatal) {
                                                     <div class="dropdown-divider"></div>
 
                                                     <br>
-                                                    <div class="col-6 col-sm-4">
-                                                        <div class="custom-control custom-checkbox">
-                                                            <?= Html::checkbox('AntecedentePerinatal[test]', $AntecedentePerinatal->test, [
-                                                                'class' => 'custom-control-input',
-                                                                'id' => 'test',
-                                                                'disabled' => !$editable
-                                                            ]) ?>
-                                                            <?= Html::label('¿Cuenta con evaluaciones neonatales?', 'test', ['class' => 'custom-control-label']) ?>
-                                                        </div>
-                                                    </div>
-                                                    <br>
-                                                    <br>
-                                                    <div class="row" id="test-container">
-                                                        <div class="col-6 col-sm-2">
-                                                            <?= Html::label('Apgar', 'p_apgar') ?>
-                                                            <?= Html::input('number', 'AntecedentePerinatal[p_apgar]', $AntecedentePerinatal->p_apgar, ['class' => 'form-control', 'disabled' => !$editable]) ?>
-
-                                                        </div>
-                                                        <div class="col-6 col-sm-2">
-                                                            <?= Html::label('Ballard', 'p_ballard') ?>
-                                                            <?= Html::input('number', 'AntecedentePerinatal[p_ballard]', $AntecedentePerinatal->p_ballard, ['class' => 'form-control', 'disabled' => !$editable]) ?>
-
-                                                        </div>
-
-                                                        <div class="col-6 col-sm-2">
-                                                            <?= Html::label('Silverman', 'p_silverman') ?>
-                                                            <?= Html::input('number', 'AntecedentePerinatal[p_silverman]', $AntecedentePerinatal->p_silverman, ['class' => 'form-control', 'disabled' => !$editable]) ?>
-
-                                                        </div>
-                                                        <div class="col-6 col-sm-2">
-                                                            <?= Html::label('Capurro', 'p_capurro') ?>
-                                                            <?= Html::input('number', 'AntecedentePerinatal[p_capurro]', $AntecedentePerinatal->p_capurro, ['class' => 'form-control', 'disabled' => !$editable]) ?>
-
-                                                        </div>
-
-                                                    </div>
-
-                                                    <div class="w-100"></div>
-                                                    <br>
+                                                    
+                                                   
                                                     <div class="col-6 col-sm-8">
                                                         <div class="form-group">
                                                             <?= Html::label('Complicaciones', 'p_complicacion') ?>
@@ -194,24 +157,8 @@ if (!$modelAntecedentePerinatal) {
                                                         </div>
                                                     </div>
 
-                                                    <div class="w-100"></div>
-                                                    <br>
-                                                    <div class="col-6 col-sm-4">
-                                                        <div class="custom-control custom-checkbox">
-                                                            <?= Html::checkbox('AntecedentePerinatal[p_anestesia]', $AntecedentePerinatal->p_anestesia, [
-                                                                'class' => 'custom-control-input',
-                                                                'id' => 'p_anestesia',
-                                                                'disabled' => !$editable
-                                                            ]) ?>
-                                                            <?= Html::label('Anestesia', 'p_anestesia', ['class' => 'custom-control-label', 'disabled' => !$editable]) ?>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-6 col-sm-8" id="anestesia-container">
-                                                        <div class="form-group">
-                                                            <?= Html::label('Especifique', 'p_especifique_anestecia') ?>
-                                                            <?= Html::textarea('AntecedentePerinatal[p_especifique_anestecia]', $AntecedentePerinatal->p_especifique_anestecia, ['class' => 'form-control', 'rows' => 2, 'id' => 'p_especifique_anestecia', 'disabled' => !$editable]) ?>
-                                                        </div>
-                                                    </div>
+                                                    
+                                                   
 
                                                     <div class="w-100"></div>
                                                     <br>

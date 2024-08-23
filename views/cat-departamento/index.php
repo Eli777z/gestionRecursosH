@@ -11,7 +11,6 @@ use app\models\CatDireccion;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Cat Departamentos';
-$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="container-fluid">
 <div class="row justify-content-center">

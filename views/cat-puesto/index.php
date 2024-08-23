@@ -9,7 +9,6 @@ use kartik\select2\Select2;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Cat Puestos';
-$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="container-fluid">
 <div class="row justify-content-center">

@@ -1,11 +1,8 @@
 <?php
-
-
+//IMPORTACIONES
 use yii\helpers\Html;
-
 use yii\grid\GridView;
 use yii\widgets\Pjax;
-
 use yii\jui\DatePicker;
 
 ?>
@@ -16,14 +13,12 @@ use yii\jui\DatePicker;
                                     </div>
                                     <li class="dropdown-divider"></li>
                                     <div class="row">
-                                        <?php Pjax::begin(); ?>
+                                        <?php Pjax::begin(); //SE INICIALIZA EL AJAX O PJAX ?>
                                         <?= GridView::widget([
-                                            'dataProvider' => $dataProviderConsultas,
-                                            'filterModel' => $searchModelConsultas,
+                                            'dataProvider' => $dataProviderConsultas, // SE EXTRAN LOS DATOS DE LOS REGISTROS CORRESPONDIENTES AL MODELO
+                                            'filterModel' => $searchModelConsultas, //SE UTILIZA EL MODELO QUE SE ENCARGA DE BUSCAR Y FILTRAR
                                             'columns' => [
                                                 ['class' => 'yii\grid\SerialColumn'],
-
-
 
                                                 [
                                                     'label' => 'Fecha de la consula',
@@ -61,22 +56,22 @@ use yii\jui\DatePicker;
                                                     'filter' => false,
                                                     'options' => ['style' => 'width: 65%;'],
                                                 ],
-                                                // Otras columnas que desees mostrar...
+                                             //ACCIONES QUE SE PUEDE REALIZAR EN LAS FILAS DEL GRIDVIEW
                                                 [
                                                     'class' => 'hail812\adminlte3\yii\grid\ActionColumn',
-                                                    'template' => '{view} {delete}',
+                                                    'template' => '{view} ',
                                                     'buttons' => [
                                                         'view' => function ($url, $model, $key) {
                                                             return Html::a('<i class="fa fa-eye"></i>', ['consulta-medica/view', 'id' => $model->id], ['title' => 'Ver', 'class' => 'btn btn-primary btn-xs']);
                                                         },
-                                                        'delete' => function ($url, $model, $key) {
-                                                            return Html::a('<i class="fa fa-trash"></i>', ['consulta-medica/delete', 'id' => $model->id], [
-                                                                'title' => 'Eliminar',
-                                                                'class' => 'btn btn-danger btn-xs',
-                                                                'data-confirm' => '¿Estás seguro de eliminar este elemento?',
-                                                                'data-method' => 'post',
-                                                            ]);
-                                                        },
+                                              //          'delete' => function ($url, $model, $key) {
+                                                //            return Html::a('<i class="fa fa-trash"></i>', ['consulta-medica/delete', 'id' => $model->id], [
+                                                  //              'title' => 'Eliminar',
+                                                    //            'class' => 'btn btn-danger btn-xs',
+                                                      //          'data-confirm' => '¿Estás seguro de eliminar este elemento?',
+                                                        //        'data-method' => 'post',
+                                                          //  ]);
+                                 //                       },
                                                     ],
                                                 ],
                                             ],

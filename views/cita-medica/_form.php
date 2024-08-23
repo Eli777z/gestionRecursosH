@@ -90,7 +90,7 @@ if ($empleadoActual->id === $empleado->id) {
                                             <div class="card-body">
 <div class="row">
 
-    <?= $form->field($model, 'empleado_id')->textInput() ?>
+    
 
     <div class="col-6 col-sm-3">
 
@@ -101,10 +101,7 @@ if ($empleadoActual->id === $empleado->id) {
 
     <?= $form->field($model, 'horario_inicio')->input('time') ?>
     </div>
-    <div class="col-6 col-sm-2">
-
-    <?= $form->field($model, 'horario_finalizacion')->input('time') ?>
-    </div>
+    
 
     
 <?= $form->field($model, 'comentario')->widget(FroalaEditorWidget::className(), [

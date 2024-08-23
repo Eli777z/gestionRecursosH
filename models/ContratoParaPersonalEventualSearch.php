@@ -4,12 +4,12 @@ namespace app\models;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Countries;
+use app\models\ContratoParaPersonalEventual;
 
 /**
- * CountriesSearch represents the model behind the search form of `app\models\Countries`.
+ * ContratoParaPersonalEventualSearch represents the model behind the search form of `app\models\ContratoParaPersonalEventual`.
  */
-class CountriesSearch extends Countries
+class ContratoParaPersonalEventualSearch extends ContratoParaPersonalEventual
 {
     /**
      * {@inheritdoc}
@@ -17,8 +17,8 @@ class CountriesSearch extends Countries
     public function rules()
     {
         return [
-            [['id'], 'integer'],
-            [['name'], 'safe'],
+            [['id', 'numero_contrato', 'duracion', 'empleado_id', 'solicitud_id'], 'integer'],
+            [['fecha_inicio', 'fecha_termino', 'modalidad', 'actividades_realizar', 'origen_contrato'], 'safe'],
         ];
     }
 
@@ -40,7 +40,7 @@ class CountriesSearch extends Countries
      */
     public function search($params)
     {
-        $query = Countries::find();
+        $query = ContratoParaPersonalEventual::find();
 
         // add conditions that should always apply here
 
@@ -59,9 +59,17 @@ class CountriesSearch extends Countries
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
+            'numero_contrato' => $this->numero_contrato,
+            'fecha_inicio' => $this->fecha_inicio,
+            'fecha_termino' => $this->fecha_termino,
+            'duracion' => $this->duracion,
+            'empleado_id' => $this->empleado_id,
+            'solicitud_id' => $this->solicitud_id,
         ]);
 
-        $query->andFilterWhere(['like', 'name', $this->name]);
+        $query->andFilterWhere(['like', 'modalidad', $this->modalidad])
+            ->andFilterWhere(['like', 'actividades_realizar', $this->actividades_realizar])
+            ->andFilterWhere(['like', 'origen_contrato', $this->origen_contrato]);
 
         return $dataProvider;
     }

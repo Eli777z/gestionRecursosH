@@ -14,7 +14,10 @@ $this->params['breadcrumbs'][] = $this->title;
    
             <div class="row">
                 <div class="col-md-12">
-                    <?=$this->render('_form', [
+                    <?=
+                    // RENDERIZA EL _FORM Y CARGA LOS MODELOS DE USUARIO, INFORMACION_LABORAL
+                    // Y JUNTA_GOBIERNO
+                    $this->render('_form', [
                         'model' => $model,
                         'usuario' => $usuario,
                            'informacion_laboral' => $informacion_laboral,

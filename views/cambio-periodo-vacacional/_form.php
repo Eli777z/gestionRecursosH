@@ -136,7 +136,7 @@ if ($empleadoActual->id === $empleado->id) {
         'endDate' => $currentDate, 
         'autoApply' => true,
     ]
-])->label('Rango de Fechas') ?>
+])->label('Nuevo periodo vacacional') ?>
 </div>
    
     <div class="w-100"></div>

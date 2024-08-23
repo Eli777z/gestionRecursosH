@@ -1,22 +1,16 @@
 <?php
-
+//IMPORTACIONES
 use yii\helpers\Html;
 use froala\froalaeditor\FroalaEditorWidget;
-
 use kartik\file\FileInput;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
-
 use kartik\form\ActiveForm;
 use yii\jui\DatePicker;
-
 use yii\helpers\ArrayHelper;
-
 use app\models\DocumentoSearch;
-
 use kartik\select2\Select2;
 use app\models\CatTipoDocumento;
-
 ?>
 <div class="row">
 
@@ -33,6 +27,7 @@ use app\models\CatTipoDocumento;
 
 
         <script>
+            //SCRIPT PARA MANEJAR EL BOTON QUE OCULTA Y MUESTRA EL FORMULARIO DE SUBIDA DE DOCUMENTO
             document.getElementById('toggle-expediente-button').addEventListener('click', function() {
                 var expedienteContent = document.getElementById('expediente-content');
                 if (expedienteContent.style.display === 'none') {
@@ -47,7 +42,10 @@ use app\models\CatTipoDocumento;
 
         <div class="card-body" id="expediente-content" style="display: none;">
 
-            <?php $form = ActiveForm::begin([
+            <?php
+            //FORMULARIO PARA SUBIR LOS DOCUMENTOS
+            
+            $form = ActiveForm::begin([
                 'action' => ['documento/create', 'empleado_id' => $model->id],
                 'options' => ['enctype' => 'multipart/form-data', 'class' => 'narrow-form']
             ]); ?>
@@ -132,6 +130,8 @@ $('#tipo-archivo').val('');
 
         <div class="card-body">
             <?php
+//GRIDVIEW PARA MOSTRAR LOS REGISTROS DE LOS DOCUMENTOS DE LOS EMPLEADOS
+
             $searchModel = new DocumentoSearch();
             $params = Yii::$app->request->queryParams;
             $params[$searchModel->formName()]['empleado_id'] = $model->id;
@@ -188,6 +188,7 @@ $('#tipo-archivo').val('');
                         'options' => ['style' => 'width: 30%;'],
                     ],
                     [
+                        //ACCIONES PARA PERMITIR LA VISUALIZACION, DESCARGAR O ELIMINAR LOS DOCUMENTOS ASOCIADOS AL EMPLEADO
                         'class' => 'hail812\adminlte3\yii\grid\ActionColumn',
                         'template' => '{view} {delete} {download}',
                         'buttons' => [
@@ -234,6 +235,7 @@ $('#tipo-archivo').val('');
 </div>
 
 <?php
+//SCRIPT PARA MOSTRAR CAMPO PARA AGREGAR UN NEUVO TIPO DE DOCUMENTO
 $this->registerJs("
 $('#tipo-documento').change(function(){
 var tipoDocumentoId = $(this).val();

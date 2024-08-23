@@ -48,26 +48,27 @@ use yii\helpers\Url;
 
         <nav class="mt-2">
             <?php
-             if (Yii::$app->user->can('gestor-rh') || Yii::$app->user->can('administrador') ) {
-            echo \hail812\adminlte\widgets\Menu::widget([
-                'items' => [
-                    ['label' => 'Inicio', 'icon' => 'home', 'url' => ['site/portalgestionrh']],
-                    ['label' => 'Mi Perfil', 'icon' => 'user', 'url' => ['site/portalempleado']],
-
-
-                    ['label' => 'Empleados', 'icon' => 'users', 'url' => ['empleado/index']],
-                    
-                   // ['label' => 'Formatos', 'icon' => 'file', 'url' => ['empleado/formatos']],
-                    ['label' => 'Solicitudes', 'icon' => 'envelope-square', 'url' => ['solicitud/index']],
-
-                    ['label' => 'Gii',  'icon' => 'file-code', 'url' => ['/gii'], 'target' => '_blank'],
-                    //['label' => 'Administrador', 'icon' => 'user-tie', 'url' => ['/admin']],
-                 
-                    ['label' => 'Configuración',  'icon' => 'wrench', 'url' => ['site/configuracion']],
-
-
-                ],
-            ]);
+            if (Yii::$app->user->can('gestor-rh') || Yii::$app->user->can('administrador')) {
+                // Obtener el número de solicitudes nuevas
+                $nuevasSolicitudesCount = \app\models\Solicitud::find()->where(['status' => 'Nueva'])->count();
+            
+                // Condicional para mostrar el contador solo si hay solicitudes nuevas
+                $solicitudesLabel = 'Solicitudes';
+                if ($nuevasSolicitudesCount > 0) {
+                    $solicitudesLabel .= " <span class='badge badge-danger'>{$nuevasSolicitudesCount}</span>";
+                }
+            
+                echo \hail812\adminlte\widgets\Menu::widget([
+                    'items' => [
+                        ['label' => 'Inicio', 'icon' => 'home', 'url' => ['site/portalgestionrh']],
+                        ['label' => 'Mi Perfil', 'icon' => 'user', 'url' => ['site/portalempleado']],
+                        ['label' => 'Empleados', 'icon' => 'users', 'url' => ['empleado/index']],
+                        ['label' => $solicitudesLabel, 'icon' => 'envelope-square', 'url' => ['solicitud/index'], 'encode' => false],
+                        ['label' => 'Configuración', 'icon' => 'wrench', 'url' => ['site/configuracion']],
+                    ],
+                ]);
+            
+            
         }elseif (Yii::$app->user->can('medico')) {
 
 

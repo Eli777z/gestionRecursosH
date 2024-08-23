@@ -6,8 +6,7 @@ use yii\helpers\Html;
 /* @var $model app\models\CambioPeriodoVacacional */
 
 $this->title = 'Create Cambio Periodo Vacacional';
-$this->params['breadcrumbs'][] = ['label' => 'Cambio Periodo Vacacionals', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+
 ?>
 
 

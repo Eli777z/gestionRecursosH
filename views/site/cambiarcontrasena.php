@@ -1,4 +1,5 @@
 <?php
+//IMPORTACIONES
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -12,7 +13,9 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="site-cambiarcontrasena">
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php
+    // FORMULARIO PARA EL CAMBIO DE CONTRASEÑA DEL USUARIO
+    $form = ActiveForm::begin(); ?>
 
         <?= $form->field($model, 'oldPassword')->passwordInput() ?>
         <?= $form->field($model, 'newPassword')->passwordInput() ?>

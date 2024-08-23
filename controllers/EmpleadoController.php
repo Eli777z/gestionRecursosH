@@ -38,7 +38,12 @@ use app\models\DocumentoMedico;
 use app\models\ExploracionFisica;
 use app\models\InterrogatorioMedico;
 use app\models\CatPuesto;
-
+use yii\helpers\ArrayHelper;
+     use yii2tech\csvgrid\CsvGrid;
+     use PhpOffice\PhpSpreadsheet\Spreadsheet;
+     use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+     use PhpOffice\PhpSpreadsheet\IOFactory;
+  
 /**
  * EmpleadoController implements the CRUD actions for Empleado model.
  */
@@ -123,10 +128,11 @@ class EmpleadoController extends Controller
      */
     public function actionView($id)
     {
+        //ENCUENTRA EL REGISTRO DEL EMPLEADO SOLICITADO
         $modelEmpleado = $this->findModel2($id);
         $modelEmpleado->scenario = Empleado::SCENARIO_UPDATE;
         
-
+  //CARGA LOS MODELOS
         $documentos = $modelEmpleado->documentos;
         $documentoModel = new Documento();
         $documentoMedicoModel = new DocumentoMedico();
@@ -141,7 +147,7 @@ class EmpleadoController extends Controller
         $dataProviderConsultas = $searchModelConsultas->search(Yii::$app->request->queryParams);
         $dataProviderConsultas->query->andWhere(['expediente_medico_id' => $modelEmpleado->expedienteMedico->id]);
 
-
+//CREA EL REGISTRO DE ANTECEDENTE HEREDITARIO Y LO ASOCIA AL EXPEDIENTE MEDICO DEL EMPLEADO
         $expedienteMedico = $modelEmpleado->expedienteMedico;
         $antecedenteHereditario = AntecedenteHereditario::findOne(['expediente_medico_id' => $expedienteMedico->id]);
         if (!$antecedenteHereditario) {
@@ -787,16 +793,119 @@ class EmpleadoController extends Controller
     }
 
 
+    public function actionInformeMedicoGeneral($id)
+    {
+        $modelEmpleado = $this->findModel2($id);
+        $expedienteMedico = $modelEmpleado->expedienteMedico;
+    
+        // Otras consultas para obtener los datos necesarios
+        $alergia = Alergia::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+        $antecedentePatologico = AntecedentePatologico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+        $exploracionFisica = ExploracionFisica::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+        $interrogatorioMedico = InterrogatorioMedico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+        $antecedenteNoPatologico = AntecedenteNoPatologico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+        $antecedentePerinatal = AntecedentePerinatal::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+        $antecedenteGinecologico = AntecedenteGinecologico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
+        $antecedenteObstrectico = AntecedenteObstrectico::findOne(['expediente_medico_id' => $expedienteMedico->id]);
 
-
+        // Obtener antecedentes hereditarios
+        $antecedentes = AntecedenteHereditario::findAll(['expediente_medico_id' => $expedienteMedico->id]);
+    
+        $antecedentesExistentes = [];
+        if ($antecedentes) {
+            foreach ($antecedentes as $antecedente) {
+                $antecedentesExistentes[$antecedente->cat_antecedente_hereditario_id][$antecedente->parentezco] = true;
+            }
+        }
+    
+        // Obtener categorías de antecedentes hereditarios
+        $catAntecedentes = CatAntecedenteHereditario::find()->all();
+    
+        return $this->render('informe_medico_general', [
+            'model' => $modelEmpleado,
+            'expedienteMedico' => $expedienteMedico,
+            'alergia' => $alergia,
+            'antecedentePatologico' => $antecedentePatologico,
+            'exploracionFisica' => $exploracionFisica,
+            'interrogatorioMedico' => $interrogatorioMedico,
+            'catAntecedentes' => $catAntecedentes,
+            'antecedentesExistentes' => $antecedentesExistentes,
+            'antecedenteNoPatologico' => $antecedenteNoPatologico,
+                'antecedentePerinatal' =>$antecedentePerinatal,
+                'antecedenteObstrectico' => $antecedenteObstrectico,
+                'antecedenteGinecologico' => $antecedenteGinecologico,
+        ]);
+    }
+    
 
     /**
      * Creates a new Empleado model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
+
+
+
+      // Ejemplo para generar CSV (puedes usar otros como Pdf o Excel)
+     
+    
+      
+      
+      public function actionGenerarReporte()
+      {
+          $searchModel = new EmpleadoSearch();
+          $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+      
+          // Eliminar la paginación para exportar todos los registros filtrados
+          $dataProvider->pagination = false;
+      
+          // Crear un nuevo objeto Spreadsheet
+          $spreadsheet = new Spreadsheet();
+          $sheet = $spreadsheet->getActiveSheet();
+      
+          // Encabezados del reporte
+          $sheet->setCellValue('A1', 'ID');
+          $sheet->setCellValue('B1', 'Nombre');
+          $sheet->setCellValue('C1', 'Apellido');
+          $sheet->setCellValue('D1', 'Número de Empleado');
+          $sheet->setCellValue('E1', 'Departamento');
+          $sheet->setCellValue('F1', 'Dirección');
+          // Añadir más encabezados si es necesario
+      
+          // Iterar sobre los empleados y agregar los datos al reporte
+          $row = 2;
+          foreach ($dataProvider->getModels() as $empleado) {
+              $sheet->setCellValue('A' . $row, $empleado->id);
+              $sheet->setCellValue('B' . $row, $empleado->nombre);
+              $sheet->setCellValue('C' . $row, $empleado->apellido);
+              $sheet->setCellValue('D' . $row, $empleado->numero_empleado);
+              $sheet->setCellValue('E' . $row, $empleado->informacionLaboral->catDepartamento->nombre_departamento ?? 'N/A');
+              $sheet->setCellValue('F' . $row, $empleado->informacionLaboral->catDireccion->nombre_direccion ?? 'N/A');
+              $row++;
+          }
+      
+          // Crear el archivo Excel
+          $writer = new Xlsx($spreadsheet);
+          $fileName = 'empleados_reporte_' . date('Y-m-d_His') . '.xlsx';
+      
+          // Enviar el archivo al navegador para su descarga
+          header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+          header('Content-Disposition: attachment;filename="' . $fileName . '"');
+          header('Cache-Control: max-age=0');
+      
+          $writer->save('php://output');
+          exit;
+      }
+      
+
+      
+      
+
+
+     //FUNCION PARA CREAR EL EMPLEADO Y SU USUARIO, TAMBIEN LOS REGISTROS ASOCIADOS
     public function actionCreate()
 {
+    //SE CARGAN LOS MODELOS ASOCIADOS AL EMPLEADO
     $model = new Empleado();
     $usuario = new Usuario();
     $informacion_laboral = new InformacionLaboral();
@@ -806,22 +915,27 @@ class EmpleadoController extends Controller
     $juntaGobiernoModel = new JuntaGobierno();
     $expedienteMedico = new ExpedienteMedico();
     $antecedenteHereditario = new AntecedenteHereditario();
+    
 
     $usuario->scenario = Usuario::SCENARIO_CREATE;
     $model->scenario = Empleado::SCENARIO_CREATE;
 
     if ($model->load(Yii::$app->request->post()) && $usuario->load(Yii::$app->request->post()) && $informacion_laboral->load(Yii::$app->request->post())) {
+       //INICIAMOS LA TRANSACCIÓN
         $transaction = Yii::$app->db->beginTransaction();
         $usuario->username = $model->nombre . $model->apellido;
         $nombres = explode(" ", $model->nombre);
         $apellidos = explode(" ", $model->apellido);
         $usernameBase = strtolower($nombres[0][0] . $apellidos[0] . (isset($apellidos[1]) ? $apellidos[1][0] : ''));
+        //SE GENERA EL NOMBRE DE USUARIO QUE TENDRA EL EMPLEADO EN BASE A SU NOMBRE Y APELLIDO
         $usuario->username = $usernameBase;
         $counter = 1;
+       
         while (Usuario::find()->where(['username' => $usuario->username])->exists()) {
             $usuario->username = $usernameBase . $counter;
             $counter++;
         }
+        //SE ESTABLECE LA CONTRASEÑA POR DEFECTO 
         $usuario->password = 'contrasena';
         $usuario->status = 10;
         $usuario->nuevo = 4;
@@ -833,6 +947,7 @@ class EmpleadoController extends Controller
             $totalDiasVacaciones = $this->calcularDiasVacaciones($informacion_laboral->fecha_ingreso, $informacion_laboral->cat_tipo_contrato_id);
             $diasPorPeriodo = ceil($totalDiasVacaciones / 2);
 
+            //GUARDA LA INFORMACION DE LOS PERIODOS VACAIONALES
             $periodoVacacional->dias_vacaciones_periodo = $diasPorPeriodo;
             if (!$periodoVacacional->save()) {
                 Yii::$app->session->setFlash('error', 'Error al guardar PeriodoVacacional.');
@@ -853,6 +968,7 @@ class EmpleadoController extends Controller
                 throw new \yii\db\Exception('Error al guardar Vacaciones');
             }
 
+            //IDENTIFICA EL DEPARTAMENTO QUE SE MANDO Y ASIGNA A INFORMACION LABORAL LA DIREECION Y DPTO AL QUE PERTENECE
             $departamento = CatDepartamento::findOne($informacion_laboral->cat_departamento_id);
             if ($departamento) {
                 $informacion_laboral->cat_direccion_id = $departamento->cat_direccion_id;
@@ -865,6 +981,7 @@ class EmpleadoController extends Controller
                 throw new \yii\db\Exception('Error al guardar InformacionLaboral');
             }
 
+            //VERIFICA Y GUARDA EL ROL QUE SE ESTABLECIO
             $model->informacion_laboral_id = $informacion_laboral->id;
             if ($usuario->save()) {
                 $model->usuario_id = $usuario->id;
@@ -889,6 +1006,7 @@ class EmpleadoController extends Controller
                 }
 
                 // Subir foto del empleado si se proporcionó
+                ///RECIBE LA FOTO DEL EMPLEADO, ADEMAS SE CREAN LAS CARPETAS DEL EMPLEADO EN RUNTIME
                 $upload = UploadedFile::getInstance($model, 'foto');
                 if (is_object($upload)) {
                     $nombreCarpetaTrabajador = Yii::getAlias('@runtime') . '/empleados/' . $model->nombre . '_' . $model->apellido;
@@ -941,7 +1059,7 @@ class EmpleadoController extends Controller
                                     throw new \yii\db\Exception('Error al guardar JuntaGobierno: ' . json_encode($juntaGobiernoModel->errors));
                                 }
                             }
-
+                                //MANDA AL CORREO DEL EMPLEADO LAS CREDENCIALES PARA INICIAR SESION
                             Yii::$app->mailer->compose()
                                 ->setFrom('elitaev7@gmail.com')
                                 ->setTo($model->email)
@@ -975,6 +1093,7 @@ class EmpleadoController extends Controller
     }
 
     return $this->render('create', [
+//RENDERIZA LA VISTA, CARGANDO LOS MODELOS CORRESPONDIENTES
         'model' => $model,
         'usuario' => $usuario,
         'informacion_laboral' => $informacion_laboral,
@@ -983,12 +1102,32 @@ class EmpleadoController extends Controller
         'segundoPeriodoVacacional' => $segundoPeriodoVacacional,
         'expedienteMedico' => $expedienteMedico,
         'antecedenteHereditario' => $antecedenteHereditario,
-        'puestos' => CatPuesto::find()->all(), // Asumiendo que tienes un modelo CatPuesto para los puestos
-        'departamentos' => CatDepartamento::find()->all(), // Asumiendo que tienes un modelo CatDepartamento para los departamentos
+        'puestos' => CatPuesto::find()->all(), 
+        'departamentos' => CatDepartamento::find()->all(), 
         'juntaGobiernoModel' => $juntaGobiernoModel,
     ]);
 }
 
+
+public function actionDesactivados()
+{
+    $searchModel = new EmpleadoSearch();
+    $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+    $juntaGobiernoModel = new JuntaGobierno();
+    // Filtrar empleados desactivados
+ 
+    $dataProvider->query->andWhere(['usuario.status' => 0]); // 0 o el valor correspondiente para desactivados
+
+    return $this->render('desactivados', [
+        'searchModel' => $searchModel,
+        'dataProvider' => $dataProvider,
+        'juntaGobiernoModel' => $juntaGobiernoModel,
+   
+    ]);
+}
+
+
+//FUNCION QUE DEFINE EL DIA DE VACACIONES EN BASE AL NOMBRE DEL TIPO DE FORMATO
     private function calcularDiasVacaciones($fechaIngreso, $tipoContratoId)
     {
         $fechaIngreso = new \DateTime($fechaIngreso);
@@ -1013,7 +1152,7 @@ class EmpleadoController extends Controller
                 return 0;
         }
     }
-
+//CANTIDAD DE VACACIONES QUE SE CALCULAN PARA EL TIPO DE CONTRATO DE EVENTUAL
     private function calcularVacacionesEventual($anios)
     {
         if ($anios < 1) {
@@ -1036,7 +1175,7 @@ class EmpleadoController extends Controller
             return 24 + floor(($anios - 15) / 5) * 2;
         }
     }
-
+//CANTIDAD DE VACACIONES QUE SE CALCULAN PARA EL TIPO DE CONTRATO DE CONFIANZA
     private function calcularVacacionesConfianza($anios)
     {
         if ($anios < 1) {
@@ -1049,7 +1188,7 @@ class EmpleadoController extends Controller
             return 22 + floor(($anios - 10) / 5) * 2;
         }
     }
-
+//CANTIDAD DE VACACIONES QUE SE CALCULAN PARA EL TIPO DE CONTRATO SINDICALIZADO
     private function calcularVacacionesSindicalizado($anios)
     {
         if ($anios < 1) {
@@ -1100,7 +1239,6 @@ class EmpleadoController extends Controller
         $usuario_id = $empleado->usuario_id;
         $informacion_laboral_id = $empleado->informacion_laboral_id;
 
-        // $junta_gobierno_id = $empleado->informacionLaboral->junta_gobierno_id;
         $transaction = Yii::$app->db->beginTransaction();
 
         try {
@@ -1112,32 +1250,17 @@ class EmpleadoController extends Controller
                 $documento->delete();
             }
 
-            
-
-
-            //  $empleado->informacionLaboral->delete();
             $empleado->delete();
-
-
             $usuario = Usuario::findOne($usuario_id);
             if ($usuario) {
                 $usuario->delete();
             }
 
-            // $junta_gobierno = JuntaGobierno::findOne($junta_gobierno_id);
-            //if ($junta_gobierno) {
-            //  $junta_gobierno->delete();
-            // }
 
             $informacion_laboral = InformacionLaboral::findOne($informacion_laboral_id);
             if ($informacion_laboral) {
                 $informacion_laboral->delete();
             }
-
-            
-
-
-
 
 
             $transaction->commit();
@@ -1311,13 +1434,14 @@ class EmpleadoController extends Controller
         }
     }
 
+    //FUNCION PARA CAMBIAR LA FOTO DE PERFIL DEL EMPLEADO
     public function actionCambio($id)
     {
         $model = $this->findModel2($id);
 
         if (Yii::$app->request->isPost) {
             $uploadedFile = UploadedFile::getInstance($model, 'foto');
-
+                //RECIBE LA FOTO DEL EMPLEADO, Y SE ALMACENA EN EL DIRECTORIO CORRESPONDIENTE
             if ($uploadedFile && $model->validate(['foto'])) {
                 $nombreCarpetaTrabajador = Yii::getAlias('@runtime') . '/empleados/' . $model->nombre . '_' . $model->apellido;
                 if (!is_dir($nombreCarpetaTrabajador)) {
@@ -1353,7 +1477,7 @@ class EmpleadoController extends Controller
     }
 
 
-
+//FUNCION QUE PERMITE EDITAR Y ACTUALZAR LA INFORMACION PERSONAL DEL EMPLEADO
     public function actionActualizarInformacion($id)
     {
         $model = $this->findModel2($id);
@@ -1403,6 +1527,7 @@ class EmpleadoController extends Controller
 
 
 
+//FUNCION QUE PERMITE EDITAR Y ACTUALZAR LA INFORMACION LABORAL DEL EMPLEADO
     public function actionActualizarInformacionLaboral($id)
     {
         $model = $this->findModel2($id);
@@ -1470,7 +1595,7 @@ class EmpleadoController extends Controller
             return $this->redirect($url);
         }
     }
-
+//ESTA FUNCION PERMITE DETERINAR SI ES JEFE DE UNIDAD, DEPARTAMENTO O SI ES DIRECTOR, EN BASE AL NOMBRE DEL PUESTO QUE TIENE ESTABLECIDO EL EMPLEADO
     protected function determinarNivelJerarquico($nombrePuesto)
 {
     if (stripos($nombrePuesto, 'DIRECTOR') !== false) {
@@ -1485,6 +1610,7 @@ class EmpleadoController extends Controller
 
     
 
+//FUNCION QUE PERMITE EDITAR Y ACTUALZAR LA INFORMACION DE LOS PERIODOS VACACIONALES DEL EMPLEADO
     public function actionActualizarPrimerPeriodo($id)
     {
         $model = $this->findModel2($id);
