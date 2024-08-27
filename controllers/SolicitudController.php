@@ -22,10 +22,12 @@ use app\models\ComisionEspecialSearch;
 use app\models\PeriodoVacacionalHistorial;
 use app\models\PermisoEconomico;
 use app\models\ActividadReporteTiempoExtra;
+use app\models\ActividadReporteTiempoExtraGeneral;
 use app\models\ContratoParaPersonalEventual;
 use app\models\PermisoFueraTrabajo;
 use app\models\PermisoSinSueldo;
 use app\models\ReporteTiempoExtra;
+use app\models\ReporteTiempoExtraGeneral;
 
 /**
  * SolicitudController implements the CRUD actions for Solicitud model.
@@ -94,12 +96,23 @@ class SolicitudController extends Controller
         if ($reporteTiempoExtra) {
             $actividades = ActividadReporteTiempoExtra::find()->where(['reporte_tiempo_extra_id' => $reporteTiempoExtra->id])->all();
         }
+
+
+         // Encontrar el ReporteTiempoExtra asociado usando el solicitud_id del modelo
+         $reporteTiempoExtraGeneral = ReporteTiempoExtraGeneral::find()->where(['solicitud_id' => $model->id])->one();
+    
+         // Si se encuentra el ReporteTiempoExtra, obtener las actividades asociadas
+         $actividadesGeneral = [];
+         if ($reporteTiempoExtraGeneral) {
+             $actividadesGeneral = ActividadReporteTiempoExtraGeneral::find()->where(['reporte_tiempo_extra_general_id' => $reporteTiempoExtraGeneral->id])->all();
+         }
     
         return $this->render('view', [
             'model' => $model,
             'formato' => $formato,
             'empleadoId' => $empleadoId,
             'actividades' => $actividades, // Pasar actividades a la vista
+          'actividadesGeneral' =>  $actividadesGeneral,
         ]);
     }
     
@@ -133,7 +146,12 @@ class SolicitudController extends Controller
                     return ReporteTiempoExtra::findOne(['solicitud_id' => $solicitud->id]);
                     case 'SOLICITUD DE CONTRATO PARA PERSONAL EVENTUAL':
                         return ContratoParaPersonalEventual::findOne(['solicitud_id' => $solicitud->id]);
-            default:
+                        case 'REPORTE DE TIEMPO EXTRA GENERAL':
+                            return ReporteTiempoExtraGeneral::findOne(['solicitud_id' => $solicitud->id]);
+          
+                        
+          
+                        default:
                 return null;
         }
     }

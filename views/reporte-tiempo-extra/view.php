@@ -119,7 +119,7 @@ if ($empleado) {
                        <?= DetailView::widget([
             'model' => $model,
             'attributes' => [
-                'id',
+             //   'id',
                 'solicitud_id',
                 // otros atributos...
                 [

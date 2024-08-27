@@ -1,7 +1,7 @@
 <?php
 use yii\helpers\Html;
 
-$this->title = 'Reporte_Tiempo_Extra_'.$model->empleado->nombre.' '.$model->empleado->apellido;
+$this->title = 'Reporte_Tiempo_Extra_General_'.$model->empleado->nombre.' '.$model->empleado->apellido;
 //$this->params['breadcrumbs'][] = $this->title;
 ?>
 <head>
@@ -71,10 +71,10 @@ $this->title = 'Reporte_Tiempo_Extra_'.$model->empleado->nombre.' '.$model->empl
             position: absolute;
             top: 15%;
             
-            left: 8%;
+            left: 1%;
             width: 200%;
             max-height: 100%;
-            transform: scale(1.25); /* Escalar el contenido al 75% */
+            transform: scale(0.9); /* Escalar el contenido al 75% */
             transform-origin: top left; /* Ajustar el origen de la transformación */
         }
         /* Márgenes de la página */

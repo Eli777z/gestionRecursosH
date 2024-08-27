@@ -28,6 +28,8 @@ class CatPuesto extends \yii\db\ActiveRecord
         return [
             [['nombre_puesto'], 'required'],
             [['nombre_puesto'], 'string', 'max' => 100],
+            [['nombre_puesto'], 'unique', 'message' => 'Este nombramiento ya existe.'],
+
         ];
     }
 

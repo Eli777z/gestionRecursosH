@@ -21,60 +21,58 @@ use Yii;
  */
 class ActividadReporteTiempoExtraGeneral extends \yii\db\ActiveRecord
 {
-    /**
-     * {@inheritdoc}
-     */
     public static function tableName()
     {
         return 'actividad_reporte_tiempo_extra_general';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rules()
     {
         return [
-            [['empleado_id', 'reporte_tiempo_extra_general_id', 'no_horas'], 'integer'],
+            [['numero_empleado'], 'exist', 'skipOnError' => true, 'targetClass' => Empleado::class, 'targetAttribute' => ['numero_empleado' => 'numero_empleado'], 'message' => 'El número de empleado no existe.'],
+            [['numero_empleado', 'reporte_tiempo_extra_general_id', 'no_horas'], 'integer'],
             [['fecha', 'hora_inicio', 'hora_fin'], 'safe'],
+            [['numero_empleado','fecha', 'hora_inicio', 'hora_fin' ], 'required'],
             [['actividad'], 'string'],
-            [['empleado_id'], 'exist', 'skipOnError' => true, 'targetClass' => Empleado::class, 'targetAttribute' => ['empleado_id' => 'id']],
             [['reporte_tiempo_extra_general_id'], 'exist', 'skipOnError' => true, 'targetClass' => ReporteTiempoExtraGeneral::class, 'targetAttribute' => ['reporte_tiempo_extra_general_id' => 'id']],
+            [['numero_empleado'], 'validateEmpleadoPertenencia'],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels()
     {
         return [
             'id' => 'ID',
-            'empleado_id' => 'Empleado ID',
+            'numero_empleado' => 'Número de empleado',
             'fecha' => 'Fecha',
-            'hora_inicio' => 'Hora Inicio',
-            'hora_fin' => 'Hora Fin',
+            'hora_inicio' => 'Hora de inicio',
+            'hora_fin' => 'Hora de finalización',
             'actividad' => 'Actividad',
             'reporte_tiempo_extra_general_id' => 'Reporte Tiempo Extra General ID',
             'no_horas' => 'No Horas',
         ];
     }
 
-    /**
-     * Gets query for [[Empleado]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getEmpleado()
+    public function validateEmpleadoPertenencia($attribute, $params)
     {
-        return $this->hasOne(Empleado::class, ['id' => 'empleado_id']);
+        $usuarioActual = Yii::$app->user->identity;
+        $empleadoActual = $usuarioActual->empleado;
+
+        // Obtén el departamento o área del empleado actual
+        $departamentoActual = $empleadoActual->informacionLaboral->catDepartamento->nombre_departamento;
+
+        // Verifica si el empleado ingresado pertenece al mismo departamento o área
+        $empleado = Empleado::findOne(['numero_empleado' => $this->$attribute]);
+        if ($empleado === null) {
+            $this->addError($attribute, 'El número de empleado no existe.');
+        } else {
+            $departamentoEmpleado = $empleado->informacionLaboral->catDepartamento->nombre_departamento;
+            if ($departamentoEmpleado !== $departamentoActual) {
+                $this->addError($attribute, 'El empleado no pertenece a su departamento.');
+            }
+        }
     }
 
-    /**
-     * Gets query for [[ReporteTiempoExtraGeneral]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
     public function getReporteTiempoExtraGeneral()
     {
         return $this->hasOne(ReporteTiempoExtraGeneral::class, ['id' => 'reporte_tiempo_extra_general_id']);

@@ -21,25 +21,24 @@ $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
                 <div class="card-body bg-light">
 
 
-
-<div class="reporte-horas-extras">
-
-
-
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Reporte ID</th>
-            <th>Total de Horas</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php foreach ($reporteData as $data): ?>
+                <div class="reporte-horas-extras">
+    <table class="table table-bordered">
+        <thead>
             <tr>
-                <td><?= Html::encode($data['reporte_id']) ?></td>
-                <td><?= Html::encode($data['total_horas']) ?></td>
+                <th>ID del reporte</th>
+                <th>Tipo de Reporte</th>
+                <th>Total de Horas</th>
             </tr>
-            <tr><td colspan="2">
+        </thead>
+        <tbody>
+            <?php foreach ($reporteData as $data): ?>
+                <tr>
+                    <td><?= Html::encode($data['reporte_id']) ?></td>
+                    <td><?= Html::encode($data['tipo']) ?></td>
+                    <td><?= Html::encode($data['total_horas']) ?></td>
+                </tr>
+                <tr>
+                    <td colspan="3">
                         <strong>Actividades:</strong>
                         <ul class="list-unstyled">
                             <?php foreach ($data['actividades'] as $actividad): ?>
@@ -55,18 +54,18 @@ $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
                             <?php endforeach; ?>
                         </ul>
                     </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="2" class="text-right">Total General de Horas:</th>
+                <th><?= Html::encode($horasTotales) ?></th>
             </tr>
-        <?php endforeach; ?>
-    </tbody>
-    <tfoot>
-        <tr>
-            <th colspan="1" class="text-right">Total General de Horas:</th>
-            <th><?= Html::encode($horasTotales) ?></th>
-        </tr>
-    </tfoot>
-</table>
-
+        </tfoot>
+    </table>
 </div>
+
 </div>
                 <!--.card-body-->
             </div>

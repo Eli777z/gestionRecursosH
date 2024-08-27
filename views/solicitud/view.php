@@ -1,10 +1,13 @@
 <?php
 //IMPORTACIONES
+
+use app\models\Empleado;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\bootstrap5\Alert;
 use yii\web\View;
 use yii\grid\GridView;
+
 /* @var $this yii\web\View */
 /* @var $model app\models\Solicitud */
 $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
@@ -31,7 +34,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Solicitud ' . $model->id];
 ?>
 <div class="container-fluid">
     <div class="row justify-content-center"> 
-        <div class="col-md-8">
+        <div class="col-md-10">
             <div class="card">
             <div class="card-header bg-info text-white">
                     <div class="d-flex justify-content-between"> 
@@ -241,7 +244,133 @@ if ($formato) {
             echo '</div>';
             echo '</div>';
             break;
-        
+            case 'REPORTE DE TIEMPO EXTRA GENERAL':
+
+                $formatoAttributes = [
+                    [
+                        'label' => 'ID de solicitud',
+                        'attribute' => 'solicitud_id',
+                        'value' => function ($model) {
+                            return $model->solicitud_id;
+                        },
+                    ],
+                  
+                    [
+                        'label' => 'Fecha de creación de solicitud',
+                        'attribute' => 'created_at',
+                        'value' => function ($model) {
+                           
+                            setlocale(LC_TIME, "es_419.UTF-8");
+                            
+                            $fechaPermiso = strtotime($model->created_at);
+                            
+                            $fechaFormateada = strftime('%A, %B %d, %Y', $fechaPermiso);
+                            
+                            setlocale(LC_TIME, null);
+                            
+                            return $fechaFormateada;
+                        },
+                    ],
+                    [
+                        'label' => 'Aprobado en',
+                        'attribute' => 'fecha_aprobacion',
+                        'value' => function ($model) {
+                           
+                            setlocale(LC_TIME, "es_419.UTF-8");
+                            
+                            $fechaPermiso = strtotime($model->solicitud->fecha_aprobacion);
+                            
+                            $fechaFormateada = strftime('%A, %B %d, %Y', $fechaPermiso);
+                            
+                            setlocale(LC_TIME, null);
+                            
+                            return $fechaFormateada;
+                        },
+                    ],
+    
+                    [
+                        'label' => 'Aprobante',
+                        'attribute' => 'nombre_aprobante',
+                        'value' => function ($model) {
+                            return $model->solicitud->nombre_aprobante;
+                        },
+                    ],
+                ];
+            
+                //$actividadesGeneral Calcular el total de horas
+                $totalHoras = array_reduce($actividadesGeneral, function ($carry, $actividad) {
+                    return $carry + $actividad['no_horas'];
+                }, 0);
+            
+                echo '<div class="row">';
+                echo '<div class="col-md-12">';
+                echo '<h3>Actividades</h3>';
+                echo GridView::widget([
+                    'dataProvider' => new \yii\data\ArrayDataProvider([
+                        'allModels' => $actividadesGeneral,
+                        'pagination' => false,
+                    ]),
+                    'columns' => [
+                        ['class' => 'yii\grid\SerialColumn'],
+                    //    'fecha',
+                    [
+                        'attribute' => 'numero_empleado',
+                        'label' => 'Nombre del Empleado',
+                        'value' => function ($model) {
+                            // Buscar el empleado basado en el numero_empleado
+                            $empleadoId = Empleado::findOne(['numero_empleado' => $model->numero_empleado]);
+                            return $empleadoId ? $empleadoId->nombre . ' ' . $empleadoId->apellido : 'Desconocido';
+                        },
+                    ],
+    
+                        [
+                            'label' => 'Fecha',
+                            'value' => function ($formato) {
+                               
+                                setlocale(LC_TIME, "es_419.UTF-8");
+                                
+                                $fechaPermiso = strtotime($formato->fecha);
+                                
+                                $fechaFormateada = strftime('%A, %B %d, %Y', $fechaPermiso);
+                                
+                                setlocale(LC_TIME, null);
+                                
+                                return $fechaFormateada;
+                            },
+                        ],
+    
+                        'hora_inicio',
+                        'hora_fin',
+                        'actividad',
+                        'no_horas',
+                    ],
+                ]);
+            
+                // Mostrar el total de horas fuera del GridView
+                echo '<div class="total-horas">';
+                echo '<h4>Total de horas: ' . $totalHoras . '</h4>';
+                echo '</div>';
+            if(Yii::$app->user->can('aprobar-solicitudes')){
+                echo Html::beginForm(['aprobar-solicitud', 'id' => $model->id], 'post', ['class' => 'form-inline']);
+                echo '<div class="form-group mr-2 mb-2">';
+                echo Html::submitButton(Html::tag('i', ' Aprobar', ['class' => 'fas fa-check']), ['name' => 'aprobacion', 'value' => 'APROBADO', 'class' => 'btn btn-success', 'title' => 'Aprobar']);
+                echo '</div>';
+                echo '<div class="form-group mr-2 mb-2">';
+                echo Html::submitButton(Html::tag('i', ' Rechazar', ['class' => 'fas fa-times']), ['name' => 'aprobacion', 'value' => 'RECHAZADO', 'class' => 'btn btn-danger', 'title' => 'Rechazar']);
+                echo '</div>';
+                echo '<div class="form-group mr-2">';
+                echo Html::label('Comentario', null, ['class' => 'control-label']);
+                echo Html::textInput('comentario', $model->comentario, ['class' => 'form-control']);
+                echo '</div>';
+                echo Html::endForm();
+            }
+            
+                echo '</div>';
+                echo '</div>';
+                break;
+            
+    
+    
 
         case 'PERMISO FUERA DEL TRABAJO':
             $formatoAttributes = [

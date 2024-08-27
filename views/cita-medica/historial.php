@@ -76,18 +76,17 @@ $this->title = 'Citas Medicas';
             
             'value' => function ($model) {//AYUDA A INDENTIFICAR EL ESTATUS DE LA SOLICITUD Y VERIFICAR SI SON NUEVAS O YA HAN SIDO VISUALIZADAS
                 if ($model->solicitud->aprobacion === 'PENDIENTE') {
-                    return 'PENDIENTE <i class="fas fa-stopwatch" aria-hidden="true" style="color: #ea4242 "></i>';
-                } elseif ($model->solicitud->aprobacion  === 'APROBADO') {
-                    return 'APROBADO <i class="fas fa-check" aria-hidden="true" style="color: #4678fc"></i>';
-                } elseif ($model->solicitud->aprobacion  === 'RECHAZADO') {
-                    return 'RECHAZADO <i class="fa fa-times" aria-hidden="true" style="color: #4678fc"></i>';
+                    return '<i class="fas fa-stopwatch" aria-hidden="true" style="color: #4678fc"></i> PENDIENTE';
+                } elseif ($model->solicitud->aprobacion === 'APROBADO') {
+                    return '<i class="fas fa-check" aria-hidden="true" style="color: #2fcf04"></i> APROBADO';
+                } elseif ($model->solicitud->aprobacion === 'RECHAZADO') {
+                    return '<i class="fa fa-times" aria-hidden="true" style="color: #d91e1e"></i> RECHAZADO';
                
                 }else{
                     return 'No aplica';
 
+}
 
-
-                }
                 
             },
             'contentOptions' => ['class' => 'text-center'],
@@ -97,15 +96,15 @@ $this->title = 'Citas Medicas';
             'label' => 'Revisado en',
             'attribute' => 'fecha_aprobacion',
             'value' => function ($model) {
-               
+                if ($model->solicitud->fecha_aprobacion === null) {
+                    return 'No definido';
+                }
+        
                 setlocale(LC_TIME, "es_419.UTF-8");
-                
                 $fechaPermiso = strtotime($model->solicitud->fecha_aprobacion);
-                
                 $fechaFormateada = strftime('%A, %B %d, %Y', $fechaPermiso);
-                
                 setlocale(LC_TIME, null);
-                
+        
                 return $fechaFormateada;
             },
         ],

@@ -20,7 +20,8 @@ use app\models\Notificacion;
 use PhpOffice\PhpSpreadsheet\Writer\Html;
 use app\models\ActividadReporteTiempoExtra;
 use yii\helpers\Url;
-
+use app\models\ReporteTiempoExtraGeneral;
+use app\models\ActividadReporteTiempoExtraGeneral;
 
 /**
  * ReporteTiempoExtraController implements the CRUD actions for ReporteTiempoExtra model.
@@ -130,6 +131,7 @@ class ReporteTiempoExtraController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
+    
     public function actionCreate($empleado_id = null)
     {
         $this->layout = "main-trabajador";
@@ -224,7 +226,10 @@ class ReporteTiempoExtraController extends Controller
         ]);
     }
     
-    public function actionReport()
+ 
+
+
+public function actionReporte2($empleado_id = null)
 {
     $searchModel = new ReporteTiempoExtraSearch();
     $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -232,15 +237,41 @@ class ReporteTiempoExtraController extends Controller
     // Calcula la suma total de horas extras
     $totalHoras = ReporteTiempoExtra::find()
         ->select(['SUM(total_horas) as total_horas'])
+        ->where(['empleado_id' => $empleado_id])
         ->one()->total_horas;
+
+    // Filtrar reportes generales para el empleado específico
+    $reporteGenerales = ReporteTiempoExtraGeneral::find()
+        ->joinWith('actividades') // Asegúrate de tener la relación definida en el modelo
+        ->where(['actividades.empleado_id' => $empleado_id])
+        ->all();
+
+    $reporteData = [];
+    foreach ($reporteGenerales as $reporteGeneral) {
+        $actividades = ActividadReporteTiempoExtraGeneral::find()
+            ->where(['reporte_tiempo_extra_general_id' => $reporteGeneral->id, 'empleado_id' => $empleado_id])
+            ->all();
+
+        $totalHorasReporte = array_sum(array_column($actividades, 'no_horas'));
+
+        $reporteData[] = [
+            'reporte_id' => $reporteGeneral->id,
+            'total_horas' => $totalHorasReporte,
+            'actividades' => $actividades,
+        ];
+    }
+
+    // Calcular el total general de horas
+    $horasTotales = $totalHoras + array_sum(array_column($reporteData, 'total_horas'));
 
     return $this->render('reporte', [
         'searchModel' => $searchModel,
         'dataProvider' => $dataProvider,
         'totalHoras' => $totalHoras,
+        'reporteData' => $reporteData,
+        'horasTotales' => $horasTotales,
     ]);
 }
-
 
     /**
      * Updates an existing ReporteTiempoExtra model.
@@ -387,6 +418,93 @@ class ReporteTiempoExtraController extends Controller
     ]);
 }
 
+public function actionReporte3($empleado_id)
+{
+    // Verifica si el empleado existe
+    $empleado = Empleado::findOne($empleado_id);
+    if ($empleado === null) {
+        throw new NotFoundHttpException('El empleado seleccionado no existe.');
+    }
+
+    // Filtrar los reportes de tiempo extra para el empleado específico y con solicitud aprobada
+    $reportes = ReporteTiempoExtra::find()
+        ->joinWith('solicitud')
+        ->where(['reporte_tiempo_extra.empleado_id' => $empleado_id])
+        ->andWhere(['solicitud.aprobacion' => 'APROBADO'])
+        ->all();
+
+    // Filtrar los reportes de tiempo extra general donde las actividades corresponden al número de empleado y con solicitud aprobada
+    $reportesGenerales = ReporteTiempoExtraGeneral::find()
+        ->joinWith('solicitud')
+        ->where(['solicitud.aprobacion' => 'APROBADO'])
+        ->all();
+
+    // Crear un array para almacenar los datos del reporte
+    $reporteData = [];
+    
+    // Variable para sumar las horas totales
+    $horasTotales = 0;
+
+    // Iterar sobre cada reporte para calcular las horas totales y recolectar datos
+    foreach ($reportes as $reporte) {
+        $actividades = ActividadReporteTiempoExtra::find()->where(['reporte_tiempo_extra_id' => $reporte->id])->all();
+        $horasReporte = 0;
+    
+        foreach ($actividades as $actividad) {
+            $horasReporte += $actividad->no_horas;
+        }
+    
+        // Agregar el total de horas del reporte a las horas totales
+        $horasTotales += $horasReporte;
+    
+        // Agregar los datos al array
+        $reporteData[] = [
+            'reporte_id' => $reporte->id,
+            'tipo' => 'Individual',
+            'total_horas' => $horasReporte,
+            'actividades' => $actividades,
+        ];
+    }
+
+    // Iterar sobre cada reporte general
+    foreach ($reportesGenerales as $reporteGeneral) {
+        $actividadesGenerales = ActividadReporteTiempoExtraGeneral::find()
+            ->where(['reporte_tiempo_extra_general_id' => $reporteGeneral->id, 'numero_empleado' => $empleado->numero_empleado])
+            ->all();
+
+        $horasReporteGeneral = 0;
+
+        foreach ($actividadesGenerales as $actividadGeneral) {
+            $horasReporteGeneral += $actividadGeneral->no_horas;
+        }
+
+        // Agregar el total de horas del reporte general a las horas totales
+        $horasTotales += $horasReporteGeneral;
+
+        // Agregar los datos al array
+        $reporteData[] = [
+            'reporte_id' => $reporteGeneral->id,
+            'tipo' => 'General',
+            'total_horas' => $horasReporteGeneral,
+            'actividades' => $actividadesGenerales,
+        ];
+    }
+
+    // Actualizar el campo de horas extras del empleado
+    $empleado->informacionLaboral->horas_extras = $horasTotales;
+    
+    // Guardar los cambios en la base de datos
+    if (!$empleado->informacionLaboral->save()) {
+        Yii::$app->session->setFlash('error', 'No se pudo actualizar el campo de horas extras.');
+    }
+    
+    return $this->render('reporte', [
+        'reporteData' => $reporteData,
+        'horasTotales' => $horasTotales,
+    ]);
+}
+
+
 
 public function getSolicitud()
 {
@@ -526,4 +644,113 @@ public function getSolicitud()
         return $this->render('excel-html', ['htmlContent' => $fullHtmlContent, 'model' => $model]);
     }
     
+    public function actionExportHtmlSegundoCaso($id)
+    {
+        $this->layout = false;
+    
+        $model = ReporteTiempoExtra::findOne($id);
+    
+        if (!$model) {
+            throw new NotFoundHttpException('El registro no existe.');
+        }
+        setlocale(LC_TIME, 'es_419.UTF-8'); 
+    
+        $templatePath = Yii::getAlias('@app/templates/tiempo_extra.xlsx');
+        $spreadsheet = IOFactory::load($templatePath);
+        $sheet = $spreadsheet->getActiveSheet();
+    
+        $sheet->setCellValue('I9', $model->empleado->numero_empleado);
+    
+        $nombre = mb_strtoupper($model->empleado->nombre, 'UTF-8');
+        $apellido = mb_strtoupper($model->empleado->apellido, 'UTF-8');
+        $nombreCompleto = $apellido . ' ' . $nombre;
+        $sheet->setCellValue('E10', $nombreCompleto);
+        $sheet->setCellValue('A38', $nombreCompleto);
+    
+        $sheet->setCellValue('G28', $model->total_horas);
+    
+        $nombrePuesto = $model->empleado->informacionLaboral->catPuesto->nombre_puesto;
+        $sheet->setCellValue('E11', $nombrePuesto);
+    
+        $nombreCargo = $model->empleado->informacionLaboral->catDptoCargo->nombre_dpto;
+        $sheet->setCellValue('I11', $nombreCargo);
+    
+        $nombreDireccion = $model->empleado->informacionLaboral->catDireccion->nombre_direccion;
+        $sheet->setCellValue('F6', $nombreDireccion);
+    
+        $sheet->setCellValue('A39', $nombrePuesto);
+    
+        //$direccion = CatDireccion::findOne($model->empleado->informacionLaboral->cat_direccion_id);
+    
+        $nombre = mb_strtoupper($model->empleado->nombre, 'UTF-8');
+$apellido = mb_strtoupper($model->empleado->apellido, 'UTF-8');
+$profesion = mb_strtoupper($model->empleado->profesion, 'UTF-8');
+$nombreCompleto = $profesion.''.$apellido . ' ' . $nombre;
+$sheet->setCellValue('E38', $nombreCompleto);
+
+$juntaGobierno = JuntaGobierno::find()
+->where(['nivel_jerarquico' => 'Director'])
+->all();
+
+$directorGeneral = null;
+
+foreach ($juntaGobierno as $junta) {
+$empleado = Empleado::findOne($junta->empleado_id);
+
+if ($empleado && $empleado->informacionLaboral->catPuesto->nombre_puesto === 'DIRECTOR GENERAL') {
+    $directorGeneral = $empleado;
+    break;
+}
+}
+
+if ($directorGeneral) {
+    $nombre = mb_strtoupper($directorGeneral->nombre, 'UTF-8');
+    $apellido = mb_strtoupper($directorGeneral->apellido, 'UTF-8');
+    $profesion = mb_strtoupper($directorGeneral->profesion, 'UTF-8');
+    $nombreCompleto =  $profesion.''.$apellido . ' ' . $nombre;
+$sheet->setCellValue('H38', $nombreCompleto);
+} else {
+
+}
+
+$sheet->setCellValue('H39', 'DIRECTOR GENERAL');
+
+
+
+
+
+
+
+
+        // Añadir actividades
+        $actividades = ActividadReporteTiempoExtra::find()->where(['reporte_tiempo_extra_id' => $id])->all();
+    
+        $startRow = 16; // Fila inicial para las actividades
+        foreach ($actividades as $index => $actividad) {
+            $row = $startRow + $index;
+        
+            // Convertir la fecha a un timestamp
+            $timestamp = strtotime($actividad->fecha);
+        
+            // Formatear la fecha
+            $fechaFormateada = strftime('%A %d de %B de %Y', $timestamp);
+        
+            // Asignar la fecha formateada a la celda
+            $sheet->setCellValue('B' . $row, $fechaFormateada);
+            $sheet->setCellValue('E' . $row, $actividad->hora_inicio);
+            $sheet->setCellValue('F' . $row, $actividad->hora_fin);
+            $sheet->setCellValue('G' . $row, $actividad->no_horas);
+            $sheet->setCellValue('H' . $row, $actividad->actividad);
+        }
+        
+        $htmlWriter = new Html($spreadsheet);
+        $htmlWriter->setSheetIndex(0);
+        $htmlWriter->setPreCalculateFormulas(false);
+    
+        $fullHtmlContent = $htmlWriter->generateHtmlAll();
+        $fullHtmlContent = str_replace('&nbsp;', ' ', $fullHtmlContent);
+    
+        return $this->render('excel-html', ['htmlContent' => $fullHtmlContent, 'model' => $model]);
+    }
+
 }

@@ -173,7 +173,7 @@ if (!$modelAlergia) {
                     <?php 
                     //PERMISO PARA MOSTRAR LOS BOTONES DE CREAR CONSULTA Y CITA MEDICA
                     if (Yii::$app->user->can('aprobar-solicitudes')) { ?>
-                    <?= Html::a('Ver Horas Extras', ['//reporte-tiempo-extra/reporte', 'empleado_id' => $model->id], [   'class' => 'btn btn-success mr-3 float-right fa-lg']) ?>
+                    <?= Html::a('Ver Horas Extras', ['//reporte-tiempo-extra/reporte3', 'empleado_id' => $model->id], [   'class' => 'btn btn-success mr-3 float-right fa-lg']) ?>
                     <?php }?>
 
                       

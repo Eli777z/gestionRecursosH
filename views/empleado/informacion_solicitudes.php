@@ -39,7 +39,7 @@ use kartik\select2\Select2;
     <?= Html::a('PERMISO SIN GOCE DE SUELDO', Url::to(['permiso-sin-sueldo/historial', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) ?>
     <?= Html::a('CAMBIO DE PERIODO VACACIONAL', Url::to(['cambio-periodo-vacacional/historial', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) ?>
     <?=  Html::a('REPORTE DE TIEMPO EXTRA', Url::to(['reporte-tiempo-extra/historial', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0'])?>
-    <?= Html::a('REPORTE DE TIEMPO EXTRA GENERAL', Url::to(['reporte-tiempo-extra-general/index']), ['class' => 'dropdown-item text-primary']) ?>
+    <?=  Html::a('REPORTE DE TIEMPO EXTRA GENERAL', Url::to(['reporte-tiempo-extra-general/historial', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0'])?>
 
    <?php if ($model->informacionLaboral->catTipoContrato->nombre_tipo === 'Eventual'): ?>
     <?= Html::a('SOLICITUD DE CONTRATO PARA PERSONAL EVENTUAL', Url::to(['contrato-para-personal-eventual/historial', 'empleado_id' => $model->id]), ['class' => 'dropdown-item text-primary', 'data-pjax' => '0']) ?>
@@ -70,6 +70,7 @@ use kartik\select2\Select2;
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
+            
             [
                 'class' => 'yii\grid\DataColumn',
                 'header' => '',
@@ -117,6 +118,30 @@ use kartik\select2\Select2;
                         'yearRange' => '-100:+0',
                     ],
                 ]),
+            ],
+            [
+                'class' => 'yii\grid\DataColumn',
+                'header' => 'Aprobación',
+                'format' => 'raw',
+                
+                'value' => function ($model) {//AYUDA A INDENTIFICAR EL ESTATUS DE LA SOLICITUD Y VERIFICAR SI SON NUEVAS O YA HAN SIDO VISUALIZADAS
+                    if ($model->aprobacion === 'PENDIENTE') {
+                        return '<i class="fas fa-stopwatch" aria-hidden="true" style="color: #4678fc"></i> PENDIENTE';
+                    } elseif ($model->aprobacion === 'APROBADO') {
+                        return '<i class="fas fa-check" aria-hidden="true" style="color: #2fcf04"></i> APROBADO';
+                    } elseif ($model->aprobacion === 'RECHAZADO') {
+                        return '<i class="fa fa-times" aria-hidden="true" style="color: #d91e1e"></i> RECHAZADO';
+                   
+                    }else{
+                        return 'No aplica';
+
+
+
+                    }
+                    
+                },
+                'contentOptions' => ['class' => 'text-center'],
+                'headerOptions' => ['class' => 'text-center'],
             ],
         
             [
@@ -202,6 +227,30 @@ use kartik\select2\Select2;
                     ],
                     'theme' => Select2::THEME_KRAJEE_BS3,
                 ]),
+            ],
+            [
+                'class' => 'yii\grid\DataColumn',
+                'header' => 'Aprobación',
+                'format' => 'raw',
+                
+                'value' => function ($model) {//AYUDA A INDENTIFICAR EL ESTATUS DE LA SOLICITUD Y VERIFICAR SI SON NUEVAS O YA HAN SIDO VISUALIZADAS
+                    if ($model->aprobacion === 'PENDIENTE') {
+                        return '<i class="fas fa-stopwatch" aria-hidden="true" style="color: #4678fc"></i> PENDIENTE';
+                    } elseif ($model->aprobacion === 'APROBADO') {
+                        return '<i class="fas fa-check" aria-hidden="true" style="color: #2fcf04"></i> APROBADO';
+                    } elseif ($model->aprobacion === 'RECHAZADO') {
+                        return '<i class="fa fa-times" aria-hidden="true" style="color: #d91e1e"></i> RECHAZADO';
+                   
+                    }else{
+                        return 'No aplica';
+
+
+
+                    }
+                    
+                },
+                'contentOptions' => ['class' => 'text-center'],
+                'headerOptions' => ['class' => 'text-center'],
             ],
             [
                 'class' => 'hail812\adminlte3\yii\grid\ActionColumn',
@@ -295,6 +344,30 @@ use kartik\select2\Select2;
                     ],
                     'theme' => Select2::THEME_KRAJEE_BS3,
                 ]),
+            ],
+            [
+                'class' => 'yii\grid\DataColumn',
+                'header' => 'Aprobación',
+                'format' => 'raw',
+                
+                'value' => function ($model) {//AYUDA A INDENTIFICAR EL ESTATUS DE LA SOLICITUD Y VERIFICAR SI SON NUEVAS O YA HAN SIDO VISUALIZADAS
+                    if ($model->aprobacion === 'PENDIENTE') {
+                        return '<i class="fas fa-stopwatch" aria-hidden="true" style="color: #4678fc"></i> PENDIENTE';
+                    } elseif ($model->aprobacion === 'APROBADO') {
+                        return '<i class="fas fa-check" aria-hidden="true" style="color: #2fcf04"></i> APROBADO';
+                    } elseif ($model->aprobacion === 'RECHAZADO') {
+                        return '<i class="fa fa-times" aria-hidden="true" style="color: #d91e1e"></i> RECHAZADO';
+                   
+                    }else{
+                        return 'No aplica';
+
+
+
+                    }
+                    
+                },
+                'contentOptions' => ['class' => 'text-center'],
+                'headerOptions' => ['class' => 'text-center'],
             ],
             [
                 'class' => 'hail812\adminlte3\yii\grid\ActionColumn',

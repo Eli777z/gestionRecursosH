@@ -5,7 +5,7 @@ use yii\grid\GridView;
 use yii\widgets\Pjax;
 use yii\web\View;
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\ReporteTiempoExtraSearch */
+/* @var $searchModel app\models\ReporteTiempoExtraGeneralSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
@@ -20,7 +20,7 @@ $this->title = 'Reporte de Tiempo Extra';
         <div class="col-md-10">
             <div class="card">
             <div class="card-header bg-info text-white">
-                    <h3>Historial de Reporte de Tiempo Extra</h3>
+                    <h3>Historial de Reporte de Tiempo Extra General</h3>
                     <?= Html::a('Crear una nueva <i class="fa fa-plus-circle"></i> ', ['create'], ['class' => 'btn btn-dark fa-lg mt-3 ml-3'])?>
                     <?= Html::a('<i class="fa fa-home"></i> Inicio', ['site/portalempleado'], [
 'class' => 'btn btn-outline-warning mr-3 mt-3 float-right fa-lg',
@@ -74,7 +74,7 @@ $this->title = 'Reporte de Tiempo Extra';
                                 },
                             ],
                         
-                            
+                           
                             [
                                 'class' => 'yii\grid\DataColumn',
                                 'header' => 'Aprobación',
@@ -114,7 +114,30 @@ $this->title = 'Reporte de Tiempo Extra';
                                     return $fechaFormateada;
                                 },
                             ],
-                           
+
+                             [
+                                        'label' => 'Revisado en',
+                                        'attribute' => 'fecha_aprobacion',
+                                        'value' => function ($model) {
+                                            if ($model->solicitud->fecha_aprobacion === null) {
+                                                return 'No definido';
+                                            }
+                                    
+                                            setlocale(LC_TIME, "es_419.UTF-8");
+                                            $fechaPermiso = strtotime($model->solicitud->fecha_aprobacion);
+                                            $fechaFormateada = strftime('%A, %B %d, %Y', $fechaPermiso);
+                                            setlocale(LC_TIME, null);
+                                    
+                                            return $fechaFormateada;
+                                        },
+                                    ],
+                            //'fecha',
+                           // 'horario_inicio',
+                            //'horario_fin',
+                            //'no_horas',
+                            //'actividad:ntext',
+                            //'total_horas',
+
                          
         ['class' => 'hail812\adminlte3\yii\grid\ActionColumn',
 
@@ -126,7 +149,7 @@ $this->title = 'Reporte de Tiempo Extra';
                     'view' => function ($url, $model) {
                         return Html::a('<i class="far fa-eye"></i>', $url, [
                             'title' => 'Ver solicitud',
-                            'class' => 'btn btn-outline-info btn-sm',
+                            'class' => 'btn btn-info btn-xs',
                             'data-pjax' => "0"
                         ]);
                     },
