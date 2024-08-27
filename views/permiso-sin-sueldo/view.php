@@ -108,7 +108,7 @@ if ($empleado) {
         <div class="card-body">
             <div class="row">
                 <div class="col-md-12">
-                  
+                   
 
                     <?php 
     foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
