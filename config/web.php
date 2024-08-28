@@ -124,14 +124,14 @@ $config = [
            // 'site/*',
            'gii/*',
            ///
-            'admin/*',
+            //'admin/*',
             'site/login',
             'site/logout',
             'site/error',
            // 'some-controller/some-action',
             'site/get-empleado-foto',
             'empleado/foto-empleado',
-            'aviso/ver-imagen'
+            'aviso/ver-imagen',
            // 'debug/*',
            // 'cat-tipo-contrato/*',
             //'cat-puesto/*',
@@ -140,7 +140,7 @@ $config = [
           //  'reporte-tiempo-extra-general/*',
             //'cat-departamento/*',
            // 'aviso/*',
-           // 'usuario/cambiarcontrasena',
+           'usuario/cambiarcontrasena',
          //   'contrato-para-personal-eventual/*'
 
 
