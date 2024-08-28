@@ -1,0 +1,73 @@
+CREATE DATABASE  IF NOT EXISTS `bdgestionrecursoshumanos` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `bdgestionrecursoshumanos`;
+-- MySQL dump 10.13  Distrib 8.0.36, for Win64 (x86_64)
+--
+-- Host: localhost    Database: bdgestionrecursoshumanos
+-- ------------------------------------------------------
+-- Server version	8.0.36
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `antecedente_obstrectico`
+--
+
+DROP TABLE IF EXISTS `antecedente_obstrectico`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `antecedente_obstrectico` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `p_f_p_p` date DEFAULT NULL,
+  `p_gestacion` int DEFAULT NULL,
+  `p_aborto` int DEFAULT NULL,
+  `p_parto` int DEFAULT NULL,
+  `p_cesarea` int DEFAULT NULL,
+  `p_nacidos_vivo` int DEFAULT NULL,
+  `p_nacidos_muerto` int DEFAULT NULL,
+  `p_viven` int DEFAULT NULL,
+  `p_muerto_primera_semana` int DEFAULT NULL,
+  `p_muerto_despues_semana` int DEFAULT NULL,
+  `p_intergenesia` tinyint DEFAULT NULL,
+  `p_malformaciones` tinyint DEFAULT NULL,
+  `p_atencion_prenatal` tinyint DEFAULT NULL,
+  `p_parto_prematuro` tinyint DEFAULT NULL,
+  `p_isoinmunizacion` tinyint DEFAULT NULL,
+  `p_no_consultas` int DEFAULT NULL,
+  `p_medicacion_gestacional` text,
+  `observacion` text,
+  `expediente_medico_id` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_exp_medico_obstrectico_idx` (`expediente_medico_id`),
+  CONSTRAINT `fk_exp_medico_obstrectico` FOREIGN KEY (`expediente_medico_id`) REFERENCES `expediente_medico` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `antecedente_obstrectico`
+--
+
+LOCK TABLES `antecedente_obstrectico` WRITE;
+/*!40000 ALTER TABLE `antecedente_obstrectico` DISABLE KEYS */;
+INSERT INTO `antecedente_obstrectico` VALUES (2,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,13),(3,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,14),(4,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,15),(5,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,16),(6,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,17),(22,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,166),(24,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,173),(27,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,181),(28,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,182),(29,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,183),(30,NULL,1,NULL,1,NULL,1,NULL,1,NULL,NULL,0,0,0,0,0,NULL,'no','<p>PASA LO SIGUIENTE Y<strong>&nbsp;ESTO TODO AQUELLO Y ASI</strong></p>',184);
+/*!40000 ALTER TABLE `antecedente_obstrectico` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2024-08-28 13:56:07
