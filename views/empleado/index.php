@@ -68,7 +68,7 @@ $visible = Yii::$app->user->can('medico');
         //PERMISO PARA IR A CREATE EMPLEADO
         if (Yii::$app->user->can('manejo-empleados')): ?>
             <?= Html::a('AÑADIR NUEVO EMPLEADO  <i class="fa fa-user-plus fa-lg"></i>', ['create'], ['class' => 'btn btn-warning float-right fa-lg btn-dark']) ?>
-            <?= Html::a('<i class="fas fa-file-excel"></i>', ['empleado/generar-reporte'], [
+            <?= Html::a('Lista General de Horas extras <i class="fas fa-file-alt"></i>', ['reporte-tiempo-extra/reporte-general'], [
     'class' => 'btn btn-success mb-3',
     'target' => '_blank', // Para abrir en una nueva pestaña
     'data-pjax' => "0",

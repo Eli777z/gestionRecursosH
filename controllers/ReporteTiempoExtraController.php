@@ -22,7 +22,7 @@ use app\models\ActividadReporteTiempoExtra;
 use yii\helpers\Url;
 use app\models\ReporteTiempoExtraGeneral;
 use app\models\ActividadReporteTiempoExtraGeneral;
-
+use app\models\EmpleadoSearch;
 /**
  * ReporteTiempoExtraController implements the CRUD actions for ReporteTiempoExtra model.
  */
@@ -758,5 +758,77 @@ $sheet->setCellValue('H39', 'DIRECTOR GENERAL');
     
         return $this->render('excel-html', ['htmlContent' => $fullHtmlContent, 'model' => $model]);
     }
+
+
+
+    public function actionReporteGeneral()
+{
+    $searchModel = new EmpleadoSearch();
+    $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+    // Obtener todos los empleados
+    $empleados = Empleado::find()->all();
+    $reporteGeneralData = [];
+
+    // Iterar sobre cada empleado
+    foreach ($empleados as $empleado) {
+        $horasTotales = 0;
+
+        // Obtener reportes individuales de tiempo extra aprobados
+        $reportes = ReporteTiempoExtra::find()
+            ->joinWith('solicitud')
+            ->where(['reporte_tiempo_extra.empleado_id' => $empleado->id])
+            ->andWhere(['solicitud.aprobacion' => 'APROBADO'])
+            ->all();
+
+        // Sumar horas de reportes individuales aprobados
+        foreach ($reportes as $reporte) {
+            $actividades = ActividadReporteTiempoExtra::find()
+                ->where(['reporte_tiempo_extra_id' => $reporte->id, 'status' => '1'])
+                ->all();
+
+            foreach ($actividades as $actividad) {
+                $horasTotales += $actividad->no_horas;
+            }
+        }
+
+        // Obtener reportes generales de tiempo extra aprobados
+        $reportesGenerales = ReporteTiempoExtraGeneral::find()
+            ->joinWith('solicitud')
+            ->where(['solicitud.aprobacion' => 'APROBADO'])
+            ->all();
+
+        // Sumar horas de reportes generales aprobados para el empleado
+        foreach ($reportesGenerales as $reporteGeneral) {
+            $actividadesGenerales = ActividadReporteTiempoExtraGeneral::find()
+                ->where([
+                    'reporte_tiempo_extra_general_id' => $reporteGeneral->id,
+                    'numero_empleado' => $empleado->numero_empleado,
+                    'status' => '1'
+                ])
+                ->all();
+
+            foreach ($actividadesGenerales as $actividadGeneral) {
+                $horasTotales += $actividadGeneral->no_horas;
+            }
+        }
+
+        // Agregar datos del empleado al reporte general
+        $reporteGeneralData[] = [
+            'empleado_id' => $empleado->numero_empleado,
+            'nombre' => $empleado->nombre . ' ' . $empleado->apellido, // Suponiendo que tienes campos 'nombre' y 'apellido'
+            'total_horas' => $horasTotales,
+        ];
+    }
+
+    return $this->render('reporte-general', [
+        'reporteGeneralData' => $reporteGeneralData,
+        'searchModel' => $searchModel,
+        'dataProvider' => $dataProvider,
+    ]);
+}
+
+
+
+
 
 }

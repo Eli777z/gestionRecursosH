@@ -44,9 +44,9 @@ class EmpleadoSearch extends Empleado
      */
     public function search($params)
 {
-   // $query = Empleado::find()->joinWith('usuario')->where(['usuario.status' => 10]); // Solo empleados activos
+    $query = Empleado::find()->joinWith('usuario')->where(['usuario.status' => 10]); // Solo empleados activos
 
-    $query = Empleado::find();
+ //   $query = Empleado::find();
     $query->alias('e'); // Alias para la tabla empleado
     $query->joinWith(['informacionLaboral il']); // Alias para la tabla informacion_laboral
     $query->joinWith(['informacionLaboral.catDepartamento cd']); // Alias para la tabla cat_departamento

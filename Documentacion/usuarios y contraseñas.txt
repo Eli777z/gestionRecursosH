@@ -9,6 +9,11 @@ empleado
 usuario: vaguilarn
 contraseña: admin12345678
 
+gestor-rh:
+usuario: urh
+contraseña: admin12345678
+
+
 roles, permisos y configuraciones
  en: http://localhost:82/index.php/admin
 

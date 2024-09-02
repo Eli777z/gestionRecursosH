@@ -216,5 +216,94 @@ class Empleado extends \yii\db\ActiveRecord
         return $this->hasOne(ExpedienteMedico::class, ['id' => 'expediente_medico_id']);
     }
 
+    public function getTotalHorasExtras()
+    {
+        $horasTotales = 0;
+
+        // Obtener reportes individuales de tiempo extra aprobados
+        $reportes = ReporteTiempoExtra::find()
+            ->joinWith('solicitud')
+            ->where(['reporte_tiempo_extra.empleado_id' => $this->id])
+            ->andWhere(['solicitud.aprobacion' => 'APROBADO'])
+            ->all();
+
+        // Sumar horas de reportes individuales aprobados
+        foreach ($reportes as $reporte) {
+            $actividades = ActividadReporteTiempoExtra::find()
+                ->where(['reporte_tiempo_extra_id' => $reporte->id, 'status' => '1'])
+                ->all();
+
+            foreach ($actividades as $actividad) {
+                $horasTotales += $actividad->no_horas;
+            }
+        }
+
+        // Obtener reportes generales de tiempo extra aprobados
+        $reportesGenerales = ReporteTiempoExtraGeneral::find()
+            ->joinWith('solicitud')
+            ->where(['solicitud.aprobacion' => 'APROBADO'])
+            ->all();
+
+        // Sumar horas de reportes generales aprobados para el empleado
+        foreach ($reportesGenerales as $reporteGeneral) {
+            $actividadesGenerales = ActividadReporteTiempoExtraGeneral::find()
+                ->where([
+                    'reporte_tiempo_extra_general_id' => $reporteGeneral->id,
+                    'numero_empleado' => $this->numero_empleado,
+                    'status' => '1'
+                ])
+                ->all();
+
+            foreach ($actividadesGenerales as $actividadGeneral) {
+                $horasTotales += $actividadGeneral->no_horas;
+            }
+        }
+
+        return $horasTotales;
+    }
+
+    /**
+     * Obtiene las actividades de tiempo extra para este empleado.
+     */
+    public function getActividadesExtras()
+    {
+        $actividadesExtras = [];
+
+        // Actividades de reportes individuales
+        $reportes = ReporteTiempoExtra::find()
+            ->joinWith('solicitud')
+            ->where(['reporte_tiempo_extra.empleado_id' => $this->id])
+            ->andWhere(['solicitud.aprobacion' => 'APROBADO'])
+            ->all();
+
+        foreach ($reportes as $reporte) {
+            $actividades = ActividadReporteTiempoExtra::find()
+                ->where(['reporte_tiempo_extra_id' => $reporte->id, 'status' => '1'])
+                ->all();
+            $actividadesExtras = array_merge($actividadesExtras, $actividades);
+        }
+
+        // Actividades de reportes generales
+        $reportesGenerales = ReporteTiempoExtraGeneral::find()
+            ->joinWith('solicitud')
+            ->where(['solicitud.aprobacion' => 'APROBADO'])
+            ->all();
+
+        foreach ($reportesGenerales as $reporteGeneral) {
+            $actividadesGenerales = ActividadReporteTiempoExtraGeneral::find()
+                ->where([
+                    'reporte_tiempo_extra_general_id' => $reporteGeneral->id,
+                    'numero_empleado' => $this->numero_empleado,
+                    'status' => '1'
+                ])
+                ->all();
+            $actividadesExtras = array_merge($actividadesExtras, $actividadesGenerales);
+        }
+
+        return $actividadesExtras;
+    }
 
 }
+
+
+
