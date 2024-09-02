@@ -65,6 +65,48 @@ class SolicitudController extends Controller
         ]);
     }
 
+
+    public function actionCambiarEstadoActividad($id, $estado)
+    {
+        // Encuentra el modelo de la actividad por su ID
+        $actividad = ActividadReporteTiempoExtra::findOne($id);
+    
+        if ($actividad !== null) {
+            $actividad->status = $estado;
+            if ($actividad->save(false)) {
+                Yii::$app->session->setFlash('success', 'El estado de la actividad se ha actualizado correctamente.');
+            } else {
+                Yii::$app->session->setFlash('error', 'No se pudo actualizar el estado de la actividad.');
+            }
+        } else {
+            Yii::$app->session->setFlash('error', 'La actividad no se encontró.');
+        }
+    
+        return $this->redirect(Yii::$app->request->referrer);
+    }
+    
+
+    
+    public function actionCambiarEstadoActividadGeneral($id, $estado)
+    {
+        // Encuentra el modelo de la actividad por su ID
+        $actividad = ActividadReporteTiempoExtraGeneral::findOne($id);
+    
+        if ($actividad !== null) {
+            $actividad->status = $estado;
+            if ($actividad->save(false)) {
+                Yii::$app->session->setFlash('success', 'El estado de la actividad se ha actualizado correctamente.');
+            } else {
+                Yii::$app->session->setFlash('error', 'No se pudo actualizar el estado de la actividad.');
+            }
+        } else {
+            Yii::$app->session->setFlash('error', 'La actividad no se encontró.');
+        }
+    
+        return $this->redirect(Yii::$app->request->referrer);
+    }
+    
+
     /**
      * Displays a single Solicitud model.
      * @param int $id ID

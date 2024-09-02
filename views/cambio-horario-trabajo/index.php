@@ -68,6 +68,7 @@ $this->title = 'Cambio de Horario de Trabajo';
                 return $model->solicitud->fecha_creacion;
             },
           //  'options' => ['style' => 'width: 30%;'],
+          'headerOptions' => ['class' => 'text-center'],
 
         ],
 
@@ -79,8 +80,45 @@ $this->title = 'Cambio de Horario de Trabajo';
                 return \yii\helpers\Html::decode($model->motivoFechaPermiso->motivo);
             },
             'filter' => false,
-            'options' => ['style' => 'width: 65%;'],
+            'options' => ['style' => 'width: 45%;'],
+            'headerOptions' => ['class' => 'text-center'],
+
         ],
+
+        [
+            'class' => 'yii\grid\DataColumn',
+            'header' => 'Estatus',
+            'format' => 'raw',
+            'value' => function ($model) {
+                // AYUDA A INDENTIFICAR EL ESTATUS DE LA SOLICITUD Y VERIFICAR SI SON NUEVAS O YA HAN SIDO VISUALIZADAS
+                if ($model->status === 1) {
+                    return 'ACTIVO <i class="fa fa-fire-alt" aria-hidden="true" style="color: #2fcf04"></i> ';
+                } elseif ($model->status === 0) {
+                    return 'CANCELADO <i class="fa fa-times" aria-hidden="true" style="color: #ea4242"></i> ';
+                } else {
+                    return '<i class="fa fa-question" aria-hidden="true" style="color: #6c757d"></i>';
+                }
+            },
+            'contentOptions' => ['class' => 'text-center'],
+            'headerOptions' => ['class' => 'text-center'],
+
+        ],
+
+        [
+            'label' => 'Comentario',
+            'attribute' => 'comentario',
+            'format' => 'html',
+            'value' => function ($model) {
+                return \yii\helpers\Html::decode($model->comentario);
+            },
+            'filter' => false,
+            //'options' => ['style' => 'width: 45%;'],
+            'headerOptions' => ['class' => 'text-center'],
+
+        ],
+
+
+
 
         ['class' => 'hail812\adminlte3\yii\grid\ActionColumn',
 

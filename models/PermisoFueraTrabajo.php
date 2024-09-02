@@ -50,6 +50,9 @@ class PermisoFueraTrabajo extends \yii\db\ActiveRecord
             [['solicitud_id'], 'exist', 'skipOnError' => true, 'targetClass' => Solicitud::class, 'targetAttribute' => ['solicitud_id' => 'id']],
             [['jefe_departamento_id'], 'safe'],
             [['fecha_hora_reponer'], 'safe'],
+            [['status'], 'integer'],
+            [['comentario'], 'string'],
+
             [['motivo_fecha_permiso_id', 'hora_salida', 'hora_regreso', 'fecha_a_reponer', 'horario_fecha_a_reponer'], 'required'],
             ['empleado_id', 'validarLimiteAnual'], // Nueva regla de validación
         
@@ -123,15 +126,19 @@ class PermisoFueraTrabajo extends \yii\db\ActiveRecord
 
 
 
-public function validarLimiteAnual($attribute, $params)
+
+    public function validarLimiteAnual($attribute, $params)
 {
     $añoActual = date('Y');
     $empleado = Empleado::findOne($this->empleado_id);
     $tipoContratoId = $empleado->informacionLaboral->cat_tipo_contrato_id;
 
+    // Contar los registros de ComisionEspecial del año actual, basándose en la fecha de MotivoFechaPermiso
     $contadorPermisos = static::find()
-        ->where(['empleado_id' => $this->empleado_id])
-        ->andWhere(['between', 'fecha_a_reponer', "$añoActual-01-01", "$añoActual-12-31"])
+        ->joinWith(['motivoFechaPermiso', 'solicitud']) // Unir con la tabla motivo_fecha_permiso y solicitud
+        ->where(['permiso_fuera_trabajo.empleado_id' => $this->empleado_id])
+        ->andWhere(['between', 'motivo_fecha_permiso.fecha_permiso', "$añoActual-01-01", "$añoActual-12-31"])
+        ->andWhere(['solicitud.activa' => 1]) // Solo contar las solicitudes activas
         ->count();
 
     $limiteAnual = ParametroFormato::find()

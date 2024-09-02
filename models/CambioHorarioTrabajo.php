@@ -52,7 +52,8 @@ class CambioHorarioTrabajo extends \yii\db\ActiveRecord
             [['jefe_departamento_id'], 'safe'], 
             [['dateRange'], 'required', 'message' => 'El rango de fechas no puede estar vacío.'], // Regla y mensaje personalizado para dateRange
             ['empleado_id', 'validarLimiteAnual'], // VALIDA EL LIMITE ANUAL ESTABLECIDO
-
+            [['status'], 'integer'],
+            [['comentario'], 'string'],
         
         ];
     }
@@ -125,6 +126,8 @@ class CambioHorarioTrabajo extends \yii\db\ActiveRecord
 //FUNCION QUE VALIDA EL LIMITE DE REGISTROS ANUALES,
 //SE INDENTIFICA EL AÑO PRESENTE, EL TIPO DE PERMISO  Y EL TIPO DE CONTRATO DEL EMPLEADO
 //Y SABER LA CANTIDAD DE PERMISOS QUE TIENE SU TIPO DE CONTRATO
+
+
     public function validarLimiteAnual($attribute, $params)
     {
         $añoActual = date('Y');
@@ -133,14 +136,15 @@ class CambioHorarioTrabajo extends \yii\db\ActiveRecord
     
         // Contar los registros de ComisionEspecial del año actual, basándose en la fecha de MotivoFechaPermiso
         $contadorPermisos = static::find()
-            ->joinWith('motivoFechaPermiso') // Unir con la tabla motivo_fecha_permiso
-            ->where(['empleado_id' => $this->empleado_id])
+            ->joinWith(['motivoFechaPermiso', 'solicitud']) // Unir con la tabla motivo_fecha_permiso y solicitud
+            ->where(['cambio_horario_trabajo.empleado_id' => $this->empleado_id])
             ->andWhere(['between', 'motivo_fecha_permiso.fecha_permiso', "$añoActual-01-01", "$añoActual-12-31"])
+            ->andWhere(['solicitud.activa' => 1]) // Solo contar las solicitudes activas
             ->count();
     
         $limiteAnual = ParametroFormato::find()
-            ->where(['tipo_permiso' => 'CAMBIO DE HORARIO DE TRABAJO', 'cat_tipo_contrato_id' => $tipoContratoId])
-            ->one()->limite_anual;
+        ->where(['tipo_permiso' => 'CAMBIO DE HORARIO DE TRABAJO', 'cat_tipo_contrato_id' => $tipoContratoId])
+        ->one()->limite_anual;
     
         if ($contadorPermisos >= $limiteAnual) {
             $this->addError($attribute, 'Has alcanzado el límite anual de cambio de horario de trabajo para tu tipo de contrato.');

@@ -196,31 +196,64 @@ if ($formato) {
                 ]),
                 'columns' => [
                     ['class' => 'yii\grid\SerialColumn'],
-                //    'fecha',
-
-
                     [
                         'label' => 'Fecha',
                         'value' => function ($formato) {
-                           
                             setlocale(LC_TIME, "es_419.UTF-8");
-                            
                             $fechaPermiso = strtotime($formato->fecha);
-                            
                             $fechaFormateada = strftime('%A, %B %d, %Y', $fechaPermiso);
-                            
                             setlocale(LC_TIME, null);
-                            
                             return $fechaFormateada;
                         },
                     ],
-
                     'hora_inicio',
                     'hora_fin',
                     'actividad',
                     'no_horas',
+                    [
+                        'label' => 'Estado',
+                        'value' => function ($model) {
+                            if ($model->status === 1) {
+                                return 'Aprobado';
+                            } elseif ($model->status === 0) {
+                                return 'Rechazado';
+                            } else {
+                                return 'No definido';
+                            }
+                        },
+                    ],
+                    [
+                        'class' => 'yii\grid\ActionColumn',
+                        'template' => '{aprobar} {rechazar}',
+                        'buttons' => [
+                            'aprobar' => function ($url, $model, $key) {
+                                return Html::a(
+                                    '<i class="fas fa-check"></i> Aprobar',
+                                    ['cambiar-estado-actividad', 'id' => $model->id, 'estado' => 1],
+                                    [
+                                        'class' => 'btn btn-success btn-sm',
+                                        'data-method' => 'post',
+                                        'data-confirm' => '¿Estás seguro de que deseas aprobar esta actividad?',
+                                    ]
+                                );
+                            },
+                            'rechazar' => function ($url, $model, $key) {
+                                return Html::a(
+                                    '<i class="fas fa-times"></i> Rechazar',
+                                    ['cambiar-estado-actividad', 'id' => $model->id, 'estado' => 0],
+                                    [
+                                        'class' => 'btn btn-danger btn-sm',
+                                        'data-method' => 'post',
+                                        'data-confirm' => '¿Estás seguro de que deseas rechazar esta actividad?',
+                                    ]
+                                );
+                            },
+                        ],
+                        'visible' => Yii::$app->user->can('aprobar-solicitudes'), // Visible solo para usuarios con permiso
+                    ],
                 ],
             ]);
+            
         
             // Mostrar el total de horas fuera del GridView
             echo '<div class="total-horas">';
@@ -312,39 +345,72 @@ if ($formato) {
                     ]),
                     'columns' => [
                         ['class' => 'yii\grid\SerialColumn'],
-                    //    'fecha',
-                    [
-                        'attribute' => 'numero_empleado',
-                        'label' => 'Nombre del Empleado',
-                        'value' => function ($model) {
-                            // Buscar el empleado basado en el numero_empleado
-                            $empleadoId = Empleado::findOne(['numero_empleado' => $model->numero_empleado]);
-                            return $empleadoId ? $empleadoId->nombre . ' ' . $empleadoId->apellido : 'Desconocido';
-                        },
-                    ],
-    
+                        [
+                            'attribute' => 'numero_empleado',
+                            'label' => 'Nombre del Empleado',
+                            'value' => function ($model) {
+                                $empleadoId = Empleado::findOne(['numero_empleado' => $model->numero_empleado]);
+                                return $empleadoId ? $empleadoId->nombre . ' ' . $empleadoId->apellido : 'Desconocido';
+                            },
+                        ],
                         [
                             'label' => 'Fecha',
                             'value' => function ($formato) {
-                               
                                 setlocale(LC_TIME, "es_419.UTF-8");
-                                
                                 $fechaPermiso = strtotime($formato->fecha);
-                                
                                 $fechaFormateada = strftime('%A, %B %d, %Y', $fechaPermiso);
-                                
                                 setlocale(LC_TIME, null);
-                                
                                 return $fechaFormateada;
                             },
                         ],
-    
                         'hora_inicio',
                         'hora_fin',
                         'actividad',
                         'no_horas',
+                        [
+                            'label' => 'Estado',
+                            'value' => function ($model) {
+                                if ($model->status === 1) {
+                                    return 'Aprobado';
+                                } elseif ($model->status === 0) {
+                                    return 'Rechazado';
+                                } else {
+                                    return 'No definido';
+                                }
+                            },
+                        ],
+                        [
+                            'class' => 'yii\grid\ActionColumn',
+                            'template' => '{aprobar} {rechazar}',
+                            'buttons' => [
+                                'aprobar' => function ($url, $model, $key) {
+                                    return Html::a(
+                                        '<i class="fas fa-check"></i> Aprobar',
+                                        ['cambiar-estado-actividad-general', 'id' => $model->id, 'estado' => 1],
+                                        [
+                                            'class' => 'btn btn-success btn-sm',
+                                            'data-method' => 'post',
+                                            'data-confirm' => '¿Estás seguro de que deseas aprobar esta actividad?',
+                                        ]
+                                    );
+                                },
+                                'rechazar' => function ($url, $model, $key) {
+                                    return Html::a(
+                                        '<i class="fas fa-times"></i> Rechazar',
+                                        ['cambiar-estado-actividad-general', 'id' => $model->id, 'estado' => 0],
+                                        [
+                                            'class' => 'btn btn-danger btn-sm',
+                                            'data-method' => 'post',
+                                            'data-confirm' => '¿Estás seguro de que deseas rechazar esta actividad?',
+                                        ]
+                                    );
+                                },
+                            ],
+                            'visible' => Yii::$app->user->can('aprobar-solicitudes'),
+                        ],
                     ],
                 ]);
+                
             
                 // Mostrar el total de horas fuera del GridView
                 echo '<div class="total-horas">';

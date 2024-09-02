@@ -102,11 +102,42 @@ class CambioHorarioTrabajoController extends Controller
         $dataProvider->query->andFilterWhere(['empleado_id' => $empleado->id]);
     
         $this->layout = "main-trabajador";
+        $year = date('Y');
+        $tipoContratoId = $empleado->informacionLaboral->cat_tipo_contrato_id;
+    
+        $parametroFormato = ParametroFormato::find()
+            ->where(['tipo_permiso' => 'CAMBIO DE HORARIO DE TRABAJO', 'cat_tipo_contrato_id' => $tipoContratoId])
+            ->one();
+        
+        if (!$parametroFormato) {
+            Yii::$app->session->setFlash('error', 'No se pudo encontrar el parámetro de formato para tu tipo de contrato.');
+            return $this->redirect(['empleado/index']);
+        }
+    
+        $totalPermisosAnuales = $parametroFormato->limite_anual;
+    
+        // Contar los permisos usados en el año actual basados en la fecha del permiso de la relación motivo_fecha_permiso
+        $permisosUsados = CambioHorarioTrabajo::find()
+        ->joinWith(['motivoFechaPermiso', 'solicitud']) // Asegurar unión con ambas relaciones
+        ->where(['cambio_horario_trabajo.empleado_id' => $empleado->id])
+        ->andWhere(['between', 'motivo_fecha_permiso.fecha_permiso', "$year-01-01", "$year-12-31"])
+        ->andWhere(['solicitud.activa' => 1]) // Solo contar las solicitudes activas
+        ->count();
+    
+    $permisosDisponibles = $totalPermisosAnuales - $permisosUsados;
+    
+    // Verificar si se alcanzó el límite de permisos
+    if ($permisosDisponibles <= 0) {
+        Yii::$app->session->setFlash('error', 'Has alcanzado el límite anual de permisos.');
+        // return $this->redirect(['index']);
+    }
     
         return $this->render('historial', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'empleado' => $empleado,
+            'permisosUsados' => $permisosUsados,
+            'permisosDisponibles' => $permisosDisponibles,
         ]);
     }
 
@@ -185,18 +216,19 @@ if ($solicitudReciente) {
     
         // Contar los permisos usados en el año actual basados en la fecha del permiso de la relación motivo_fecha_permiso
         $permisosUsados = CambioHorarioTrabajo::find()
-            ->joinWith('motivoFechaPermiso') // Unir con la tabla motivo_fecha_permiso
-            ->where(['cambio_horario_trabajo.empleado_id' => $empleado->id])
-            ->andWhere(['between', 'motivo_fecha_permiso.fecha_permiso', "$year-01-01", "$year-12-31"])
-            ->count();
+        ->joinWith(['motivoFechaPermiso', 'solicitud']) // Asegurar unión con ambas relaciones
+        ->where(['cambio_horario_trabajo.empleado_id' => $empleado->id])
+        ->andWhere(['between', 'motivo_fecha_permiso.fecha_permiso', "$year-01-01", "$year-12-31"])
+        ->andWhere(['solicitud.activa' => 1]) // Solo contar las solicitudes activas
+        ->count();
     
-        $permisosDisponibles = $totalPermisosAnuales - $permisosUsados;
+    $permisosDisponibles = $totalPermisosAnuales - $permisosUsados;
     
-        // Verificar si se alcanzó el límite de permisos
-        if ($permisosDisponibles <= 0) {
-            Yii::$app->session->setFlash('error', 'Has alcanzado el límite anual de permisos.');
-           // return $this->redirect(['index']);
-        }
+    // Verificar si se alcanzó el límite de permisos
+    if ($permisosDisponibles <= 0) {
+        Yii::$app->session->setFlash('error', 'Has alcanzado el límite anual de permisos.');
+        // return $this->redirect(['index']);
+    }
     
 
         if ($model->load(Yii::$app->request->post()) && $motivoFechaPermisoModel->load(Yii::$app->request->post())) {
@@ -214,8 +246,16 @@ if ($solicitudReciente) {
                     $solicitudModel->fecha_aprobacion = null;
                     $solicitudModel->fecha_creacion = date('Y-m-d H:i:s');
                     $solicitudModel->nombre_formato = 'CAMBIO DE HORARIO DE TRABAJO';
+                    $solicitudModel->activa = 1;
+
+
                     if ($solicitudModel->save()) {
                         $model->solicitud_id = $solicitudModel->id;
+
+                        $model->load(Yii::$app->request->post());
+        
+                        // Aquí establecemos el valor inicial de 'status' a 1
+                        $model->status = 1;
 
                         if ($model->jefe_departamento_id) {
                             $jefeDepartamento = JuntaGobierno::findOne($model->jefe_departamento_id);
@@ -262,6 +302,41 @@ if ($solicitudReciente) {
         ]);
     }
 
+
+    public function actionGuardarComentario()
+{
+    $comentarios = Yii::$app->request->post('comentario', []);
+    $id = Yii::$app->request->post('id');
+
+    if (!empty($comentarios[$id])) {
+        $model = CambioHorarioTrabajo::findOne($id);
+        if ($model !== null) {
+            $model->comentario = $comentarios[$id];
+            if ($model->save(false)) {
+                // Encuentra al empleado asociado
+                $empleado = Empleado::findOne($model->empleado_id);
+
+                if ($empleado !== null) {
+                    Yii::$app->session->setFlash('success', 'El comentario se ha guardado exitosamente.');
+                    $url = Url::to(['historial', 'empleado_id' => $empleado->id]); // Redirige a la vista del empleado
+                    return $this->redirect($url);
+                } else {
+                    Yii::$app->session->setFlash('error', 'El empleado asociado no fue encontrado.');
+                }
+            } else {
+                Yii::$app->session->setFlash('error', 'Hubo un error al guardar el comentario.');
+            }
+        } else {
+            Yii::$app->session->setFlash('error', 'El registro de permiso no fue encontrado.');
+        }
+    } else {
+        Yii::$app->session->setFlash('error', 'No se proporcionó comentario para guardar.');
+    }
+
+    return $this->redirect(['index']); // Redirige a la vista de índice si ocurre algún error
+}
+
+
     /**
      * Updates an existing CambioHorarioTrabajo model.
      * If update is successful, the browser will be redirected to the 'view' page.
@@ -291,48 +366,100 @@ if ($solicitudReciente) {
      */
     public function actionDelete($id)
     {
-        $model = $this->findModel($id);
-        $empleado = Empleado::findOne($model->empleado_id);
+        $model = $this->findModel($id); // Encuentra el modelo de ComisionEspecial
+        $empleado = Empleado::findOne($model->empleado_id); // Encuentra al empleado asociado
+    
         if ($model === null) {
             Yii::$app->session->setFlash('error', 'El registro de permiso no fue encontrado.');
             return $this->redirect(['index']);
         }
         
-        $transaction = Yii::$app->db->beginTransaction();
+        $transaction = Yii::$app->db->beginTransaction(); // Inicia la transacción
         try {
-            // Obtener el ID de la solicitud asociada antes de eliminar el permiso
+            // Obtener el ID de la solicitud asociada
             $solicitudId = $model->solicitud_id;
-            
-            // Eliminar el registro de PermisoFueraTrabajo
-            if ($model->delete()) {
-                // Buscar y eliminar el registro asociado en la tabla Solicitud
+    
+            // Cambiar el atributo 'status' del modelo ComisionEspecial a 0
+            $model->status = 0;
+            if ($model->save(false)) { // Guardar el modelo sin validación
+                // Buscar el registro asociado en la tabla Solicitud y actualizar su estado
                 $solicitudModel = Solicitud::findOne($solicitudId);
                 if ($solicitudModel !== null) {
-                    $solicitudModel->delete();
+                    $solicitudModel->activa = 0; // Cambiar el atributo 'activa' a 0
+                    $solicitudModel->save(false); // Guardar el modelo sin validación
                 }
-                $transaction->commit();
-                
-                Yii::$app->session->setFlash('success', 'El registro de permiso y la solicitud asociada han sido eliminados correctamente.');
+                $transaction->commit(); // Confirmar la transacción
+    
+                Yii::$app->session->setFlash('success', 'El registro de permiso y la solicitud asociada han sido cancelados correctamente.');
             } else {
-                Yii::$app->session->setFlash('error', 'Hubo un error al eliminar el registro de permiso.');
+                Yii::$app->session->setFlash('error', 'Hubo un error al cancelar el registro de permiso.');
             }
         } catch (\Exception $e) {
-            $transaction->rollBack();
-            Yii::$app->session->setFlash('error', 'Hubo un error al eliminar el registro: ' . $e->getMessage());
+            $transaction->rollBack(); // Revertir la transacción en caso de error
+            Yii::$app->session->setFlash('error', 'Hubo un error al cancelar el registro: ' . $e->getMessage());
         } catch (\Throwable $e) {
-            $transaction->rollBack();
-            Yii::$app->session->setFlash('error', 'Hubo un error al eliminar el registro: ' . $e->getMessage());
+            $transaction->rollBack(); // Revertir la transacción en caso de error
+            Yii::$app->session->setFlash('error', 'Hubo un error al cancelar el registro: ' . $e->getMessage());
         }
-        
+    
         if (Yii::$app->user->can('gestor-rh')) {
-            Yii::$app->session->setFlash('success', 'El registro se ha eliminado exitosamente.');
-            $url = Url::to(['historial', 'empleado_id' => $empleado->id]) ;
+            Yii::$app->session->setFlash('success', 'El registro se ha cancelado exitosamente.');
+            $url = Url::to(['historial', 'empleado_id' => $empleado->id]);
             return $this->redirect($url);
         } else {
             return $this->redirect(['index']);
         }
     }
+
+
+
+    public function actionRestore($id)
+{
+    $model = $this->findModel($id); // Encuentra el modelo de ComisionEspecial
+    $empleado = Empleado::findOne($model->empleado_id); // Encuentra al empleado asociado
     
+    if ($model === null) {
+        Yii::$app->session->setFlash('error', 'El registro de permiso no fue encontrado.');
+        return $this->redirect(['index']);
+    }
+
+    $transaction = Yii::$app->db->beginTransaction(); // Inicia la transacción
+    try {
+        // Obtener el ID de la solicitud asociada
+        $solicitudId = $model->solicitud_id;
+
+        // Cambiar el atributo 'status' del modelo ComisionEspecial a 1 (activo/restaurado)
+        $model->status = 1;
+        if ($model->save(false)) { // Guardar el modelo sin validación
+            // Buscar el registro asociado en la tabla Solicitud y actualizar su estado
+            $solicitudModel = Solicitud::findOne($solicitudId);
+            if ($solicitudModel !== null) {
+                $solicitudModel->activa = 1; // Cambiar el atributo 'activa' a 1 (restaurado)
+                $solicitudModel->save(false); // Guardar el modelo sin validación
+            }
+            $transaction->commit(); // Confirmar la transacción
+
+            Yii::$app->session->setFlash('success', 'El registro de permiso y la solicitud asociada han sido restaurados correctamente.');
+        } else {
+            Yii::$app->session->setFlash('error', 'Hubo un error al restaurar el registro de permiso.');
+        }
+    } catch (\Exception $e) {
+        $transaction->rollBack(); // Revertir la transacción en caso de error
+        Yii::$app->session->setFlash('error', 'Hubo un error al restaurar el registro: ' . $e->getMessage());
+    } catch (\Throwable $e) {
+        $transaction->rollBack(); // Revertir la transacción en caso de error
+        Yii::$app->session->setFlash('error', 'Hubo un error al restaurar el registro: ' . $e->getMessage());
+    }
+
+    if (Yii::$app->user->can('gestor-rh')) {
+        Yii::$app->session->setFlash('success', 'El registro se ha restaurado exitosamente.');
+        $url = Url::to(['historial', 'empleado_id' => $empleado->id]);
+        return $this->redirect($url);
+    } else {
+        return $this->redirect(['index']);
+    }
+}
+ 
 
 
     /**

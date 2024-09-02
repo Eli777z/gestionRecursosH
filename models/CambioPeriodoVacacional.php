@@ -51,6 +51,8 @@ class CambioPeriodoVacacional extends \yii\db\ActiveRecord
             [['dateRange', 'dateRangeOriginal'], 'safe'], 
             [['año'], 'string', 'max' => 8],
             [['dateRange', 'dateRangeOriginal'], 'required', 'message' => 'El rango de fechas no puede estar vacío.'], // Regla y mensaje personalizado para dateRange
+            [['comentario'], 'string'],
+            [['status'], 'integer'],
 
             [['motivo', 'primera_vez', 'numero_periodo', 'año'], 'required'],
             ['empleado_id', 'validarLimiteAnual'], // Nueva regla de validación
@@ -79,7 +81,9 @@ class CambioPeriodoVacacional extends \yii\db\ActiveRecord
             'jefe_departamento_id' => 'Jefe de Departamento',
             'fecha_inicio_original' => 'Fecha Inicio Original',
             'fecha_fin_original' => 'Fecha Fin Original',
-            'dias_pendientes' => 'Dias pendientes'
+            'dias_pendientes' => 'Dias pendientes',
+            'status' => 'Estatus'
+
         ];
     }
 
@@ -146,20 +150,26 @@ class CambioPeriodoVacacional extends \yii\db\ActiveRecord
 
 
     
+
+
+
 public function validarLimiteAnual($attribute, $params)
 {
     $añoActual = date('Y');
     $empleado = Empleado::findOne($this->empleado_id);
     $tipoContratoId = $empleado->informacionLaboral->cat_tipo_contrato_id;
 
+    // Contar los registros de ComisionEspecial del año actual, basándose en la fecha de MotivoFechaPermiso
     $contadorPermisos = static::find()
-        ->where(['empleado_id' => $this->empleado_id])
+        ->joinWith(['solicitud']) // Unir con la tabla motivo_fecha_permiso y solicitud
+        ->where(['cambio_periodo_vacacional.empleado_id' => $this->empleado_id])
         ->andWhere(['between', 'fecha_fin_periodo', "$añoActual-01-01", "$añoActual-12-31"])
+        ->andWhere(['solicitud.activa' => 1]) // Solo contar las solicitudes activas
         ->count();
 
     $limiteAnual = ParametroFormato::find()
-        ->where(['tipo_permiso' => 'CAMBIO DE PERIODO VACACIONAL', 'cat_tipo_contrato_id' => $tipoContratoId])
-        ->one()->limite_anual;
+    ->where(['tipo_permiso' => 'CAMBIO DE PERIODO VACACIONAL', 'cat_tipo_contrato_id' => $tipoContratoId])
+    ->one()->limite_anual;
 
     if ($contadorPermisos >= $limiteAnual) {
         $this->addError($attribute, 'Has alcanzado el límite anual de cambio de periodo vacacional para tu tipo de contrato.');

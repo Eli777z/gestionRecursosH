@@ -43,7 +43,7 @@ class Solicitud extends \yii\db\ActiveRecord
             [['status', 'aprobacion'], 'string', 'max' => 30],
             [['nombre_formato'], 'string', 'max' => 50],
             [['empleado_id'], 'exist', 'skipOnError' => true, 'targetClass' => Empleado::class, 'targetAttribute' => ['empleado_id' => 'id']],
-            
+            [['activa'], 'integer'],
         
         ];
     }

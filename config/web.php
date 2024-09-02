@@ -124,7 +124,7 @@ $config = [
            // 'site/*',
            'gii/*',
            ///
-            //'admin/*',
+            'admin/*',
             'site/login',
             'site/logout',
             'site/error',

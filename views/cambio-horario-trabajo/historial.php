@@ -20,6 +20,11 @@ $this->title = 'Cambio de Horario de Trabajo';
             <div class="card-header bg-info text-white">
                     <h3>Historial de Cambio de Horario de Trabajo</h3>
                     <p>  Empleado: <?= $empleado->nombre.' '.$empleado->apellido ?></p>
+                  
+                    <div class="col-12">
+                                                <p><strong>Permisos usados:</strong> <?= $permisosUsados ?></p>
+                                                <p><strong>Permisos disponibles:</strong> <?= $permisosDisponibles ?></p>
+                                            </div>
                     <?php if (Yii::$app->user->can('ver-empleados-departamento') || Yii::$app->user->can('ver-empleados-direccion') ) {?>
                             <?= Html::a('<i class="fa fa-chevron-left"></i> Volver', ['empleado/index'], [
 'class' => 'btn btn-outline-warning mr-3 float-right fa-lg',
@@ -44,7 +49,7 @@ $this->title = 'Cambio de Horario de Trabajo';
 
                         </div>
                     </div>
-<?php Pjax::begin();?>
+
 
 <?= GridView::widget([
     'dataProvider' => $dataProvider,
@@ -60,6 +65,7 @@ $this->title = 'Cambio de Horario de Trabajo';
                 return $model->solicitud->fecha_creacion;
             },
           //  'options' => ['style' => 'width: 30%;'],
+          'headerOptions' => ['class' => 'text-center'],
 
         ],
 
@@ -71,32 +77,86 @@ $this->title = 'Cambio de Horario de Trabajo';
                 return \yii\helpers\Html::decode($model->motivoFechaPermiso->motivo);
             },
             'filter' => false,
-            'options' => ['style' => 'width: 65%;'],
+            'options' => ['style' => 'width: 25%;'],
+            'headerOptions' => ['class' => 'text-center'],
+
         ],
+
+        [
+            'class' => 'yii\grid\DataColumn',
+            'header' => 'Estatus',
+            'format' => 'raw',
+            'value' => function ($model) {
+                // AYUDA A INDENTIFICAR EL ESTATUS DE LA SOLICITUD Y VERIFICAR SI SON NUEVAS O YA HAN SIDO VISUALIZADAS
+                if ($model->status === 1) {
+                    return 'ACTIVO <i class="fa fa-fire-alt" aria-hidden="true" style="color: #2fcf04"></i> ';
+                } elseif ($model->status === 0) {
+                    return 'CANCELADO <i class="fa fa-times" aria-hidden="true" style="color: #ea4242"></i> ';
+                } else {
+                    return '<i class="fa fa-question" aria-hidden="true" style="color: #6c757d"></i>';
+                }
+            },
+            'contentOptions' => ['class' => 'text-center'],
+            'headerOptions' => ['class' => 'text-center'],
+
+        ],
+
+        [
+            'attribute' => 'comentario',
+            'label' => 'Comentario',
+            'format' => 'raw',
+            'value' => function ($model) {
+                if (Yii::$app->user->can('borrar-registros-formatos-incidencias')) {
+                    // Permitir añadir comentario
+                    return Html::beginForm(['guardar-comentario'], 'post', ['data-pjax' => 1])
+                        . Html::textarea("comentario[{$model->id}]", $model->comentario, ['class' => 'form-control'])
+                        . Html::hiddenInput('id', $model->id)
+                        . Html::submitButton('Añadir', ['class' => 'btn btn-success btn-sm float-right mt-1'])
+                        . Html::endForm();
+                } else {
+                    // Solo mostrar el comentario
+                    return Html::encode($model->comentario);
+                }
+            },
+            'headerOptions' => ['class' => 'text-center'],
+            'options' => ['style' => 'width: 25%;'],
+        ],
+
+
         ['class' => 'hail812\adminlte3\yii\grid\ActionColumn',
 
     
-        'template' => Yii::$app->user->can('ver-empleados-departamento') || Yii::$app->user->can('ver-empleados-direccion')  ? '{view}' : '{view} {delete}',
+       'template' => Yii::$app->user->can('ver-empleados-departamento') || Yii::$app->user->can('ver-empleados-direccion')  ? '{view}' : '{view}  {restore} {delete}',
 
-        'buttons' => [
-                       
-                       'view' => function ($url, $model) {
-                           return Html::a('<i class="far fa-eye"></i>', $url, [
-                               'title' => 'Ver solicitud',
-                               'class' => 'btn btn-outline-info btn-sm',
-                               'data-pjax' => "0"
-                           ]);
-                       },
-                      'delete' => function ($url, $model) {
-                           return Html::a('<i class="fas fa-trash"></i>', $url, [
-                               'title' => Yii::t('yii', 'Eliminar'),
-                               'data-confirm' => Yii::t('yii', '¿Estás seguro de que deseas eliminar este elemento?'),
-                               'data-method' => 'post',
-                              'class' => 'btn btn-outline-danger btn-sm'
-                           ]);
-                       },
-   
-                   ],
+     'buttons' => [
+                    
+                    'view' => function ($url, $model) {
+                        return Html::a('<i class="far fa-eye"></i>', $url, [
+                            'title' => 'Ver solicitud',
+                            'class' => 'btn btn-outline-info btn-sm',
+                            'data-pjax' => "0"
+                        ]);
+                    },
+                    'restore' => function ($url, $model) {
+                        return Html::a('<i class="fas fa-check"></i>', $url, [
+                            'title' => Yii::t('yii', 'Activar'),
+                            'data-confirm' => Yii::t('yii', '¿Estás seguro de que deseas activar esta solicitud?'),
+                            'data-method' => 'post',
+                           'class' => 'btn btn-outline-success btn-sm'
+                        ]);
+                    },
+                   'delete' => function ($url, $model) {
+                        return Html::a('<i class="fas fa-times"></i>', $url, [
+                            'title' => Yii::t('yii', 'Cancelar'),
+                            'data-confirm' => Yii::t('yii', '¿Estás seguro de que deseas cancelar esta solicitud?'),
+                            'data-method' => 'post',
+                           'class' => 'btn btn-outline-danger btn-sm'
+                        ]);
+                    },
+              
+
+                ],
+    
     
     
     
@@ -113,7 +173,7 @@ $this->title = 'Cambio de Horario de Trabajo';
          //                                       },
 ]) ?>
 
-                    <?php Pjax::end(); ?>
+                 
 
                 </div>
                 <!--.card-body-->

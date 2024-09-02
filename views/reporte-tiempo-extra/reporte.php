@@ -17,6 +17,8 @@ $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
             <div class="card">
                 <div class="card-header bg-info text-white">
                     <h3><?= Html::encode($this->title) ?></h3>
+                    <p>  Empleado: <?= $empleado->nombre.' '.$empleado->apellido ?></p>
+
                 </div>
                 <div class="card-body bg-light">
 

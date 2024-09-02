@@ -37,20 +37,28 @@ $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
                             ['class' => 'yii\grid\SerialColumn'],
                             [
                                 'class' => 'yii\grid\DataColumn',
-                                'header' => '',
+                                'header' => 'Estatus',
                                 'format' => 'raw',
-                                'value' => function ($model) {//AYUDA A INDENTIFICAR EL ESTATUS DE LA SOLICITUD Y VERIFICAR SI SON NUEVAS O YA HAN SIDO VISUALIZADAS
+                                'value' => function ($model) {
+                                    // AYUDA A INDENTIFICAR EL ESTATUS DE LA SOLICITUD Y VERIFICAR SI SON NUEVAS O YA HAN SIDO VISUALIZADAS
                                     if ($model->status === 'Nueva') {
-                                        return '<i class="fa fa-fire" aria-hidden="true" style="color: #ea4242 "></i>';
+                                        return '<i class="fa fa-fire" aria-hidden="true" style="color: #ea4242"></i>';
                                     } elseif ($model->status === 'Visto') {
                                         return '<i class="fa fa-check-double" aria-hidden="true" style="color: #4678fc"></i>';
                                     } else {
                                         return '<i class="fa fa-question" aria-hidden="true" style="color: #6c757d"></i>';
                                     }
                                 },
+                                'filter' => Html::activeDropDownList(
+                                    $searchModel,
+                                    'status',
+                                    ['' => 'Todos', 'Nueva' => 'Nueva', 'Visto' => 'Visto'], // Opciones de filtro
+                                    ['class' => 'form-control', 'prompt' => 'Estatus'] // Añade una opción para que sea seleccionable por el usuario
+                                ),
                                 'contentOptions' => ['class' => 'text-center'],
                                 'headerOptions' => ['class' => 'text-center'],
                             ],
+                            
 
                            
 
@@ -73,31 +81,37 @@ $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
                                     ],
                                     'theme' => Select2::THEME_KRAJEE_BS3,
                                 ]),
+                                'headerOptions' => ['class' => 'text-center'],
+                                
                             ],
                             [
                                 'attribute' => 'fecha_creacion',
                                 'format' => 'raw',
+                                'label' => 'De - Hasta',
                                 'value' => function ($model) {
                                     setlocale(LC_TIME, "es_419.UTF-8");
                                     return strftime('%A, %d de %B de %Y', strtotime($model->fecha_creacion));
                                 },
-                                'filter' => DatePicker::widget([
+                                'filter' => DateRangePicker::widget([
                                     'model' => $searchModel,
                                     'attribute' => 'fecha_creacion',
+                                    'convertFormat' => true,
                                     'language' => 'es',
-                                    'dateFormat' => 'php:Y-m-d',
+                                    'pluginOptions' => [
+                                        'locale' => [
+                                            'format' => 'Y-m-d',
+                                            'separator' => ' - ',
+                                        ],
+                                        'opens' => 'right',
+                                    ],
                                     'options' => [
                                         'class' => 'form-control',
                                         'autocomplete' => 'off',
-
-                                    ],
-                                    'clientOptions' => [
-                                        'changeYear' => true,
-                                        'changeMonth' => true,
-                                        'yearRange' => '-100:+0',
                                     ],
                                 ]),
+                                'headerOptions' => ['class' => 'text-center'],
                             ],
+                            
 
 
 
@@ -119,6 +133,7 @@ $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
                                     ],
                                     'theme' => Select2::THEME_KRAJEE_BS3,
                                 ]),
+                                'headerOptions' => ['class' => 'text-center'],
                             ],
 
                             [
@@ -142,6 +157,12 @@ $this->registerCssFile('@web/css/site.css', ['position' => View::POS_HEAD]);
                                     }
                                     
                                 },
+                                'filter' => Html::activeDropDownList(
+                                    $searchModel,
+                                    'aprobacion',
+                                    ['' => 'TODOS', 'APROBADO' => 'APROBADO', 'RECHAZADO' => 'RECHAZADO','PENDIENTE' => 'PENDIENTE' ], // Opciones de filtro
+                                    ['class' => 'form-control', 'prompt' => ''] // Añade una opción para que sea seleccionable por el usuario
+                                ),
                                 'contentOptions' => ['class' => 'text-center'],
                                 'headerOptions' => ['class' => 'text-center'],
                             ],

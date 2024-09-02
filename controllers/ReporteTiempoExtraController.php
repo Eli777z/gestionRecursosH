@@ -417,7 +417,6 @@ public function actionReporte2($empleado_id = null)
         'horasTotales' => $horasTotales,
     ]);
 }
-
 public function actionReporte3($empleado_id)
 {
     // Verifica si el empleado existe
@@ -447,7 +446,9 @@ public function actionReporte3($empleado_id)
 
     // Iterar sobre cada reporte para calcular las horas totales y recolectar datos
     foreach ($reportes as $reporte) {
-        $actividades = ActividadReporteTiempoExtra::find()->where(['reporte_tiempo_extra_id' => $reporte->id])->all();
+        $actividades = ActividadReporteTiempoExtra::find()
+            ->where(['reporte_tiempo_extra_id' => $reporte->id, 'status' => '1']) // Filtrar por estado aprobado
+            ->all();
         $horasReporte = 0;
     
         foreach ($actividades as $actividad) {
@@ -469,7 +470,11 @@ public function actionReporte3($empleado_id)
     // Iterar sobre cada reporte general
     foreach ($reportesGenerales as $reporteGeneral) {
         $actividadesGenerales = ActividadReporteTiempoExtraGeneral::find()
-            ->where(['reporte_tiempo_extra_general_id' => $reporteGeneral->id, 'numero_empleado' => $empleado->numero_empleado])
+            ->where([
+                'reporte_tiempo_extra_general_id' => $reporteGeneral->id,
+                'numero_empleado' => $empleado->numero_empleado,
+                'status' => '1' // Filtrar por estado aprobado
+            ])
             ->all();
 
         $horasReporteGeneral = 0;
@@ -501,6 +506,7 @@ public function actionReporte3($empleado_id)
     return $this->render('reporte', [
         'reporteData' => $reporteData,
         'horasTotales' => $horasTotales,
+        'empleado' => $empleado
     ]);
 }
 

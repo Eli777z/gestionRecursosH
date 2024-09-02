@@ -36,6 +36,7 @@ class ActividadReporteTiempoExtra extends \yii\db\ActiveRecord
             [['actividad'], 'string'],
 
             [['fecha', 'hora_inicio', 'hora_fin', 'actividad'], 'required'],
+            [['status'], 'integer'],
 
             [['reporte_tiempo_extra_id', 'no_horas'], 'integer'],
             [['reporte_tiempo_extra_id'], 'exist', 'skipOnError' => true, 'targetClass' => ReporteTiempoExtra::class, 'targetAttribute' => ['reporte_tiempo_extra_id' => 'id']],
@@ -54,7 +55,8 @@ class ActividadReporteTiempoExtra extends \yii\db\ActiveRecord
             'hora_fin' => 'Hora de finalización',
             'actividad' => 'Actividad',
             'reporte_tiempo_extra_id' => 'Reporte Tiempo Extra ID',
-            'no_horas' => 'Número de horas'
+            'no_horas' => 'Número de horas',
+            'status' => 'Estatus'
         ];
     }
 

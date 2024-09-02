@@ -17,7 +17,7 @@ class ComisionEspecialSearch extends ComisionEspecial
     public function rules()
     {
         return [
-            [['id', 'empleado_id', 'solicitud_id', 'motivo_fecha_permiso_id'], 'integer'],
+            [['id', 'empleado_id', 'solicitud_id', 'motivo_fecha_permiso_id', 'status'], 'integer'],
             [['nombre_jefe_departamento'], 'safe'],
         ];
     }

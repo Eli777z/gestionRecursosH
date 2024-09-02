@@ -36,6 +36,8 @@ class ActividadReporteTiempoExtraGeneral extends \yii\db\ActiveRecord
             [['actividad'], 'string'],
             [['reporte_tiempo_extra_general_id'], 'exist', 'skipOnError' => true, 'targetClass' => ReporteTiempoExtraGeneral::class, 'targetAttribute' => ['reporte_tiempo_extra_general_id' => 'id']],
             [['numero_empleado'], 'validateEmpleadoPertenencia'],
+            [['status'], 'integer'],
+
         ];
     }
 
@@ -50,6 +52,8 @@ class ActividadReporteTiempoExtraGeneral extends \yii\db\ActiveRecord
             'actividad' => 'Actividad',
             'reporte_tiempo_extra_general_id' => 'Reporte Tiempo Extra General ID',
             'no_horas' => 'No Horas',
+            'status' => 'Estatus'
+
         ];
     }
 

@@ -43,81 +43,103 @@ $this->title = 'Cambio de Periodo Vacacional';
                        
 
                         </div>
-                    </div>
-<?php Pjax::begin();?>
+                    </div><?php Pjax::begin();?>
 <?= GridView::widget([
-                        'dataProvider' => $dataProvider,
-                        'filterModel' => $searchModel,
-                        'columns' => [
-                            ['class' => 'yii\grid\SerialColumn'],
-
-                            [
-                                'attribute' => 'fecha_creacion',
-                                'label' => 'Fecha de creación',
-                                'value' => function ($model) {
-                                    return $model->solicitud->fecha_creacion;
-                                },
-                              //  'options' => ['style' => 'width: 30%;'],
-                    
-                            ],
-                            [
-                                'label' => 'Motivo',
-                                'attribute' => 'motivo',
-                                'format' => 'html',
-                                'value' => function ($model) {
-                                    return \yii\helpers\Html::decode($model->motivo);
-                                },
-                                'filter' => false,
-                                'options' => ['style' => 'width: 65%;'],
-                            ],
-                    
-
-                            ['class' => 'hail812\adminlte3\yii\grid\ActionColumn',
-
-    
-        'template' => Yii::$app->user->can('ver-empleados-departamento') || Yii::$app->user->can('ver-empleados-direccion')  ? '{view}' : '{view} {delete}',
-
-   
-        'buttons' => [
-                    
-            'view' => function ($url, $model) {
-                return Html::a('<i class="far fa-eye"></i>', $url, [
-                    'title' => 'Ver solicitud',
-                    'class' => 'btn btn-outline-info btn-sm',
-                    'data-pjax' => "0"
-                ]);
+    'dataProvider' => $dataProvider,
+    'filterModel' => $searchModel,
+    'columns' => [
+        ['class' => 'yii\grid\SerialColumn'],
+        
+        [
+            'attribute' => 'fecha_creacion',
+            'label' => 'Fecha de creación',
+            'value' => function ($model) {
+                return $model->solicitud->fecha_creacion;
             },
-            
-            'delete' => function ($url, $model) {
-                return Html::a('<i class="fas fa-trash"></i>', $url, [
-                    'title' => Yii::t('yii', 'Eliminar'),
-                    'data-confirm' => Yii::t('yii', '¿Estás seguro de que deseas eliminar este elemento?'),
-                    'data-method' => 'post',
-                    'class' => 'btn btn-outline-danger btn-sm'
-                ]);
-            },
-
-           
         ],
-    
-    
-    
-    
-    ],
+        [
+            'label' => 'Motivo',
+            'attribute' => 'motivo',
+            'format' => 'html',
+            'value' => function ($model) {
+                return \yii\helpers\Html::decode($model->motivo);
+            },
+            'filter' => false,
+            'options' => ['style' => 'width: 25%;'],
+        ],
+        [
+            'class' => 'yii\grid\DataColumn',
+            'header' => 'Estatus',
+            'format' => 'raw',
+            'value' => function ($model) {
+                if ($model->status === 1) {
+                    return 'ACTIVO <i class="fa fa-fire-alt" aria-hidden="true" style="color: #2fcf04"></i>';
+                } elseif ($model->status === 0) {
+                    return 'CANCELADO <i class="fa fa-times" aria-hidden="true" style="color: #ea4242"></i>';
+                } else {
+                    return '<i class="fa fa-question" aria-hidden="true" style="color: #6c757d"></i>';
+                }
+            },
+            'contentOptions' => ['class' => 'text-center'],
+            'headerOptions' => ['class' => 'text-center'],
+        ],
+        [
+            'attribute' => 'comentario',
+            'label' => 'Comentario',
+            'format' => 'raw',
+            'value' => function ($model) {
+                if (Yii::$app->user->can('borrar-registros-formatos-incidencias')) {
+                    // Permitir añadir comentario
+                    return Html::beginForm(['guardar-comentario'], 'post', ['data-pjax' => 1])
+                        . Html::textarea("comentario[{$model->id}]", $model->comentario, ['class' => 'form-control'])
+                        . Html::hiddenInput('id', $model->id)
+                        . Html::submitButton('Añadir', ['class' => 'btn btn-success btn-sm float-right mt-1'])
+                        . Html::endForm();
+                } else {
+                    // Solo mostrar el comentario
+                    return Html::encode($model->comentario);
+                }
+            },
+            'headerOptions' => ['class' => 'text-center'],
+            'options' => ['style' => 'width: 25%;'],
+        ],
+        [
+            'class' => 'hail812\adminlte3\yii\grid\ActionColumn',
+            'template' => Yii::$app->user->can('ver-empleados-departamento') || Yii::$app->user->can('ver-empleados-direccion') ? '{view}' : '{view} {restore} {delete}',
+            'buttons' => [
+                'view' => function ($url, $model) {
+                    return Html::a('<i class="far fa-eye"></i>', $url, [
+                        'title' => 'Ver solicitud',
+                        'class' => 'btn btn-outline-info btn-sm',
+                        'data-pjax' => "0"
+                    ]);
+                },
+                'restore' => function ($url, $model) {
+                    return Html::a('<i class="fas fa-check"></i>', $url, [
+                        'title' => Yii::t('yii', 'Activar'),
+                        'data-confirm' => Yii::t('yii', '¿Estás seguro de que deseas activar esta solicitud?'),
+                        'data-method' => 'post',
+                        'class' => 'btn btn-outline-success btn-sm',
+                    ]);
+                },
+                'delete' => function ($url, $model) {
+                    return Html::a('<i class="fas fa-times"></i>', $url, [
+                        'title' => Yii::t('yii', 'Cancelar'),
+                        'data-confirm' => Yii::t('yii', '¿Estás seguro de que deseas cancelar esta solicitud?'),
+                        'data-method' => 'post',
+                        'class' => 'btn btn-outline-danger btn-sm',
+                    ]);
+                },
+            ],
+        ],
     ],
     'summaryOptions' => ['class' => 'summary mb-2'],
     'pager' => [
         'class' => 'yii\bootstrap4\LinkPager',
     ],
-   // 'tableOptions' => ['class' => 'si-style-gridview'],
-     //                                           'rowOptions' => function ($model, $key, $index, $grid) {
-       //                                             return ['class' => 'si-style-gridview'];
-         //                                       },
 ]) ?>
-
-
-
 <?php Pjax::end(); ?>
+
 
 </div>
 <!--.card-body-->
